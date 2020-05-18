@@ -9,7 +9,7 @@ published: 2019-06-03 15:46:08 +0300
 noimage: true
 ---
 
-<h1> The Context</h1>   
+<h2>The Context</h2>   
 
 <p>I had written an engine using a custom ClassLoader. To do that just create a new <a
         href="https://docs.oracle.com/javase/7/docs/api/java/net/URLClassLoader.html">URLClassLoader</a>, load a jar and
@@ -19,13 +19,13 @@ noimage: true
 
 <script src="https://gist.github.com/vepo/492f8cdc4f99ff56173177a0541c93d0.js"></script>
 
-<h1>The Problem </h1>
+<h2>The Problem </h2>
 
 <p>But... We do not have control with the code loaded from an external Jar. That is the problem. So if you want to avoid
     memory leaks the your custom classloader should be released by Garbage Collector. If the loaded code uses JDBC you
     will soon get an OutOfMemoryError and everything will crash! Not good!</p>
 
-<h1>The reason</h1>
+<h2>The reason</h2>
 <p>Whe JDBC loads the driver they assumes that you will use only one ClassLoader, so it create a reference to your
     ClassLoader. This reference prevents the Garbage Collector from removing your custom ClassLoader from the memory.
 </p>
@@ -35,7 +35,7 @@ noimage: true
 <p>So, even if you create your ClassLoader, execute your code and close it. The total of loaded classes will never
     decrease.</p>
 
-<h1>How to solve?</h1>
+<h2>How to solve?</h2>
 
 <p>To solve this problem we have to unregister all JDBC drivers just after the execution, than close URLClassLoader.</p>
 
@@ -45,7 +45,7 @@ noimage: true
 
 <img src="https://thepracticaldev.s3.amazonaws.com/i/xzaa7ftdokc0078tg9n5.png" />
 
-<h1>Possible problems</h1>
+<h2>Possible problems</h2>
 
 <ol>
     <li>If the executed code create any Thread, the URLClassLoader is not eligible for Garbage Collector.</li>
