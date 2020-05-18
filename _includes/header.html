@@ -2,11 +2,10 @@
 	<nav class="navbar navbar-default navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<button class="navbar-toggle collapsed" type="button"
-					data-toggle="collapse" data-target="#navbar-collapse-menu">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" href="/"> <i class="fa fa-barcode"></i>
 				</a>
@@ -15,44 +14,43 @@
 				<ul class="nav navbar-nav">
 
 					{% for item in site.data.settings.menu %}
-						<!-- If has submenues -->
-						{% if item.submenu %}
-						<li class="dropdown">
-							<a class="dropdown-toggle"	data-toggle="dropdown" href="#">
-								{{item.name}}
-								<span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu">
-								{% for subitem in item.submenu %}
-									<li>
-										<a href="{{subitem.link}}">
-											{% if subitem.icon %}
-											<i class="fa fa-inverse fa-{{subitem.icon}} fa-2x"></i>
-											{% endif %}
-											{{subitem.name}}
-										</a>
-									</li>
-								{% endfor %}
-								</ul>
+					<!-- If has submenues -->
+					{% if item.submenu %}
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							{{item.name}}
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							{% for subitem in item.submenu %}
+							<li>
+								<a href="{{subitem.link}}">
+									{% if subitem.icon %}
+									<i class="fa fa-inverse fa-{{subitem.icon}} fa-2x"></i>
+									{% endif %}
+									{{subitem.name}}
+								</a>
 							</li>
-						{% else %}
-							<li><a href="{{item.link}}">{{item.name}}</a></li>
-						{% endif %}
+							{% endfor %}
+						</ul>
+					</li>
+					{% else %}
+					<li><a href="{{item.link}}">{{item.name}}</a></li>
+					{% endif %}
 					{% endfor %}
 				</ul>
 			</div>
 		</div>
 	</nav>
-		{% if page.noimage %}
-		{% elsif page.cover_image %}
-		<img
-			alt="{{ page.title }}"
-			src="{{ page.cover_image }}" class="img-responsive">
-		{% else %}
-		<img
-			alt="{{ page.title }}"
-			src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
-		{% endif %}
+	{% if page.noimage %}
+	<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
+	{% elsif page.cover_image %}
+	<div class="cover-image">
+		<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
+	</div>
+	{% else %}
+	<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
+	{% endif %}
 
 	<div class="jumbotron  clearfix">
 
