@@ -34,23 +34,22 @@
 			<div>Latest update {{ page.date | date: '%B %d, %Y' }}</div>
 		</div>
 
-
-		<p><strong>Related posts :</strong></p>
-		<ul>
+		<div class="related-posts">
+			<div class="related-post-header">Related posts</div>
 			{% for allpost in site.posts %}
 			{% for tag in page.tags %}
 			{% if allpost.tags contains tag and allpost.id != page.id %}
-			<li>
+			<div class="related-post-item">
 				<a href="{{ allpost.url }}">
 					{{ allpost.title }}
 				</a>
-			</li>
+			</div>
 			{% break %}
 			{% endif %}
 			{% endfor %}
 			{% endfor %}
-		</ul>
-		{% endif %}
+			{% endif %}
+		</div>
 
 		{% include disqus.html %}
 	</div>
