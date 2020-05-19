@@ -1,3 +1,5 @@
+require 'liquid'
+
 module GetDomainFilter 
     def get_domain(input)
         url = input.start_with?('http') ? input : "http://#{input}"
