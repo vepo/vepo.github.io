@@ -8,9 +8,9 @@
 
 		{% if page.id %}
 		<p>
-			<strong>{{ page.published | date: '%B %d, %Y' }}</strong> ( last updated :
-			{{ page.date | date: '%B %d, %Y' }} )
-			<br>
+			{% if page.publish_date %}
+			<strong>{{ page.publish_date | date: '%B %d, %Y' }}</strong>
+			{% endif %}
 			{% for tag in page.tags %}
 			<a class="label label-default" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
 			{% endfor %}
@@ -24,7 +24,7 @@
 		{% endif %}
 		{% if page.original %}
 		<div>
-			Post originally published on <a href="{{ page.original }}">{{ page.original_domain }}</a>.
+			Post originally published on <a href="{{ page.original }}">{{ page.original | domain }}</a>.
 		</div>
 		{% endif %}
 		<hr>
@@ -35,8 +35,9 @@
 
 		{% if page.id %}
 		<div class="published">
-			<div>Originally published {{ page.published | date: '%B %d, %Y' }}</div>
-			<div>Latest update {{ page.date | date: '%B %d, %Y' }}</div>
+			{% if page.publish_date %}
+			<div>Originally published {{ page.publish_date| date: '%B %d, %Y' }}</div>
+			{% endif %}
 		</div>
 
 		<div class="related-posts">
@@ -57,6 +58,7 @@
 		</div>
 
 		{% include disqus.html %}
+		{% include twitter.html %}
 	</div>
 	{% include footer.html %}
 	{% include analytics.html %}
