@@ -3,7 +3,7 @@ module GetDomainFilter
         url = "http://#{input}" unless input.start_with?('http')
         uri = URI.parse(url)
         host = uri.host.downcase
-        host.start_with?('www.') ? "#{host[4..-1]}" : "#{host}"
+        return host.start_with?('www.') ? "#{host[4..-1]}" : "#{host}"
     end
 end
 
