@@ -34,8 +34,10 @@
   {% if page.id %}
   <!-- if it's an article -->
   <meta property="og:type" content="article" />
-  <meta property="article:published_time" content="{{ page.published | date_to_xmlschema }}" />
-  <meta property="article:modified_time" content="{{ page.date | date_to_xmlschema }}" />
+  {% if page.publish_date %}
+  <meta property="article:published_time" content="{{ page.publish_date | date_to_xmlschema }}" />
+  <meta property="article:modified_time" content="{{ page.publish_date | date_to_xmlschema }}" />
+  {% endif %}
 
   <meta content="{{site.author}}" property="article:author">
 
@@ -55,7 +57,7 @@
 {"@context": "http://schema.org",
 "@type": "BlogPosting",
 "headline": "{{page.title}}",
-"datePublished": "{{ page.published | date_to_xmlschema }}",
+"datePublished": "{{ page.publish_date | date_to_xmlschema }}",
   {% if page.description %}
 "description": "{{page.description}}",
   {% else %}
