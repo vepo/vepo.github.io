@@ -1,6 +1,6 @@
 module Jekyll
     module GetDomainFilter 
-        def get_domain(input)
+        def getdomain(input)
             url = input.start_with?('http') ? input : "http://#{input}"
             uri = URI.parse(url)
             host = uri.host.downcase
