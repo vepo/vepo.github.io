@@ -5,7 +5,7 @@ module Jekyll
     class GithubTag < Liquid::Tag
         def initialize(tag_name, repo, tokens)
             super
-            @repo = repo
+            @repo = repo.strip
         end
 
         def render(context)

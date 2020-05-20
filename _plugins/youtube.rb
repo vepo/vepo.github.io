@@ -5,7 +5,7 @@ module Jekyll
     class YoutubeTag < Liquid::Tag
         def initialize(tag_name, youtube_id, tokens)
             super
-            @youtube_id = youtube_id
+            @youtube_id = youtube_id.strip
         end
 
         def render(context)
