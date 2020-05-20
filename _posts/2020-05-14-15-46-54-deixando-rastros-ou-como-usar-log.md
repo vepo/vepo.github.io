@@ -10,7 +10,7 @@ original: https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg
 comments: true
 ---
 
-_Esse post é necessário para outro que vou escrever.... Ele não é ol_ 🤔
+_Esse post é necessário para outro que vou escrever...._ 🤔
 
 Log é uma ferramenta muito importante. Se você é apenas um desenvolvedor, talvez não saiba a utilidade dele, mas com certeza que cuida da operação do seu software sabe.
 
