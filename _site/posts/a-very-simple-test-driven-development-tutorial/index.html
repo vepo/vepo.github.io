@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@koint">
+  <meta name="twitter:creator" content="@koint">
+
+  <!-- SEO stuff -->
+  <title>A very simple Test Driven Development Tutorial</title>
+  <meta property="og:title" content="A very simple Test Driven Development Tutorial" />
+  <meta name="twitter:title" content="A very simple Test Driven Development Tutorial">
+
+
+  
+  <meta name="description" content="Some small tips for who wants to beggan with TDD" />
+  <meta property="og:description" content="Some small tips for who wants to beggan with TDD" />
+  <meta name="twitter:description" content="Some small tips for who wants to beggan with TDD">
+
+  
+  <link rel="canonical" href="/posts/a-very-simple-test-driven-development-tutorial/" />
+  <meta property="og:url" content="/posts/a-very-simple-test-driven-development-tutorial/" />
+  <meta name="twitter:url" content="/posts/a-very-simple-test-driven-development-tutorial/">
+
+  <meta property="og:site_name" content="Victor Osório's Tech Stuffs" />
+  <meta property="og:image" content="/assets/images//posts/a-very-simple-test-driven-development-tutorial/top.jpg" />
+  <meta name="twitter:image" content="/assets/images//posts/a-very-simple-test-driven-development-tutorial/top.jpg">
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2019-07-24T09:32:22-03:00" />
+  <meta property="article:modified_time" content="2019-07-24T09:32:22-03:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Testing" property="article:tag">
+  
+  <meta content="Java" property="article:tag">
+  
+  <meta content="Test" property="article:tag">
+  
+  <meta content="TDD" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+{"@context": "http://schema.org",
+"@type": "BlogPosting",
+"headline": "A very simple Test Driven Development Tutorial",
+"datePublished": "2019-07-24T09:32:22-03:00",
+  
+"description": "Some small tips for who wants to beggan with TDD",
+  
+"url": "/posts/a-very-simple-test-driven-development-tutorial/"}</script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+	<div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-barcode"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Presentations
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">About</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Follow me
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	<div class="cover-image">
+		<img alt="A very simple Test Driven Development Tutorial" src="https://thepracticaldev.s3.amazonaws.com/i/jkocbutap8qvhdod7jbv.jpg" class="img-responsive">
+	</div>
+	
+
+	<div class="jumbotron  clearfix">
+
+		<h1 class="text-center">A very simple Test Driven Development Tutorial</h1>
+
+	</div>
+</div>
+	<div class="container">
+
+		
+		<p>
+			
+			<strong>July 24, 2019</strong>
+			
+			
+			<a class="label label-default" href="/tags/#testing">Testing</a>
+			
+			<a class="label label-default" href="/tags/#java">Java</a>
+			
+			<a class="label label-default" href="/tags/#test">Test</a>
+			
+			<a class="label label-default" href="/tags/#tdd">TDD</a>
+			
+		</p>
+		
+		
+		<div>
+			Post originally published on <a href="https://dev.to/vepo/a-very-simple-test-driven-development-tutorial-3309">dev.to</a>.
+		</div>
+		
+		<hr>
+		
+
+		<p>Now I’m addicted with Test Driven Development, but… Somewhere in the past I thought it was a bad idea. Now I can’t develop any code without this technique.</p>
+
+<p>In this post I will present some steps to starting using TDD in your daily work.</p>
+
+<h1 id="tips">Tips</h1>
+
+<h2 id="tip-1-know-which-tools-you-must-use">Tip 1: Know which tools you must use</h2>
+
+<p>Which language you use? I work mostly using Java and for many years I never heard about Maven and how integrate Maven with JUnit. So JUnit without Maven or Gradle or any other building tool is nothing! <em>Nobody in the company I was working kwen Maven or any building tool… It was some kind of amateur craftsmanship software</em>.</p>
+
+<p>When I was introduced to Maven, after some years using Gradle by my own, I only asked: <em>“Ok. It make the build, run the tests and make the application deployable?</em>”. That was I was looking for! 😀</p>
+
+<p>When start a new project make a roadmap:</p>
+
+<ol>
+  <li>Setup building tool: <em>Maven or Gradle for Java</em></li>
+  <li>Configure the Testing tool: <em>Why not using JUnit 5</em></li>
+  <li>Create your first Test with an assert and check if works!</li>
+</ol>
+
+<h2 id="tip-2-know-the-tdd-cycles">Tip 2: Know the TDD Cycles</h2>
+
+<p>Red, Green, Refactor! This makes senses? No, so <a href="https://blog.cleancoder.com/uncle-bob/2014/12/17/TheCyclesOfTDD.html">read about it!</a> This is the way you will develop using TDD. Write a falling test, write the code for make the test works and refactor it.</p>
+
+<p>Until the test works, do not worry about replicated code, or bad smells, or if your code is good and beautiful! Just solve the problem. This is not the moment for that.</p>
+
+<p>Make small steps. Do not worry about write the full feature before tests. Test every step of your code. If you should save a entity on your database, first save it, then test every kind of input for this entity, then write all business rules. It is a waste of time write the full feature and then tests. Making small steps you can fix an error before it gets bigger, and you make sure that the code you wrote a hour ago works well.</p>
+
+<h2 id="tip-3-validate-your-code">Tip 3: Validate your code</h2>
+
+<p>What means pass the test? For a development team a work with, it means giving a Coverage Report with at least 80%! Is that correct? No! You should validate what you have done.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">givenUser</span><span class="o">();</span>
+<span class="n">userService</span><span class="o">.</span><span class="na">createUser</span><span class="o">(</span><span class="n">user</span><span class="o">);</span> <span class="c1">// here I have 100% of Code Coverage</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">list</span><span class="o">();</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">users</span><span class="o">).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="c1">// But I do not know if it was save</span>
+                 <span class="o">.</span><span class="na">allMatch</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">passwordIsEncrypted</span><span class="o">);</span> <span class="c1">// And if the password is correctly encrypted</span>
+</code></pre></div></div>
+
+<h2 id="tip-4-know-good-test-libraries">Tip 4: Know Good Test Libraries</h2>
+
+<p>Mockito, AssertJ, To String Verifier, etc… This will help you. Trust in me! Do not reinvent a library, reuse. There is a lot of good libraries for tests.</p>
+
+<h2 id="tip-5-organize-your-code-for-testing">Tip 5: Organize your code for testing</h2>
+
+<p>Write your production code thinking who can you test it.</p>
+
+<p>Imagine that you have a code with a lot of Services Consumers and Providers (Kafka, <em>MQ, Aws</em>, Google*, etc..). Every time you create a new producer or consumer, it should be created by the same piece of code! When you do it, it is easy to create a Mock for this class. If you have a KafkaClientFactory, you do need to worry about a new KafkaProducer, just use Mockito to mock KafkaClientFactory and be happy</p>
+
+<p>How to build a Singleton?</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeSingleton</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">instance</span> <span class="nc">AtomicReference</span><span class="o">&lt;</span><span class="nc">SomeSingleton</span><span class="o">&gt;</span> <span class="n">ref</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">SomeSingleton</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="na">updateAndGet</span><span class="o">(</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nf">isNull</span><span class="o">(</span><span class="n">e</span><span class="o">)</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">SomeSingleton</span><span class="o">()</span> <span class="o">:</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Is this implementation good? No! Why? If I want to cleanup this singleton and recreated? How can I access the field <code class="highlighter-rouge">ref</code>? You can’t! You have to options, or you let the field <code class="highlighter-rouge">ref</code> as a <code class="highlighter-rouge"><span class="k">package</span> <span class="n">private</span></code> or you create a cleanup method as package private, and create a SomeSingletonHelper in the same package as a code test to reset all values.</p>
+
+<p>The intention is thinking, how can I test my code when you are writing the code.</p>
+
+<h2 id="tip-6-know-the-input-and-output">Tip 6: Know the input and output</h2>
+
+<p>When creating tests, you should known with type of input your code will received, and which type of output should provide. Use known inputs, not only auto-generated. This helps you to make sure its working</p>
+
+<h2 id="tip-7-use-real-inputs">Tip 7: Use real inputs</h2>
+
+<p>Use real inputs, not only generated/dummy inputs. Found a production bug? Get what input produces the bug, create a test with it!</p>
+
+<h2 id="tip-8-testing-language">Tip 8: Testing language</h2>
+
+<p>Create a Test DSL for your code.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+<span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">randomString</span><span class="o">());</span>
+<span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">randomString</span><span class="o">());</span>
+<span class="n">userService</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">allUsers</span> <span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">list</span><span class="o">();</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">allUsers</span><span class="o">).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>Compare the code above with the code bellow</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userService</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">givenRandonUser</span><span class="o">())</span>
+
+<span class="n">assertThat</span><span class="o">(</span><span class="n">thenAllUsers</span><span class="o">()).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>Build a High Level <a href="https://en.wikipedia.org/wiki/Given-When-Then">Given-When-Then</a> library for your code</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Testing is not a waste of time! When you had never done TDD you will think that, but with TDD you use better your time.</p>
+
+
+
+		
+		<div class="published">
+			
+			<div>Originally published July 24, 2019</div>
+			
+		</div>
+
+		<div class="related-posts">
+			<div class="related-post-header">Related posts</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="related-post-item">
+				<a href="/posts/jakarta-ee-e-microprofile-io/">
+					Jakarta EE e Microprofile.io
+				</a>
+			</div>
+			
+			
+			
+			
+			
+			
+			<div class="related-post-item">
+				<a href="/posts/escolhendo-uma-implementacao-jakarta-ee-microprofile-io/">
+					Escolhendo uma implementação Jakarta EE & Microprofile.io
+				</a>
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="related-post-item">
+				<a href="/posts/thoughts-on-tdd-tests-and-requirements/">
+					Tests and Requirements
+				</a>
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			<div class="related-post-item">
+				<a href="/posts/java-memory-leak-for-jdbc/">
+					Java Memory Leak for JDBC
+				</a>
+			</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		</div>
+
+		
+		<script>window.twttr = (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+      t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  
+    t._e = [];
+    t.ready = function(f) {
+      t._e.push(f);
+    };
+  
+    return t;
+  }(document, "script", "twitter-wjs"));</script>
+	</div>
+	<footer class="footer">
+	<ul class="footer-links">
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+	</ul>
+</footer>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id="></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', '');
+</script>
+</body>
+
+</html>
