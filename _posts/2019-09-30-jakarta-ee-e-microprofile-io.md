@@ -3,7 +3,6 @@ title: "Jakarta EE e Microprofile.io"
 description: "Introdução as especificações Jakarta EE e Microprofile.io"
 tags: [Jakarta-EE, Java-EE, Java, Framework]
 series: Especificações Jakarta EE & Microprofile.io
-layout: default
 comments: true
 publish_date: 2019-09-30 09:44:36 +0300
 original: "https://dev.to/vepo/jakarta-ee-e-microprofile-io-4gbg"
