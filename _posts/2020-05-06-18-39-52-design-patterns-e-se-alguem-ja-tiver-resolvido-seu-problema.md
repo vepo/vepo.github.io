@@ -84,7 +84,7 @@ Ok. O mundo mudou desde 2006. Mas existem outros padrões que devemos seguir?
 
 Sim! 
 
-Caso você trabalhe com microserviços? Obrigatoriamente você tem que conhecer os padrões de microserviços. Vá em [microservices.io](https://microservices.io/patterns/index.html) e leia.
+Caso você trabalhe com Microsserviços? Obrigatoriamente você tem que conhecer os padrões de Microsserviços. Vá em [microservices.io](https://microservices.io/patterns/index.html) e leia.
 
 Caso você trabalhe com Java? Existem alguns padrões do extinto Java EE, agora Jakarta EE. Eu falo de um deles aqui: {% youtube iDGgNNLYaO4 %}
 

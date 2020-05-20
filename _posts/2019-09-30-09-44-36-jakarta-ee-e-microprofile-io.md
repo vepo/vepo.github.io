@@ -47,7 +47,7 @@ cover_image: "https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jp
 
 <p>Para isso foi proposto um novo conjunto de especificações o <a href="https://microprofile.io/">Microprofile.io</a>.
     Este seria focado em implementar os padrões de projetos para Cloud Native e <a
-        href="https://microservices.io/">Microserviços</a>. Mas em termos de gerenciamento, estas especificações não
+        href="https://microservices.io/">Microsserviços</a>. Mas em termos de gerenciamento, estas especificações não
     seriam <i>Specification First</i>, mas <i>Coding First</i>. Assim os padrões que já era implementados por um ou mais
     framework seriam homogeinizados e quiça melhorados. O projeto não seria coordenado pela Oracle, mas pela <a
         href="https://twitter.com/EclipseFdn">Eclipse Foundation</a>. Com o padrão de governança da Eclise Fdn, haveria
@@ -114,7 +114,7 @@ cover_image: "https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jp
 <h3>Especificações</h3>
 
 <p>Esse post é uma introdução a uma série que iniciarei detalhando as especificações Jakarta EE e Microprofile.io. Com
-    isso gostaria de compartilhar como é fácil desenvolver microserviços Java robustos! Segue a lista de Especificações
+    isso gostaria de compartilhar como é fácil desenvolver Microsserviços Java robustos! Segue a lista de Especificações
     que planejo abranger:
 <ul>
     <li>JSR 365 – Contexts and Dependency Injection (CDI) 2.0</li>

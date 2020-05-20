@@ -12,7 +12,7 @@ comments: true
 
 O primeiro passo ao se desenvolver uma aplicação Jakarta EE ou Microprofile.io é escolher qual será a implementação que você irá utilizar. Ou o mais conhecido Servidor de Aplicação.
 
-As implementações de Microprofile.io são mais leves que as implementações de Jakarta EE. Isso acontece porque o número de especificações implementadas por um servidor Jakarta EE é muito maior do que o de Microprofile.io. Logo, se você deseja implementar um simples microserviços, escolher um [WildFly](https://wildfly.org/) seria como escolher um canhão pra matar uma mosca.
+As implementações de Microprofile.io são mais leves que as implementações de Jakarta EE. Isso acontece porque o número de especificações implementadas por um servidor Jakarta EE é muito maior do que o de Microprofile.io. Logo, se você deseja implementar um simples Microsserviços, escolher um [WildFly](https://wildfly.org/) seria como escolher um canhão pra matar uma mosca.
 
 # Starters
 
