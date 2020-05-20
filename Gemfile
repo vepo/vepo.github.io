@@ -14,8 +14,6 @@ gem 'jekyll'
 
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima","2.5.1"
-gem "jekyll-sitemap", "1.4.0"
-gem 'jekyll-paginate', "1.1.0"
 
 gem 'rest-client'
 gem 'json'
