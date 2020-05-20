@@ -5,7 +5,7 @@ description: Um Sênior precisa saber usar log... minto! Qualquer desenvolvedor 
 series: Coisas que todo Sênior deve saber
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/l153dd7u13kvpovalysz.jpg
 tags: [Desenvolvimento de Software, logging, Java, SLF4J]
-published: 2020-05-14 12:46:54 +0300
+publish_date: 2020-05-14 12:46:54 +0300
 original: https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg
 comments: true
 ---
