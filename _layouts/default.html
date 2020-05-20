@@ -12,7 +12,7 @@
 			<strong>{{ page.publish_date | date: '%B %d, %Y' }}</strong>
 			{% endif %}
 			{% for tag in page.tags %}
-			<a class="label label-default" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
+			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
 			{% endfor %}
 		</p>
 		{%if page.github %}
@@ -30,8 +30,11 @@
 		<hr>
 		{% endif %}
 
+		{% include serie.html %}
+
 		{{ content }}
 
+		{% include serie.html %}
 
 		{% if page.id %}
 		<div class="published">
@@ -47,7 +50,11 @@
 			{% if allpost.tags contains tag and allpost.id != page.id %}
 			<div class="related-post-item">
 				<a href="{{ allpost.url }}">
+					{% if allpost.series %}
+					{{ allpost.series }}: {{ allpost.title }}
+					{% else %}
 					{{ allpost.title }}
+					{% endif %}
 				</a>
 			</div>
 			{% break %}
@@ -62,6 +69,7 @@
 	</div>
 	{% include footer.html %}
 	{% include analytics.html %}
+	{% include adjust-image.html %}
 </body>
 
 </html>

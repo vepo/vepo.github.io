@@ -10,11 +10,11 @@ original: "https://dev.to/vepo/construindo-softwares-resilientes-3d65"
 comments: true
 ---
 
-_- Já ouviu falar de **eXtreme Go Horse (XGH)**?_ 
-_- Não?!_ 🙄 
-_- Mas você pratica **XGH**?_ 🤨
-_- Não?_ 
-_- Ainda bem!_ 😀
+_- Já ouviu falar de **eXtreme Go Horse (XGH)**?_   
+_- Não?!_ 🙄   
+_- Mas você pratica **XGH**?_ 🤨  
+_- Não?_   
+_- Ainda bem!_ 😀  
 
 **XGH** é uma piada que gosto muito. Espero que você não o pratique. Mas coloquei ele na roda por seu exato oposto. Um Sênior deve construir softwares estáveis. E para se construir software estáveis você tem que ir pro extremo oposto do **XGH**. Devemos construir software resilientes.
 

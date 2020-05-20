@@ -32,10 +32,13 @@ Here we generate all the tags.
 {% endfor %}
 
 <br />
-
-{% for tag in tags %}
-<a class="label label-success" href="#{{ tag | slugify }}"> {{ tag }} </a> &nbsp;
-{% endfor %}
+<div class="tag-container">
+  {% for tag in tags %}
+  <div>
+    <a class="label label-default {{ tag | slugify }}" href="#{{ tag | slugify }}"> {{ tag }} </a>
+  </div>
+  {% endfor %}
+</div>
 {% for tag in tags %}
 <h4 id="{{ tag | slugify }}">{{ tag }}</h4>
 <ul>

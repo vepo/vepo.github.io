@@ -1,6 +1,3 @@
-require 'rest-client'
-require 'json'
-
 module Jekyll
     class YoutubeTag < Liquid::Tag
         def initialize(tag_name, youtube_id, tokens)
