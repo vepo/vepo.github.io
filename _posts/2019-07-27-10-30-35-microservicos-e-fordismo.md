@@ -4,6 +4,7 @@ published: true
 description: 
 tags: [Citações, Microserviços, Desenvolvimento]
 comments: true
+publish_date: 2019-07-27 10:30:35 +0300
 original: "https://dev.to/vepo/microservicos-e-fordismo-1fhp"
 cover_image: https://thepracticaldev.s3.amazonaws.com/i/4ld5ndu9osmfj71y27v0.jpg
 ---
