@@ -5,11 +5,32 @@ module Jekyll
     class GithubTag < Liquid::Tag
         def initialize(tag_name, repo, tokens)
             super
-            @repo = repo.strip
+            repo = repo.start_with?('https://github.com/') ? repo[19..-1] : repo
+            github_user = ENV["GITHUB_USER"]
+            github_password = ENV["GITHUB_PASSWORD"]
+            auth_key = Base64.strict_encode64(github_user + ":" + github_password)
+            @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}", {:authorization => "Basic #{auth_key}"}))
+            puts @repo_info
         end
 
         def render(context)
-            "<iframe src=\"https://github.com/#{@repo}\" frameBorder=\"0\" width=\"100%\" height=\"512px\"></iframe>"
+            output = <<~EOS
+            <div class="github-repo">
+                <h2>
+                    <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+                    <img class="user" src="#{@repo_info["owner"]["avatar_url"]}" loading="lazy" />
+                    <span class="url">
+                        <a href="https://github.com/#{@repo_info["owner"]["login"]}">
+                            #{@repo_info["owner"]["login"]}
+                        </a> 
+                        / 
+                        <a href="https://github.com/#{@repo_info["owner"]["login"]}/#{@repo_info["name"]}">
+                            #{@repo_info["name"]}
+                        </a>
+                    </span>
+                </h2>
+            </div>
+            EOS
         end
     end
 end
