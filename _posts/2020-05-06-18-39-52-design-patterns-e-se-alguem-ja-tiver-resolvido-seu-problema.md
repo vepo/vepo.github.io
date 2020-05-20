@@ -86,7 +86,9 @@ Sim!
 
 Caso você trabalhe com Microsserviços? Obrigatoriamente você tem que conhecer os padrões de Microsserviços. Vá em [microservices.io](https://microservices.io/patterns/index.html) e leia.
 
-Caso você trabalhe com Java? Existem alguns padrões do extinto Java EE, agora Jakarta EE. Eu falo de um deles aqui: {% youtube iDGgNNLYaO4 %}
+Caso você trabalhe com Java? Existem alguns padrões do extinto Java EE, agora Jakarta EE. Eu falo de um deles aqui: 
+
+{% youtube iDGgNNLYaO4 %}
 
 # Conclusão
 
