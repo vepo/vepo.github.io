@@ -2,7 +2,7 @@
 title: Design Patterns. E se alguém já tiver resolvido seu problema?
 published: true
 description: Todo Sênior deve conhecer ao menos um Padrão de Projeto. Aqui apresento o que são e como um deles me ajudou em 2006.
-tags: Desenvolvimento, Design Patterns, Padrões de Projeto, Clean Code
+tags: [Desenvolvimento de Software, Design Patterns, Padrões de Projeto, Clean Code]
 series: Coisas que todo Sênior deve saber
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/6dnvy0nb4j8aj57f3xs3.jpg
 publish_date: 2020-05-06 15:39:52 +0300
