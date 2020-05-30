@@ -52,16 +52,17 @@
 			</div>
 		</div>
 	</nav>
-	{% if page.noimage %}
-	<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
-	{% elsif page.cover_image %}
-	<div class="cover-image">
-		<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
+	<div class="cover-header">
+		{% if page.noimage %}
+		<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
+		{% elsif page.cover_image %}
+		<div class="cover-image">
+			<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
+		</div>
+		{% else %}
+		<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
+		{% endif %}
 	</div>
-	{% else %}
-	<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
-	{% endif %}
-
 	<div class="jumbotron clearfix">
 		<h1 class="text-center">
 			{% if page.series %}
