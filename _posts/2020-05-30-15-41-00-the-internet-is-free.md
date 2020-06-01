@@ -7,7 +7,7 @@ cover_image: "https://miro.medium.com/max/1400/0*1UUT4amZD5QKtBFj.jpg"
 series: A Sociedade Tecnológica no Século XXI
 comments: true
 publish_date: 2020-05-30 15:41:00 +0300
-original: "https://dev.to/vepo/anatomia-de-um-topico-25da"
+original: "https://medium.com/@vepo/the-internet-is-free-d066ab122a27"
 ---
 
 Há uma máxima que diz em Inglês "A Internet é Livre". É engraçado como em Inglês a palavra Livre é a mesma de Gratuita e muitos prefeririam uma Internet Gratuita. Vou descrever o que significa uma internet livre e o porque liberdade é melhor que gratuidade.
