@@ -52,21 +52,23 @@
 			</div>
 		</div>
 	</nav>
-	<div class="title">
-		{% if page.series %}
-		<div class="serie-title">{{ page.series}}</div>
-		{% endif %}
-		{{ page.title }}
-	</div>
-	<div class="cover-header">
-		{% if page.noimage %}
-		<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
-		{% elsif page.cover_image %}
-		<div class="cover-image">
-			<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
+	<div class="container">
+		<div class="title">
+			{% if page.series %}
+			<div class="serie-title">{{ page.series}}</div>
+			{% endif %}
+			{{ page.title }}
 		</div>
-		{% else %}
-		<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
-		{% endif %}
+		<div class="cover-header">
+			{% if page.noimage %}
+			<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
+			{% elsif page.cover_image %}
+			<div class="cover-image">
+				<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
+			</div>
+			{% else %}
+			<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
+			{% endif %}
+		</div>
 	</div>
 </div>
