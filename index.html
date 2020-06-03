@@ -6,7 +6,7 @@ comments: true
 ---
 
 <!-- Pagination links -->
-<div>
+<div class="pagination">
 	{% if paginator.previous_page %}
 	<a href="{{ paginator.previous_page_path }}">
 		Anterior
@@ -36,9 +36,11 @@ comments: true
 			{% endif %}
 			<h6 class="list-group-item-heading">{{ post.publish_date | date: '%B %d, %Y' }}</h6>
 		</a>
-		{% for tag in post.tags %}
-		<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
-		{% endfor %}
+		<div class="tag-container">
+			{% for tag in post.tags %}
+			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
+			{% endfor %}
+		</div>
 		{% if post.noimage %}
 		{% else %}
 		<div class="cover-image">
@@ -52,7 +54,7 @@ comments: true
 </div>
 
 <!-- Pagination links -->
-<div>
+<div class="pagination">
 	{% if paginator.previous_page %}
 	<a href="{{ paginator.previous_page_path }}">
 		Previous

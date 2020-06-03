@@ -52,6 +52,12 @@
 			</div>
 		</div>
 	</nav>
+	<div class="title">
+		{% if page.series %}
+		<div class="serie-title">{{ page.series}}</div>
+		{% endif %}
+		{{ page.title }}
+	</div>
 	<div class="cover-header">
 		{% if page.noimage %}
 		<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
@@ -62,13 +68,5 @@
 		{% else %}
 		<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
 		{% endif %}
-	</div>
-	<div class="jumbotron clearfix">
-		<h1 class="text-center">
-			{% if page.series %}
-			{{ page.series}}:
-			{% endif %}
-			{{ page.title }}
-		</h1>
 	</div>
 </div>
