@@ -1,5 +1,6 @@
 ---
 title: The Internet is FREE!
+permalink: /posts/the-internet-is-free
 published: true
 description: Um breve histórico sobre a liberdade e valor dos serviços de Internet.
 tags: [Internet, Tecnologia, Jacques Ellul, Sociedade]

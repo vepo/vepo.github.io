@@ -1,5 +1,6 @@
 ---
 title: Construindo softwares resilientes
+permalink: /posts/construindo-software-resilientes
 published: true
 description: Um Sênior de Verdade sabe construir software resilientes! Mas o que significa um Software Resiliente?
 tags: [Desenvolvimento de Software, Programação, TDD, Carreira]

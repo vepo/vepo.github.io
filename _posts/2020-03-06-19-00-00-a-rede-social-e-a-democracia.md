@@ -1,5 +1,6 @@
 ---
 title: A Rede Social e a Democracia
+permalink: /posts/a-rede-social-e-a-democracia
 published: true
 description: Como o Facebook pode ameaçar a democracia
 tags: [Facebook, Jacques Ellul, Democracia, Man In The Middle Attack, Graph API]

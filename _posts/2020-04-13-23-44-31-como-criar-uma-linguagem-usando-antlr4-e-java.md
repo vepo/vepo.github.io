@@ -1,5 +1,6 @@
 ---
 title: Como criar uma linguagem usando ANTLR4 e Java
+permalink: /posts/como-criar-uma-linguagem-usando-antlr4-e-java
 published: true
 description: Nesse post ensinarei como criar uma linguagem, não de programação, usando ANTLR4 em Java.
 tags: [Java, Parser, ANTLR4, Tutorial]

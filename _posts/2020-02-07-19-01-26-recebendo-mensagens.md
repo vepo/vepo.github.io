@@ -1,5 +1,6 @@
 ---
 title: Recebendo Mensagens
+permalink: /posts/recebendo-mensagens
 published: true
 description: Exemplo de como receber uma mensagem para um broker Kafka
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]

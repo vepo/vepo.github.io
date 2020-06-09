@@ -1,5 +1,6 @@
 ---
 title: Deixando rastros, ou como usar log
+permalink: /posts/deixando-rastros-ou-como-usar-log
 published: true
 description: Um Sênior precisa saber usar log... minto! Qualquer desenvolvedor precisar saber usar log. Aqui apresento como usar o SLF4J em Java.
 series: Coisas que todo Sênior deve saber

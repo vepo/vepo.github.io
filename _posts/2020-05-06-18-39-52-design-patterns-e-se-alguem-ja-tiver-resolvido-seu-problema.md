@@ -1,5 +1,6 @@
 ---
 title: Design Patterns. E se alguém já tiver resolvido seu problema?
+permalink: /posts/design-patterns-e-se-alguem-ja-tiver-resolvido-seu-problema
 published: true
 description: Todo Sênior deve conhecer ao menos um Padrão de Projeto. Aqui apresento o que são e como um deles me ajudou em 2006.
 tags: [Desenvolvimento de Software, Design Patterns, Padrões de Projeto, Clean Code]

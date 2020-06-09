@@ -1,5 +1,6 @@
 ---
 title: "Jakarta EE e Microprofile.io"
+permalink: /posts/jakarta-ee-e-microprofile-io
 description: "Introdução as especificações Jakarta EE e Microprofile.io"
 tags: [Jakarta-EE, Java-EE, Java, Framework]
 series: Especificações Jakarta EE & Microprofile.io

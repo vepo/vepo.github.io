@@ -1,5 +1,6 @@
 ---
 title: Microsserviços e Fordismo
+permalink: /posts/microsservicos-e-fordismo
 published: true
 description: 
 tags: [Citações, Microsserviços, Desenvolvimento]

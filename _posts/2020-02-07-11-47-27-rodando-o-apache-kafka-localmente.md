@@ -1,5 +1,6 @@
 ---
 title: Rodando o Apache Kafka localmente
+permalink: /posts/rodando-o-apache-kafka-localmente
 published: true
 description: Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows.
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]

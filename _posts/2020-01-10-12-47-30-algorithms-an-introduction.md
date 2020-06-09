@@ -1,5 +1,6 @@
 ---
 title: Algorithms - An introduction
+permalink: /posts/algorithms-an-introduction
 published: true
 description: What is an algorithm? How can we define an algorithm?
 tags: [Algorithms, Computer Science]

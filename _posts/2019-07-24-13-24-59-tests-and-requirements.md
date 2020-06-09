@@ -1,5 +1,6 @@
 ---
 title: Tests and Requirements
+permalink: /posts/tests-and-requirements
 tags: [Java, TDD, Bugs, Requirement]
 series: Thoughts on TDD
 publish_date: 2019-07-24 13:24:59 +0300

@@ -1,5 +1,6 @@
 ---
 title: Escolhendo uma implementação Jakarta EE & Microprofile.io 
+permalink: /posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io
 published: true
 description: Tutorial de como escolher uma implementação para Microprofile.io ou Jakarta EE. Será atualizado sempre com novas informações.
 tags: [Jakarta-EE, Java-EE, Java, Framework]

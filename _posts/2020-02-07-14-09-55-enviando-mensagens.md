@@ -1,5 +1,6 @@
 ---
 title: Enviando Mensagens
+permalink: /posts/enviando-mensagens
 published: true
 description: Exemplo de como enviar uma mensagem para um broker Kafka
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]

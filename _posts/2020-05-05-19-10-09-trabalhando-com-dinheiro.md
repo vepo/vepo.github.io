@@ -1,5 +1,6 @@
 ---
 title: Trabalhando com dinheiro!
+permalink: /posts/trabalhando-com-dinheiro
 published: true
 description: Todo sênio deve saber lidar com valores monetários em seu código. Não sabe? Tem ensino! 😀
 tags: [Java, Floating Point, Money, Beginners]

@@ -1,5 +1,6 @@
 ---
 title: Anatomia de um Tópico
+permalink: /posts/anatomia-de-um-topico
 published: true
 description: Uma breve descrição de como funciona um Tópico do Kafka. Como garantir replicação e ordenação
 tags: [Apacha Kafka, Java, Messaging, Microsserviços]

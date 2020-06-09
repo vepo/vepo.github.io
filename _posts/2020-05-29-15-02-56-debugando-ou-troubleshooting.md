@@ -1,5 +1,6 @@
 ---
 title: Debugando ou Troubleshooting
+permalink: /posts/debugando-ou-troubleshooting
 published: true
 description: Um Sênior deve saber fazer troubleshooting. Aqui vão algumas dicas.
 series: Coisas que todo Sênior deve saber
