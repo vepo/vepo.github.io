@@ -1,4 +1,51 @@
-<div>
+<div class="sidebar">
+	<div class="container">
+		<h1>Victor Osório</h1>
+		<div class="collapse" id="menu">
+			<div>
+				<a href="/">
+					<i class="fa fa-server" aria-hidden="true">Home</i>
+				</a>
+			</div>
+			{% for item in site.data.settings.menu %}
+			<div>
+				{% if item.submenu %}
+				{% if item.icon %}
+				<i class="fa fa-{{ item.icon }}" aria-hidden="true">{{ item.name }}</i>
+				{% endif %}
+				{% for subitem in item.submenu %}
+				<div class="sub-menu">
+					{% if subitem.icon %}
+					<a href="{{subitem.link}}">
+						<i class="fa fa-{{ subitem.icon }}" aria-hidden="true">{{ subitem.name }}</i>
+					</a>
+					{% else %}
+					<a href="{{subitem.link}}">{{subitem.name}}</a>
+					{% endif %}
+
+				</div>
+				{% endfor %}
+				{% else %}
+				{% if item.icon %}
+				<a href="{{item.link}}">
+					<i class="fa fa-{{ item.icon }}" aria-hidden="true">{{ item.name }}</i>
+				</a>
+				{% else %}
+				<a href="{{item.link}}">{{item.name}}</a>
+				{% endif %}
+				{% endif %}
+			</div>
+			{% endfor %}
+		</div>
+		<nav class="navbar navbar-dark bg-dark">
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu"
+				aria-expanded="	false" aria-label="Ver itens">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</nav>
+	</div>
+</div>
+<div style="display: none;">
 	<nav class="navbar navbar-default navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -52,23 +99,4 @@
 			</div>
 		</div>
 	</nav>
-	<div class="container">
-		<div class="title">
-			{% if page.series %}
-			<div class="serie-title">{{ page.series}}</div>
-			{% endif %}
-			{{ page.title }}
-		</div>
-		<div class="cover-header">
-			{% if page.noimage %}
-			<img alt="{{ page.title }}" src="/assets/images/top.jpg" class="img-responsive">
-			{% elsif page.cover_image %}
-			<div class="cover-image">
-				<img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive">
-			</div>
-			{% else %}
-			<img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.jpg" class="img-responsive">
-			{% endif %}
-		</div>
-	</div>
 </div>
