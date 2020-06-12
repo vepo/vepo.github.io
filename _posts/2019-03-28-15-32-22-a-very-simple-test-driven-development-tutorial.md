@@ -1,6 +1,6 @@
 ---
 title: A very simple Test Driven Development Tutorial
-permalink: /posts/a-very-simple-test-driven-development Tutorial
+permalink: /posts/a-very-simple-test-driven-development-tutorial
 published: true
 description: Some small tips for who wants to beggan with TDD
 tags: [Testing, Java, Test, TDD]
