@@ -1,7 +1,8 @@
 ---
 layout: default
-title: "Notas sobre coisas do dia a dia para um engenheiro de software"
-description: Notas sobre coisas do dia a dia para um engenheiro de software
+title: Notas sobre coisas do dia a dia para um engenheiro de software
+description: "Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e
+reflexões sobre filosofia"
 comments: true
 ---
 
@@ -34,7 +35,11 @@ comments: true
 			{% else %}
 			<h4 class="list-group-item-heading">{{ post.title }}</h4>
 			{% endif %}
-			<h6 class="list-group-item-heading">{{ post.publish_date | date: '%B %d, %Y' }}</h6>
+			<h6 class="list-group-item-heading">
+				<time datetime="{{ post.publish_date | date_to_xmlschema }}">
+					{{ post.publish_date | date: '%B %d, %Y' }}
+				</time>
+			</h6>
 		</a>
 		<div class="tag-container">
 			{% for tag in post.tags %}

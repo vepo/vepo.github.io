@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 {% include head.html %}
 
@@ -9,7 +9,11 @@
 		{% if page.id %}
 		<p>
 			{% if page.publish_date %}
-			<strong>{{ page.publish_date | date: '%B %d, %Y' }}</strong>
+			<strong>
+				<time datetime="{{ page.publish_date | date_to_xmlschema }}">
+					{{ page.publish_date | date: '%B %d, %Y' }}
+				</time>
+			</strong>
 			{% endif %}
 		</p>
 		<div class="tag-container">

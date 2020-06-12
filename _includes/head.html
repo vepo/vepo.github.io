@@ -39,11 +39,11 @@
   <meta property="og:image" content="{{site.url}}/assets/images/top.jpg" />
   <meta name="twitter:image" content="{{site.url}}/assets/images/top.jpg">
   {% elsif page.cover_image %}
-  <meta property="og:image" content="{{ page.cover_image }}" />
-  <meta name="twitter:image" content="{{ page.cover_image }}">
+  <meta property="og:image" content="{{site.url}}{{ page.cover_image }}" />
+  <meta name="twitter:image" content="{{site.url}}{{ page.cover_image }}">
   {% else %}
-  <meta property="og:image" content="/assets/images/{{page.id}}/top.jpg" />
-  <meta name="twitter:image" content="/assets/images/{{page.id}}/top.jpg">
+  <meta property="og:image" content="{{site.url}}/assets/images/{{page.id}}/top.jpg" />
+  <meta name="twitter:image" content="{{site.url}}/assets/images/{{page.id}}/top.jpg">
   {% endif %}
 
   {% if page.id %}
@@ -69,38 +69,54 @@
   {% endif %}
 
   <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "BlogPosting",
-"headline": "{{page.title}}",
-"datePublished": "{{ page.publish_date | date_to_xmlschema }}",
-  {% if page.description %}
-"description": "{{page.description}}",
-  {% else %}
-"description": "{{page.excerpt | strip_html}}",
-  {% endif %}
-"url": "{{site.url}}{{page.url}}"}</script>
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{page.title}}",
+      "datePublished": "{{ page.publish_date | date_to_xmlschema }}",
+      {% if page.description %}
+      "description": "{{page.description}}",
+      {% else %}
+      "description": "{{page.excerpt | strip_html}}",
+      {% endif %}
+      {% if page.original %}
+      "sameAs" : [
+        "{{ page.original }}"
+      ],
+      {% endif %}
+      "url": "{{site.url}}{{page.url}}"
+    }
+  </script>
 
   {% else %}
   <!-- its not an article -->
   <meta property="og:type" content="website" />
 
   <script type="application/ld+json">
-{"@context": "http://schema.org",
-"@type": "WebSite",
-"headline": "{{page.title}}",
-  {% if page.description %}
-"description": "{{page.description}}",
-  {% else %}
-"description": "{{page.excerpt | strip_html}}",
-  {% endif %}
-"url": "{{site.url}}{{page.url}}"}</script>
+  {
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "headline": "{{page.title}}",
+    {% if page.description %}
+    "description": "{{page.description}}",
+    {% else %}
+    "description": "{{page.excerpt | strip_html}}",
+    {% endif %}
+    "url": "{{site.url}}{{page.url}}",
+    "sameAs" : [
+      "https://twitter.com/vepo",
+      "https://www.linkedin.com/in/victorosorio/"
+    ]
+  }
+</script>
   {% endif %}
 
   <link rel="author" href="{{site.author}}" />
 
   <!-- End SEO stuff -->
 
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap"
+    rel="stylesheet">
 
   <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
   <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
