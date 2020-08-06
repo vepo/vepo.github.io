@@ -11,11 +11,13 @@ comments: true
 original: https://dev.to/vepo/devops-como-comecar-54gk
 ---
 
-Porque desenvolvemos software? Muitos desenvolvedores não fazem essa pergunta. E tudo bem se você nunca a fez. Agora Engenheiros devem fazer essa pergunta, porque a função de um engenheiro é refletir sobre a natureza do proprio trabalho. Se você nunca se perguntou a diferença entre um desevolvedor e engenheiro, fica uma dica.
+_- Porque desenvolvemos software?_
+
+Muitos desenvolvedores não fazem essa pergunta. E tudo bem se você nunca a fez. Agora Engenheiros devem fazer essa pergunta, porque a função de um engenheiro é refletir sobre a natureza do proprio trabalho. Se você nunca se perguntou a diferença entre um desevolvedor e engenheiro, fica uma dica.
 
 ![Significado de Engenharia](https://dev-to-uploads.s3.amazonaws.com/i/vs25yg8ritu70x9e99rg.png)
 
-Um engenheiro, por natureza da sua formação, deve refletir sobre a natureza do seu trabalho, também como pelo processo do seu trabalho. Deve aplicar metodos científicos para melhoria do todo que envolve mo seu trabalho.
+Um engenheiro, por natureza da sua formação, deve refletir sobre a natureza do seu trabalho, também como pelo processo do seu trabalho. Deve aplicar metodos científicos para melhoria do todo que envolvem o seu trabalho.
 
 Em resumo a função de um software é automatizar tarefas já anteriormente executadas. Mas eu desenvolvo software, são novas demandas! Sim, o software pode criar demandas de novas tarefas, porém elas também pode ser automatizadas por software. 🤖
 
