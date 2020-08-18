@@ -12,7 +12,7 @@ original: "https://medium.com/@vepo/gentileza-gera-gentileza-ou-por-etiqueta-dig
 
 Etiqueta é um péssimo nome. Concordo. Péssimo pela visão de que alguns tem dela, você julgar os outros pela maneira como eles agem. Não quero falar disso, ao contrário, vou usar esse nome que também pode ser chamado de protocolo. Mas protocolo é para algo formal, etiqueta é para a vida cotidiana.
 
-Mas vamos aqui, o que quero dizer é que precisamos de uma etiqueta digital. Assim como algumas empresas tem Dress Code, outra ideia péssima. Mas que nos ajuda a não ver alguém com camiseta regata no trabalho. Obrigado Dess Code.
+Mas vamos aqui, o que quero dizer é que precisamos de uma etiqueta digital. Assim como algumas empresas tem _Dress Code_, outra ideia péssima. Mas que nos ajuda a não ver alguém com camiseta regata no trabalho. Obrigado _Dress Code_.
 
 ![Ninguém tá numa corte, talkey?!](https://miro.medium.com/max/469/1*U4XGuZn3kwcshoiYzCw1iA.png)
 
@@ -46,6 +46,8 @@ Se você partir para cultura do cancelamento, a pessoa vai se isolar na bolha de
 
 Ah o profeta Gentileza… Apagaram tudo… Pitaram tudo de cinza…
 
+{% youtube mpDHQVhyUrY %}
+
 Se alguém entrou em contato com você, dialogue. Se alguém foi grosso com você, bloqueie. Não alimente o ódio, alimente a gentileza. Seja gentil, mesmo que o outro lado não esteja disposto. Não se rebaixe ao nível que você mesmo condena.
 
 ## 4. A Rede Social não é a realidade
@@ -57,15 +59,14 @@ O que acontece é que Redes Sociais promovem mensagens que há interações. É 
 O que quero dizer com isso? As vezes somos tomados por emoções ao ver uma mensagem. “Ah, todos os comentários que vejo sobre tal assunto são negativos”. Calma lá… Todos os comentários impulsionados pelas Redes Sociais são os carregados de emoção. Logo um comentário que “não fez mais que sua obrigação” passará batido!
 
 Caso você assuma pressupostos baseados em comentários em redes sociais, você estará criando uma falácia.
-Falácia da composição - Filosofia
-A falácia da composição ( fallacy of composition, em inglês) é um exemplo de falácia da ambiguidade e, portanto, um…
-www.infoescola.com
 
-Treine a seguinte frase: Nem todo(a) ________________ é _____________. Repita ela exaustivamente.
+[![Falácia da Composição](/assets/images/posts/falacia-composicao.png)](https://www.infoescola.com/filosofia/falacia-da-composicao/)
+
+Treine a seguinte frase: _**Nem todo(a) ________________ é _____________. Repita ela exaustivamente**_.
 
 ## 5. Debata ideias e não pessoas
 
-Essa é outra falácia, se chama Ad Hominem.
+Essa é outra falácia, se chama _Ad Hominem_.
 
 [![Ad Hominem](/assets/images/posts/ad-hominem.png)](https://www.significados.com.br/ad-hominem/)
 
