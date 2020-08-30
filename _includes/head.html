@@ -24,13 +24,18 @@
   <meta name="description" content="{{page.description}}" />
   <meta property="og:description" content="{{page.description}}" />
   <meta name="twitter:description" content="{{page.description}}">
-
   {% else %}
   <meta name="description" content="{{page.excerpt | strip_html | strip}}" />
   <meta property="og:description" content="{{page.excerpt | strip_html| strip}}" />
   <meta name="twitter:description" content="{{page.excerpt | strip_html| strip}}">
   {% endif %}
+
+  {% if page.tags %}
+  <meta name="keywords" content="{{ page.tags | join:', ' }}">
+  {% else %} 
   <meta name="keywords" content="Software Development, Java, Apache Kafka, Desenvolvimento de Software, Jakarta EE, TDD, Microsserviçoes">
+  {% endif %}
+
   <link rel="canonical" href="{{site.url}}{{page.url}}" />
   <meta property="og:url" content="{{site.url}}{{page.url}}" />
   <meta name="twitter:url" content="{{site.url}}{{page.url}}">
