@@ -3,79 +3,61 @@
 {% include head.html %}
 
 <body>
-	{% include header.html %}
-	<div class="container">
+    {% include header.html %}
+    <div class="container">
 
-		{% if page.id %}
-		<p>
-			{% if page.publish_date %}
-			<strong>
+        {% if page.id %}
+        <p>
+            {% if page.publish_date %}
+            <strong>
 				<time datetime="{{ page.publish_date | date_to_xmlschema }}">
 					{{ page.publish_date | date: '%B %d, %Y' }}
 				</time>
-			</strong>
-			{% endif %}
-		</p>
-		<div class="tag-container">
-			{% for tag in page.tags %}
-			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
-			{% endfor %}
-		</div>
-		{%if page.github %}
-		<p>
-			<a href="{{ page.github }}" class="btn btn-default">
-				<i class="fa fa-github fa-2x"></i> {{ page.github }}
-			</a>
-		</p>
-		{% endif %}
-		{% if page.original %}
-		<div>
-			Post originally published on <a href="{{ page.original }}">{{ page.original | domain }}</a>.
-		</div>
-		{% endif %}
-		<hr>
-		{% endif %}
+			</strong> {% endif %}
+        </p>
+        <div class="tag-container">
+            {% for tag in page.tags %}
+            <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a> {% endfor %}
+        </div>
+        {%if page.github %}
+        <p>
+            <a href="{{ page.github }}" class="btn btn-default">
+                <i class="fa fa-github fa-2x"></i> {{ page.github }}
+            </a>
+        </p>
+        {% endif %} {% if page.original %}
+        <div>
+            Post originally published on <a href="{{ page.original }}">{{ page.original | domain }}</a>.
+        </div>
+        {% endif %}
+        <hr> {% endif %} {% include serie.html %}
+        <article>
+            {{ content }}
+        </article>
+        {% include serie.html %} {% if page.id %}
+        <div class="published">
+            {% if page.publish_date %}
+            <div>Originally published {{ page.publish_date| date: '%B %d, %Y' }}</div>
+            {% endif %}
+        </div>
 
-		{% include serie.html %}
-		<article>
-			{{ content }}
-		</article>
-		{% include serie.html %}
-
-		{% if page.id %}
-		<div class="published">
-			{% if page.publish_date %}
-			<div>Originally published {{ page.publish_date| date: '%B %d, %Y' }}</div>
-			{% endif %}
-		</div>
-
-		<div class="related-posts">
-			<div class="related-post-header">Related posts</div>
-			{% for allpost in site.posts %}
-			{% for tag in page.tags %}
-			{% if allpost.tags contains tag and allpost.id != page.id %}
-			<div class="related-post-item">
-				<a href="{{ allpost.url }}">
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+            {% for allpost in site.posts %} {% for tag in page.tags %} {% if allpost.tags contains tag and allpost.id != page.id %}
+            <div class="related-post-item">
+                <a href="{{ allpost.url }}">
 					{% if allpost.series %}
 					{{ allpost.series }}: {{ allpost.title }}
 					{% else %}
 					{{ allpost.title }}
 					{% endif %}
 				</a>
-			</div>
-			{% break %}
-			{% endif %}
-			{% endfor %}
-			{% endfor %}
-		</div>
-		{% endif %}
-
-		{% include disqus.html %}
-		{% include twitter.html %}
-	</div>
-	{% include footer.html %}
-	{% include analytics.html %}
-	{% include adjust-image.html %}
+            </div>
+            {% break %} {% endif %} {% endfor %} {% endfor %}
+        </div>
+        {% endif %} {% include disqus.html %} {% include twitter.html %}
+    </div>
+    {% include footer.html %} {% include analytics.html %} {% include adjust-image.html %}
 </body>
 
 </html>
