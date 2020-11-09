@@ -27,7 +27,7 @@ module Jekyll
                         <a href="https://github.com/#{@repo_info["owner"]["login"]}">
                             #{@repo_info["owner"]["login"]}
                         </a> 
-                        / 
+                        /
                         <a href="https://github.com/#{@repo_info["owner"]["login"]}/#{@repo_info["name"]}">
                             #{@repo_info["name"]}
                         </a>
