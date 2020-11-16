@@ -8,7 +8,6 @@ publish_date: 2019-09-30 10:28:52 +0300
 cover_image: https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jpeg
 original: "https://dev.to/vepo/escolhendo-uma-implementacao-jakarta-ee-microprofile-io-13om"
 series: Especificações Jakarta EE & Microprofile.io
-comments: true
 ---
 
 O primeiro passo ao se desenvolver uma aplicação Jakarta EE ou Microprofile.io é escolher qual será a implementação que você irá utilizar. Ou o mais conhecido Servidor de Aplicação.

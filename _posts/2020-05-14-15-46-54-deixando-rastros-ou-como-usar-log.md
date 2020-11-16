@@ -8,7 +8,6 @@ cover_image: https://dev-to-uploads.s3.amazonaws.com/i/l153dd7u13kvpovalysz.jpg
 tags: [Desenvolvimento de Software, logging, Java, SLF4J]
 publish_date: 2020-05-14 12:46:54 +0300
 original: https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg
-comments: true
 ---
 
 _Esse post é necessário para outro que vou escrever...._ 🤔

@@ -4,7 +4,6 @@ permalink: /posts/jakarta-ee-e-microprofile-io
 description: "Introdução as especificações Jakarta EE e Microprofile.io"
 tags: [Jakarta-EE, Java-EE, Java, Framework]
 series: Especificações Jakarta EE & Microprofile.io
-comments: true
 publish_date: 2019-09-30 09:44:36 +0300
 original: "https://dev.to/vepo/jakarta-ee-e-microprofile-io-4gbg"
 cover_image: "https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jpeg"

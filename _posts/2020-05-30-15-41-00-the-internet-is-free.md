@@ -6,7 +6,6 @@ description: Um breve histórico sobre a liberdade e valor dos serviços de Inte
 tags: [Internet, Tecnologia, Jacques Ellul, Sociedade]
 cover_image: "https://miro.medium.com/max/1400/0*1UUT4amZD5QKtBFj.jpg"
 series: A Sociedade Tecnológica no Século XXI
-comments: true
 publish_date: 2020-05-30 15:41:00 +0300
 original: "https://medium.com/@vepo/the-internet-is-free-d066ab122a27"
 ---

@@ -8,7 +8,6 @@ series: Coisas que todo Sênior deve saber
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/r0c1v42fgwn0oufuo4u6.jpg
 publish_date: 2020-05-08 17:05:31 +0300
 original: "https://dev.to/vepo/construindo-softwares-resilientes-3d65"
-comments: true
 ---
 
 _- Já ouviu falar de **eXtreme Go Horse (XGH)**?_   

@@ -8,7 +8,6 @@ publish_date: 2019-06-03 15:46:08 +0300
 tags: [Java, JDBC, Memory Leak, Garbage Collector]
 original: "https://dev.to/vepo/java-memory-leak-for-jdbc-5dnn"
 replicated: ["https://medium.com/@vepo/outofmemory-why-occurs-and-how-to-fix-it-c28a7fa16690"]
-comments: true
 ---
 
 # The Context

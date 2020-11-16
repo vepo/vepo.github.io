@@ -6,7 +6,6 @@ description: Nesse artigo vou explicar brevemente o que é o Kafka e qual sua fi
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/s1fchqaeqgoj7wss2rfd.jpg
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]
 series: Entendendo o Kafka
-comments: true
 publish_date: 2020-02-07 11:46:34 +0300
 original: https://dev.to/vepo/o-que-e-o-apache-kafka-3kpk
 ---

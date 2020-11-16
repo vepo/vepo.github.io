@@ -4,7 +4,6 @@ description: ""
 tags: [5G]
 series: 5G
 layout: default
-comments: true
 published: false
 ---
 

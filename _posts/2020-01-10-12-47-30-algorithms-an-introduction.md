@@ -7,7 +7,6 @@ tags: [Algorithms, Computer Science]
 cover_image: https://thepracticaldev.s3.amazonaws.com/i/r4m1fxs9otr17hcqfcq9.png
 series: Algorithms
 publish_date: 2020-01-09 12:47:30 +0300
-comments: true
 ---
 
 > _The NOTION of an algorithm is basic to all computer programming._ 

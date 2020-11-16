@@ -6,7 +6,6 @@ description: Exemplo de como enviar uma mensagem para um broker Kafka
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]
 series: Entendendo o Kafka
 cover_image: "https://dev-to-uploads.s3.amazonaws.com/i/g87dtn83anqssn9yw4q6.jpg"
-comments: true
 publish_date: 2020-02-07 14:09:55 +0300
 original: "https://dev.to/vepo/enviando-mensagens-5ab0"
 ---

@@ -5,7 +5,6 @@ published: true
 description: Precisamos de Gentileza nas Redes Sociais. Alguns pensamentos e dicas….
 tags: [Etiqueta, Protocolo Social, Cancelamento, Redes Sociais, Sociedade]
 cover_image: https://miro.medium.com/max/700/1*GBNEDQs9Va7IBHPbl-j_Kg.png
-comments: true
 publish_date: 2020-08-18 12:00:00 +0300
 original: "https://medium.com/@vepo/gentileza-gera-gentileza-ou-por-etiqueta-digital-af7fc903c981?source=friends_link&sk=25f3495f9b7e299c7960d261e5e145f6"
 ---

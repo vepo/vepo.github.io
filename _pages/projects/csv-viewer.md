@@ -4,7 +4,6 @@ title: CSV Viewer
 tags: [CSV Viewer, Linux, Open Source]
 permalink: /projects/csv-viewer
 description: CSV Viewer is a CLI application to enable reading CSV files on Linux.
-comments: true
 github: "https://github.com/vepo/csv-viewer"
 ---
 

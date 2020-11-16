@@ -7,7 +7,6 @@ tags: [Desenvolvimento de Software, Design Patterns, Padrões de Projeto, Clean 
 series: Coisas que todo Sênior deve saber
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/6dnvy0nb4j8aj57f3xs3.jpg
 publish_date: 2020-05-06 15:39:52 +0300
-comments: true
 original: "https://dev.to/vepo/design-patterns-e-se-alguem-ja-tiver-resolvido-seu-problema-4klf"
 ---
 

@@ -6,7 +6,6 @@ description: SOLID é uma das base a Orientação a Objeto. Nesse post explico o
 series: Coisas que todo Sênior deve saber
 tags: [Orientação a Objeto, Java, SOLID, Programação]
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/uy2e9rldjjrumiekusnz.jpg
-comments: true
 publish_date: 2020-07-20 22:33:17 +0300
 original: "https://dev.to/vepo/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto-4de7"
 ---

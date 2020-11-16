@@ -9,7 +9,6 @@ series: Thoughts on TDD
 publish_date: 2019-07-24 15:32:22 +0300
 original: "https://dev.to/vepo/a-very-simple-test-driven-development-tutorial-3309"
 replicated: ["https://medium.com/@vepo/a-very-simple-test-driven-development-tutorial-d11d22276bad"]
-comments: true
 ---
 
 Now I'm addicted with Test Driven Development, but... Somewhere in the past I thought it was a bad idea. Now I can't develop any code without this technique.
@@ -26,7 +25,7 @@ When I was introduced to Maven, after some years using Gradle by my own, I only 
 
 When start a new project make a roadmap:
 
-1. Setup building tool: _Maven or Gradle for Java_
+1. Set up building tool: _Maven or Gradle for Java_
 2. Configure the Testing tool: _Why not using JUnit 5_
 3. Create your first Test with an assert and check if works!
 
