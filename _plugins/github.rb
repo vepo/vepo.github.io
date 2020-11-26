@@ -6,14 +6,7 @@ module Jekyll
         def initialize(tag_name, repo, tokens)
             super
             repo = repo.start_with?('https://github.com/') ? repo[19..-1] : repo
-            github_user = ENV["GITHUB_USER"]
-            github_password = ENV["GITHUB_PASSWORD"]
-            if github_user == nil || github_password == nil then
-                puts "Environment variables not set! GITHUB_USER and GITHUB_PASSWORD"
-                raise "Environment variables not set! GITHUB_USER and GITHUB_PASSWORD"
-            end
-            auth_key = Base64.strict_encode64(github_user + ":" + github_password)
-            @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}", {:authorization => "Basic #{auth_key}"}))
+            @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}"))
             puts @repo_info
         end
 
