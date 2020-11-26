@@ -6,10 +6,8 @@ description: A minimal how-to of how to configure JPA on Quarkus.io
 tags: [Quarkus, Java, JPA, Hibernate]
 cover_image: /assets/images/data-center.jpg
 series: Quarkus Tutorial
-publish_date: 2020-11-25 09:14:00 +0300
+publish_date: 2020-11-25 23:50:00 +0300
 ---
-
-# Step 02 - Configure JPA _Jakarta Persistence_
 
 JPA is a specification from Jakarta EE that controls the Data Access Layer. The most common implementation for it is [Hibernate ORM](https://hibernate.org/orm/).
 
@@ -405,6 +403,22 @@ public User get(int userId) {
 ### Transactional Objects
 
 As we are using a transactional object, all changes we do in the JPA object it will be updated on the database. Each object read from the database is attached to the current session.
+
+## Executing and Testing
+
+With the database running you only need to start the Quarkus using maven.
+
+```bash
+mvn quarkus:dev
+```
+
+In our example, we have provided 3 endpoints:
+
+* List all Users: `GET /user`
+* Create an User: `POST /user`
+* Find User by Username: `GET /user/{username}`
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f9fc24e64abbfb3aac90)
 
 # Conclusion
 
