@@ -1,5 +1,5 @@
 ---
-title: Configure JPA on Quarkus
+title: Configure JPA on Quarkus.io
 permalink: /posts/configure-jpa-on-quarkus
 published: true
 description: A minimal how-to of how to configure JPA on Quarkus.io
