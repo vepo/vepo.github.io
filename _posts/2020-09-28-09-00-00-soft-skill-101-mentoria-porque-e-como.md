@@ -5,6 +5,7 @@ description: Um breve relato de como é o meu processo de mentoria. Como faço e
 tags: [Soft Skills, Mentoria, Carreira]
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/lifgkggmy9gglx235vdr.jpg
 series: Level Up
+permalink: /posts/soft-skills-101-mentoria-porque-e-como
 publish_date: 2020-09-28 09:14:00 +0300
 original: "https://dev.to/vepo/soft-skill-101-mentoria-porque-e-como-3lcd"
 ---
