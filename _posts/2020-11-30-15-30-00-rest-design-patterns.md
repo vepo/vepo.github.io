@@ -1,12 +1,12 @@
 ---
-title: REST API Design Patterns
+title: Padros de Projetos para APIs REST?
 permalink: /posts/rest-api-design-patterns
-published: false
-description: A minimal how-to of how to create a REST API using Quarkus.io
-tags: [Quarkus, Java, JAX-RS]
-cover_image: /assets/images/server.jpg
-series: Quarkus Tutorial
-publish_date: 2020-09-28 09:14:00 +0300
+published: true
+description: Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta
+tags: [API, REST, Design Patterns]
+cover_image: /assets/images/biblioteca.jpg
+series: Backend Roadmap
+publish_date: 2020-11-30 09:14:00 +0300
 ---
 
 # Motivação
@@ -173,14 +173,32 @@ Esse Anti-Pattern é muito semelhante ao anterior, exceto que, além do URI, o *
 * **Exemplo**: `https://api.particle.io/v1/events/123?access_token=456789`
 
 ### Versionized API (V_API)
-* **Descrição**: A diferenciação de versão da API é feita na request. Esta pode ser feita com base em um nó no _Base_, que representa a versão. 
-* **Sessões afetadas**: 
+* **Descrição**: A diferenciação de versão da API é feita na request. Esta pode ser feita com base em um nó no _Base_, que representa a versão. Ou também com um parâmetro na Query.
+* **Sessões afetadas**: _Base_ e _Query_ 
 * **Formato**: 
+    1. `Scheme://Authority/v{number}/Main?Query`
+    2. `Scheme://Authority/AccessNode(s)/v{number}/Main?Query`
+    3. `Scheme://Authority//AccessNode(s)/v/{number}/Main?Query`
+    4. `Scheme://Authority/v{number}/AccessNode(s)/Main?Query`
+    5. `Scheme://Authority/Base/Main?{version-key}={version-data-value}`
 * **Exemplo**: 
+    * `https://myiothub.azure-devices.net/configurations/123?api-version=2020-03-13` 
+    * `http://api.cubesensors.com/v1/devices`
 
 ### Versionized Resources (VR)
-[TBD]
-* **Descrição**: 
-* **Sessões afetadas**: 
+* **Descrição**: Nesse padrão, os recursos podem ter versões, e ao acessar um recurso uma versão antiga pode ser acessada. 
+* **Sessões afetadas**: _Main_
 * **Formato**: 
-* **Exemplo**: 
+    1. `Scheme://Authority/Base/../ParentNode{number}/..?Query`
+    2. `Scheme://Authority/Base/../ParentNode/v{number}/..?Query`
+* **Exemplo**: `https://myiothub.azure-devices.net/jobs/v2/123`
+
+# Conclusão
+
+Design Patterns podem existir para qualquer área. Eles podem ser de grande ajuda se você os conhece, vão te dar repertórios tanto para novos desenvolvimentos, quando para melhorias em códigos já existentes. Eles também podem indicar pontos de melhoria no seu projeto.
+
+---
+
+Foto de [**Element5 Digital**](https://www.pexels.com/pt-br/foto/aprendendo-aprender-biblioteca-conhecimento-1370295/) no **Pexels**
+
+![Biblioteca](/assets/images/biblioteca.jpg)
