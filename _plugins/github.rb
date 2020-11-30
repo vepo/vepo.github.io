@@ -6,7 +6,10 @@ module Jekyll
         def initialize(tag_name, repo, tokens)
             super
             repo = repo.start_with?('https://github.com/') ? repo[19..-1] : repo
-            @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}"))
+            github_user = ENV["GITHUB_USER"]
+            github_access_token = ENV["GITHUB_ACCESS_TOKEN"]
+            auth_key = Base64.strict_encode64(github_user + ":" + github_access_token)            
+            @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}", {:authorization => "Basic #{auth_key}"}))
             puts @repo_info
         end
 
