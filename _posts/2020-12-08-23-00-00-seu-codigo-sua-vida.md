@@ -118,6 +118,18 @@ Você pode aprender uma nova forma de resolver problemas. Nada me tira da cabeç
 
 Conhecer outras linguagens também pode te ajudar a resolver problemas. Você não precisa resolver todos os problemas na sua linguagem, talvez seu problema seja resolvido de forma mais eficiente em outra linguagem. Será que Clojure não resolve seu problema melhor? E Go? E C? Eu não conheço seu problema, mas conheço algumas coisas dessas linguagens. C e Go são linguagens compiladas e terão um footprint de memória muito menor do que Java. Mas é mais difícil desenvolver nessa linguagens. Clojure é uma linguagem funcional... etc...
 
+# Resolva problemas
+
+Uma outra forma de melhorar seu código é ter mais repertório. Eu sou um músico amador, estudei por quase 4 anos gaita. Conheço praticamente todas as técnicas e teorias, mas hoje seria muito difícil tocar uma música. Porque?
+
+Existem dois motivos para isso. O primeiro é que não tenho mais repertório. Eu parei estudar e não tenho tocado. Não sei as frases mais comuns e nem os _licks_ que podem ser copiados e usados em improvisos. 
+
+O outro motivo é que estou enferrujado! Me falta prática. Eu me lembro de algumas músicas de cabeça, sei escrever a partitura dela. Me lembro de ter tocado _The Wizard_ do _Black Sabbath_ na audição da escola num bar lotado. A música é super simples, tanto que não era minha audição, mas do cara da bateria. A bateria dela é complicada, a gaita... bobeira. Mas se eu for tocar agora vou travar! Me falta prática!
+
+Esses dois motivos vão atua em qualquer atividade cognitiva sua. Atua até mesmo quando você deixa de falar sua lingua natal por uns anos, imagina com programação. E programar é como tocar um instrumento, quanto mais exercicio você faz, mais repertório você terá.
+
+Uma forma de ter mais repertório é resolver problemas simpels. Existem sites para isso! Podemos falar do [codewars](https://www.codewars.com/kata) ou [HackerRank](https://www.hackerrank.com/). Eles vão te dar problemas simples, mas alguns com soluções elegantes. Se você é alguém iniciante, vai tentando resolver uns problemas, vê a solução de outros. Isso vai te dar repertório para você usar no seu dia a dia.
+
 # Tome café
 
 E por último, vamos falar de café! Sim, o café pode ajudar a melhorar o seu código. Tomar café não é o ato de beber uma bebida de origem Árabe/Africana, é o ato de socializar. Quando eu digo que Tomar café vai além de beber estou falando dos processos que giram em torno desse ato. 
