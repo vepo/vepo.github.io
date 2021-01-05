@@ -18,6 +18,7 @@ gem "minima","2.5.1"
 gem 'rest-client'
 gem 'json'
 gem 'kramdown-parser-gfm'
+gem 'jekyll-time-to-read'
 
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.

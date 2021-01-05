@@ -1,7 +1,7 @@
 ---
 title: Seu Código, Sua vida
 permalink: /posts/seu-codigo-sua-vida
-published: true
+published: false
 description: Como vai o seu código? Exitem formas de melhorar ele? Será que sua empresa se preocupa com isso também?
 tags: [Desenvolvimento de Software, Backend, Linguagem de Programação, Qualidade de Código]
 cover_image: /assets/images/pexels-negative-space-169573.jpg
