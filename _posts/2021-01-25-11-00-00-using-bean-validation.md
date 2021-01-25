@@ -56,7 +56,7 @@ That is all you need! Now you just need to configure where you will use and what
 
 ## Requiring Valid Parameters
 
-The next step, you should informe Quarkus, where you want to use the validate. From the example above, we can remove all validation lines and just add the annotation `javax.validation.Valid`.
+The next step, you should inform Quarkus, where you want to use the validate. From the example above, we can remove all validation lines and just add the annotation `javax.validation.Valid`.
 
 ```java
 @POST
@@ -72,7 +72,7 @@ public User create(@Valid CreateUserRequest request) {
 }
 ```
 
-Then we need inform Quarkus the logic for this validation, it can be done inside CreataUserRequest class. We will use the annotations `Email`, `NotBlank`, `Pattern` and `Size`.
+Then we need to inform Quarkus the logic for this validation, it can be done inside CreataUserRequest class. We will use the annotations `Email`, `NotBlank`, `Pattern` and `Size`.
 
 ```java
 import javax.validation.constraints.Email;
@@ -124,7 +124,7 @@ This can be used in any Managed Bean inside Quarkus, but if you used on Endpoint
 }
 ```
 
-If you need to add validation for a parameter that you do not implement the class, like a `String` or a primitive type, you can use the annotations directly on the bean paramenter. In this case you can ommit the `Valid`.
+If you need to add validation for a parameter that you do not implement the class, like a `String` or a primitive type, you can use the annotations directly on the bean parameter. In this case, you can omit the `Valid`.
 
 ```java
 public Optional<User> findByUsername(@Size(min = 4, max = 15) String username) {
@@ -136,7 +136,7 @@ public Optional<User> findByUsername(@Size(min = 4, max = 15) String username) {
 
 ## Creating Custom Validations
 
-Now that we are able to use the Built-in validations, let's create some custom validators. First we need to define the annotation for it. It should have the following pattern.
+Now that we are able to use the Built-in validations, let's create some custom validators. First, we need to define the annotation for it. It should have the following pattern.
 
 ```java
 @Documented
@@ -163,7 +163,7 @@ public @interface ReservedWord {
 }
 ```
 
-In our case we are creating a `Repeatable` just for an example, but you can set any kind of Type for value. Then we need to declare and implement the Validator. As you can see, we are already linking the Validator with the Annotation using `@Constraint(validatedBy = ReservedWordValidator.class)`, now we only need to implement it.
+In our case, we are creating a `Repeatable` just for an example, but you can set any kind of Type for value. Then we need to declare and implement the Validator. As you can see, we are already linking the Validator with the Annotation using `@Constraint(validatedBy = ReservedWordValidator.class)`, now we only need to implement it.
 
 ```java
 public class ReservedWordValidator implements ConstraintValidator<ReservedWord, String> {
@@ -206,8 +206,11 @@ You can find all the code on github.com/vepo/quarkus-tutorial.
 
 ## Design by Contract
 
-The most important concept on Validating parameters is **Design By Contract**. A contract defines you rights and responsability, if you define a contract you will not handle values outside that contract. And using Bean Validation enable you to implement Orthogonal Contracts, keeping your code clear. You do not mix validation with business logic. And you don't need to replicated code, only adding an annotation you can spread validation in all your Managed Beans.
+The most important concept on Validating parameters is **Design By Contract**. A contract defines your rights and responsibility, if you define a contract you will not handle values outside that contract. And using Bean Validation enables you to implement Orthogonal Contracts, keeping your code clear. You do not mix validation with business logic. And you don't need to replicate code, only adding an annotation you can spread validation in all your Managed Beans.
 
 ## Conclusion
 
 Quarkus is easy to configure. You can remove a lot of code, only creating validations.
+
+![Man drawing a Software Architecture diagram](https://dev-to-uploads.s3.amazonaws.com/i/e65xl1069bgqs8ge87wm.jpg)
+Foto de Startup Stock Photos no Pexels
