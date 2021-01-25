@@ -185,6 +185,25 @@ public class ReservedWordValidator implements ConstraintValidator<ReservedWord, 
 
 Now you can use it in your service.
 
+## Executing and Testing
+
+With the database running you only need to start the Quarkus using maven.
+
+```bash
+mvn quarkus:dev
+```
+
+In our example, we have provided 2 endpoints where you can test with valid and invalid parameters.
+
+* Create an User: `POST /user`
+* Find User by Username: `GET /user/{username}`
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/f9fc24e64abbfb3aac90)
+
+You can find all the code on github.com/vepo/quarkus-tutorial.
+
+{% github https://github.com/vepo/quarkus-tutorial %}
+
 ## Design by Contract
 
 The most important concept on Validating parameters is **Design By Contract**. A contract defines you rights and responsability, if you define a contract you will not handle values outside that contract. And using Bean Validation enable you to implement Orthogonal Contracts, keeping your code clear. You do not mix validation with business logic. And you don't need to replicated code, only adding an annotation you can spread validation in all your Managed Beans.
