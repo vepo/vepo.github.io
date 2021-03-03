@@ -4,7 +4,7 @@ permalink: /posts/linux-everything-is-a-file
 published: true
 description: On Linux everything is a file. This is the starting point to learn Linux
 tags: [Linux]
-cover_image: /assets/images/data-center.jpg
+cover_image: /assets/images/pexels-dick-hoskins-6969512.jpg
 series: Learning Linux
 publish_date: 2021-03-03 18:00:00 +0300
 ---
@@ -32,3 +32,8 @@ attr  auxv  cgroup  cmdline  comm  cwd  environ  exe  fd  gid_map  limits  maps 
 $ cat  /proc/472/cmdline 
 java-classpath/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-3.8.0/lib/languagetool-languageserver/build/install/languagetool-languageserver/lib/*:/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-pt-3.8.0/lib/*App54469
 ```
+
+--- 
+
+![Pinguims](/assets/images/pexels-dick-hoskins-6969512.jpg)
+Picture by Dick Hoskins on Pexels
