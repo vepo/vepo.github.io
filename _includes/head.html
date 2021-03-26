@@ -79,12 +79,12 @@
     {
       "@context": "http://schema.org",
       "@type": "BlogPosting",
-      "headline": "{{page.title}}",
+      "headline": "{{ page.title | xml_escape }}",
       "datePublished": "{{ page.publish_date | date_to_xmlschema }}",
       {% if page.description %}
-      "description": "{{page.description}}",
+      "description": "{{ page.description | xml_escape }}",
       {% else %}
-      "description": "{{page.excerpt | strip_html}}",
+      "description": "{{ page.excerpt | strip_html}}",
       {% endif %}
       {% if page.original %}
       "sameAs" : [
@@ -103,11 +103,11 @@
   {
     "@context": "http://schema.org",
     "@type": "WebSite",
-    "headline": "{{page.title}}",
+    "headline": "{{ page.title  | xml_escape }}",
     {% if page.description %}
-    "description": "{{page.description}}",
+    "description": "{{ page.description | xml_escape }}",
     {% else %}
-    "description": "{{page.excerpt | strip_html}}",
+    "description": "{{ page.excerpt | strip_html | xml_escape }}",
     {% endif %}
     "url": "{{site.url}}{{page.url}}",
     "sameAs" : [
