@@ -1,7 +1,7 @@
 ---
 title: Inicie um projeto pelo README.md
 permalink: /posts/inicie-um-projeto-pelo-readme
-published: false
+published: true
 publish_date: 2021-03-26 08:51:06 +0300
 description: Antes de iniciar a desenvolver, descreva o que você vai fazer
 tags: [Documentação de Software, README, Documentação, Engenharia de Software]
@@ -58,85 +58,97 @@ Seja direto. Descreva seu componente de forma simples e direta.
 
 Nas primeiras sentenças você tem que fazer com que qualquer desenvolvedor que caia desavisado sabia onde usar seu componente. Vamos ver alguns exemplos?
 
-## Good Example
+#### Um bom example
 
-A good example is [Zookeeper](http://zookeeper.apache.org/) description:
+Um bom exemploe é a documentação do [Zookeeper](http://zookeeper.apache.org/). Vemos ver o que está escrito?
 
-_ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services._
+> Apache ZooKeeper is an effort to develop and maintain an open-source server which enables highly reliable distributed coordination.
+> ##### What is ZooKeeper?
+> _ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services._
 
-In the first line you know what problem you an solve with this project. If you continue to reading there is a more detailed description. Good!
+Na primeira linha você já tem uma ideia do problema que ele se propõe a resolver. Se você continuar lendo vai encontrar um lista completa dos [casos de uso](https://zookeeper.apache.org/doc/current/zookeeperUseCases.html). Isso é muito bom! Já dá pra ter uma boa visão do que é possível fazer com ele.
 
-## Bad Example
+#### Um exemplo ruim
 
-A bad example is [Kafka](https://kafka.apache.org/intro) description:
+Um exemplo não tão bom foi a documentação do [Apache Kafka](https://web.archive.org/web/20190711233550/https://kafka.apache.org/intro) quando eu escrevi o primeiro post. Ele descrevia o Kafka como:
 
 _Apache Kafka® is a distributed streaming platform. What exactly does that mean?_
 
-The documentation is clear that the reader will not undestand!! If you continue to read, it will describe _real time pipelines_, _clusters_, etc... But what the main porpuse of Kafka?
 
-If I had to rewrite Kafka documentation, this will be the second item from it. The first will be a short description of **What is** Kafka and **Which type of problem it solves**.
+Porque essa documentão não é clara? Porque ela não define os termos. Um leitor desavisado não vai entender o real proposito dela. É preciso primeiro definir os conceitos. Seria o Kafka um Pub/Sub? O que difere um Stream de simplesmente mensagens? Se você continuar, ele vai usar termos como _pipelines_ e _clusters_ sem definir eles. Mas qual é o real proposito do Kafka? Porque o Kafka é mais do que um Message Queue? Vale a penas usar o Kafka apenas como Message Queue?
 
-## Tips
+Eu resumiria tudo isso em uma única frase: _Apache Kafka foi construido ser a Fonte da Verdade de sistemas reativos. Muito além de um simples Pub/Sub, é possível todo um ecosistema orientado a eventos com baixo acoplamento, alta escalabildade e estabildidade._
 
-1. Avoid own defined terms. Use commons terms
-2. Be short. Few and short lines.
-3. Answer questions.
+Observe que eu tentei responder duas perguntas básicas **O que é** e **Que tipo de problema resolve**. Além disso acabei respondendo **O que não é**.
 
-## Briefly... 
-A good description is a short text that answer two question. What is and Which type of problem solves.
+#### Dicas
 
-# 2. After describing you project, explain hidden ideas
+1. Evite usar seus próprios termos.
+2. Seja direto. Poucas linas.
+3. Responde as principais questões.
 
-The second section of my READMEs are the **Rational** section. Here I quickly list all ideas behind my code. 
+#### TL; DR;
+Uma boa descrição é um texto curto que responde a duas questões. O que é e Que tipo de problema resolve;
 
-Let's imagine we are building a new NoSQL database. 
+### 2. Explique as motivações dele
 
-The first thought a user can have is: _I lost all my SQL validations?_
+Um segundo passo é descrever quais são as motivações do seu componente. Isso deve ir muito além do problema que ele resolve, deve se explicar os principais motivos que incentivaram o desenvolvimento de um novo componente.
 
-The first thought a developer can have is: _Can we add some kind of validations?_
+Vamos supor um caso, você quer criar um novo Server Render Framework, mas esse será diferente dos demais, o servidor fará a renderização do template e do código javascript. Esses templates serão usados em tempo de execução com algumas funções que são chamadas via REST. Para que isso acontece, o desenvolvedor deve declarar qual é o escopo de cada código. Um desenvolvedor deve conhecer essa motivação, senão ele será tentado a criar os templates para cada dela, sem separar responsabilidades de cada componente.
 
-Both questions are welcome, but it can be answer with a single line in this session:
+Eu normalmnente crio uma sessão no meu README.md chamada **Racional**, onde descrevo as principais forças que me levaram a escolher alguns detalhes arquiteturais. Por exemplo, uma vez desenvolvi uma engine de Regras de Negócio que tinha um XML para descrever a regra de negócio que era associado a um classpath. Eu detalhei isso explicando os motivos, usava XML para que os times de negócio pudesse validar o que estava sendo feito podendo eles alterarem sem alterar código Java. Logo, qualquer desenvolvedor saberia que o XML poderia ser inspecionado por um não desenvolvedor, assim ele tinha por obrigação criar um XML que expressasse a regra, ao invês de encapsular tudo isso dentro do código Java.
 
-* This achieve a High-Throughput, no validation will be done by the database.
 
-Any important idea **SHOULD** be described in this session shortly. If more information is need, you can add a link to another README explain it.
+#### TL; DR;
 
-# 3. Explain Resources and Terms
+Qualquer idea importante **DEVE** ser descrita brevemente. Se mais informações é necessária, pode-se criar um link para o local onde ela é descrita por completo.
 
-Does your project define any term? Explain here.
+### 3. Defina os termos que você irá usar
 
-Does your project uses a own file format? Explain here.
+Cada software tem seus termos com seus próprios significados. O [MongoDB](https://docs.mongodb.com/manual/core/document/) fala de documentos e não são os mesmo documentos do [Apache POI](https://poi.apache.org/). O [Apache Kafka](https://kafka.apache.org/documentation/streams/) fala de Stream, mas não é o mesmo definido pela biblioteca padrão do [Java](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html).
 
-Imagine that I'm building a Business Rule Engine, all business rule must be written in a specifica file format. You should explain shortly what is this file format and create a specific README file for it:
+Sua documentação deve definir esses conceitos de maneira clara. Há algum termo que você comumentesa? Vale apena definir ele? Cria uma sessão para isso. Explique _o que é_ e _o que não é_ esse termo.
 
-* BR file defines a single Business Rule. (More information link)
+O livro [Domain-Driven Design: atacando as complexidades no coração do software](https://amzn.to/3wdFroe) trás um conceito que acho bastante interessante. Ele chama de Linguagme Onipresente. Ela é as definições dos termos comuns usadas no contexto de um projeto, se você está criando uma biblioteca, você também pode criar termos. Comece definindo eles, depois use em toda a documentação e código.
 
-# 4. Explain behaviour and Interactions
+### 4. Explique o comportamento e as interações
 
-Explain how your code works. A user or a developer should know how your project works. If you are developing a Message Queue, here is a good place where you can describe shortly how a message will be delivered to all (or not to all) clients.
+Como as coisas acontecem? Como as coisas se relacionam? Isso também deve ser descrito pela sua documentação. 
 
-# 5. Describe which API you provide
+Um dos projetos Jakarta EE que eu mais gosto é o [Java CDI](http://cdi-spec.org/), ele possibilita um baixo acoplamento em projetos Java. Mas... Ao usar ele, muitas coisas podem parecer mágica. Ao implementar meu primeiro _CDI Bean_, eu fiquei me perguntando quem cria os objetos? Isso não está respondido na documentação, mas é o CDI Container.
 
-Do you provide a REST API? An Java library? A C library? Describe the key points for the provided API. Shortly! 
+Se eu fosse reescrever a documentação do Java CDI, iria fazer um pequeno diagrama com o ciclo de vida de um objecto. Além disso, iria usar o termo Beans Gerenciado (Managed Beans) largamente no texto, para que o desenvolvedor saiba que quem controla o Ciclo de Vida desse objeto é o próprio framework e não o meu código.
 
-# Be short!
+### 5. Descreva como usar
 
-In the main README file you **SHOULD** be shortly. This is not the place where you will deeply explain everything, this is the place to show key concepts.
+Você fornece uma API REST? Uma biblioteca Java? Uma biblioteca C? Descreva como usar cada funcionalidade da API fornecida. Seja breve, porém extenso! Uma dica é criar uma lista de funcionaldiades e Code Snippets.
 
-# Be consistent!
+#### Seja Breve!
 
-What if a change on the code change something related with what is written in the README? This is the main problem that occurs in software development. The documentation is not consistent with the code.
+No seu README você deve ser breve, não se alongue muito. Coloque apenas o principal uso e um exemplo simples, depois link uma página com a lista detalhada. Mas dê preferência a usar um indice, nesse é melhor usar um [AsciiDoc](https://asciidoc.org/) ao invés de um [Markdown](https://www.markdownguide.org/). Use um **Snippets.adoc** ao inves de um **Snippets.md**.
 
-For each project you should define your own **Definition Of Done**. If the change does not reflects the documention, so the change is not ready!
+#### Seja consistente!
 
-# Concluding
+Considere a documentação como parte do seu código. Na verdade ela é! 
 
-When you listen that *the documentation is the code*, do not touch in this code! Every line of code there is a hidden idea that sometimes are not expressed because it cannot be expressed in code. 
+Qualquer alteração que você fizer, procure se ela altera algum ponto na documentação.
+
+Qualquer nova funcionalidade que você adiciona, descreve ela na documentação.
+
+No SCRUM temos o conceito de [**Definição de Pronto**](https://www.agilealliance.org/glossary/definition-of-done), entre em acordo com seu time que para que uma tarefa seja concluída, a documentação deve refletir as alterações.
+
+Inconsistências são muito perigosas, elas podem levar a erros de uso ou bugs que podiam ser facilmente evitáveis, mas é muito difícil de achar.
+
+## Concluindo
+
+Quando você ouvir que **o código é a documentação**, tenha muito ao usar esse código. você não conhece a intenção de quem fez. Código descreve apenas comportamento, não descreve a intenção de quem o fez. Cada linha de código pode ter algo escondido que trará muitoa complexidade ou quem sabe bugs escondidos.
+
+Aqui quero até expressar em como discordo do Uncle Bob sobre Comentários e Documentação. Ele sempre expressa que o código deve ter todas as respostas. Eu acho essa opinião fundamentalistas, o código deve ter muitas respostas, mas deve existir documentação para explicar os conceitos do código.
 
 {% twitter https://twitter.com/unclebobmartin/status/870311898545258497 %}
 
-The idea of Uncle Bob is well accepted in simple projects, but what if the project has some architectural complex decisions? How can express it without a README or some comments?
+A ideia do Uncle Bob é bem aceita em projetos simples, mas e se o projeto tiver algumas decisões arquitetônicas complexas? Como posso expressá-lo sem um README ou alguns comentários?
 
-# More
+## Mais
 
-You can add more sections to your main README file. But you should be short.
+Você pode adicionar o que quiser ao seu README.md. Seja livre!
