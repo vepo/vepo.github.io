@@ -176,19 +176,19 @@ Por último, podemos fazer o clone de uma classe usando Reflexão. Reflexão, ou
 ```java 
 @SuppressWarnings("unchecked")
 public static <T> T clone(T original) {
-	try {
-		T clone = (T) original.getClass().getDeclaredConstructor().newInstance();
-		for (Field field : original.getClass().getDeclaredFields()) {
-			if (!Modifier.isStatic(field.getModifiers())) {
-				field.setAccessible(true);
-				field.set(clone, field.get(original));
-			}
-		}
-		return clone;
-	} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-			| NoSuchMethodException | SecurityException e) {
-		throw new RuntimeException("Não consigo clonar!", e);
-	}
+    try {
+        T clone = (T) original.getClass().getDeclaredConstructor().newInstance();
+        for (Field field : original.getClass().getDeclaredFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) {
+                field.setAccessible(true);
+                field.set(clone, field.get(original));
+            }
+        }
+        return clone;
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+            | NoSuchMethodException | SecurityException e) {
+        throw new RuntimeException("Não consigo clonar!", e);
+    }
 }
 ```
 
