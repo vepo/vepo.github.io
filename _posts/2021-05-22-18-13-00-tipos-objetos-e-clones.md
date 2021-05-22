@@ -113,8 +113,8 @@ em.persist(user);                                       // INSERT INTO user_role
 Ora, mas eu ainda não falei em como fazer uma passagem de valor usando a JVM, certo? Porque isso não é possível! Para isso é preciso clonar o objeto, e isso podemos sim fazer pela JVM. Vamos aqui enumerar as formas de se fazer um clone:
 
 1. Programaticamente
-2. Programaticamente usando Object.clone
-2. Programaticamente usando Object.clone em classe Cloneable
+2. Programaticamente usando `Object.clone`
+2. Programaticamente usando `Object.clone` em classe `Cloneable`
 3. Por reflexão
 
 O primeiro método é o mais declarativo e de forma nenhuma orientada a objeto. O código deve copiar o objeto campo a campo, e isso deve somente acontece quando não tempos o controle sobre a classe a ser clonado. Essa solução, em geral, é péssima, pois é altamente acoplada, isso significa que qualquer alteração da classe sendo clonada, precisa refletir na classe que a está clonando.
