@@ -131,7 +131,7 @@ Quando temos o controle sobre a classe a ser clonada, devemos sobrescrever o met
 
 ```java
 public class User {
-    [...]
+    // [...]
 
     @Override
     public User clone() {
@@ -149,7 +149,7 @@ Uma outra maneira de se fazer um clone é usando a interface `Cloneable`. Apesar
 
 ```java
 public class User implements Cloneable {
-    [...]
+    // [...]
 
     @Override
     public User clone() {
