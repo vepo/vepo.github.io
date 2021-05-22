@@ -4,7 +4,7 @@ published: true
 description: Como clonar objetos em Java
 tags: [Java, Memória, Clone]
 cover_image: /assets/images/pexels-negative-space-169573.jpg
-publish_date: 2021-05-222 18:13:00 +0300
+publish_date: 2021-05-22 18:13:00 +0300
 permalink: /posts/tipos-objetos-e-clones
 ---
 
