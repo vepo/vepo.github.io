@@ -1,7 +1,7 @@
 ---
 title: Tipos, Objetos e Clones
 published: true
-description: Como clonar objetos em Java
+description: Como Java lida com objetos e tipos primitivos? O que é Stack e Heap? O que seria passagem por valor e por referência? Existe isso em Java?
 tags: [Java, Memória, Clone]
 cover_image: /assets/images/pexels-negative-space-169573.jpg
 publish_date: 2021-05-22 18:13:00 +0300
