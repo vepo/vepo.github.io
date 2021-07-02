@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Entendendo o Kafka: Rodando o Apache Kafka localmente</title>
+  <meta property="og:title" content="Entendendo o Kafka: Rodando o Apache Kafka localmente" />
+  <meta name="twitter:title" content="Entendendo o Kafka: Rodando o Apache Kafka localmente">
+  
+
+
+  
+  <meta name="description" content="Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows." />
+  <meta property="og:description" content="Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows." />
+  <meta name="twitter:description" content="Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows.">
+  
+
+  
+  <meta name="keywords" content="Apache Kafka, Messaging, Middleware, Microsserviços">
+  
+
+  <link rel="canonical" href="https://vepo.github.io/posts/rodando-o-apache-kafka-localmente" />
+  <meta property="og:url" content="https://vepo.github.io/posts/rodando-o-apache-kafka-localmente" />
+  <meta name="twitter:url" content="https://vepo.github.io/posts/rodando-o-apache-kafka-localmente">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://vepo.github.iohttps://dev-to-uploads.s3.amazonaws.com/i/vjb2xa2hwzvtgdks1x9v.png" />
+  <meta name="twitter:image" content="https://vepo.github.iohttps://dev-to-uploads.s3.amazonaws.com/i/vjb2xa2hwzvtgdks1x9v.png">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2020-02-07T08:47:27+00:00" />
+  <meta property="article:modified_time" content="2020-02-07T08:47:27+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Apache Kafka" property="article:tag">
+  
+  <meta content="Messaging" property="article:tag">
+  
+  <meta content="Middleware" property="article:tag">
+  
+  <meta content="Microsserviços" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Rodando o Apache Kafka localmente",
+      "datePublished": "2020-02-07T08:47:27+00:00",
+      
+      "description": "Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows.",
+      
+      
+      "sameAs" : [
+        "https://dev.to/vepo/rodando-o-apache-kafka-localmente-412i"
+      ],
+      
+      "url": "https://vepo.github.io/posts/rodando-o-apache-kafka-localmente"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> 
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+    <div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-server" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/kafka-tool">
+									
+									Kafka Tool
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Apresentações
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/series">Séries</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">Sobre</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/books">Livros Recomendados</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Redes Sociais
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a class="navbar-brand" href="https://twitter.com/vepo">
+								<i class="fa fa-twitter" aria-hidden="true"></i>
+								@vepo
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="title">
+			
+			<h1 class="serie-title">
+				Entendendo o Kafka
+			</h1>
+			<h2>
+				Rodando o Apache Kafka localmente
+			</h2>
+			
+		</div>
+		<div class="cover-header">
+			
+			<div class="cover-image">
+				<img alt="Rodando o Apache Kafka localmente" src="https://dev-to-uploads.s3.amazonaws.com/i/vjb2xa2hwzvtgdks1x9v.png" class="img-responsive">
+			</div>
+			
+		</div>
+	</div>
+</div>
+    <div class="container">
+
+        
+        <p>
+            
+            <strong>
+				<time datetime="2020-02-07T08:47:27+00:00">
+					February 07, 2020
+				</time>
+			</strong> 
+        </p>
+        <div class="tag-container">
+            
+            <a class="label label-default apache-kafka" href="/tags/#apache-kafka">Apache Kafka</a> 
+            <a class="label label-default messaging" href="/tags/#messaging">Messaging</a> 
+            <a class="label label-default middleware" href="/tags/#middleware">Middleware</a> 
+            <a class="label label-default microsserviços" href="/tags/#microsserviços">Microsserviços</a> 
+        </div>
+         
+        <div>
+            Post originally published on <a href="https://dev.to/vepo/rodando-o-apache-kafka-localmente-412i">dev.to</a>.
+        </div>
+        
+        <hr>  
+<div class="series">
+    <div class="serie-contents">
+        <h2>Entendendo o Kafka</h2>
+        
+        
+        
+        <a href="/posts/o-que-e-o-apache-kafka">
+            <div class="serie-article">O que é o Apache Kafka</div>
+        </a>
+        
+        
+        
+        <div class="serie-article selected">Rodando o Apache Kafka localmente</div>
+        
+        
+        
+        <a href="/posts/enviando-mensagens">
+            <div class="serie-article">Enviando Mensagens</div>
+        </a>
+        
+        
+        
+        <a href="/posts/recebendo-mensagens">
+            <div class="serie-article">Recebendo Mensagens</div>
+        </a>
+        
+        
+        
+        <a href="/posts/anatomia-de-um-topico">
+            <div class="serie-article">Anatomia de um Tópico</div>
+        </a>
+        
+        
+        
+        <a href="/posts/log-cleanup-no-kafka">
+            <div class="serie-article">Log Cleanup no Kafka</div>
+        </a>
+        
+        
+    </div>
+</div>
+
+        <article>
+            <p>Continuando a série de <strong>Entendendo o Kafka</strong>, vou criar aqui um pequeno tutorial de como rodar o Kafka localmente em ambiente Windows.</p>
+
+<p>Para desenvolvimento, recomendo usar containers Docker. Porém, para aprendizado vale a pena configurar um cluster manualmente.</p>
+
+<h1 id="configurando">Configurando</h1>
+
+<ol>
+  <li>Instale o JDK 8</li>
+  <li>Baixe a última versão do Kafka em <a href="https://kafka.apache.org/downloads">https://kafka.apache.org/downloads</a>
+    <ul>
+      <li>Há várias versões baseadas na versão do Scala, escolha qualquer uma delas. Vamos usar a <strong>kafka_2.12-2.4.0</strong> por ela estar recomendada no site.</li>
+    </ul>
+  </li>
+  <li>Extraia o arquivo
+    <ul>
+      <li>No Windows a extensão <strong>.tgz</strong> não é muito amigável, mas você precisa das ferramentas corretas. Dica, use o <a href="https://www.7-zip.org/">7-Zip</a>. Com ele dá pra extrair usando o menu de contexto do mouse.</li>
+    </ul>
+  </li>
+  <li>Feito! Não é necessário nenhuma configuração a mais. Para melhor organização eu sempre instalo em <code class="language-plaintext highlighter-rouge">C:\opt</code>, ficando o Kafka com o PATH <code class="language-plaintext highlighter-rouge">C:\opt\kafka</code>.</li>
+</ol>
+
+<h1 id="iniciando-o-servidor-kafka">Iniciando o Servidor Kafka</h1>
+
+<p>O Kafka depende do Zookeeper. Este é um serviço para sincronia de configurações. Provavelmente será removido em futuras release. Mas por enquanto é necessário.</p>
+
+<p>Para iniciar o Kafka, abra duas linhas de comando e execute a partir da pasta de instalação do Kafka:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-server-start.bat config\server.properties
+</code></pre></div></div>
+
+<p>Pronto! Você tem um Kafka <strong><em>Up &amp; Running</em></strong>!</p>
+
+<h2 id="testando-o-cluster">Testando o Cluster</h2>
+
+<p>Para testar o cluster, a instalação do Kafka já vem com alguns scripts preparados.</p>
+
+<p>Primeiro precisamos criar um tópico para enviar mensagens. Isso pode ser feito com a linha abaixo:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
+</code></pre></div></div>
+
+<p>Após criado o tópico é só, a partir de duas janelas, executar as seguintes linhas abaixo:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/x6zzoik8zb1a66ytivow.png" alt="Kafka Consumer" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/3plxrkla0kra0g7ga46p.png" alt="Kafka Producer" /></p>
+
+<p>A primeira inicia um consumidor do Tópico <code class="language-plaintext highlighter-rouge">test</code> e a segunda um produtor. Cada mensagem escrita na segunda será enviada para a primeira.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>É fácil configurar um servidor Kafka para testes. Em outra oportunidade vou compartilhar como utilizar uma imagem docker, mas por enquanto apenas com o JDK 8 instalado é possível fazer essa configuração de qualquer ambiente.</p>
+
+        </article>
+        
+<div class="series">
+    <div class="serie-contents">
+        <h2>Entendendo o Kafka</h2>
+        
+        
+        
+        <a href="/posts/o-que-e-o-apache-kafka">
+            <div class="serie-article">O que é o Apache Kafka</div>
+        </a>
+        
+        
+        
+        <div class="serie-article selected">Rodando o Apache Kafka localmente</div>
+        
+        
+        
+        <a href="/posts/enviando-mensagens">
+            <div class="serie-article">Enviando Mensagens</div>
+        </a>
+        
+        
+        
+        <a href="/posts/recebendo-mensagens">
+            <div class="serie-article">Recebendo Mensagens</div>
+        </a>
+        
+        
+        
+        <a href="/posts/anatomia-de-um-topico">
+            <div class="serie-article">Anatomia de um Tópico</div>
+        </a>
+        
+        
+        
+        <a href="/posts/log-cleanup-no-kafka">
+            <div class="serie-article">Log Cleanup no Kafka</div>
+        </a>
+        
+        
+    </div>
+</div>
+ 
+        <div class="published">
+            
+            <div>Originally published February 07, 2020</div>
+            
+        </div>
+
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+                                                                                                                                                          
+            <div class="related-post-item">
+                <a href="/posts/log-cleanup-no-kafka">
+					
+					Entendendo o Kafka: Log Cleanup no Kafka
+					
+				</a>
+            </div>
+                                                                                                                                                                               
+            <div class="related-post-item">
+                <a href="/posts/anatomia-de-um-topico">
+					
+					Entendendo o Kafka: Anatomia de um Tópico
+					
+				</a>
+            </div>
+                                                                           
+            <div class="related-post-item">
+                <a href="/posts/recebendo-mensagens">
+					
+					Entendendo o Kafka: Recebendo Mensagens
+					
+				</a>
+            </div>
+               
+            <div class="related-post-item">
+                <a href="/posts/enviando-mensagens">
+					
+					Entendendo o Kafka: Enviando Mensagens
+					
+				</a>
+            </div>
+                         
+            <div class="related-post-item">
+                <a href="/posts/o-que-e-o-apache-kafka">
+					
+					Entendendo o Kafka: O que é o Apache Kafka
+					
+				</a>
+            </div>
+                                                   
+            <div class="related-post-item">
+                <a href="/posts/microsservicos-e-fordismo">
+					
+					Microsserviços e Fordismo
+					
+				</a>
+            </div>
+                                                     
+        </div>
+         
+        <!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o5djb');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+    </div>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li style="text-align: left;">
+			<div>
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+		<li>&nbsp;</li>
+	</ul>
+</footer> <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166943279-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'UA-166943279-1');
+</script> <script>
+    $(document).ready(() =>
+        $("p > img").each(function () {
+            if (this.parentElement.children.length == 1) {
+                $(this.parentElement).addClass("img-block");
+            }
+        }));
+</script>
+</body>
+
+</html>

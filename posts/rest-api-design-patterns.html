@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Backend Roadmap: Padrões de Projetos para APIs REST?</title>
+  <meta property="og:title" content="Backend Roadmap: Padrões de Projetos para APIs REST?" />
+  <meta name="twitter:title" content="Backend Roadmap: Padrões de Projetos para APIs REST?">
+  
+
+
+  
+  <meta name="description" content="Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta" />
+  <meta property="og:description" content="Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta" />
+  <meta name="twitter:description" content="Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta">
+  
+
+  
+  <meta name="keywords" content="API, REST, Design Patterns, Arquitetura de Software">
+  
+
+  <link rel="canonical" href="https://vepo.github.io/posts/rest-api-design-patterns" />
+  <meta property="og:url" content="https://vepo.github.io/posts/rest-api-design-patterns" />
+  <meta name="twitter:url" content="https://vepo.github.io/posts/rest-api-design-patterns">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://vepo.github.io/assets/images/biblioteca.jpg" />
+  <meta name="twitter:image" content="https://vepo.github.io/assets/images/biblioteca.jpg">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2020-11-30T06:14:00+00:00" />
+  <meta property="article:modified_time" content="2020-11-30T06:14:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="API" property="article:tag">
+  
+  <meta content="REST" property="article:tag">
+  
+  <meta content="Design Patterns" property="article:tag">
+  
+  <meta content="Arquitetura de Software" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Padrões de Projetos para APIs REST?",
+      "datePublished": "2020-11-30T06:14:00+00:00",
+      
+      "description": "Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta",
+      
+      
+      "url": "https://vepo.github.io/posts/rest-api-design-patterns"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> 
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+    <div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-server" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/kafka-tool">
+									
+									Kafka Tool
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Apresentações
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/series">Séries</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">Sobre</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/books">Livros Recomendados</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Redes Sociais
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a class="navbar-brand" href="https://twitter.com/vepo">
+								<i class="fa fa-twitter" aria-hidden="true"></i>
+								@vepo
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="title">
+			
+			<h1 class="serie-title">
+				Backend Roadmap
+			</h1>
+			<h2>
+				Padrões de Projetos para APIs REST?
+			</h2>
+			
+		</div>
+		<div class="cover-header">
+			
+			<div class="cover-image">
+				<img alt="Padrões de Projetos para APIs REST?" src="/assets/images/biblioteca.jpg" class="img-responsive">
+			</div>
+			
+		</div>
+	</div>
+</div>
+    <div class="container">
+
+        
+        <p>
+            
+            <strong>
+				<time datetime="2020-11-30T06:14:00+00:00">
+					November 30, 2020
+				</time>
+			</strong> 
+        </p>
+        <div class="tag-container">
+            
+            <a class="label label-default api" href="/tags/#api">API</a> 
+            <a class="label label-default rest" href="/tags/#rest">REST</a> 
+            <a class="label label-default design-patterns" href="/tags/#design-patterns">Design Patterns</a> 
+            <a class="label label-default arquitetura-de-software" href="/tags/#arquitetura-de-software">Arquitetura de Software</a> 
+        </div>
+         
+        <hr>  
+<div class="series">
+    <div class="serie-contents">
+        <h2>Backend Roadmap</h2>
+        
+        
+        
+        <div class="serie-article selected">Padrões de Projetos para APIs REST?</div>
+        
+        
+        
+        <a href="/posts/anatomia-protocolo-http">
+            <div class="serie-article">Anatomia do Protocolo HTTP</div>
+        </a>
+        
+        
+        
+        <a href="/posts/backend-o-desenvolvedor-invisivel">
+            <div class="serie-article">Backend: O desenvolvedor invisível</div>
+        </a>
+        
+        
+    </div>
+</div>
+
+        <article>
+            <h1 id="motivação">Motivação</h1>
+
+<p>A motivação desse post é fazer um estudo sobre quais são os Design Patterns e Anti-Patterns para REST APIS. APIs é uma tendência atualmente e como desenvolvedor Backend sempre me preocupei em criar boas, e bem projetas, APIs. Creio que conhecendo tanto os Design Patterns quanto os Anti-Patterns, vou melhorar ainda mais minha capacidade de projetar boas APIs.</p>
+
+<h1 id="levantamento-bibliografico">Levantamento Bibliografico</h1>
+
+<p>Para fazer o levantamento desses Patterns, resolvi buscar na academia, por isso fiz um levantamento usando o Google Scholar e os termos:</p>
+
+<ul>
+  <li>REST Anti Pattern</li>
+  <li>REST Design Patterns</li>
+</ul>
+
+<p>Minha intenção é buscar artigos publicado nos últimos 10 anos que me tragam insights para o meu proprio aprendizado.</p>
+
+<p>Os artigos selecionados para leitura foram:</p>
+
+<ul>
+  <li>2014 - <a href="https://link.springer.com/chapter/10.1007/978-3-662-45391-9_16">Detection of REST Patterns and Antipatterns: A Heuristics-Based Approach</a>: Francis Palma, Johann Dubois, Naouel Moha, and Yann-Gaël Guéhéneuc</li>
+  <li>2017 - <a href="https://ieeexplore.ieee.org/abstract/document/7930199">A Framework for the Structural Analysis of REST APIs</a>: Florian Haupt, Frank Leymann, Anton Scherer, Karolina Vukojevic-Haupt</li>
+  <li>2020 - <a href="https://link.springer.com/chapter/10.1007/978-3-030-59155-7_32">Defining Design Patterns for IoT APIs</a>: Rasmus Svensson, Adell Tatrous, Francis Palma</li>
+</ul>
+
+<h1 id="resumos">Resumos</h1>
+
+<h2 id="detection-of-rest-patterns-and-antipatterns-a-heuristics-based-approach">Detection of REST Patterns and Antipatterns: A Heuristics-Based Approach</h2>
+
+<p>Palma propões uma analise de Patterns e Anti-Patterns baseado nas hueristicas que os proprios Patterns propõe. Esse artigo foi escrito antes da <a href="https://smartbear.com/news/news-releases/sponsorship-of-swagger/">proposição</a> do <a href="https://spec.openapis.org/oas/v3.0.3">OpenAPI</a>, em 2015. Na analise foi uma identificação das requisições e respostas, baseada nas implementações de clientes das APIs.</p>
+
+<p>Foi identificada que muitas das APIs comerciais da época implementavam Anti-Patterns e Design Patterns.</p>
+
+<p><img src="/assets/images/design-patterns/palma-2014-results.png" alt="Resultados" /></p>
+
+<h2 id="a-framework-for-the-structural-analysis-of-rest-apis">A Framework for the Structural Analysis of REST APIs</h2>
+
+<p>Haupt propões uma analise estrutural baseada na documentação da API usando OpenAPI. A documentação de APIs abertas foram analisadas por uma ferramenta para se extrair o modelo dela. Ele por sua vez se baseia no <em>Atomic Resource Model</em> e no <em>URI Model</em>. O segundo modelo estende o primeiro, dando a oportunidade ao cliente da API de navegar nos recursos baseados em hyperlinks providos pela propria API.</p>
+
+<p><img src="/assets/images/design-patterns/atomic-resource-model.png" alt="Atomic Resource Model" /></p>
+
+<p>Com essa analise é possivel conhecer a complexidade da API, descrevendo quandos Recursos ela possui, quantos desses são <em>ReadOnly</em> e quais as relações entre eles através de links.</p>
+
+<h2 id="defining-design-patterns-for-iot-apis">Defining Design Patterns for IoT APIs</h2>
+
+<p>Svensson faz uma analise de algumas APIs de mercado para IoT e propões 8 Design Patterns, baseado no modelo do GoF. APIs de IoT são altamente voltada a recursos, pois cada dispositivo é um recurso. Segundo Svensson, os Patterns presentes na literatura são mais voltados para garantir a qualidade RESTful das APIs e não para o design dos endpoints, por isso todos esses Patterns são voltados para o endpoint.</p>
+
+<h1 id="anatomia-de-uma-requisição">Anatomia de uma Requisição</h1>
+
+<p>Segundo a <a href="https://tools.ietf.org/html/rfc3986">IETF RFC 3986</a>, uma URI deve ser dividida nos seguintes componentes:</p>
+
+<blockquote>
+  <p>Scheme://Authority/Path?Query#Fragment</p>
+</blockquote>
+
+<p>Cada componente de uma URI tem sua especificidade e significância que deve ser levada em conta na construção de uma API.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Descrição</th>
+      <th>Exemplo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Scheme</td>
+      <td>Define sobre qual protocolo essa API está sendo disponibilizada. APIs REST são obrigatoriamente disponibilizadas via HTTP, logo para nosso caso teremos apenas HTTP e HTTPS</td>
+      <td><strong>http</strong>://www.google.com/</td>
+    </tr>
+    <tr>
+      <td>Authority</td>
+      <td>Define onde está a API e como será acessada. Na grande maioria dos casos é composto pelo <code class="language-plaintext highlighter-rouge">hostname</code> do serviço, mas este pode ser substituido pelo endereço IP. Pode contar ainda qual autenticação será feita e a porta a ser acessada.</td>
+      <td>https://<strong>api.twitter.com</strong>/1.1/search/tweets.json</td>
+    </tr>
+    <tr>
+      <td>Path</td>
+      <td>Contem dados organizados hieraquircamente através de nós. Cada nó é separado por “/”</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Query</td>
+      <td>Parâmetros opcionais ou obrigatórios da requisição</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Fragment</td>
+      <td>Parâmetros que não serão considerados na requisição</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Svensson subdvide o <strong>Path</strong> em <strong>Base</strong> e <strong>Main</strong>. <strong>Base</strong> normalmente é usado para definir qual API e/ou qual versão da API deve ser acesada. Enquanto o <strong>Main</strong> é o ponto crucial da requisição. Dentre os nós de um <strong>Path</strong>, é possível também classificar sua função.</p>
+
+<blockquote>
+  <p>Scheme://Authority/Base/Main?Query</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Nó de Acesso</td>
+      <td>Um nó que é usado apenas para direcionar as seguintes partes do URI para uma determinada seção da API, ou seja, não é um recurso ou dados que podem ser buscados.</td>
+    </tr>
+    <tr>
+      <td>Nó Pai</td>
+      <td>Um nó que geralmente representa uma categoria, um recurso que inclui recursos ou um objeto. Na API e no URI, esse nó existe em uma hierarquia. Aqui, tendemos a mencionar apenas o fim da hierarquia.</td>
+    </tr>
+    <tr>
+      <td>Nó Indicativo</td>
+      <td>Um nó que representa uma ordem, consulta ou ação a ser realizada em um determinado recurso para aplicar esta ação ou conhecer uma informação específica sobre esse recurso, por exemplo, filtrar os resultados de uma solicitação feita em um determinado recurso. Podemos pensar nisso como um ponto final que dispara uma função. Geralmente é uma palavra convencional, como info, ‘create’, ‘last’, ‘status’, etc. Nós indicativos podem ser divididas em três categorias: Nós de Ação, Nós de Filtro e Nós Informacionais</td>
+    </tr>
+    <tr>
+      <td>Nós de Ação</td>
+      <td>Um nó usado para acionar uma função específica ou aplicar funcionalidades clássicas de CRUD em um recurso, usando qualquer método de solicitação HTTP. Na maioria dos casos, esses nós assumem a forma de um pedido para realizar uma ação, por exemplo, “create”, “clone”, “upload” ou “consume”</td>
+    </tr>
+    <tr>
+      <td>Nós de Filtro</td>
+      <td>Um nó usado para direcionar um grupo específico ou estado dos recursos solicitados.</td>
+    </tr>
+    <tr>
+      <td>Nós Informacionais</td>
+      <td>Um nó usado para obter informações sobre metadados para um ou vários recursos. Esses metadados não podem ser modificados diretamente nem acessíveis por meio do recurso</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Svensson também classifica a Authority como dinâmica e estática.</p>
+
+<ul>
+  <li><strong>Dinâmica</strong>: o mesmo valor é usado para todos os recursos controlado pela API</li>
+  <li><strong>Estática</strong>: valores são gerados para controlar grupo de recursos.</li>
+</ul>
+
+<h1 id="design-patterns">Design Patterns</h1>
+
+<h2 id="micro-level-patterns">Micro-Level Patterns</h2>
+
+<h3 id="entity-linking">Entity Linking</h3>
+<p>Este padrão permite a <strong>comunicação em tempo de execução</strong> através de <strong>links</strong> providos pelo servidor no corpo da resposta ou via <strong>Location:</strong>, no cabeçalho da responsta. Usando hyperlinks, cliente e servidor, estão <strong>fracamente acoplados</strong>, e o cliente pode <strong>automaticamente encontrar</strong> as <strong>entidades relacionadas</strong> em <strong>tempo de execução</strong>.</p>
+
+<h3 id="response-caching">Response Caching</h3>
+<p>O cacheamento da resposta é uma boa pratica para <strong>evitar enviar requisições duplicadas</strong> e <strong>respostas</strong> através do cacheamento de todas as mensagens no <strong>local</strong> da máquina do cliente. São usados os cabeçalhos <strong>Cache-Control</strong> e <strong>ETag</strong>, assim como o <strong>código HTTP 304</strong>.</p>
+
+<h3 id="content-negotiation">Content Negotiation</h3>
+<p>Esse padrão suporta <strong>representações alternativas para recursos</strong>, (por exemplo, em <strong>json</strong>, <strong>xml</strong>, <strong>pdf</strong>, etc.) assim o serviço consumidor se torna mais flexivel com alta reutilização. Servidores podem prover recursos em <strong>qualquer formato padrão</strong> requerido pelos clientes. Este padrão é aplicado através dp <strong>HTTP Media Types</strong> e adere ao principio de serviço de baixo acoplamento.</p>
+
+<h3 id="end-point-redirection">End-point Redirection</h3>
+<p>A funcionalidade de redirecionamento através da Web é suportado por este padrão, que também desempenha um papel importante como meio de <strong>composição de serviços</strong>. Para redirecionar clientes,o servidor envia uma nova localidade para acompanhar um dos códigos HTTP entre 301, 302, 307 ou 308. O principal beneficio desse padrão é - um serviço alternativo continua ativo mesmo que o endpoint requerido não responda.</p>
+
+<h3 id="entity-endpoint">Entity Endpoint</h3>
+<p>Serviços com um único <strong>endpoint</strong> são pouco granular. Usualmente, um cliente requer ao menos <strong>dois identificadores</strong>: um <strong>global</strong> para o <strong>serviço</strong> em si e um <strong>local</strong> para o <strong>recurso ou entidade</strong> gerenciada pelo serviço. Aplicando este padrão, isto é, usando <strong>multiplos endpoints</strong>, cada entidade (ou recurso) de um serviço incorporado pode ter seu <strong>identicador único</strong> e <strong>endereço global</strong>.</p>
+
+<h2 id="anti-patterns">Anti-Patterns</h2>
+
+<h3 id="breaking-self-descriptiveness">Breaking Self-descriptiveness</h3>
+<p>Desenvolvedores de APIs <strong>REST</strong> tendem a ignorar os <strong>cabeçalhos padrão</strong>, <strong>formatos</strong> e <strong>protocolos</strong> e criam customizações proprias. Esta pratica quebra o carater auto-descritivo e a mensagem contida no cabeçalho. A ausência do carater auto-descritivo limita a <strong>reutilização</strong> e a <strong>adaptabilidade</strong> do recurso REST.</p>
+
+<h3 id="forgetting-hypermedia">Forgetting Hypermedia</h3>
+<p>A falta de hipermídia, ou seja, a não vinculação de recursos, dificulta a transição de estado para aplicativos REST. Uma possível indicação deste antipadrão é a ausência de links de URL na representação de origem, o que normalmente restringe os clientes a seguir os links, ou seja, limita a comunicação dinâmica entre clientes e servidores</p>
+
+<h3 id="ignoring-caching">Ignoring Caching</h3>
+<p>Clientes REST e desenvolvedores backend tendem a <strong>evitar</strong> o cache devido à sua complexidade de implementação. No entanto, a capacidade de armazenamento em cache é uma das principais restrições de REST. Ao ignorar recursos de chace não usando <strong><em>Cache-Controe: no-cache</em></strong> ou <strong><em>no-store</em></strong> e não provendo um <strong>ETag</strong> no <strong>cabeçalho da resposta</strong>.</p>
+
+<h3 id="ignoring-mime-types">Ignoring MIME Types</h3>
+<p>O servidor deve representar <strong>recursos</strong> em vários formatos, por exemplo, <strong>XML</strong>, <strong>JSON</strong>, PDF, etc., o que pode permitir a clientes, desenvolvidos em qualquer linguagens, um consumo de serviço mais flexível. No entanto, os <strong>desenvolvedores</strong> backend geralmente pretendem ter uma <strong>única representação</strong> de recursos ou depender de seus próprios formatos, o que limita a <strong>acessibilidade</strong> e a <strong>reutilização</strong> do recurso (ou serviço).</p>
+
+<h3 id="ignoring-status-code">Ignoring Status Code</h3>
+<p>Apesar de um rico conjunto de códigos de status de nível de aplicativo definidos adequados para vários contextos, os desenvolvedores REST tendem a evitá-los, ou seja, contam apenas com os comuns, a saber 200, 404 e 500, ou até mesmo usam os códigos de status errados ou nenhum. O uso correto dos códigos de status das classes 2xx, 3xx, 4xx e 5xx auxilia clientes e servidores a se comunicarem de forma mais semântica</p>
+
+<h3 id="misusing-cookies">Misusing Cookies</h3>
+<p>Statelessness é outro princípio REST a ser seguido - o <strong>estado da sessão</strong> no lado do servidor <strong>não é permitido</strong> e todos os <strong>cookies violam o RESTfulness</strong>. O envio de <strong>chaves</strong> ou <strong>tokens</strong> no campo de cabeçalho <strong>Set-Cookie</strong> ou <strong>Cookie</strong> para a sessão do lado do servidor é um exemplo de uso indevido de cookies, que diz respeito à <strong>segurança</strong> e <strong>privacidade</strong></p>
+
+<h3 id="tunnelling-through-get">Tunnelling Through GET</h3>
+<p>Sendo o método HTTP mais fundamental em REST, o método GET recupera um recurso identificado por um URI. No entanto, muitas vezes os desenvolvedores <strong>usam apenas</strong> este método para realizar qualquer tipo de ação ou operação, incluindo a <strong>criação</strong>, <strong>exclusão</strong> ou até mesmo para <strong>atualizar</strong> um recurso. No entanto, HTTP GET é um método impróprio para qualquer ação diferente de <strong>acessar um recurso</strong> e não corresponde ao seu <strong>propósito semântico</strong>, se usado indevidamente.</p>
+
+<h3 id="tunnelling-through-post">Tunnelling Through POST</h3>
+<p>Esse Anti-Pattern é muito semelhante ao anterior, exceto que, além do URI, o <strong>corpo</strong> da solicitação HTTP POST pode <strong>incorporar operações</strong> e <strong>parâmetros</strong> a serem aplicados ao recurso. Os desenvolvedores tendem a depender apenas do método HTTP POST para enviar qualquer tipo de solicitação ao servidor, incluindo <strong>acesso</strong>, <strong>atualização</strong> ou <strong>exclusão</strong> de um recurso. Em geral, o uso adequado de HTTP POST é <strong>criar um recurso</strong> do lado do servidor. Qualquer paramêtro que altere uma requisição de informação, deve ser enviado como Query Parameter.</p>
+
+<h2 id="domain-patterns">Domain Patterns</h2>
+
+<h3 id="early-directed-uri-ed_uri">Early Directed URI (ED_URI)</h3>
+
+<ul>
+  <li><strong>Descrição</strong>: Para direcionar a requisição da URI para um grupo especifico ou único dentro da API. Pode ser um ID de organização, código de área ou nome de servidor. Normalmente é usado um nome variável no começo da <em>Authority</em>.</li>
+  <li><strong>Sessões afetadas</strong>: <em>Authority</em></li>
+  <li><strong>Formato</strong>: <code class="language-plaintext highlighter-rouge">Scheme://{variable}.../Base/Main?Query</code></li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://myiothub.azure-devices.net/jobs</code></li>
+</ul>
+
+<h3 id="expressive-request-er">Expressive Request (ER)</h3>
+<ul>
+  <li><strong>Descrição</strong>: Para executar as funcionalidades clássicas do CRUD ou acionar uma função específica em um recurso, ao mesmo tempo em que declara claramente a finalidade do URI e não apenas se baseia no método usado, adicione um <strong>Nó de Ação</strong> na seção <em>Main</em>.</li>
+  <li><strong>Sessões afetadas</strong>: <em>Main</em></li>
+  <li><strong>Formato</strong>:
+    <ol>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../ActionNode?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../ParentNode/ActionNode/{variable}?Query</code></li>
+    </ol>
+  </li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://ioe.droplit.io/v0/api/zones/123/behaviors/456/start</code></li>
+</ul>
+
+<h3 id="me-accessible-resources-mar">‘me’ Accessible Resources (MAR)</h3>
+<ul>
+  <li><strong>Descrição</strong>:  Para apontar para o usuário autenticado no momento ao solicitar recursos ou executar ações às quais este usuário tem acesso, use um nó “me” no início da seção <em>Main</em></li>
+  <li><strong>Sessões afetadas</strong>: <em>Main</em></li>
+  <li><strong>Formato</strong>: <code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/me/..?Query</code></li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://api.losant.com/me/refreshToken</code></li>
+</ul>
+
+<h3 id="metadata-retrievability-mr">Metadata Retrievability (MR)</h3>
+<ul>
+  <li><strong>Descrição</strong>: Para ler informações, principalmente usando o método GET, sobre metadados para um único ou vários recursos, como: <code class="language-plaintext highlighter-rouge">count</code>, <code class="language-plaintext highlighter-rouge">state</code>, <code class="language-plaintext highlighter-rouge">status</code> ou outros dados que não podem ser modificados diretamente nem acessíveis por meio de um recurso, o URI pode ter um Nó Informativo significativo no final da seção <em>Main</em> como uma indicação para as informações solicitadas.</li>
+  <li><strong>Sessões afetadas</strong>: <em>Main</em></li>
+  <li><strong>Formato</strong>: <code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../InformationalNode?Query</code></li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://api.particle.io/v1/sims/123/status</code></li>
+</ul>
+
+<h3 id="proactive-filtering-pf">Proactive Filtering (PF)</h3>
+<ul>
+  <li><strong>Descrição</strong>: Para direcionar um grupo específico ou estado do recurso solicitado sem depender de um parâmetro de consulta dedicado, use um Nó de Filtro na seção <em>Main</em></li>
+  <li><strong>Sessões afetadas</strong>: <em>Main</em></li>
+  <li><strong>Formato</strong>:
+    <ol>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../FilteringNode/ParentNode/..?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../ParentNode/FilteringNode/..?Query</code></li>
+    </ol>
+  </li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://platform.clearblade.com/codeadmin/failed</code></li>
+</ul>
+
+<h3 id="querified-authentication-qa">Querified Authentication (QA)</h3>
+<ul>
+  <li><strong>Descrição</strong>: Para fornecer a string de autenticação do usuário no URI ao usar o método GET, em vez de fornecê-la no cabeçalho ou no corpo ao usar outros métodos, use um parâmetro de consulta dedicado</li>
+  <li><strong>Sessões afetadas</strong>: <em>Query</em></li>
+  <li><strong>Formato</strong>: <code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/Main/?{authentication-key}={authentication-string-value</code></li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://api.particle.io/v1/events/123?access_token=456789</code></li>
+</ul>
+
+<h3 id="versionized-api-v_api">Versionized API (V_API)</h3>
+<ul>
+  <li><strong>Descrição</strong>: A diferenciação de versão da API é feita na request. Esta pode ser feita com base em um nó no <em>Base</em>, que representa a versão. Ou também com um parâmetro na Query.</li>
+  <li><strong>Sessões afetadas</strong>: <em>Base</em> e <em>Query</em></li>
+  <li><strong>Formato</strong>:
+    <ol>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/v{number}/Main?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/AccessNode(s)/v{number}/Main?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority//AccessNode(s)/v/{number}/Main?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/v{number}/AccessNode(s)/Main?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/Main?{version-key}={version-data-value}</code></li>
+    </ol>
+  </li>
+  <li><strong>Exemplo</strong>:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">https://myiothub.azure-devices.net/configurations/123?api-version=2020-03-13</code></li>
+      <li><code class="language-plaintext highlighter-rouge">http://api.cubesensors.com/v1/devices</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="versionized-resources-vr">Versionized Resources (VR)</h3>
+<ul>
+  <li><strong>Descrição</strong>: Nesse padrão, os recursos podem ter versões, e ao acessar um recurso uma versão antiga pode ser acessada.</li>
+  <li><strong>Sessões afetadas</strong>: <em>Main</em></li>
+  <li><strong>Formato</strong>:
+    <ol>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../ParentNode{number}/..?Query</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Scheme://Authority/Base/../ParentNode/v{number}/..?Query</code></li>
+    </ol>
+  </li>
+  <li><strong>Exemplo</strong>: <code class="language-plaintext highlighter-rouge">https://myiothub.azure-devices.net/jobs/v2/123</code></li>
+</ul>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Design Patterns podem existir para qualquer área. Eles podem ser de grande ajuda se você os conhece, vão te dar repertórios tanto para novos desenvolvimentos, quando para melhorias em códigos já existentes. Eles também podem indicar pontos de melhoria no seu projeto.</p>
+
+<hr />
+
+<p>Foto de <a href="https://www.pexels.com/pt-br/foto/aprendendo-aprender-biblioteca-conhecimento-1370295/"><strong>Element5 Digital</strong></a> no <strong>Pexels</strong></p>
+
+<p><img src="/assets/images/biblioteca.jpg" alt="Biblioteca" /></p>
+
+        </article>
+        
+<div class="series">
+    <div class="serie-contents">
+        <h2>Backend Roadmap</h2>
+        
+        
+        
+        <div class="serie-article selected">Padrões de Projetos para APIs REST?</div>
+        
+        
+        
+        <a href="/posts/anatomia-protocolo-http">
+            <div class="serie-article">Anatomia do Protocolo HTTP</div>
+        </a>
+        
+        
+        
+        <a href="/posts/backend-o-desenvolvedor-invisivel">
+            <div class="serie-article">Backend: O desenvolvedor invisível</div>
+        </a>
+        
+        
+    </div>
+</div>
+ 
+        <div class="published">
+            
+            <div>Originally published November 30, 2020</div>
+            
+        </div>
+
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+                                                                                
+            <div class="related-post-item">
+                <a href="/posts/linux-tudo-e-um-arquivo">
+					
+					Sobre Design de Software: O que é complexidade?
+					
+				</a>
+            </div>
+                                                                   
+            <div class="related-post-item">
+                <a href="/posts/anatomia-protocolo-http">
+					
+					Backend Roadmap: Anatomia do Protocolo HTTP
+					
+				</a>
+            </div>
+                                                                                                                                             
+            <div class="related-post-item">
+                <a href="/posts/linguagem-onipresente">
+					
+					Domain-Driven Design: Linguagem Onipresente
+					
+				</a>
+            </div>
+                                                                                                   
+            <div class="related-post-item">
+                <a href="/posts/design-patterns-e-se-alguem-ja-tiver-resolvido-seu-problema">
+					
+					Coisas que todo Sênior deve saber: Design Patterns. E se alguém já tiver resolvido seu problema?
+					
+				</a>
+            </div>
+                                                                                                                                                                   
+        </div>
+         
+        <!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o5djb');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+    </div>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li style="text-align: left;">
+			<div>
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+		<li>&nbsp;</li>
+	</ul>
+</footer> <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166943279-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'UA-166943279-1');
+</script> <script>
+    $(document).ready(() =>
+        $("p > img").each(function () {
+            if (this.parentElement.children.length == 1) {
+                $(this.parentElement).addClass("img-block");
+            }
+        }));
+</script>
+</body>
+
+</html>

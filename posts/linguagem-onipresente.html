@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Domain-Driven Design: Linguagem Onipresente</title>
+  <meta property="og:title" content="Domain-Driven Design: Linguagem Onipresente" />
+  <meta name="twitter:title" content="Domain-Driven Design: Linguagem Onipresente">
+  
+
+
+  
+  <meta name="description" content="Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design." />
+  <meta property="og:description" content="Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design." />
+  <meta name="twitter:description" content="Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design.">
+  
+
+  
+  <meta name="keywords" content="Domain-Driven Design, DDD, Arquitetura de Software, Desenvolvimento de Software">
+  
+
+  <link rel="canonical" href="https://vepo.github.io/posts/linguagem-onipresente" />
+  <meta property="og:url" content="https://vepo.github.io/posts/linguagem-onipresente" />
+  <meta name="twitter:url" content="https://vepo.github.io/posts/linguagem-onipresente">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://vepo.github.iohttps://dev-to-uploads.s3.amazonaws.com/i/1lk5xixpio5zyp5271ml.jpg" />
+  <meta name="twitter:image" content="https://vepo.github.iohttps://dev-to-uploads.s3.amazonaws.com/i/1lk5xixpio5zyp5271ml.jpg">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2020-07-20T12:15:12+00:00" />
+  <meta property="article:modified_time" content="2020-07-20T12:15:12+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Domain-Driven Design" property="article:tag">
+  
+  <meta content="DDD" property="article:tag">
+  
+  <meta content="Arquitetura de Software" property="article:tag">
+  
+  <meta content="Desenvolvimento de Software" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Linguagem Onipresente",
+      "datePublished": "2020-07-20T12:15:12+00:00",
+      
+      "description": "Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design.",
+      
+      
+      "sameAs" : [
+        "https://dev.to/vepo/linguagem-onipresente-1nld"
+      ],
+      
+      "url": "https://vepo.github.io/posts/linguagem-onipresente"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> 
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+    <div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-server" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/kafka-tool">
+									
+									Kafka Tool
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Apresentações
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/series">Séries</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">Sobre</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/books">Livros Recomendados</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Redes Sociais
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a class="navbar-brand" href="https://twitter.com/vepo">
+								<i class="fa fa-twitter" aria-hidden="true"></i>
+								@vepo
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="title">
+			
+			<h1 class="serie-title">
+				Domain-Driven Design
+			</h1>
+			<h2>
+				Linguagem Onipresente
+			</h2>
+			
+		</div>
+		<div class="cover-header">
+			
+			<div class="cover-image">
+				<img alt="Linguagem Onipresente" src="https://dev-to-uploads.s3.amazonaws.com/i/1lk5xixpio5zyp5271ml.jpg" class="img-responsive">
+			</div>
+			
+		</div>
+	</div>
+</div>
+    <div class="container">
+
+        
+        <p>
+            
+            <strong>
+				<time datetime="2020-07-20T12:15:12+00:00">
+					July 20, 2020
+				</time>
+			</strong> 
+        </p>
+        <div class="tag-container">
+            
+            <a class="label label-default domain-driven-design" href="/tags/#domain-driven-design">Domain-Driven Design</a> 
+            <a class="label label-default ddd" href="/tags/#ddd">DDD</a> 
+            <a class="label label-default arquitetura-de-software" href="/tags/#arquitetura-de-software">Arquitetura de Software</a> 
+            <a class="label label-default desenvolvimento-de-software" href="/tags/#desenvolvimento-de-software">Desenvolvimento de Software</a> 
+        </div>
+         
+        <div>
+            Post originally published on <a href="https://dev.to/vepo/linguagem-onipresente-1nld">dev.to</a>.
+        </div>
+        
+        <hr>  
+<div class="series">
+    <div class="serie-contents">
+        <h2>Domain-Driven Design</h2>
+        
+        
+        
+        <div class="serie-article selected">Linguagem Onipresente</div>
+        
+        
+    </div>
+</div>
+
+        <article>
+            <p>Faz alguns meses comprei o livro “Domain-Driven Desing: Atacando as Complexidades no Coração do Software” e comecei a ler somente agora. Ao iniciar a leitura já topo com um termo muito interessante e bem pertinente. O autor nos apresenta a necessidade de se construir uma Linguagem Onipresente (<em>ubiquitous language</em>).</p>
+
+<p>Nesse post vou apresentar o que é uma Linguagem Onipresente e como podemos contrui-lá. Fica uma aviso que eu ainda estou começando a ler o livro. 😉</p>
+
+<h1 id="porque-desenvolver-programas">Porque desenvolver programas?</h1>
+
+<p>Antes de entrar na faculdade, gostava muito de matemática e achava ela em si um fim. Pra mim, a matemática existia simplesmente por existir. Foi grande a minha decepção quando descobri que a matemática é uma linguagem com um proposito. Calculo existe para explicar o movimentos dos Corpos e foi criada por Newton. Se Newton não tivesse interesse de estudar o movimento dos corpos, provavelmente o Calculo não existiria e o mundo seria completamente diferente.</p>
+
+<p>Porque eu fui falar de matemática? Porque com computação acontece a mesma coisa. A computação em si não existiria se ela não ajudasse a resolver problemas do mundo real. Pra que programar? No fundo você está resolvendo um problema ou automatizando uma atividade que já estava aí. Logo existe um usuário que está aí já lidando com o problema que você quer resolver. Este pode ser um operador de caixa, um advogado, uma médica, uma farmacêutica, um chefe de cozinha ou você desenvolvendo software.</p>
+
+<p>Esse usuário já lida com o problema pelo qual você vai resolver e já tem muitos conceitos criados. Chamamos de <strong>Domínio</strong> (<em>Domain</em>) a Área de Atuação desse problema.</p>
+
+<h1 id="a-necessidade-de-modelos">A Necessidade de Modelos</h1>
+
+<p>Qualquer desenvolvedor sabe que precisa de Modelos. Os mais inexperientes não conseguem abstrair o que é um modelo, ficando presos a conceitos da linguagem.</p>
+
+<p><em>- “Eu tenho um array aqui com o nome dos meus funcionários”</em></p>
+
+<p>A criação de um modelo é um passo importante para se resolver o problema satisfatoriamente. No caso da frase acima, eu considero que existe a entidade <strong>Funcionário</strong>. Este passa a ser um conceito abstrato no contexto do seu projeto. A <strong>Funcionário</strong> serão dados atribuições relacionamentos.</p>
+
+<p><em>- “Tenho 500 <strong>Funcionários</strong> na Base de Dados, e consigo fazer um relatório por departamento.”</em></p>
+
+<p>Modelos podem ser representados em diagramas, gráficos e textos. Porém eles existem no código, estão amarrados ao código. Uma vez mudando o código o diagrama não é atualizado, o que pode gerar confusão.</p>
+
+<h1 id="de-modelos-a-domínio">De Modelos a Domínio</h1>
+
+<p>Como já foi dito, Domínio é algo que já existe antes da criação de um software. Antes que você escreva um programa para o RH da empresa, já existirão funcionários lá. Ao contrário de Modelos, o Domínio ele é inerente ao negócio. Este pode não estar mapeado, ou nomeado, mas já existe lá.</p>
+
+<p>Podemos afirmar que o conhecimento do Domínio, ou o Modelo do Domínio é o coração do software. Sem o conhecimento dela, o software pode desempenhar um papel não desejado e assim não ser utilizado.</p>
+
+<p>Vale aqui resaltar que Modelo pode se aplicado em vários contextos. Podemos falar em Modelo de Dados ou Modelo de Domínio. Aqui vamos tratar de Modelo de Domínio.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/88dcrwupiimcho95whsm.png" alt="Vai um vinho?" /></p>
+
+<h1 id="construindo-o-modelo-do-domínio">Construindo o Modelo do Domínio</h1>
+
+<p>O Domínio é algo prexistente, porém cada usuário tem uma visão do mesmo. Um cliente do supermercado não precisa saber o horário de entrega do fornecedor de verduras, porém o estoquista precisa dessa informação. Porém, mesmo já existindo, pode ser que este não esteja mapeado ou modelado.</p>
+
+<p>A atividade de se Modelar um Domínio é um processo em várias etapas. Ela involve questionamos e perguntas e deve ser feita em voz alta.</p>
+
+<p><em>- “Um <strong>Funcionário</strong> tem apenas um supervisor?”</em>
+<em>- “Não, há <strong>Funcionários</strong> que respondem para seu gerente e para o cliente.</em>
+<em>- “E quais são as responsabilidades do <strong>Gerente</strong> para com o <strong>Funcionário</strong>? E quando esse responde também ao <strong>Cliente</strong>, qual o papel do mesmo?</em></p>
+
+<p>Observe que no dialogo acima, há palavras que aparecem em negrito. Quando coloco elas em negrito, estou afirmando que a mesma foi incorporada ao Modelo de Domínio. Assim nesse pegqueno dialogo, o desenvolvedor acabou de descobrir que na modelagem de um software para RH, deve levar em consideração tanto o <strong>Gerente</strong> do <strong>Funcionário</strong> quanto o <strong>Cliente</strong>, porém o <strong>Cliente</strong> não é um <strong>Funcionário</strong>.</p>
+
+<p>Esses termos quando identificados e devidamente adicionados ao Modelo, começam a fazer parte da <strong>Linguagem Onipresente</strong> do mesmo. <strong>Linguagem Onipresente</strong> é o conjunto de nomes de entidades e operações que a mesma podem fazer associadas ao Domínio do Software. Essa linguagem deve ser construida e cultivada em todo o ciclo de vida do projeto de software, não sendo considerada acabada enquanto o software ainda estiver em desenvolvimento.</p>
+
+<h2 id="como-extrair-o-modelo">Como extrair o Modelo</h2>
+
+<h3 id="1-ligando-o-modelo-e-a-implementação">1. Ligando o modelo e a implementação</h3>
+
+<p>O modelo do Domínio é o coração do software e ele deve refletir em todos os os contextos, por isso se chama Onipresente. Assim ele deve estar presente no Código, na Base de Dados, na Documentação e na comunicação de todos envolvidos no projeto. Tanto os desenvolvedores quandos os usuários do programa.</p>
+
+<p>Se, por algum motivo, o modelo não estiver atualizado em algum desses contextos, teremos um problema em potencial.</p>
+
+<h3 id="2-cultivando-uma-linguagem-baseada-no-modelo">2. Cultivando uma Linguagem baseada no Modelo</h3>
+
+<p>Extrair termos do Domínio e começar a usa-los corretamente no dia a dia é um hábito muito útil no desenvolvimento de software. Ele habilitará os usuários a terem ciência de certas atividades que já desenvolvem. E também ajudará os desenvolvedores a conhecerem as atividades que o usuário desenvolvem.</p>
+
+<p>O desenvolvedor não precisa saber exatamente como a atividade é desenvolvida, assim como o usuário não precisa saber de detalhes da implementação. Mas habilitará uma comunicação com os dois “<em>extremos</em>”.</p>
+
+<h3 id="3-desenvolvendo-um-modelo-rico-em-conhecimentos">3. Desenvolvendo um modelo rico em conhecimentos</h3>
+
+<p>O modelo vai muito além do que está implementado. E ele pode ser enriquecido sempre que possível. Construir o modelo é uma atividade que não tem fim.</p>
+
+<h3 id="4-destilando-o-modelo">4. Destilando o modelo</h3>
+
+<p>Apesar de a construção do modelo não acabar, enquanto o projeto não acabar. Não significa que ele não possa ser simplificado. Sou muito fã do princípio <a href="https://pt.wikipedia.org/wiki/Princ%C3%ADpio_KISS"><em><strong>KISS</strong>: Keep It Simple, Stupid</em></a>.</p>
+
+<p>Em qualquer estudo, ao se adicionar novas informações aumenta-se a complexidade do sistemas. <a href="https://pt.wikipedia.org/wiki/Leis_de_Newton#Primeira_lei_de_Newton">Isso é uma lei da natureza, se não gastarmos esforço para compreender a relação entre os novos conceitos e os antigos tentando simplificar</a>… <a href="https://www.significados.com.br/entropia/">a entropia do sistema vai aumentar</a>.</p>
+
+<h3 id="5-colhendo-ideias-e-experimentando">5. Colhendo ideias e experimentando</h3>
+
+<p>A construção de inteções, cenários, pressupostos e afirmações é um exercicio que enriquece muito o modelo. Simples perguntas podem criar novas entidades, podem fundir duas entidades que poderiam ser consideradas distintas ou simplesmente alterar relações entre entidades. Nesse ponto não há pergunta boba.</p>
+
+<h2 id="como-nÃo-extrair-o-modelo">Como <strong>NÃO</strong> extrair o Modelo</h2>
+
+<h3 id="1-importar-modelos">1. Importar modelos</h3>
+
+<p>É comum, em projetos de software, a importação de modelos já prontos. Ao se iniciar um projeto já se define algumas classes e objetos com nomes padrão. Quem nunca viu <strong>UserService</strong>? Pra que serve um UserService? Essa pergunta pode ter uma resposta completamente genérica que em muitos casos não se aplica ao atual projeto.</p>
+
+<h3 id="2-importar-uma-nomenclatura">2. Importar uma nomenclatura</h3>
+
+<p>É comum, em projetos de software, nomear objetos com o nome dos seus tipos. Muitas vezes o desenvolvedor cria um <strong>UserDTO</strong> logo ao se iniciar um projeto, sem ao menos se perguntar qual seria a melhor nomenclatura.</p>
+
+<p><a href="https://pt.wikipedia.org/wiki/Objeto_de_Transfer%C3%AAncia_de_Dados">DTO</a> significa <strong>Data Transfer Object</strong> e é um objeto usado para transfêrencia de Dados. Eu uso muitos DTOs, mas nunca uso esse sufixo, até porque ele não tem sentido dentro de um software. Quando os uso posso chamar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>UserResponse</strong></td>
+      <td>Resposta a chamada REST que retorna os dados do Usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserCreatedEvent</strong></td>
+      <td>Evento de criação de um Usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserChangedEvent</strong></td>
+      <td>Evento de alteração dos dados de um usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserPayload</strong></td>
+      <td>Dados do Usuário usado para criação em serviços REST</td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td>…</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Observe que para cada Nome existe uma funcionalidade associada.</p>
+
+<h3 id="3-desenvolvimento-orientado-a-design-patterns">3. Desenvolvimento Orientado a Design Patterns</h3>
+
+<p>Design Patterns são extremamente uteis, porém devem não devem ser usados apenas por usar. Eles devem fazer sentido. Pode se usar uma adaptação ou mesmo uma mescla de dois sentidos, vai depender do problema. Entre um Desing Pattern e o Domínio, prefira o Domínio. Não que ele tenha que existir um conflito entre os dois, mas o Pattern tem que se adaptar ao modelo.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Modela um software é uma atividade muito importante. Cada software tem o seu Domínio e este deve ser modela de acordo com o problema a ser resolvido. O Domínio é muito mais extenso que a implementação do software e quando desenvolvedores limitam sua linguagem a apenas a implementação isso pode ser um fator gerador de problemas.</p>
+
+<h1 id="livros-recomendados">Livros Recomendados</h1>
+
+<ol>
+  <li><a href="https://amzn.to/3jodm7i">Domain-Driven Design: Atacando as Complexidades no Coração do Software</a> de Eric Evans</li>
+  <li><a href="https://amzn.to/30ua0H3">Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código</a> de Pete Goodliffe</li>
+  <li><a href="https://amzn.to/3chO9r6">Código Limpo: Habilidades Práticas do Agile Software</a> de Robert C. Martin</li>
+</ol>
+
+        </article>
+        
+<div class="series">
+    <div class="serie-contents">
+        <h2>Domain-Driven Design</h2>
+        
+        
+        
+        <div class="serie-article selected">Linguagem Onipresente</div>
+        
+        
+    </div>
+</div>
+ 
+        <div class="published">
+            
+            <div>Originally published July 20, 2020</div>
+            
+        </div>
+
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+                                                                              
+            <div class="related-post-item">
+                <a href="/posts/linux-tudo-e-um-arquivo">
+					
+					Sobre Design de Software: O que é complexidade?
+					
+				</a>
+            </div>
+                                                             
+            <div class="related-post-item">
+                <a href="/posts/backend-o-desenvolvedor-invisivel">
+					
+					Backend Roadmap: Backend: O desenvolvedor invisível
+					
+				</a>
+            </div>
+                             
+            <div class="related-post-item">
+                <a href="/posts/rest-api-design-patterns">
+					
+					Backend Roadmap: Padrões de Projetos para APIs REST?
+					
+				</a>
+            </div>
+                                                                                                                                                                                                         
+            <div class="related-post-item">
+                <a href="/posts/deixando-rastros-ou-como-usar-log">
+					
+					Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/construindo-software-resilientes">
+					
+					Coisas que todo Sênior deve saber: Construindo softwares resilientes
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/design-patterns-e-se-alguem-ja-tiver-resolvido-seu-problema">
+					
+					Coisas que todo Sênior deve saber: Design Patterns. E se alguém já tiver resolvido seu problema?
+					
+				</a>
+            </div>
+                                                                                                                                                                   
+        </div>
+         
+        <!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o5djb');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+    </div>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li style="text-align: left;">
+			<div>
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+		<li>&nbsp;</li>
+	</ul>
+</footer> <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166943279-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'UA-166943279-1');
+</script> <script>
+    $(document).ready(() =>
+        $("p > img").each(function () {
+            if (this.parentElement.children.length == 1) {
+                $(this.parentElement).addClass("img-block");
+            }
+        }));
+</script>
+</body>
+
+</html>

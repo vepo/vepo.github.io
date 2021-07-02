@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Backend Roadmap: Anatomia do Protocolo HTTP</title>
+  <meta property="og:title" content="Backend Roadmap: Anatomia do Protocolo HTTP" />
+  <meta name="twitter:title" content="Backend Roadmap: Anatomia do Protocolo HTTP">
+  
+
+
+  
+  <meta name="description" content="Nesse post apresento em detalhes o protocolo HTTP e sua implementação usando Jakarta-EE" />
+  <meta property="og:description" content="Nesse post apresento em detalhes o protocolo HTTP e sua implementação usando Jakarta-EE" />
+  <meta name="twitter:description" content="Nesse post apresento em detalhes o protocolo HTTP e sua implementação usando Jakarta-EE">
+  
+
+  
+  <meta name="keywords" content="HTTP, REST, JAX-RS, Java, Jakarta-EE">
+  
+
+  <link rel="canonical" href="https://vepo.github.io/posts/anatomia-protocolo-http" />
+  <meta property="og:url" content="https://vepo.github.io/posts/anatomia-protocolo-http" />
+  <meta name="twitter:url" content="https://vepo.github.io/posts/anatomia-protocolo-http">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://vepo.github.io/assets/images/nasa-connected.jpg" />
+  <meta name="twitter:image" content="https://vepo.github.io/assets/images/nasa-connected.jpg">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2020-12-05T14:00:00+00:00" />
+  <meta property="article:modified_time" content="2020-12-05T14:00:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="HTTP" property="article:tag">
+  
+  <meta content="REST" property="article:tag">
+  
+  <meta content="JAX-RS" property="article:tag">
+  
+  <meta content="Java" property="article:tag">
+  
+  <meta content="Jakarta-EE" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Anatomia do Protocolo HTTP",
+      "datePublished": "2020-12-05T14:00:00+00:00",
+      
+      "description": "Nesse post apresento em detalhes o protocolo HTTP e sua implementação usando Jakarta-EE",
+      
+      
+      "url": "https://vepo.github.io/posts/anatomia-protocolo-http"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> 
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+    <div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-server" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/kafka-tool">
+									
+									Kafka Tool
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Apresentações
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/series">Séries</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">Sobre</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/books">Livros Recomendados</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Redes Sociais
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a class="navbar-brand" href="https://twitter.com/vepo">
+								<i class="fa fa-twitter" aria-hidden="true"></i>
+								@vepo
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="title">
+			
+			<h1 class="serie-title">
+				Backend Roadmap
+			</h1>
+			<h2>
+				Anatomia do Protocolo HTTP
+			</h2>
+			
+		</div>
+		<div class="cover-header">
+			
+			<div class="cover-image">
+				<img alt="Anatomia do Protocolo HTTP" src="/assets/images/nasa-connected.jpg" class="img-responsive">
+			</div>
+			
+		</div>
+	</div>
+</div>
+    <div class="container">
+
+        
+        <p>
+            
+            <strong>
+				<time datetime="2020-12-05T14:00:00+00:00">
+					December 05, 2020
+				</time>
+			</strong> 
+        </p>
+        <div class="tag-container">
+            
+            <a class="label label-default http" href="/tags/#http">HTTP</a> 
+            <a class="label label-default rest" href="/tags/#rest">REST</a> 
+            <a class="label label-default jax-rs" href="/tags/#jax-rs">JAX-RS</a> 
+            <a class="label label-default java" href="/tags/#java">Java</a> 
+            <a class="label label-default jakarta-ee" href="/tags/#jakarta-ee">Jakarta-EE</a> 
+        </div>
+         
+        <hr>  
+<div class="series">
+    <div class="serie-contents">
+        <h2>Backend Roadmap</h2>
+        
+        
+        
+        <a href="/posts/rest-api-design-patterns">
+            <div class="serie-article">Padrões de Projetos para APIs REST?</div>
+        </a>
+        
+        
+        
+        <div class="serie-article selected">Anatomia do Protocolo HTTP</div>
+        
+        
+        
+        <a href="/posts/backend-o-desenvolvedor-invisivel">
+            <div class="serie-article">Backend: O desenvolvedor invisível</div>
+        </a>
+        
+        
+    </div>
+</div>
+
+        <article>
+            <h1 id="anatomia-do-protocolo-http">Anatomia do Protocolo HTTP</h1>
+
+<h2 id="introdução">Introdução</h2>
+
+<p><strong>HyperText Transfer Protocol</strong> (HTTP) é um protocolo no nível da aplicação para sistemas de informação distribuídos e colaborativos. É um protocolo genérico e <em>stateless</em> que pode ser estendido pela aplicação. O protocolo permite a negociação do formato do dado entre cliente e servidor, permitindo que sistemas sejam implementados independentemente.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>RFCs</th>
+      <th>Título</th>
+      <th>Data</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc2616">2616</a></td>
+      <td>Hypertext Transfer Protocol – HTTP/1.1</td>
+      <td>Junho 1999</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc2617">2617</a></td>
+      <td>HTTP Authentication: Basic and Digest Access Authentication</td>
+      <td>Junho 1999</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc2817">2817</a></td>
+      <td>Upgrading to TLS Within HTTP/1.1</td>
+      <td>Maio 2000</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc5785">5785</a></td>
+      <td>Defining Well-Known Uniform Resource Identifiers (URIs)</td>
+      <td>Abril 2010</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc6265">6265</a></td>
+      <td>HTTP State Management Mechanism</td>
+      <td>Abril 2011</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc6266">6266</a></td>
+      <td>Use of the Content-Disposition Header Field in the Hypertext Transfer Protocol (HTTP)</td>
+      <td>Junho 2011</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc6585">6585</a></td>
+      <td>Additional HTTP Status Codes</td>
+      <td>Abril 2012</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc6749">6749</a></td>
+      <td>The OAuth 2.0 Authorization Framework</td>
+      <td>Outubro 2012</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc6750">6750</a></td>
+      <td>The OAuth 2.0 Authorization Framework: Bearer Token Usage</td>
+      <td>Outubro 2012</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7168">7168</a></td>
+      <td>The Hyper Text Coffee Pot Control Protocol for Tea Efflux Appliances (HTCPCP-TEA)</td>
+      <td>1º Abril de 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7230">7230</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7231">7231</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7232">7232</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Conditional Requests</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7233">7233</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Range Requests</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7234">7234</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Caching</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7235">7235</a></td>
+      <td>Hypertext Transfer Protocol (HTTP/1.1): Authentication</td>
+      <td>Junho 2014</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7519">7519</a></td>
+      <td>JSON Web Token (JWT)</td>
+      <td>Maio 2015</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7540">7540</a></td>
+      <td>Hypertext Transfer Protocol Version 2 (HTTP/2)</td>
+      <td>Maio 2015</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc7797">7797</a></td>
+      <td>JSON Web Signature (JWS) Unencoded Payload Option</td>
+      <td>Fevereiro 2016</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc8725">8725</a></td>
+      <td>JSON Web Token Best Current Practices</td>
+      <td>Fevereiro 2020</td>
+    </tr>
+    <tr>
+      <td><a href="https://tools.ietf.org/html/rfc8740">8740</a></td>
+      <td>Using TLS 1.3 with HTTP/2</td>
+      <td>Fevereiro 2020</td>
+    </tr>
+    <tr>
+      <td><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-http-32">Draft</a></td>
+      <td>Hypertext Transfer Protocol Version 3 (HTTP/3)</td>
+      <td>Outubro 2020</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Apesar de todas as RFCS serem relativamente recentes, o HTTP tem sido usado pela World-Wide Web desde 1990, sendo o formato HTTP/1.1 o mais conhecido. As atualizações propostas pelas versões mais recentes não alteraram a estrutura do protocolo, somente a codificação das mensagens trocadas. Os itens da sua estrutura, como Métodos, Caminhos, Cabeçalhos e Corpo da Mensagem, continuam existindo.</p>
+
+<p>A grande vantagem do HTTP/1.1 é que o mesmo é um protocolo humanamente legível. Você pode abrir uma sessão telnet escrever uma requisição HTTP com uma linha.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ telnet www.w3.org 80
+Trying 128.30.52.100...
+Connected to www.w3.org.
+Escape character is '^]'.
+GET http://www.w3.org/pub/WWW/TheProject.html HTTP/1.1
+
+HTTP/1.1 400 Bad Request
+date: Wed, 02 Dec 2020 17:59:53 GMT
+last-modified: Thu, 04 Jun 2020 15:34:04 GMT
+etag: "420-5a743dfdcf300"
+accept-ranges: bytes
+content-length: 1056
+vary: upgrade-insecure-requests
+content-type: text/html; charset=iso-8859-1
+x-backend: www-mirrors
+
+&lt;!DOCTYPE html&gt;
+(...)
+&lt;/html&gt;
+
+
+Connection closed by foreign host.
+</code></pre></div></div>
+
+<h2 id="histórico">Histórico</h2>
+
+<p>Inicialmente o HTTP era usado somente para visualização de conteúdo nos navegadores. As páginas Web tinham poucas funcionalidades e seu conteúdo era renderizado pelo servidor. Depois os navegadores começaram a ter mais funcionalidades graças ao Javascript. Com o advento de uma linguagem a ser executado no navegador, era possível alterar a <a href="https://developer.mozilla.org/pt-BR/docs/DOM/Referencia_do_DOM/Introdu%C3%A7%C3%A3o">DOM</a>, esta é o modo de acesso de todos os elementos da UI via código. Cada elemento HTML era um Objeto Javascript, podendo ser alterado. Isso deu vida ao que chamamos Web 2.0, as páginas estaticas evoluiram para um versão mais interativa. Cada usuário poderia ter contas de acesso e o conteúdo da página atualizava de acordo com a iteração do usuário, as vezes sem fazer requisição HTTP. Vale lembrar que nessa época uma Requisição HTTP as vezes era muito demorada.</p>
+
+<p>Tudo isso impulsionou a requisição <a href="https://developer.mozilla.org/pt-BR/docs/Web/Guide/AJAX">AJAX</a>, onde dentro de um código Javascript era feito uma requisição HTTP, não estamos falando de <a href="https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm">REST</a>, muitas vezes era feita uma requisição de uma outra página HTML ou de um XML, ou era acessado um serviço via <a href="https://www.w3.org/TR/soap12/">SOAP</a>. Só pra lembrar, os navegadores tinham suporte a <a href="https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Firefox/SOAP_in_Gecko-based_Browsers">SOAP</a>, mas muitas vezes ele era feito diretamente por AJAX, porque o grande problema da época era a compatibilidade dos navegadores.</p>
+
+<p>Paralelo ao crescimento das funcionalidades do lado do cliente, surgiu os Smartphones. Ambos de início eram muito rudimentares. As apliações Web, se é que podemos chamar assim, era construida basicamente usando jQuery. A grande vantagem do jQuery era criar uma fachada para acesso ao navegador, tentando assim diminuir a dor de portar uma aplicação em todos os navegadores do mercado. Assim estas aplicações foram evoluindo até surgirem as primeiras <a href="https://en.wikipedia.org/wiki/Single-page_application#History">Single-Page Applications</a> (SPA) e os primeiros frameworks Frontend.</p>
+
+<p>As principais forças para o crescimento das APIs foram as SPAs e os aplicativos Mobile. Os microserviços acabaram se popularizando na mesma época, mas grande parte das APIs são feitas para serem consumida como serviços a serem exibidos diretamente para usuários.</p>
+
+<h2 id="implementação-java">Implementação Java</h2>
+
+<p>Java já tem mais de 25 anos, quantas vezes você imagina que o protocolo HTTP já foi implementado na linguagem? Incontáveis! Eu mesmo já implementei um como prova de conceito antes de conhecer e saber usar as especificações do Jakarta EE (previamente conhecido como Java EE). A grande vantagem de Java sobre outras linguagens são as especificações, você não precisa conhecer as implementações de cada framework HTTP, basta conhecer uma das especificações <a href="https://www.jcp.org/en/jsr/detail?id=370"><strong>JSR 370: JavaTM API for RESTful Web Services (JAX-RS 2.1) Specification</strong></a> ou <a href="https://jcp.org/en/jsr/detail?id=340"><strong>JSR 340: Java Servlet 3.1 Specification</strong></a> e escolher qual implementação usar.</p>
+
+<p>A diferença básica entre essas duas especificações é o escopo de cada uma. Enquanto a Java Servlet é focada em responder a requisição HTTP, a JAX-RS é focada em prover uma API REST. Assim a JAX-RS tem como base ser:</p>
+<ul>
+  <li><strong>POJO-Based</strong>: A implementação é projetada de forma a ser fácil expor POJOs como recursos da API.</li>
+  <li><strong>HTTP-centric</strong>: Se estamos falando de REST, estamos falando de HTTP, e o centro da API é o protocolo. Você terá contado com URIs e Verbos e deve entender o que é isso.</li>
+  <li><strong>Format independence</strong>: Uma API REST pode responder XML, JSON ou qualquer outro formato. Você precisa mudar seu código? Pois é, JAX-RS deixa seu código independente.</li>
+  <li><strong>Container independence</strong>: Essa é uma feature das Specs Jakarta EE. Você pode escolher a implementação que seu código irá rodar. Não ficando atrelado a um framework/empresa.</li>
+</ul>
+
+<p>Aqui apresentarei como usar o JAX-RS, visto que hoje ele é o mais conhecido e usado no mercado. Isso não significa que o Servlet é ultrapassado, muito pelo contrário, ele é a base para o JAX-RS. Quando o assunto apresentado fugir do escopo do JAX-RS, será apresentado a especificação que implementa a solução. Para microsserviços, temos um conjunto de especificações conhecidos como MicroProfile.io, eles buscam trazer implementações de padrões de serviços, esses não são definidos pelo Protocolo HTTP, mas são padrões de mercado recomendados.</p>
+
+<h1 id="elementos-do-protocolo">Elementos do Protocolo</h1>
+
+<p>O Protocolo HTTP é de certa forma simples, por ser stateless, não há vários estados ou tipos de requisição. Podemos resumir o protocolo na análise simples de uma requisição. Vamos começar vendo os elementos proposto na versão 1.1, para depois vermos o que foi adicionado nas versões mais recentes.</p>
+
+<p>Podemos dizer que uma Requisição HTTP terá os seguintes elementos: Método, URI, Cabeçalhos e Corpo.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Elemento</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Método</td>
+      <td>Indica o que deve ser feito ao recurso. Os métodos existente são: <code class="language-plaintext highlighter-rouge">OPTIONS</code>,  <code class="language-plaintext highlighter-rouge">GET</code>, <code class="language-plaintext highlighter-rouge">HEAD</code>, <code class="language-plaintext highlighter-rouge">POST</code>, <code class="language-plaintext highlighter-rouge">PUT</code>, <code class="language-plaintext highlighter-rouge">DELETE</code>, <code class="language-plaintext highlighter-rouge">TRACE</code> e <code class="language-plaintext highlighter-rouge">CONNECT</code>.</td>
+    </tr>
+    <tr>
+      <td>URI</td>
+      <td>Indica para qual recurso a Requisição deve ser aplicada.</td>
+    </tr>
+    <tr>
+      <td>Cabeçalho</td>
+      <td>Informações adicionais a Requisição passada pelo cliente. Atuam como modificadores da requisição. Os cabeçalhos definido pelo protocolo são: <code class="language-plaintext highlighter-rouge">Accept</code>, <code class="language-plaintext highlighter-rouge">Accept-Charset</code>, <code class="language-plaintext highlighter-rouge">Accept-Encoding</code>, <code class="language-plaintext highlighter-rouge">Accept-Language</code>, <code class="language-plaintext highlighter-rouge">Authorization</code>, <code class="language-plaintext highlighter-rouge">Expect</code>, <code class="language-plaintext highlighter-rouge">From</code>, <code class="language-plaintext highlighter-rouge">Host</code>, <code class="language-plaintext highlighter-rouge">If-Match</code>, <code class="language-plaintext highlighter-rouge">If-Modified-Since</code>, <code class="language-plaintext highlighter-rouge">If-None-Match</code>, <code class="language-plaintext highlighter-rouge">If-Range</code>, <code class="language-plaintext highlighter-rouge">If-Unmodified-Since</code>, <code class="language-plaintext highlighter-rouge">Max-Forwards</code>, <code class="language-plaintext highlighter-rouge">Proxy-Authorization</code>, <code class="language-plaintext highlighter-rouge">Range</code>, <code class="language-plaintext highlighter-rouge">Referer</code>, <code class="language-plaintext highlighter-rouge">TE</code> e <code class="language-plaintext highlighter-rouge">User-Agent</code>.</td>
+    </tr>
+    <tr>
+      <td>Corpo</td>
+      <td>Entidade associada a Requisição. Só existe na requisição associada aos métodos: <code class="language-plaintext highlighter-rouge">POST</code> e <code class="language-plaintext highlighter-rouge">PUT</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Para cada Requisição existe uma Resposta e esta tem os mesmo elementos.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Elemento</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Status</td>
+      <td>Composto por um código com 3 dígitos e descrição textual dele. Esses código são agrupados por centenas.</td>
+    </tr>
+    <tr>
+      <td>Cabeçalho</td>
+      <td>Informações adicionais sobre a Resposta.</td>
+    </tr>
+    <tr>
+      <td>Corpo</td>
+      <td>Entidade respondida pelo servidor. Não é obrigatório, mas qualquer Método aceita corpo na resposta</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vale ressaltar que no HTTP/1.1 esse protocolo é legível para nós, a separação de cada elemento se dá usando <code class="language-plaintext highlighter-rouge">CRLF</code>, que são os caracteres <strong>Carriage Return (13)</strong> + <strong>Line Feed (10)</strong>.</p>
+
+<p>Todos esses elementos são importantes e todos são usados em qualquer servidor. Muitos problemas ocorrem por causa de Código de Status sendo usado incorretamente, ou Cabeaçalhos sendo ignorados. Analisaremos cada elemento baseado em Casos de Uso.</p>
+
+<ol>
+  <li>Decidindo o Recurso</li>
+  <li>Decidindo a Ação</li>
+  <li>Decidindo o Formato</li>
+  <li>Apresentando as credenciais</li>
+  <li>Colocando Valores na Requisição</li>
+  <li>Adicionando Parâmetros de busca</li>
+  <li>Escrevendo a Resposta</li>
+  <li>Informando o tipo de Resposta</li>
+  <li>Tratando erros</li>
+  <li>Usando o Cache</li>
+</ol>
+
+<h1 id="1-decidindo-o-recurso">1. Decidindo o Recurso</h1>
+
+<p>Na Requisição HTTP, a URI tem como objetivo identificar o Recurso a ser objeto da Requisição. Em muitos contextos a URI será chamada de Caminho, <em>Path</em>, ou <em>Endpoint</em>.</p>
+
+<p>Vamos analisar a API do Twitter, se selecionarmos as opções <a href="https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/api-reference/get-search-tweets">Search Tweets</a> e <a href="https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline">Get Tweet timelines</a>, vamos observar que há uma pequena diferença na URL das duas:</p>
+<ul>
+  <li>https://api.twitter.com/1.1/search/tweets.json</li>
+  <li>https://api.twitter.com/1.1/statuses/home_timeline.json</li>
+</ul>
+
+<p>Observe que elas tem uma raiz em comum <strong>https://api.twitter.com/1.1</strong>. O que está acontecendo? O Twitter hospeda todas a suas API sob o DNS <code class="language-plaintext highlighter-rouge">api.twitter.com</code> e usando HTTPS, que é HTTP sob uma camada de criptografia, como visto na imagem abaixo. A URI contém alguns nós, o primeiro dele <code class="language-plaintext highlighter-rouge">1.1</code> se refere a versão da API, provavelmente é usado por um servidor que não responderá a requisição, apenas fará o proxy dela para outro servidor contendo a implementação dessa versão. Dado os dois endpoints, provavelmente a mesma implementação do servidor irá receber requisições com URIs <code class="language-plaintext highlighter-rouge">/search/tweets.json</code> e <code class="language-plaintext highlighter-rouge">/statuses/home_timeline.json</code>.</p>
+
+<p><img src="/assets/images/http/https-seguranca.png" alt="Informações de Segurança" /></p>
+
+<p>Podemos verificar qual o endereço físico que resolve <code class="language-plaintext highlighter-rouge">api.twitter.com</code> usando um simples <code class="language-plaintext highlighter-rouge">ping</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ping api.twitter.com
+
+Pinging tpop-api.twitter.com <span class="o">[</span>104.244.42.194] with 32 bytes of data:
+Reply from 104.244.42.194: <span class="nv">bytes</span><span class="o">=</span>32 <span class="nb">time</span><span class="o">=</span>162ms <span class="nv">TTL</span><span class="o">=</span>54
+Reply from 104.244.42.194: <span class="nv">bytes</span><span class="o">=</span>32 <span class="nb">time</span><span class="o">=</span>214ms <span class="nv">TTL</span><span class="o">=</span>54
+Reply from 104.244.42.194: <span class="nv">bytes</span><span class="o">=</span>32 <span class="nb">time</span><span class="o">=</span>156ms <span class="nv">TTL</span><span class="o">=</span>54
+Reply from 104.244.42.194: <span class="nv">bytes</span><span class="o">=</span>32 <span class="nb">time</span><span class="o">=</span>166ms <span class="nv">TTL</span><span class="o">=</span>54
+
+Ping statistics <span class="k">for </span>104.244.42.194:
+    Packets: Sent <span class="o">=</span> 4, Received <span class="o">=</span> 4, Lost <span class="o">=</span> 0 <span class="o">(</span>0% loss<span class="o">)</span>,
+Approximate round trip <span class="nb">times </span><span class="k">in </span>milli-seconds:
+    Minimum <span class="o">=</span> 156ms, Maximum <span class="o">=</span> 214ms, Average <span class="o">=</span> 174ms
+</code></pre></div></div>
+
+<p>Muito provavelmente uma máquina com om endereço <code class="language-plaintext highlighter-rouge">104.244.42.194</code> vai receber uma requisição com URL <code class="language-plaintext highlighter-rouge">/1.1/search/tweets.json</code>. Esta máquina vai copiar essa requisição e enviará para outro processo ou máquina com a URI <code class="language-plaintext highlighter-rouge">/search/tweets.json</code>.</p>
+
+<h2 id="implementação-usando-jax-rs">Implementação usando JAX-RS</h2>
+<p>Com JAX-RS é possível criar classes para Recursos (<em>Resources</em>). Assim cara <em>endpoint</em> seria mapeado para uma classe separada. Vamos imaginar então que existiria uma classe para o recurso <code class="language-plaintext highlighter-rouge">Search</code> e outra para <code class="language-plaintext highlighter-rouge">Statuses</code>. Como o recurso <code class="language-plaintext highlighter-rouge">Search</code> tem só um nó filho, vou usar como exemplo o <code class="language-plaintext highlighter-rouge">Statuses</code>, este tem os seguintes nós filhos:</p>
+
+<ul>
+  <li><strong><em>GET</em> <code class="language-plaintext highlighter-rouge">statuses/home_timeline</code></strong></li>
+  <li><strong><em>GET</em> <code class="language-plaintext highlighter-rouge">statuses/mentions_timeline</code></strong></li>
+  <li><strong><em>GET</em> <code class="language-plaintext highlighter-rouge">statuses/user_timeline</code></strong></li>
+</ul>
+
+<p>Todos esses podem ser criados dentro da classe Resource <code class="language-plaintext highlighter-rouge">StatusResource</code>. Para resolver a URI corretamente, podemos dizer que a classe irá resolver todas as URIs começada com <code class="language-plaintext highlighter-rouge">/statuses</code> usando a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/path"><code class="language-plaintext highlighter-rouge">javax.ws.rs.Path</code></a>, e nessa classe vamos criar os métodos para cada recurso e métodos usando a mesma Annotation e a especifica do Método <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/get"><code class="language-plaintext highlighter-rouge">javax.ws.rs.GET</code></a>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/statuses"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatusResource</span> <span class="o">{</span>
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/home_timeline"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Tweet</span><span class="o">&gt;</span> <span class="nf">getHomeTimeline</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/mentions_timeline"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Tweet</span><span class="o">&gt;</span> <span class="nf">getMentionsTimeline</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/user_timeline"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Tweet</span><span class="o">&gt;</span> <span class="nf">getUserTimeline</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="2-decidindo-a-ação">2. Decidindo a Ação</h1>
+<p>Apesar de ignorado por alguns protocolos, o Método HTTP é muito importante, ele dá uma nova dimensão a requisição. podemos por exemplo para um mesmo recurso ter várias ações diferentes. O protocolo foi pensado para prover acesso a recursos através da internet, assim cada método significa uma operação em um recurso. Vimos anteriormente que a URI define qual recurso será acessado, e o Método define qual operação será feita.</p>
+
+<p>Protocolos como SOAP tentam trazer um nível de abstração usando o corpo da requisição, desse modo o método usado deve ser sempre o POST. Mas APIs REST se baseiam muito no Método, ele é um dos pontos centrais da API. Normalmente em servidor temos apenas os Métodos GET para recursos como arquivos Javascript e páginas HTML. Alguns mais antigos implementam o POST para formulários. Foi a API REST que trouxe os Métodos como elemento primordial para o protocolo, ela dá significância a POST, PUT, PATCH e DELETE.</p>
+
+<p>Na tabela abaixo são listadas as definições de cada Método pela RFC 2616.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Definição</th>
+      <th style="text-align: center">É Idempotente?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>OPTIONS</td>
+      <td>O método OPTIONS representa um pedido de informação sobre as opções de comunicação disponíveis na cadeia de pedido / resposta identificada pelo Request-URI.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>GET</td>
+      <td>O método GET significa recuperar qualquer informação (na forma de uma entidade) é identificada pelo Request-URI.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>HEAD</td>
+      <td>O método HEAD é idêntico ao GET, exceto que o servidor NÃO DEVE retornar um corpo de mensagem na resposta.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>POST</td>
+      <td>O método POST é usado para solicitar que o servidor de origem aceite a entidade incluída na solicitação como um novo subordinado do recurso identificado pelo Request-URI na Request-Line.</td>
+      <td style="text-align: center">Não</td>
+    </tr>
+    <tr>
+      <td>PUT</td>
+      <td>O método PUT solicita que a entidade incluída seja armazenada no URI de Solicitação fornecido.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>DELETE</td>
+      <td>O método DELETE solicita que o servidor de origem exclua o recurso identificado pelo Request-URI.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>TRACE</td>
+      <td>O método TRACE é usado para invocar um loopback remoto da camada de aplicativo da mensagem de solicitação.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td>CONNECT</td>
+      <td>Esta especificação reserva o nome do método CONNECT para uso com um proxy que pode mudar dinamicamente para ser um túnel (por exemplo, túnel SSL).</td>
+      <td style="text-align: center">N/A</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Observe que o PATCH não está listado. Ele havia sido proposto pela RFC anterior <a href="https://tools.ietf.org/html/rfc2068">RFC 2068 Hypertext Transfer Protocol – HTTP/1.1</a>, mas como não havia uma implementação dele, foi removido na atualização. Mas vale lembrar que segundo a própria especificação do protocolo, o Método é um valor em aberto, podendo ser usando qualquer token.</p>
+
+<p>Para APIs REST, os Métodos ganharam outra significância. As vezes são chamados de Verbos, como podemos ver no <a href="https://github.com/Microsoft/api-guidelines/blob/master/Guidelines.md#74-supported-methods">Guideline</a> para APIs REST da Microsoft. Eles descrevem cada Verbo a ser utilizado da seguinte forma:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Método</th>
+      <th>Descrição</th>
+      <th style="text-align: center">É Idempotente?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">GET</td>
+      <td>Retorna o valor atual de um objeto.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">PUT</td>
+      <td>Sobrescreve um objeto, ou cria um objeto nomeado, quando aplicável.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">DELETE</td>
+      <td>Remove um objeto.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">POST</td>
+      <td>Cria um novo objeto baseado nos dados fornecidos, ou enviados pelo comando.</td>
+      <td style="text-align: center">Não</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">HEAD</td>
+      <td>Retorna os metadados de um objeto para a resposta de GET. Recursos que suportam GET podem suportar também HEAD.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">PATCH</td>
+      <td>Aplica uma atualização parcial a um objeto</td>
+      <td style="text-align: center">Não</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">OPTIONS</td>
+      <td>Retorna informação sobre a requisião. Permite que um cliente recupere informações sobre um recurso, no mínimo, retornando o cabeçalho Allow denotando os Métodos válidos para este recurso.</td>
+      <td style="text-align: center">Sim</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="implementação-usando-jax-rs-1">Implementação usando JAX-RS</h2>
+
+<p>Para demonstrarmos como implementar em JAX-RS, vamos partir do pressuposto que precisamos criar uma API de CRUD de usuários. Essa API deve ter as opções de Criar, Ler, Alterar e Apagar. Também vamos adicionar uma opção de metadados, que retornará todas as estatisticas de acesso do usuário.</p>
+
+<p>Para isso precisamos projetar uma classe recursos chamada <code class="language-plaintext highlighter-rouge">UserEnpoint</code>, com alguns métodos implementando cada função. Para especificar os métodos, precisamos apenas usar as Annotations <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/get"><code class="language-plaintext highlighter-rouge">javax.ws.rs.GET</code></a>, <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/put"><code class="language-plaintext highlighter-rouge">javax.ws.rs.PUT</code></a>, <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/delete"><code class="language-plaintext highlighter-rouge">javax.ws.rs.DELETE</code></a>, <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/post"><code class="language-plaintext highlighter-rouge">javax.ws.rs.POST</code></a>, <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/head"><code class="language-plaintext highlighter-rouge">javax.ws.rs.HEAD</code></a>, <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/patch"><code class="language-plaintext highlighter-rouge">javax.ws.rs.PATCH</code></a> ou <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/options"><code class="language-plaintext highlighter-rouge">javax.ws.rs.OPTIONS</code></a>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserEndpoint</span> <span class="o">{</span>
+
+    <span class="nd">@PUT</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">createUser</span><span class="o">(</span><span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">UserResponse</span><span class="o">&gt;</span> <span class="nf">findUsers</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/{userId: [1-9][0-9]*}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">getUser</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"userId"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@POST</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/{userId: [1-9][0-9]*}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">updateUser</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"userId"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">userId</span><span class="o">,</span> <span class="nc">UpdateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PATCH</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/{userId: [1-9][0-9]*}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">updateUserProperties</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"userId"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">userId</span><span class="o">,</span> <span class="nc">UpdateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@DELETE</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/{userId: [1-9][0-9]*}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"userId"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@HEAD</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/{userId: [1-9][0-9]*}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserStatisticsResponse</span> <span class="nf">getUserStatistics</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"userId"</span><span class="o">)</span> <span class="kt">int</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Observe que usando apenas Annotations é simples e legível criar classes que serão uma fachada de acesso para API. Toda a lógica de negocios fica separada da lógica de acesso do HTTP. Nesse exemplo, acabamos criando caminhos usando regras e variáveis, mas isso serão visto em outro caso de uso.</p>
+
+<h1 id="3-decidindo-o-formato">3. Decidindo o Formato</h1>
+
+<p>Através dos cabeçalho <code class="language-plaintext highlighter-rouge">Accept</code>, <code class="language-plaintext highlighter-rouge">Accept-Language</code>, <code class="language-plaintext highlighter-rouge">Accept-Encoding</code> e <code class="language-plaintext highlighter-rouge">Accept-Charset</code> o cliente e o servidor podem negociar o que será enviado como resposta.</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">Accept: application/json, text/plain, */*
+Accept-Language: en,en-US;q=0.8,pt-BR;q=0.5,pt;q=0.3
+Accept-Encoding: gzip, deflate
+Accept-Charset: iso-8859-5, unicode-1-1;q=0.8
+</span></code></pre></div></div>
+
+<p>Para entender o que a requisição acima está pedindo, precisamos entender um pouco como funciona esse campo. Começaremos com o <code class="language-plaintext highlighter-rouge">Accept-Language</code>, mas a interpretação do conteúdo vale pra todos, só mudando o escopo.</p>
+
+<p>Na requisição, o navegador envia todas os idiomas que o usuário configurou com seus respectivos pesos. No caso tempos que o usuário aceita os idiomas nas ordens de prioridade:</p>
+
+<ol>
+  <li>Inglês → <code class="language-plaintext highlighter-rouge">en</code></li>
+  <li>Inglês Americano → <code class="language-plaintext highlighter-rouge">en-US</code></li>
+  <li>Português Brasileiro → <code class="language-plaintext highlighter-rouge">pt-BR</code></li>
+  <li>Português → <code class="language-plaintext highlighter-rouge">pt</code></li>
+</ol>
+
+<p>Como que a ordem de prioridade é definida? Através do parâmetro <code class="language-plaintext highlighter-rouge">q=0.3</code>. Parece estranho porque intuitivamente você entendeu que o separador é o <code class="language-plaintext highlighter-rouge">;</code>, mas não o separador é o <code class="language-plaintext highlighter-rouge">,</code>. O  <code class="language-plaintext highlighter-rouge">;</code> esta como separador entre valor e parâmetro. Quando omitido, o valor de <code class="language-plaintext highlighter-rouge">q</code>, <em>relative quality factor</em> ou <em>fator de qualidade relativa</em> ou simplemente peso, é <code class="language-plaintext highlighter-rouge">1.0</code>.</p>
+
+<p>Com esses valores, o servidor vai decidir como será processada a resposta. Se estiver acessando um conteúdo disponível em inglês ou português, vai escolher por português. Se o conteúdo da resposta puder ser exibido como <strong>JSON</strong> ou <strong>XML</strong>, escolherá <strong>JSON</strong>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Cabeçalho</th>
+      <th>Escopo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Accept</td>
+      <td>Especifica os tipos de mídia aceitos como resposta.</td>
+    </tr>
+    <tr>
+      <td>Accept-Language</td>
+      <td>Especifica quais idiomas são aceitos como resposta.</td>
+    </tr>
+    <tr>
+      <td>Accept-Encoding</td>
+      <td>Especifica como a reposta pode ser codificada.</td>
+    </tr>
+    <tr>
+      <td>Accept-Charset</td>
+      <td>Especifica qual charset são aceitos como resposta.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="implementação-usando-jax-rs-2">Implementação usando JAX-RS</h2>
+
+<p>O JAX-RS dá suporte para controlarmos quais serão os formatos consumidos/produzidos pela API desenvolvida. Para isso tem que se usar as Annotations <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/consumes"><code class="language-plaintext highlighter-rouge">javax.ws.rs.Consumes</code></a> e <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/produces"><code class="language-plaintext highlighter-rouge">javax.ws.rs.Produces</code></a>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Consumes</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">UserUpdatedResponse</span> <span class="nf">update</span><span class="o">(</span><span class="nc">UserUpdateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="4-apresentando-as-credenciais">4. Apresentando as credenciais</h1>
+
+<p>Como já foi dito, o protocolo HTTP é stateless. Não há como se guardar o estado da conexão no protocolo. Cada requisição é única e o protocolo não tem a intenção de se manter o estado. Então como é feito a identificação de usuário e da sessão? Para responder essa pergunta temos que olhar para os Cabeçalhos!</p>
+
+<p>A RFC 2616 define o cabeçalho <code class="language-plaintext highlighter-rouge">Authorization</code> com essa finalidade, ele deve conter a identificação do usuário. Vale lembrar que, se falando de cabeçalhos, o protocolo não determina como as coisas devem ser feitas, apenas dá um direcionamento. Essa RCF não determina como o <code class="language-plaintext highlighter-rouge">Authorization</code> deve ser usado, usando apenas o termo vago “credenciais”.</p>
+
+<p>Mesmo sem ter nenhum padrão definido como obrigatório no protocolo, há um método de Autenticação padrão definido na RFC 2617. Conhecida como HTTP Basic Authentication, ela consiste no uso da tupla usuário:senha codificada em Base64. Assim o cabeçalho ficaria da seguinte forma: <code class="language-plaintext highlighter-rouge">Authorization: Basic Base64(usuário:senha)</code>. Como a senha é apenas códificada, e não criptografada, esse método de authenticação apresenta algumas falhas de segurança se usada com HTTP. Para resolver esse problema, é aconselhável usar HTTPS adicionando uma camada de segurança a comunicação.</p>
+
+<p>A RFC ainda levanta algumas falhas de segurança em authenticações HTTP, uma dessas preocupações é referente ao ataque <strong>Man in the Middle</strong>. Ela acontece quando, entre Alice e Bob, há um interlocutor observando o valor de <code class="language-plaintext highlighter-rouge">Autorization</code>. Com o conhecimento desse valor, ele pode ser reusado em outras requisições. Assim quando Alice envia uma mensagem para Bob, o interlocutor pode ler o valor e fingir ser Alice.</p>
+
+<p>Além da Autenticação Basic, há outros modos. Uma forma bem comum é o uso de Cookies. Eles não são uma boa prática e muitas vezes são usados de maneira antiética por empresas conhecidas como Big Techs. Um Cookie consiste em uma informação adicionada no cliente ou no servidor que será replicada a cada iteração. Definido na RFC 6265, o Cookie é um mecanismo para armazenar Tokens, esses Tokens podem servir para armazenar informações do usuário. Assim uma informação simples como <code class="language-plaintext highlighter-rouge">Cookie: SID=31d4d96e407aad42; lang=en-US</code> pode conter todo o registro de acesso do usuário em vários endereços da internet. Vale lembrar que o Cookie é replicado apenas por um endereço, mas hoje temos códigos Javascript de várias empresas rodando nos nossos sites e coletando Cookies.</p>
+
+<p>O Cookie também é usado criar o registro da sessão do usuário, pois ele é uma solução simple onde há um método de expiração do Token. Assim, ao se logar em um servidor e este usar o <code class="language-plaintext highlighter-rouge">Set-Cookie: session=e1d8ade7aa00f1a7e66f6f324a5819ad; domain=.mycompany.com; path=/; expires=Fri, 18 Dec 2020 10:37:38 GMT;</code>, temos um acesso que irá expirar em 18 de dezembro de 2020. Se o usuário não acessar o servidor novamente até essa data, será necessário um novo Token.</p>
+
+<p>Com a evolução dos frameworks frontend, um token não era mais suficiente para o registro da sessão. Ele é muito útil quando temos todas as decições tomadas apenas de um lado da comunicação. Mas e quando são necessárias informações de acesso dos dois lados? Para isso a RFC 7519 define o JWT, que é um formato para armazenar informações do usuário. Usando criptografia assimétrica o token é gerado por uma autoridade, que não necessariamente precisa ser o servidor para qual está sendo enviada a requisição. Esse pode ser usado no cabeçalho <code class="language-plaintext highlighter-rouge">Autorization</code> como token método <code class="language-plaintext highlighter-rouge">Bearer</code>, definido nas RFC 6749.</p>
+
+<p>Para exemplificar o JWT, vamos imaginar o cabeçalho abaixo, qualquer cliente pode ler esse token e descobrir que ele usa o algoritmo HS256 e se refere ao usuário John Doe com identificador 1234567890 possuindo as permissões de ADMIN e EDITOR. Um token JWT é composto de 3 partes, a primeira contem o o tipo do token e o algoritmo usado para criptografar o token. Já a segunda parte conterá um objeto JSON com todas as informações do usuário, alguns campos desse JSON são definidos pela RFC 7919, mas a aplicação pode adicionar o que for necessário. E o último token serve para validar a autenticidade do token, ele vai conter o conteúdo das duas primeiras sessões encriptada com a chave privada que não deve ser compartilhada. Cada serviço que contenha a chave pública pode ler essa informação e validar esse token foi gerado pela autoridade certificador, ou seja, o nosso serviço de authenticação de usuários.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyb2xlcyI6WyJBRE1JTiIsIkVESVRPUiJdfQ.ppRwCyy0PiXgtfRgMZm77CIWHq-Y6sUFtxM2vahlv-k
+</code></pre></div></div>
+
+<p><img src="/assets/images/http/jwt.png" alt="JWT decodificado em jwt.io" /></p>
+
+<h2 id="implementação-usando-microprofileio">Implementação usando Microprofile.io</h2>
+
+<p>Como há muitos métodos de autenticação, vamos apresentar como o proposto pela especificação <a href="https://github.com/eclipse/microprofile-jwt-auth"><strong>JWT RBAC for Microprofile</strong></a>. Essa especificação usa Annotations definidas na <a href="https://jcp.org/en/jsr/detail?id=250"><strong>JSR-000250 Common Annotations for the JavaTM Platform 1.0</strong></a>.</p>
+
+<p>Para o nosso exemplo, vamos imaginar um serviço de acesso a usuário onde cada usuário pode pegar suas proprias informações, mas apenas usuários Administradores pode listar usuários. Qualquer usuário poderá fazer o login quando não autenticado. Para permitir o acesso de usuário não autenticados, devemos usar a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/annotation/security/permitall"><code class="language-plaintext highlighter-rouge">javax.annotation.security.PermitAll</code></a>. Para restringir o acesso a usuários autenticados, devemos usar <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/annotation/security/denyall"><code class="language-plaintext highlighter-rouge">javax.annotation.security.DenyAll</code></a>. E por fim, para restringir o acesso apenas para alguns usuários com certas permissões, devemos definir quais são as funções permitidas usando <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/annotation/security/rolesallowed"><code class="language-plaintext highlighter-rouge">javax.annotation.security.RolesAllowed</code></a>.</p>
+
+<p>Vale lembrar, que de acordo com a implementação, alguns vão requerer que todas as funções sejam declaradas usando <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/annotation/security/declareroles"><code class="language-plaintext highlighter-rouge">javax.annotation.security.DeclareRoles</code></a>.</p>
+
+<p>Para na lógica de validação da requisição, o MicroProfile Auth prevê dois métodos de retorno dos valores do JWT. Podemos injetar usando CDI todos os valores, ou apenas um Claim do JWT. Para acessar todo token, precisamo usar a classe <code class="language-plaintext highlighter-rouge">org.eclipse.microprofile.jwt.JsonWebToken</code>. Já para acessar um Claim especifico, só usar a Annotation <code class="language-plaintext highlighter-rouge">org.eclipse.microprofile.jwt.Claim</code> como qualifier.</p>
+
+<p>Assim, se criamos a classe <code class="language-plaintext highlighter-rouge">UserEndpoint</code>, vamos ter:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="nd">@DeclareRoles</span><span class="o">({</span> <span class="s">"ADMIN"</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserEndpoint</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="kd">private</span> <span class="nc">JsonWebToken</span> <span class="n">callerPrincipal</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nd">@Claim</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="s">"exp"</span><span class="o">,</span> <span class="n">standard</span><span class="o">=</span><span class="nc">Claims</span><span class="o">.</span><span class="na">iat</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">timeClaim</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@RolesAllowed</span><span class="o">({</span> <span class="s">"ADMIN"</span> <span class="o">})</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">UserResponse</span><span class="o">&gt;</span> <span class="nf">findUsers</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/me"</span><span class="o">)</span>
+    <span class="nd">@DenyAll</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">getLoggedUser</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+    <span class="nd">@POST</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/login"</span><span class="o">)</span>
+    <span class="nd">@PermitAll</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">doLogin</span><span class="o">(</span><span class="nc">LoginRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// some code</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="5-colocando-valores-na-requisição">5. Colocando Valores na Requisição</h1>
+<p>Algumas requisições tem um corpo, a definição do protocolo não se preocupa em definir quais Métodos deve ou não ter um corpo associado a mensagem. Mas já é um padrão que somente o <strong>POST</strong> e <strong>PUT</strong> tem um body associado, tanto que as especificações do 3GPP para 5G coloca que somente operações de remoção quando não requerem parametros que não identifiquem o recurso devem usar <strong>DELETE</strong> (4.2.3 TS 129 501 V15.7.0). Isso significa que operações como <code class="language-plaintext highlighter-rouge">/chargingdata/{ChargingDataRef}/release</code> do module <strong>CHF - Converged Charging</strong> devem usar POST, por requerem mais informação que um identificador.</p>
+
+<p>Por ser um protocolo bem simples, o HTTP aceita qualquer coisa no corpo da mensagem. Este só é finalizado quando há dois CRLF seguindos, mas sempre é recomendado o uso do cabeçalho <code class="language-plaintext highlighter-rouge">Content-Length</code> para evitar que o conteúdo da mensagem seja confundindo com a finalização da mensagem.</p>
+
+<p>Esse valor não é interpretado pelo protocolo, essa função é da aplicação. Assim, não há problema haver discrepância de dados entre o cabeçalho e o corpo da mensagem. Mas vale lembrar que tudo funcionará melhor se o conteúdo vier associado aos cabeçalhos <code class="language-plaintext highlighter-rouge">Content-Type</code> e <code class="language-plaintext highlighter-rouge">Content-Length</code>.</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">Content-Type: application/x-www-form-urlencoded
+Content-Length: 115
+</span></code></pre></div></div>
+
+<p>O valor de <code class="language-plaintext highlighter-rouge">Content-Type</code> vai informar a aplicação como o dado no corpo da mensagem deve ser interpretado, este é um <a href="https://tools.ietf.org/html/rfc2045">MIME Type</a>. Assim um valor pode ser serializado tanto em XML quanto em JSON, mas se esse formato estiver especificado no <code class="language-plaintext highlighter-rouge">Content-Type</code> a aplicação poderá ler ele sem nenhum problema.</p>
+
+<h2 id="implementação-usando-jax-rs-3">Implementação usando JAX-RS</h2>
+
+<p>Para adicionar um corpo na mensagem do JAX-RS, não é preciso nenhuma configuração especial. O método que implementa esse endpoint deve conter a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/consumes"><code class="language-plaintext highlighter-rouge">javax.ws.rs.Consumes</code></a> e deve ser um <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/post"><code class="language-plaintext highlighter-rouge">javax.ws.rs.POST</code></a> ou <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/put"><code class="language-plaintext highlighter-rouge">javax.ws.rs.PUT</code></a>. A única especificidade é que o método deve ter um parâmetro que é um POJO. Abaixo segue o exemplo que já usamos anteriormente.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Consumes</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">UserUpdatedResponse</span> <span class="nf">update</span><span class="o">(</span><span class="nc">UserUpdateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="6-adicionando-parâmetros-de-busca">6. Adicionando Parâmetros de busca</h1>
+<p>Se olharmos bem para o Path, veremos que a URI tem uma porção que é comum para vários recursos. Chamamos de Query String tudo que vem depois de um <code class="language-plaintext highlighter-rouge">?</code>. O recurso é identificado pelo caminho que vai do inicio até o <code class="language-plaintext highlighter-rouge">?</code>, o que vem depois é apenas um parâmetro. Vamos analisar o caso abaixo, nesse caso <code class="language-plaintext highlighter-rouge">/a/b/c</code> é o recurso com dois parâmetros que alteram essa busca.</p>
+
+<blockquote>
+  <p>/a/b/c?key1=value1&amp;key2=value2</p>
+</blockquote>
+
+<p>Query Strings devem ser usado com muita parcimonia, pois em muitos casos esses valores devem vir no corpo da mensagem e não na requisição. Seu uso deve ser limitado a buscas, como o proprio nome já diz, e isso já limita para o Método GET.</p>
+
+<h2 id="implementação-usando-jax-rs-4">Implementação usando JAX-RS</h2>
+
+<p>No JAX-RS, como ele é um parâmetro, deve ser declarado como um parâmetro da função. Para isso deve-se usar a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/queryparam"><code class="language-plaintext highlighter-rouge">javax.ws.rs.QueryParam</code></a>. Quando há valores padrão, deve-se usar a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/defaultvalue"><code class="language-plaintext highlighter-rouge">javax.ws.rs.DefaultValue</code></a> passando o valor padrão como uma String.</p>
+
+<p>Vamos imaginar como exemplo, um serviço de busca de usuário que pode aceitar três parâmetros de busca: nome, idade e ativo. Todos os parâmetros são opcionais, mas se ativo não for provido deve retornar apenas os usuários ativos no sistema. Para resolver esse problema, vamos criar os 3 parâmetros usando <code class="language-plaintext highlighter-rouge">QueryParam</code>, mas somente ativo terá <code class="language-plaintext highlighter-rouge">DefaultValue</code>. Quando não existir a chave na URL, o valor respectivo vai vir <code class="language-plaintext highlighter-rouge">null</code>, por isso usei o objeto <code class="language-plaintext highlighter-rouge">Integer</code> e não o primitivo para a idade. Mas como estou provendo o valor de ativo, posso usar o tipo primitivo.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GET</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">search</span><span class="o">(</span><span class="nd">@QueryParam</span><span class="o">(</span><span class="s">"name"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span> 
+                         <span class="nd">@QueryParam</span><span class="o">(</span><span class="s">"age"</span><span class="o">)</span> <span class="nc">Integer</span> <span class="n">age</span><span class="o">,</span> 
+                         <span class="nd">@DefaultValue</span><span class="o">(</span><span class="s">"true"</span><span class="o">)</span> <span class="nd">@QueryParam</span><span class="o">(</span><span class="s">"active"</span><span class="o">)</span> <span class="kt">boolean</span> <span class="n">active</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="7-escrevendo-a-resposta">7. Escrevendo a Resposta</h1>
+<p>O valor retornado como resposta não é obrigatório, a reposta pode vir de outras formas. Mas por padrão ela acontece exatamente igual ao corpo da requisição. São usados os mesmo cabeçalhos: <code class="language-plaintext highlighter-rouge">Content-Type</code> e <code class="language-plaintext highlighter-rouge">Content-Length</code>. A única diferencia é que o <code class="language-plaintext highlighter-rouge">Content-Type</code> é decidido pelo servidor de acordo com o valor de <code class="language-plaintext highlighter-rouge">Accept</code>.</p>
+
+<h2 id="implementação-usando-jax-rs-5">Implementação usando JAX-RS</h2>
+
+<p>Para adicionar um corpo na mensagem de resposta do JAX-RS, não é preciso nenhuma configuração especial. O método que implementa esse endpoint deve conter a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/produces"><code class="language-plaintext highlighter-rouge">javax.ws.rs.Produces</code></a>. A única especificidade é que o método deve retornar um POJO. Abaixo segue o exemplo que já usamos anteriormente.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Consumes</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">UserUpdatedResponse</span> <span class="nf">update</span><span class="o">(</span><span class="nc">UserUpdateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="8-informando-o-tipo-de-resposta">8. Informando o tipo de Resposta</h1>
+<p>Um ponto muito importante que ainda não foi explicado é o Código de Estado. Cada resposta HTTP tem um código especifico e, muitas vezes, ele diz mais sobre a resposta do que a propria resposta. Os códigos são números inteiros no intervalo [100,599]. Cada centena tem um significado especifico.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Intervalo</th>
+      <th>Tipe</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">1xx</td>
+      <td>Informacional</td>
+      <td>Requisição recebida, continuando o processo…</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">2xx</td>
+      <td>Sucesso</td>
+      <td>A ação foi recebida, compreendida e aceita com sucesso.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3xx</td>
+      <td>Redirecionamento</td>
+      <td>Outras ações devem ser tomadas para concluir a solicitação.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">4xx</td>
+      <td>Erro do Cliente</td>
+      <td>A solicitação contém sintaxe incorreta ou não pode ser atendida.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">5xx</td>
+      <td>Erro do Servidor</td>
+      <td>O servidor falhou em cumprir um pedido aparentemente válido.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>É muito importante conhecer cada mensagem, pois muitas vezes um erro pode ser feito a usar a mensagem errada. Há questões como, se uma busca é feita e não se encontra resultado nenhum, deve se retornar <code class="language-plaintext highlighter-rouge">404</code>? Obviamente que não, pois a busca foi concluida com sucesso, é mais importante retornar uma lista vazia. O 404 deve ser retornado se ou não uma ação mapeada para o recurso, ou se a entidade procurada não é encontrada. Há erros como ao se fazer uma alteração o cliente verifica por um resultado <code class="language-plaintext highlighter-rouge">200</code>, mas o servidor retorna <code class="language-plaintext highlighter-rouge">201</code> ou <code class="language-plaintext highlighter-rouge">204</code>.</p>
+
+<p>Há erros que são muito comuns e fazem parte do ciclo da operação. Podemos citar o <code class="language-plaintext highlighter-rouge">409</code>, quando há um conflito e a operação ter que ser refeita completamente. Ou o <code class="language-plaintext highlighter-rouge">401</code> quando a Autenticação expirou.</p>
+
+<h2 id="implementação-usando-jax-rs-6">Implementação usando JAX-RS</h2>
+<p>Uma das limitações do JAX-RS é que ele é voltado para POJOs e não há uma maneira fácil de retornar o POJO e o código de estado da resposta. Para fazer isso é preciso instanciar um objeto <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/core/response">javax.ws.rs.core.Response</a>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Consumes</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">update</span><span class="o">(</span><span class="nc">UserUpdateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+    <span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">()</span> <span class="c1">// 200</span>
+                   <span class="o">.</span><span class="na">entity</span><span class="o">(</span><span class="n">response</span><span class="o">)</span>
+                   <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="nd">@POST</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="nd">@Consumes</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="nd">@Produces</span><span class="o">({</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">,</span> <span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_XML</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">create</span><span class="o">(</span><span class="nc">UserCreateRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// some code</span>
+    <span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">status</span><span class="o">(</span><span class="nc">Status</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span> <span class="c1">// 201</span>
+                   <span class="o">.</span><span class="na">entity</span><span class="o">(</span><span class="n">response</span><span class="o">)</span>
+                   <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="9-tratando-erros">9. Tratando erros</h1>
+<p>O tratamento de erro é a continuação do tópico anterior. Em HTTP os erros são bem definidos e existem código de erros especificos. Imagina o caso de que um parâmetro veio no formato incorreto, ou está faltando um parâmetro obrigatório? Esse caso deve retornar <code class="language-plaintext highlighter-rouge">400</code>. Uma grande vantagem do HTTP é que os códigos de estado podem ser criados respeitando a separação pode tipo. Então se sua API quer criar um novo tipo de erro, que seja especifico do negócio, só colocar um código entre 450 e 499.</p>
+
+<p>Retornar uma mensagem de erro não significa que a mensagem não pode ter uma resposta. É uma boa pratica em APIs explicar o erro. Assim a resposta pode ter um razão que vai além do código do estado. É preciso muito cuidado para não expor detalhes da implementação como Stack Traces.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Parameter userId is required!"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="implementação-usando-jax-rs-7">Implementação usando JAX-RS</h2>
+
+<p>Para um tratamento de erros ótimo, são necessários duas coisas. Primeiro deve-se gerar uma Exception no momento em que o erro ocorre, e depois essa Exception deve ser trata para se tornar uma resposta.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Exception</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/BadRequestException.html">BadRequestException</a></td>
+      <td>A runtime exception indicating a bad client request.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ClientErrorException.html">ClientErrorException</a></td>
+      <td>A base runtime application exception indicating a client request error (HTTP 4xx status codes).</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ClientErrorException.html">ForbiddenException</a></td>
+      <td>A runtime exception indicating that an access to a resource requested by a client has been forbidden by the server.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/InternalServerErrorException.html">InternalServerErrorException</a></td>
+      <td>A runtime exception indicating an internal server error.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/NotAcceptableException.html">NotAcceptableException</a></td>
+      <td>A runtime exception indicating that a client request is not acceptable by the server.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/NotAllowedException.html">NotAllowedException</a></td>
+      <td>A runtime exception indicating a client requesting a resource method that is not allowed.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/NotAuthorizedException.html">NotAuthorizedException</a></td>
+      <td>A runtime exception indicating request authorization failure caused by one of the following scenarios: a client did not send the required authorization credentials to access the requested resource, i.e.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/NotFoundException.html">NotFoundException</a></td>
+      <td>A runtime exception indicating a resource requested by a client was not found on the server.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/NotSupportedException.html">NotSupportedException</a></td>
+      <td>A runtime exception indicating that the client request entity media type is not supported.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ProcessingException.html">ProcessingException</a></td>
+      <td>A base runtime processing exception.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/RedirectionException.html">RedirectionException</a></td>
+      <td>A runtime application exception indicating a request redirection (HTTP 3xx status codes).</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ServerErrorException.html">ServerErrorException</a></td>
+      <td>A base runtime application exception indicating a server error (HTTP 5xx status codes).</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ServiceUnavailableException.html">ServiceUnavailableException</a></td>
+      <td>A runtime exception indicating that the requested resource cannot be served.</td>
+    </tr>
+    <tr>
+      <td><a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/WebApplicationException.html">WebApplicationException</a></td>
+      <td>Runtime exception for applications.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>O próximo passo é criar um <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ext/exceptionmapper"><code class="language-plaintext highlighter-rouge">javax.ws.rs.ext.ExceptionMapper</code></a> usando a Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/ext/provider"><code class="language-plaintext highlighter-rouge">javax.ws.rs.ext.Provider</code></a>. Essa deve criar uma Response baseada na Exception.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Provider</span> 
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ErrorMessageMapper</span> <span class="kd">implements</span> <span class="nc">ExceptionMapper</span><span class="o">&lt;</span><span class="nc">WebApplicationException</span><span class="o">&gt;</span> <span class="o">{</span> 
+
+    <span class="nd">@Override</span> 
+    <span class="kd">public</span> <span class="nc">Response</span> <span class="nf">toResponse</span><span class="o">(</span><span class="nc">WebApplicationException</span> <span class="n">exception</span><span class="o">)</span> <span class="o">{</span> 
+        <span class="c1">// some code</span>
+    <span class="o">}</span> 
+
+<span class="o">}</span> 
+</code></pre></div></div>
+
+<h1 id="10-usando-o-cache">10. Usando o Cache</h1>
+<p>Como último caso de uso, deixei o uso de Cache. Em alguns casos, qualquer processamento é caro ao servidor, mesmo que seja só para retornar informações. Muitos softwares distribuidos escalam e, quando falamos de escalabilidade, qualquer economia de tempo ou memória é importante assim se houver a possibilidade de um servidor não precisar responder uma requisição, ele poderá usar esse tempo respondendo outra.</p>
+
+<p>O Cache de uma requisição pode ser feito por vários estágios, mas para termos em mente como é feito é preciso termos em mente que para um serviço de alta disponibilidade nem sempre existe só cliente e servidor. Muitas vezes há Servidores de Balanceamento de Carga e Servidores de Cache, há também a base de dados. Quando mais profunda a requisição chegar, mais será usado da infraestrutura.</p>
+
+<p><img src="/assets/images/http/http-larga-escala.svg" alt="HTTP Em larga escala" /></p>
+
+<p>Podemos classificar também os recursos como de dois tipos. Os Recursos Estáticos são aqueles que não podem ser alterados durante o ciclo de vida da aplicação, estamos falando de arquivos Javascript ou CSS, Imagens. Muitos deles também não precisam ter um nome legível, podendo assim associar seu nome ao seu conteúdo. Podemos também falar de Recursos Dinâmicos, eles são alterados durante o ciclo de vida de uma aplicação. O autor de blog pode fazer uma correção no texto. Um usuário pode ter seus dados alterados.</p>
+
+<p>Para Recursos Estáticos, a melhor forma de fazer o check é usar o cabeçalho <code class="language-plaintext highlighter-rouge">Cache-Control</code>, com ele você pode definir se um recurso vai ter cache ou não, se ele não vai mudar e qual a idade máxima do mesmo. Tem que se ter muito cuidado ao usar ele se o recurso for mutável. Talvez você tá tenha experimentado erros em um página e ao fazer refresh (<strong><em>CTRL + F5</em></strong>) o mesmo voltou a funcionar, isso acontecia antes dos frameworks frontend porque alterações em arquivos não eram refletidas no nome do arquivo. Porque isso não acontece mais? Porque os frameworks inserem no nome do recurso um HASH do conteúdo do mesmo, e muitas vezes o conteúdo de um arquivo Javascript é gerado a partir de uma série de outros recursos.</p>
+
+<p>A resposta com <code class="language-plaintext highlighter-rouge">Cache-Control</code> pode ser feita usando o Código de Estado  <code class="language-plaintext highlighter-rouge">304 - Not Modified</code>, ou em alguns casos o cliente nem chega a enviar a requisão. Essa resposta <code class="language-plaintext highlighter-rouge">304</code> pode ser produzida tanto pelo próprio servidor ou por algum servidor de cache.</p>
+
+<p>A figura abaixo mostra um exemplo retirado de um caso concreto. Na primeira vez que vai fazer a requisição, o cliente não envia o valor de <code class="language-plaintext highlighter-rouge">If-None-Match</code>. Mas da segunda, por causa da resposta do servidor é enviado. Na segunda resposta o servidor não respondeu os dados da mensagem, reduzindo o uso da rede.</p>
+
+<p><img src="/assets/images/http/sequence-diagram-cache-control.png" alt="Diagrama de Sequência" /></p>
+
+<p>Para finalizar, vou apresentar soluções prontas de caching que podem ser usadas. Uma delas é o NGINX, ele serve tanto como cache como para balanceamento de Carga. Vale ressaltar que se você usa Kubernetes, isso já faz parte da sua infraestrutura naturalmente.</p>
+
+<h2 id="implementação-usando-jax-rs-8">Implementação usando JAX-RS</h2>
+
+<p>A implementação de qualquer mecanismo de cache nunca é simples. Não vamos aqui entrar em detalhes de como ela pode ser feita, o foco vai ser o suporte dado pela especificação JAX-RS a ela.</p>
+
+<p>Segundo a espeficicação, em cada requisição temos o objeto <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/core/request"><code class="language-plaintext highlighter-rouge">javax.ws.rs.core.Request</code></a> associado que pode ser passado como parâmetro, se acompanhado da Annotation <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/ws/rs/core/context"><code class="language-plaintext highlighter-rouge">javax.ws.rs.core.Context</code></a>. Com o objeto <code class="language-plaintext highlighter-rouge">Request</code>, temos o método <code class="language-plaintext highlighter-rouge">evaluatePreconditions</code> que consegue validar se a data de última modificação é valida ou se a ETag é a mesma. Como você vai resolver essa data? Isso é um futuro problema!</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GET</span>
+<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">getUsers</span><span class="o">(</span><span class="nd">@Context</span> <span class="nc">Request</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Date</span> <span class="n">lastModifiedDate</span> <span class="o">=</span> <span class="c1">// retrieve last modified date for all users</span>
+    <span class="nc">Response</span><span class="o">.</span><span class="na">ResponseBuilder</span> <span class="n">responseBuilder</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">evaluatePreconditions</span><span class="o">(</span><span class="n">lastModifiedDate</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">responseBuilder</span><span class="o">))</span> <span class="o">{</span><span class="c1">//last modified date didn't match, send new content</span>
+        <span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="cm">/* user list */</span><span class="o">)</span>
+                       <span class="o">.</span><span class="na">lastModified</span><span class="o">(</span><span class="n">lastModifiedDate</span><span class="o">)</span>
+                       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="c1">//sending 304 not modified</span>
+        <span class="k">return</span> <span class="n">responseBuilder</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="nd">@GET</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"{id}"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">getUser</span><span class="o">(</span><span class="nd">@PathParam</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">id</span><span class="o">,</span> <span class="nd">@Context</span> <span class="nc">Request</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">EntityTag</span> <span class="n">eTag</span> <span class="o">=</span> <span class="c1">// retrieve ETag for userId = id</span>
+    <span class="nc">Response</span><span class="o">.</span><span class="na">ResponseBuilder</span> <span class="n">responseBuilder</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">evaluatePreconditions</span><span class="o">(</span><span class="n">eTag</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">responseBuilder</span><span class="o">))</span> <span class="o">{</span><span class="c1">//eTag has changed, sending new content</span>
+        <span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="cm">/* user */</span><span class="o">)</span>
+                       <span class="o">.</span><span class="na">tag</span><span class="o">(</span><span class="n">eTag</span><span class="o">)</span>
+                       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="c1">//sending 304 not modified</span>
+        <span class="k">return</span> <span class="n">responseBuilder</span><span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+        </article>
+        
+<div class="series">
+    <div class="serie-contents">
+        <h2>Backend Roadmap</h2>
+        
+        
+        
+        <a href="/posts/rest-api-design-patterns">
+            <div class="serie-article">Padrões de Projetos para APIs REST?</div>
+        </a>
+        
+        
+        
+        <div class="serie-article selected">Anatomia do Protocolo HTTP</div>
+        
+        
+        
+        <a href="/posts/backend-o-desenvolvedor-invisivel">
+            <div class="serie-article">Backend: O desenvolvedor invisível</div>
+        </a>
+        
+        
+    </div>
+</div>
+ 
+        <div class="published">
+            
+            <div>Originally published December 05, 2020</div>
+            
+        </div>
+
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+                                
+            <div class="related-post-item">
+                <a href="/posts/tipos-objetos-e-clones">
+					
+					Tipos, Objetos e Clones
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/criando-um-stream-em-java">
+					
+					Criando um Stream em Java
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/context-and-dependency-injection-cdi-2-0">
+					
+					Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+					
+				</a>
+            </div>
+                                                                     
+            <div class="related-post-item">
+                <a href="/posts/using-bean-Validation-on-quarkus">
+					
+					Quarkus Tutorial: Using Bean Validation on Quarkus.io
+					
+				</a>
+            </div>
+                                                     
+            <div class="related-post-item">
+                <a href="/posts/rest-api-design-patterns">
+					
+					Backend Roadmap: Padrões de Projetos para APIs REST?
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/configure-jpa-on-quarkus">
+					
+					Quarkus Tutorial: Configure JPA on Quarkus.io
+					
+				</a>
+            </div>
+                               
+            <div class="related-post-item">
+                <a href="/posts/quarkus-rest-api">
+					
+					Quarkus Tutorial: How to set up a REST API using Quarkus.io
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/testes-101-testando-aplicações-java">
+					
+					Level Up: Testes 101 - Testando aplicações Java
+					
+				</a>
+            </div>
+                                             
+            <div class="related-post-item">
+                <a href="/posts/devops-como-comecar">
+					
+					Coisas que todo Sênior deve saber: DevOps! Como começar?
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+					
+					Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+					
+				</a>
+            </div>
+                                                                                             
+            <div class="related-post-item">
+                <a href="/posts/anatomia-de-um-topico">
+					
+					Entendendo o Kafka: Anatomia de um Tópico
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/deixando-rastros-ou-como-usar-log">
+					
+					Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+					
+				</a>
+            </div>
+                                             
+            <div class="related-post-item">
+                <a href="/posts/trabalhando-com-dinheiro">
+					
+					Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+					
+					Como criar uma linguagem usando ANTLR4 e Java
+					
+				</a>
+            </div>
+                                                                                             
+            <div class="related-post-item">
+                <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+					
+					Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/jakarta-ee-e-microprofile-io">
+					
+					Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/tests-and-requirements">
+					
+					Thoughts on TDD: Tests and Requirements
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/java-memory-leak-for-jdbc">
+					
+					Java Memory Leak for JDBC
+					
+				</a>
+            </div>
+                     
+            <div class="related-post-item">
+                <a href="/posts/a-very-simple-test-driven-development-tutorial">
+					
+					Thoughts on TDD: A very simple Test Driven Development Tutorial
+					
+				</a>
+            </div>
+             
+        </div>
+         
+        <!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o5djb');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+    </div>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li style="text-align: left;">
+			<div>
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+		<li>&nbsp;</li>
+	</ul>
+</footer> <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166943279-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'UA-166943279-1');
+</script> <script>
+    $(document).ready(() =>
+        $("p > img").each(function () {
+            if (this.parentElement.children.length == 1) {
+                $(this.parentElement).addClass("img-block");
+            }
+        }));
+</script>
+</body>
+
+</html>

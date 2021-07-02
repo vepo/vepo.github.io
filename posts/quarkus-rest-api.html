@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Quarkus Tutorial: How to set up a REST API using Quarkus.io</title>
+  <meta property="og:title" content="Quarkus Tutorial: How to set up a REST API using Quarkus.io" />
+  <meta name="twitter:title" content="Quarkus Tutorial: How to set up a REST API using Quarkus.io">
+  
+
+
+  
+  <meta name="description" content="A minimal how-to of how to create a REST API using Quarkus.io" />
+  <meta property="og:description" content="A minimal how-to of how to create a REST API using Quarkus.io" />
+  <meta name="twitter:description" content="A minimal how-to of how to create a REST API using Quarkus.io">
+  
+
+  
+  <meta name="keywords" content="Quarkus, Java, JAX-RS">
+  
+
+  <link rel="canonical" href="https://vepo.github.io/posts/quarkus-rest-api" />
+  <meta property="og:url" content="https://vepo.github.io/posts/quarkus-rest-api" />
+  <meta name="twitter:url" content="https://vepo.github.io/posts/quarkus-rest-api">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://vepo.github.io/assets/images/server.jpg" />
+  <meta name="twitter:image" content="https://vepo.github.io/assets/images/server.jpg">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2020-11-09T06:14:00+00:00" />
+  <meta property="article:modified_time" content="2020-11-09T06:14:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Quarkus" property="article:tag">
+  
+  <meta content="Java" property="article:tag">
+  
+  <meta content="JAX-RS" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "How to set up a REST API using Quarkus.io",
+      "datePublished": "2020-11-09T06:14:00+00:00",
+      
+      "description": "A minimal how-to of how to create a REST API using Quarkus.io",
+      
+      
+      "url": "https://vepo.github.io/posts/quarkus-rest-api"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  <!-- End SEO stuff -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet"> 
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link href="/assets/css/syntax.css" rel="stylesheet">
+
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/bootstrap.min.js"></script>
+  <script data-ad-client="ca-pub-8088229614848913" async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+
+<body>
+    <div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button class="navbar-toggle collapsed" type="button" data-toggle="collapse"
+					data-target="#navbar-collapse-menu">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/"> <i class="fa fa-server" aria-hidden="true"></i>
+				</a>
+			</div>
+			<div id="navbar-collapse-menu" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Pet Projects
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/projects/csv-viewer">
+									
+									CSV Viewer
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/plain-test">
+									
+									Plain Test
+								</a>
+							</li>
+							
+							<li>
+								<a href="/projects/kafka-tool">
+									
+									Kafka Tool
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Apresentações
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="/presentations/2020-03-26-sou-java-kafka">
+									
+									Kafka: Uma introdução para Desenvolvedores e Arquitetos
+								</a>
+							</li>
+							
+							<li>
+								<a href="/presentations/2019-09-14-sou-java-cdi">
+									
+									Usando Java CDI em projetos Jakarta EE ou Microprofile
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/">Posts</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/tags">Tags</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/series">Séries</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/about">Sobre</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li><a href="/books">Livros Recomendados</a></li>
+					
+					
+					<!-- If has submenues -->
+					
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+							Redes Sociais
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							
+							<li>
+								<a href="http://github.com/vepo">
+									
+									<i class="fa fa-inverse fa-github fa-2x"></i>
+									
+									GitHub
+								</a>
+							</li>
+							
+							<li>
+								<a href="http://www.linkedin.com/in/victorosorio">
+									
+									<i class="fa fa-inverse fa-linkedin-square fa-2x"></i>
+									
+									LinkedIn
+								</a>
+							</li>
+							
+							<li>
+								<a href="https://twitter.com/vepo">
+									
+									<i class="fa fa-inverse fa-twitter fa-2x"></i>
+									
+									Twitter
+								</a>
+							</li>
+							
+						</ul>
+					</li>
+					
+					
+				</ul>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a class="navbar-brand" href="https://twitter.com/vepo">
+								<i class="fa fa-twitter" aria-hidden="true"></i>
+								@vepo
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="title">
+			
+			<h1 class="serie-title">
+				Quarkus Tutorial
+			</h1>
+			<h2>
+				How to set up a REST API using Quarkus.io
+			</h2>
+			
+		</div>
+		<div class="cover-header">
+			
+			<div class="cover-image">
+				<img alt="How to set up a REST API using Quarkus.io" src="/assets/images/server.jpg" class="img-responsive">
+			</div>
+			
+		</div>
+	</div>
+</div>
+    <div class="container">
+
+        
+        <p>
+            
+            <strong>
+				<time datetime="2020-11-09T06:14:00+00:00">
+					November 09, 2020
+				</time>
+			</strong> 
+        </p>
+        <div class="tag-container">
+            
+            <a class="label label-default quarkus" href="/tags/#quarkus">Quarkus</a> 
+            <a class="label label-default java" href="/tags/#java">Java</a> 
+            <a class="label label-default jax-rs" href="/tags/#jax-rs">JAX-RS</a> 
+        </div>
+         
+        <hr>  
+<div class="series">
+    <div class="serie-contents">
+        <h2>Quarkus Tutorial</h2>
+        
+        
+        
+        <div class="serie-article selected">How to set up a REST API using Quarkus.io</div>
+        
+        
+        
+        <a href="/posts/configure-jpa-on-quarkus">
+            <div class="serie-article">Configure JPA on Quarkus.io</div>
+        </a>
+        
+        
+        
+        <a href="/posts/using-bean-Validation-on-quarkus">
+            <div class="serie-article">Using Bean Validation on Quarkus.io</div>
+        </a>
+        
+        
+    </div>
+</div>
+
+        <article>
+            <h1 id="why-quarkus-is-a-good-choice">Why Quarkus is a good choice?</h1>
+
+<p>Quarkus is one of the best frameworks for Java! First, there was the Wildfly, that as an experiment became a microservices focus project called Wildfly Swarm. Then Wildfly Swarm was renamed to Thorntail. The main purpose of Thorntail was to build a Jakarta EE implementation build for microservices. But there was some pitfall that needed a full rewrite for the code. So this is Quarkus, a light implementation, ready for microservices and it has native support to GraalVM.</p>
+
+<p><img src="/assets/images/quarkus/quarkus_metrics.png" alt="Quarkus metrics" /></p>
+
+<p>So Quarkus is based on <a href="https://docs.thorntail.io/4.0.0-SNAPSHOT/">lessons learned</a> from previous development. Based on these lessons I believe this will be a better framework, easy to use and fast on execution.</p>
+
+<p><img src="/assets/images/quarkus/thorntail_icon_rgb_64px.png" alt="Thorntail icon" /></p>
+
+<blockquote>
+  <p><strong>Mangling artifacts is dangerous</strong>
+<em>When you mangle and repackage a user’s artifacts and dependencies, it can many times go awry.</em></p>
+
+  <p><strong>Don’t replace Maven</strong>
+<em>Let Maven (or Gradle) handle the entirety of pulling dependencies. We cannot predict the topology of someone’s repository managers, proxies and network.</em></p>
+
+  <p><strong>Don’t get complicated with uberjars</strong>
+<em>The more complex our uberjar layout is, the harder it is to support Gradle or other non-Maven build systems.</em></p>
+
+  <p><strong>Classpaths are tricky</strong>
+<em>If different codepaths are required for executing from Maven, an IDE, a unit-test, and during production, you will have a bad time.</em></p>
+
+  <p><strong>Don’t insist on uberjars</strong>
+<em>For Linux containers, people want layers that cleanly separate application code from runtime support code.</em></p>
+
+  <p><strong>Testability is important</strong>
+<em>A slow test is a test that is never willingly executed. PRs take forever to validate. Users like to be able to test their own code quickly and iteratively.</em></p>
+
+  <p><strong>Easily extensible means ecosystem</strong>
+<em>If it’s entirely too difficult to extend the platform, the ecosystem will not grow. New integrations should be simple.</em></p>
+
+  <p><strong>Related: Core things should not be any more first-class than community contributions</strong>
+<em>For instance, auto-detection in WildFly Swarm only worked with core fractions; user-provided wouldn’t auto-detect.</em></p>
+
+  <p><strong>Ensure the public-vs-private API guarantees are clear.</strong>
+<em>Intertwingly code (and javadocs) make finding the delineation between public API and private implementations difficult.</em></p>
+
+  <p><strong>Allow BYO components</strong>
+<em>We don’t want to decide all of the implementations, and certainly not versions, of random components we support.</em></p>
+
+  <p><strong>Be a framework, not a platform</strong>
+<em>Frameworks are easier to integrate into an existing app; a platform becomes the target with (generally too many) constraints.</em></p>
+
+  <p><strong>Maintain tests &amp; documentation</strong>
+<em>Ensure the definition of “done” includes both tests and documentation.</em></p>
+
+  <p><strong>Productization complexity</strong>
+<em>The greater divergence between community and product, the more effort is required for productization. Complicating any process to automate productization from community.</em></p>
+
+  <p><strong>BOM complexity</strong>
+<em>Related to productization as well, but of itself having a handful of BOMs made life confusing for us and for users. There were often times where fractions would be “Unstable” or “Experimental” for months with no real reason other than we forgot to update it.</em></p>
+</blockquote>
+
+<h1 id="configure-quarkus">Configure Quarkus</h1>
+
+<p>The first question we need to answer on a tutorial is: <em>To build a project using Quarkus, what do you need?</em></p>
+
+<p>For Quarkus we need:</p>
+<ol>
+  <li>Add the dependencies</li>
+  <li>Configure the package</li>
+  <li>Starting coding</li>
+</ol>
+
+<h2 id="1-configure-the-dependencies">1. Configure the dependencies</h2>
+
+<p>As Quarkus is a Jakarta EE, we will use the Jakarta EE annotations on the code. But, for the <code class="language-plaintext highlighter-rouge">pom.xml</code> we should point to Quarkus dependencies because quarkus has native support for GraalVM.</p>
+
+<p>First we need add all dependencies to Quarkus, this can be done using dependencyManagement:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependencyManagement&gt;</span>
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>quarkus-universe-bom<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>1.9.2.Final<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>import<span class="nt">&lt;/scope&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span>
+</code></pre></div></div>
+
+<p>The for that project we will need:</p>
+
+<ol>
+  <li>Create REST API</li>
+  <li>Add JSON Support</li>
+  <li>Add Reactive Support</li>
+</ol>
+
+<p>For that we will need the following dependencies:</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:io.quarkus</code> for creating the REST API</li>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:quarkus-resteasy-jsonb</code> for adding JSON serializer to REST API</li>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:quarkus-resteasy-mutiny</code> for adding reactive support for REST API</li>
+</ol>
+
+<h2 id="2-configuring-the-build">2. Configuring the build</h2>
+
+<p>The next step we should configure Quarkus build. As we know, Quarkus creates a fat jar with all dependencies.</p>
+
+<p>To enable the Quarkus builder on Maven, just add the following plugin:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.9.2.Final<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>generate-code<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>generate-code-tests<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>build<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>In this example, I’m compiling as Java 11, but I’m using Java 15 to test. It will work for any version of Java newer than 11. If you need to execute it on Java 8, just change the compiler options.</p>
+
+<p>We can make the build just executing:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
+</code></pre></div></div>
+
+<p>This will create two <code class="language-plaintext highlighter-rouge">jars</code> inside the target folder, the one terminating with <code class="language-plaintext highlighter-rouge">-runner.jar</code> can be executed with no dependencies.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>java <span class="nt">-jar</span> target<span class="se">\q</span>uarkus-tutorial-runner.jar
+__  ____  __  _____   ___  __ ____  ______
+ <span class="nt">--</span>/ __ <span class="se">\/</span> / / / _ | / _ <span class="se">\/</span> //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /<span class="se">\ \</span>
+<span class="nt">--</span><span class="se">\_</span>__<span class="se">\_\_</span>___/_/ |_/_/|_/_/|_|<span class="se">\_</span>___/___/
+2020-11-09 11:16:53,416 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> quarkus-tutorial 0.0.1-SNAPSHOT on JVM <span class="o">(</span>powered by Quarkus 1.9.2.Final<span class="o">)</span> started <span class="k">in </span>4.706s. Listening on: http://0.0.0.0:8080
+2020-11-09 11:16:53,470 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> Profile prod activated.
+2020-11-09 11:16:53,475 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> Installed features: <span class="o">[</span>cdi, mutiny, resteasy, resteasy-jsonb, resteasy-mutiny, smallrye-context-propagation]
+2020-11-09 11:16:58,790 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>Shutdown thread<span class="o">)</span> quarkus-tutorial stopped <span class="k">in </span>0.024s
+</code></pre></div></div>
+
+<p>This is the way we should execute for production environments, for development we can use Quarkus Maven plugin. It already does the deploy of any change on the running server:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn quarkus:dev
+</code></pre></div></div>
+
+<h2 id="3-adding-the-rest-api-endpoint">3. Adding the REST API Endpoint</h2>
+
+<p>The latest step for creating an API is creating the code that will handle the requests. Using JAX-RS is easy, just create a class and add the annotations.</p>
+
+<p>The most simple example is:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="nd">@GET</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">sayHello</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"Hello World!"</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>JAX-RS automatically generate a JSON representation for any object returned by this method, you have just to inform the MIME Type.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">HelloResponse</span> <span class="nf">generateResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">HelloResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setCode</span><span class="o">(</span><span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/json"</span><span class="o">)</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">HelloResponse</span> <span class="nf">sayHelloWithJson</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">generateResponse</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Quarkus also have support for reactive programming. For JAX-RS, you have just to return a <code class="language-plaintext highlighter-rouge">Uni</code> or a <code class="language-plaintext highlighter-rouge">CompletableFuture</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">HelloResponse</span> <span class="nf">generateResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">HelloResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setCode</span><span class="o">(</span><span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/json/reactive"</span><span class="o">)</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">HelloResponse</span><span class="o">&gt;</span> <span class="nf">sayHelloWithJsonReactively</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Uni</span><span class="o">.</span><span class="na">createFrom</span><span class="o">().</span><span class="na">item</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">generateResponse</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>With Quarkus you can build quickly a REST API using JAX-RS. As JAX-RS is a Jakarta EE specification, you can migrate your code with few changes to another existing implementation, but Quarkus is the lighter implementation.</p>
+
+<p>Quarkus is a good choice!</p>
+
+<p>You can find all examples on <a href="https://github.com/vepo/quarkus-tutorial">github.com/vepo/quarkus-tutorial</a></p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/quarkus-tutorial">
+                quarkus-tutorial
+            </a>
+        </span>
+    </h2>
+</div>
+
+        </article>
+        
+<div class="series">
+    <div class="serie-contents">
+        <h2>Quarkus Tutorial</h2>
+        
+        
+        
+        <div class="serie-article selected">How to set up a REST API using Quarkus.io</div>
+        
+        
+        
+        <a href="/posts/configure-jpa-on-quarkus">
+            <div class="serie-article">Configure JPA on Quarkus.io</div>
+        </a>
+        
+        
+        
+        <a href="/posts/using-bean-Validation-on-quarkus">
+            <div class="serie-article">Using Bean Validation on Quarkus.io</div>
+        </a>
+        
+        
+    </div>
+</div>
+ 
+        <div class="published">
+            
+            <div>Originally published November 09, 2020</div>
+            
+        </div>
+
+        <div class="related-posts">
+            <div class="related-post-header">Related posts</div>
+                        
+            <div class="related-post-item">
+                <a href="/posts/tipos-objetos-e-clones">
+					
+					Tipos, Objetos e Clones
+					
+				</a>
+            </div>
+                         
+            <div class="related-post-item">
+                <a href="/posts/criando-um-stream-em-java">
+					
+					Criando um Stream em Java
+					
+				</a>
+            </div>
+                 
+            <div class="related-post-item">
+                <a href="/posts/context-and-dependency-injection-cdi-2-0">
+					
+					Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+					
+				</a>
+            </div>
+                                               
+            <div class="related-post-item">
+                <a href="/posts/using-bean-Validation-on-quarkus">
+					
+					Quarkus Tutorial: Using Bean Validation on Quarkus.io
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/anatomia-protocolo-http">
+					
+					Backend Roadmap: Anatomia do Protocolo HTTP
+					
+				</a>
+            </div>
+                               
+            <div class="related-post-item">
+                <a href="/posts/configure-jpa-on-quarkus">
+					
+					Quarkus Tutorial: Configure JPA on Quarkus.io
+					
+				</a>
+            </div>
+                                         
+            <div class="related-post-item">
+                <a href="/posts/testes-101-testando-aplicações-java">
+					
+					Level Up: Testes 101 - Testando aplicações Java
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/devops-como-comecar">
+					
+					Coisas que todo Sênior deve saber: DevOps! Como começar?
+					
+				</a>
+            </div>
+                         
+            <div class="related-post-item">
+                <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+					
+					Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+					
+				</a>
+            </div>
+                                                                 
+            <div class="related-post-item">
+                <a href="/posts/anatomia-de-um-topico">
+					
+					Entendendo o Kafka: Anatomia de um Tópico
+					
+				</a>
+            </div>
+                 
+            <div class="related-post-item">
+                <a href="/posts/deixando-rastros-ou-como-usar-log">
+					
+					Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+					
+				</a>
+            </div>
+                                 
+            <div class="related-post-item">
+                <a href="/posts/trabalhando-com-dinheiro">
+					
+					Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+					
+				</a>
+            </div>
+                 
+            <div class="related-post-item">
+                <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+					
+					Como criar uma linguagem usando ANTLR4 e Java
+					
+				</a>
+            </div>
+                                                                 
+            <div class="related-post-item">
+                <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+					
+					Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+					
+				</a>
+            </div>
+                 
+            <div class="related-post-item">
+                <a href="/posts/jakarta-ee-e-microprofile-io">
+					
+					Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+					
+				</a>
+            </div>
+                         
+            <div class="related-post-item">
+                <a href="/posts/tests-and-requirements">
+					
+					Thoughts on TDD: Tests and Requirements
+					
+				</a>
+            </div>
+                         
+            <div class="related-post-item">
+                <a href="/posts/java-memory-leak-for-jdbc">
+					
+					Java Memory Leak for JDBC
+					
+				</a>
+            </div>
+                 
+            <div class="related-post-item">
+                <a href="/posts/a-very-simple-test-driven-development-tutorial">
+					
+					Thoughts on TDD: A very simple Test Driven Development Tutorial
+					
+				</a>
+            </div>
+             
+        </div>
+         
+        <!-- Twitter universal website tag code -->
+<script>
+  !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+  },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='//static.ads-twitter.com/uwt.js',
+  a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+  // Insert Twitter Pixel ID and Standard Event data below
+  twq('init','o5djb');
+  twq('track','PageView');
+  </script>
+  <!-- End Twitter universal website tag code -->
+    </div>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li style="text-align: left;">
+			<div>
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li><a href="http://github.com/vepo"> <i class="fa fa-inverse fa-github fa-3x"></i></a></li>
+		<li><a href="http://www.linkedin.com/in/victorosorio"> <i
+					class="fa fa-inverse fa-linkedin-square fa-3x"></i></a></li>
+		<li><a href="https://twitter.com/vepo"> <i class="fa fa-inverse fa-twitter fa-3x"></i></a></li>
+		<li>&nbsp;</li>
+	</ul>
+</footer> <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-166943279-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+
+  gtag('config', 'UA-166943279-1');
+</script> <script>
+    $(document).ready(() =>
+        $("p > img").each(function () {
+            if (this.parentElement.children.length == 1) {
+                $(this.parentElement).addClass("img-block");
+            }
+        }));
+</script>
+</body>
+
+</html>
