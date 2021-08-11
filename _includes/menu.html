@@ -1,0 +1,30 @@
+<div class="nav flex-column">
+	<li class="nav-item">
+		<a class="nav-link" aria-current="page" href="/">
+			Victor Osório&nbsp;<i class="fa fa-fist-raised"></i>
+		</a>
+	</li>
+	{% for item in site.data.settings.menu %}
+		{% if item.submenu %}
+		<li class="nav-item">
+			<a class="nav-link" aria-current="page" href="#" 
+			   data-bs-toggle="collapse" data-bs-target="#container-collapse-{{ item.name | slugify }}" 
+			   aria-expanded="false" aria-controls="container-collapse-{{ item.name | slugify }}" >{{ item.name }}</a>
+			<div class="collapse submenu" id="container-collapse-{{ item.name | slugify }}">
+				{% for subitem in item.submenu %}
+				<a class="nav-link" aria-current="page" href="{{subitem.link}}">{{ subitem.name }}</a>
+				{% endfor %}
+			</div>
+		</li>		
+		{% else %}
+		<li class="nav-item">
+			<a class="nav-link" aria-current="page" href="{{item.link}}">{{ item.name }}</a>
+		</li>
+		{% endif %}
+	{% endfor %}
+	<li class="nav-item">
+		<a class="nav-link" aria-current="page" href="https://twitter.com/vepo">
+			<i class="fab fa-twitter"></i> @vepo
+		</a>
+	</li>
+</div>

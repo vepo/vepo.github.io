@@ -1,16 +1,19 @@
 {% if page.series %}
 <div class="series">
     <div class="serie-contents">
-        <h2>{{ page.series }}</h2>
         {% assign serie_articles = site.posts | where: "series", page.series | sort: "publish_date" %}
+        <h2>
+            {{ page.series }}<br/>
+            <span class="description">(série de {{ serie_articles | size }} partes)</span>
+        </h2>
         {% for article in serie_articles %}
-        {% if article == page %}
-        <div class="serie-article selected">{{ article.title }}</div>
-        {% else %}
-        <a href="{{ article.url }}">
-            <div class="serie-article">{{ article.title }}</div>
-        </a>
-        {% endif %}
+            {% if article == page %}
+            <div class="serie-article selected">{{ article.title }}</div>
+            {% else %}
+            <a href="{{ article.url }}">
+                <div class="serie-article">{{ article.title }}</div>
+            </a>
+            {% endif %}
         {% endfor %}
     </div>
 </div>
