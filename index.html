@@ -14,9 +14,15 @@ reflexões sobre filosofia"
 	{% else %}
 	<span>Anterior</span>
 	{% endif %}
-	| <span class="page_number ">
+	&nbsp;
+	|
+	&nbsp;
+	<span class="page_number ">
 		Página: {{ paginator.page }} de {{ paginator.total_pages }}
-	</span> |
+	</span>
+	&nbsp;
+	|
+	&nbsp;
 	{% if paginator.next_page %}
 	<a href="{{ paginator.next_page_path }}">Próximo</a>
 	{% else %}
@@ -42,7 +48,10 @@ reflexões sobre filosofia"
 		</a>
 		<div class="tag-container">
 			{% for tag in post.tags %}
-			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a>
+			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">
+				<i class="fas fa-tags"></i>
+				{{ tag }}
+			</a>
 			{% endfor %}
 		</div>
 		{% if post.noimage %}
@@ -61,17 +70,23 @@ reflexões sobre filosofia"
 <div class="pagination">
 	{% if paginator.previous_page %}
 	<a href="{{ paginator.previous_page_path }}">
-		Previous
+		Anterior
 	</a>
 	{% else %}
-	<span>Previous</span>
+	<span>Anterior</span>
 	{% endif %}
-	| <span class="page_number ">
-		Page: {{ paginator.page }} of {{ paginator.total_pages }}
-	</span> |
+	&nbsp;
+	|
+	&nbsp;
+	<span class="page_number ">
+		Página: {{ paginator.page }} de {{ paginator.total_pages }}
+	</span>
+	&nbsp;
+	|
+	&nbsp;
 	{% if paginator.next_page %}
-	<a href="{{ paginator.next_page_path }}">Next</a>
+	<a href="{{ paginator.next_page_path }}">Próximo</a>
 	{% else %}
-	<span>Next</span>
+	<span>Próximo</span>
 	{% endif %}
 </div>
