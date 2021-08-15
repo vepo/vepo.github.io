@@ -1,7 +1,7 @@
 ---
 title: "Backend: O desenvolvedor invisível"
 permalink: /posts/backend-o-desenvolvedor-invisivel
-published: true
+published: false
 description: Apresentação do que é ser um desenvolvedor Backend e um histórico dos papeis dentro do mundo do desenvolvimento de Software
 tags: [Desenvolvimento de Software, Backend, Histórico]
 cover_image: /assets/images/backend/clint-eastwood-the-good-the-bad-and-the-ugly.jpg
