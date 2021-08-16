@@ -4,7 +4,7 @@ published: true
 description: Primeiras impressões do livro Elegant Objects, vol. 1 
 series: Primeiras Impressões
 tags: [Orientação a Objetos, Programação, Design de Código]
-cover_image: /assets/images/elegant-objects.svg
+cover_image: /assets/images/elegant-objects.png
 publish_date: 2021-08-16 11:11:00 +0300
 permalink: /posts/elegant-objects-1
 ---
