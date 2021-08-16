@@ -7,8 +7,12 @@
         <div class="menu">
         {% include menu.html %}
         </div>
+        {% assign container_classes = "container" %}
+        {% if page.id %}
+            {% assign container_classes = "container post" %}
+        {% endif %}
         <div class="flex-grow-1">
-            <div class="container">
+            <div class="{{ container_classes }}">
                 {% include page-header.html %}
                 {% if page.id %}
                 <p>
