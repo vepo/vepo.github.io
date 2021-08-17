@@ -133,6 +133,16 @@ $ systemctl status meu-bot
            └─9565 /usr/lib/jvm/java-11-openjdk-11.0.11.0.9-1.amzn2.0.1.x86_64/bin/java -jar /opt/meu-bot/quarkus-run.jar
 ```
 
+## Acessando o log do serviço
+
+Observe que não falamos de log!
+
+Quando fazemos um serviço, existe várias formas de log. Você pode direcionar o log para um arquivo, ou pode deixar que o sistema operacional cuide dele. Caso deixe para o sistema, pode acessar usando
+
+```
+journalctl -f -u meu-bot.service
+```
+
 ## Conclusão
 
 Criar um serviço é fácil usando Linux. Precisa só de um arquivo texto e seu programa compilado. É a melhor abordagem se você precisa de um programa sempre em execução. Caso seu programa termine a execução ao encontrar qualquer erro, você terá o próprio sistema reinicializando ele.
