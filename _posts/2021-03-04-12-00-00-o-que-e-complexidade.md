@@ -1,6 +1,6 @@
 ---
 title: O que é complexidade?
-permalink: /posts/linux-tudo-e-um-arquivo
+permalink: /posts/o-que-e-complexidade
 published: true
 description: O que trás complexidade a um projeto de software?
 tags: [Design de Software, Arquitetura de Software, Complexidade]
