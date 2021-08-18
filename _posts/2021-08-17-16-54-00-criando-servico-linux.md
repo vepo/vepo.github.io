@@ -98,7 +98,6 @@ sudo systemctl restart meu-bot
 
 Quem define o serviço é o arquivo `meu-bot.service` que deve ficar na pasta `/etc/systemd/system`. Depois de atualizado o arquivo, precisamos rodar o comando `systemctl daemon-reload` e então é só iniciar o serviço `systemctl restart meu-bot`.
 
-
 Assim o conteúdo do serviço será:
 
 ```
@@ -119,7 +118,7 @@ WorkingDirectory=/opt/meu-bot/
 WantedBy=multi-user.target
 ```
 
-Observe que preciso definir alguns parâmetros obrigatórios como `User`, `ExecStart` e `Requires`. Outros são opcionais como `WorkingDirectory`. Para os outros, eu não validei a necessidade, mas é bom sempre usar.
+Observe que preciso definir alguns parâmetros obrigatórios como `User`, `ExecStart` e `Requires`. Outros são opcionais como `WorkingDirectory`. Para os outros, eu não validei a necessidade, mas é bom sempre usar. Um detalhe importante nesse arquivo é que todos os executáveis devem ser referênciados pelo caminho absolutor, por isso não usei apenas `java`. Foi necessário buscar o caminho real do executável Java no sistema, nada que usando `whereis java` não resolva.
 
 Agora é só verificar se o serviço está de pé:
 
