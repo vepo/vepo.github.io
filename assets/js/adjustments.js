@@ -4,7 +4,7 @@ $(document).ready(() => {
             $(elm.parentElement).addClass("img-block");
         }
     });
-    $("article > table").each((index, elm) => {
+    $("article > table, article > .gist").each((index, elm) => {
         var tableContainer = document.createElement('div');
         tableContainer.classList.add('table-container');
         elm.parentNode.insertBefore(tableContainer, elm);
