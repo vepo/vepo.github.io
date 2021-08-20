@@ -28,7 +28,7 @@ Mas nós não estamos aqui para falar de filosofia, mas da filosofia do design d
 
 Estamos tentando pensar o que é Design de Código, para isso vamos iniciar com uma sugestão:
 
-> Design de Código são Técnicas que diminuem a complexidade do código.
+> _Design de Código são Técnicas que diminuem a complexidade do código._
 
 Na verdade dessa afirmação é verdadeira, mas ela é vaga. Primeiro porque não sabemos exatamente o que é uma técnica. Depois não sabemos definir exatamente o que é complexidade. E por fim, sabemos o real objetivo de se escrever código?
 
@@ -38,7 +38,7 @@ A definição de Técnica é bem complexa. Na realidade, é um assunto que tenho
 
 Se eu precisar resumir o que é Técnica, eu partiria da definição do Ellul de Operação Técnica no primeiro capitulo do seu livro.
 
-> Técnica pode ser definida como qualquer operação, ou conjunto de operações, executada com um determinado método com o objetivo a ser atingido.
+> _Técnica pode ser definida como qualquer operação, ou conjunto de operações, executada com um determinado **método** com o **objetivo** a ser atingido._
 
 Baseado nessa definição podemos concluir que o Design de Código é um método e tem um objetivo claro.
 
