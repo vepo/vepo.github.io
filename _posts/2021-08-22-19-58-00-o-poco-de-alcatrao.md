@@ -22,5 +22,5 @@ Esse é um trecho do artigo **O Poço de Alcatrão** do livro **O Mítico Homem-
 >
 > A quarta é a aprendizagem constante, que vem da natureza não repetitiva da tarefa. De uma forma ou de outra, o problema é sempre novo, e quem o soluciona aprende algo: algumas vezes a prática, outras a teoria, ou ambas.
 >
-> Finalmente, há a delícia de trabalhar em um meio tão maleável. O programador, como o poerta, trabalha apenas levemente deslocado de um ambiente de pensamento puro. Ele constrói seus castelos no ar, de ar, criando a partir da sua imaginação.
+> Finalmente, há a delícia de trabalhar em um meio tão maleável. O programador, como o poeta, trabalha apenas levemente deslocado de um ambiente de pensamento puro. Ele constrói seus castelos no ar, de ar, criando a partir da sua imaginação.
 
