@@ -4,6 +4,12 @@ $(document).ready(() => {
             $(elm.parentElement).addClass("img-block");
         }
     });
+    $('p > a > img').each((index, elm) => {
+        if($(elm).text().length == 0) {
+            (elm.parentElement.parentElement).addClass("img-block");
+        }
+    });
+    
     $("article > table, article > .gist").each((index, elm) => {
         var tableContainer = document.createElement('div');
         tableContainer.classList.add('table-container');
