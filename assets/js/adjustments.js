@@ -6,7 +6,7 @@ $(document).ready(() => {
     });
     $('p > a > img').each((index, elm) => {
         if($(elm).text().length == 0) {
-            (elm.parentElement.parentElement).addClass("img-block");
+            $(elm.parentElement.parentElement).addClass("img-block");
         }
     });
     
