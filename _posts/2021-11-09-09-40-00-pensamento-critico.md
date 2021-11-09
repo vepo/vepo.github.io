@@ -35,18 +35,18 @@ O que define um bom pensador? Como boas ideias chegam e transformam a realidade?
 São elas fruto de inspiração? Não! Um bom pensador está baseado em três pilares:
 criatividade, estratégia e pensamento critíco.
 
-O pensamento criativo vem de aplicar outras formas de pensar ao seu campo de trabalho.
+O **pensamento criativo** vem de aplicar outras formas de pensar ao seu campo de trabalho.
 Em muitos casos essas novas forma de pensar não são novas, são apenas adaptadas de outros
 campos. Como é o machine learning por exemplo, que resolveu copiar a forma que o neurônio
 usa para processar informações. Ou ela parte da simples inversão da ordem das coisas.
 
-O pensamento estratégico é usado para analisar o problema, detalhando forças e fraquezas,
+O **pensamento estratégico** é usado para analisar o problema, detalhando forças e fraquezas,
 analisando tendências através do tempo, ou simplesmente chegando a raiz do problema. 
 Perguntar o porque das coisas é um bom método de alcançar o pensamento estratégico. 
 Cada resposta levantará uma série de outras perguntas, e assim por diante, expandindo
 o conhecimento e as possibilidades de mais investigação sobre o problema.
 
-O pensamento crítico trará valor a informação coletada. Dentre todas as respostas levantadas
+O **pensamento crítico** trará valor a informação coletada. Dentre todas as respostas levantadas
 anteriormente, qual é a mais valiosa? Ou qual é a mais relevante para antingirmos o nosso 
 objetivo a curto prazo? Para ser crítico, você precisa ser cético, não cínico. Você validar
 e questionar todas as evidências que tem em mãos, não deixando de explorar premissas e 
@@ -62,7 +62,7 @@ Idealmente o pensamento crítico atua quando criticamos o que cremos.
 Mas existe algum framework que pode nos ajudar nisso? Sim! Podemos 
 sempre questionar a confiabilidade, relevância e validade.
 
-Um exemplo classico de como podemos ser traidos pela confiabilidade 
+Um exemplo classico de como podemos ser traidos pela **confiabilidade** 
 foram de alguns engenheiros que construiram uma IA para reconhecer 
 cachorros ou lobos em fotos. Essa IA foi treinada alcançando uma 
 confiabilidade altissima, mas quando os engenheiros foram validar 
@@ -74,14 +74,14 @@ Não! Essa é uma forma de exercer o pensamento crítico, se os
 engenheiros tivessem confiado que o algoritmo é confiável, eles não
 teriam obtido sucesso.
 
-Relevância é usada para julgar se questões que são importantes para 
+**Relevância** é usada para julgar se questões que são importantes para 
 determinados contextos tem significado em outros contextos. Para 
 identificar se um animal é um cachorro ou um lobo o ambiente é 
 relevante? Mas e se quiséssemos identificar qual esporte uma pessoa 
 está praticando será extremamente útil para distinguir esqui aquático
 do seu primo mais velho esqui.
 
-Validade é usada para criar um fluxo lógico entre evidências e conclusões.
+**Validade** é usada para criar um fluxo lógico entre evidências e conclusões.
 Sempre que chegamos a uma conclusão baseada em uma evidência, precisamos
 fazer a pergunta inversa: _essa conclusão é comprovada pela evidência?_
 
@@ -90,7 +90,8 @@ Um exemplo classico:
 2. Rex é um animal que vive na floresta
 3. Logo, Rex é um lobo.
 
-Seria (3) uma conclusão das duas evidências? Não, pois não há nenhuma 
-evidência que Rex seja realmente um lobo. As duas evidências são fracas.
+Seria **(3)** uma conclusão das duas evidências? Não, pois não há nenhuma 
+evidência que Rex seja realmente um lobo, **(1)** é um argumento vago visto que 
+existem inúmeros animais que vivem nas florestas. As duas evidências são fracas.
 Eu poderia até fazer a clássica piada do Steve Wonder ser Deus, mas creio
 que ela é muito velha e poucos a conheceriam.
