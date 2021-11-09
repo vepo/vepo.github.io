@@ -1,5 +1,5 @@
 ---
-title: (i) Um pouco de Pensamento Crítico
+title: Um pouco de Pensamento Crítico
 permalink: /posts/um-pouco-de-pensamento-critico
 published: true
 series: Pensamento Crítico
