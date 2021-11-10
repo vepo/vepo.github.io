@@ -15,7 +15,7 @@ O que pode impactar na confiabilidade de uma evidência? Aqui vou levantar três
 2. Preconceitos sutis
 3. Confusão entre Confiabilidade e Precisão
 
-Dados ruins podem vir de um universo pequeno ou não representativo. Esse é um ponto muito 
+**Dados ruins** podem vir de um universo pequeno ou não representativo. Esse é um ponto muito 
 interessante que pode ser visto em algumas discussões na [#BolhaDev](https://twitter.com/search?q=%23BolhaDev) 
 do Twitter, alguns engenheiros que trabalham no vale do silício acreditam que todas as 
 politicas que eles usam por lá pode ser aplicadas em empresas aqui no Brasil. Porque isso
@@ -28,7 +28,7 @@ ser simplesmente usada em contextos tão distintos. Isso pode ser contornado ao 
 as caracteristicas do universo a ser fruto da nossa analise. Nossa amostra representa o 
 universo?
 
-Preconceitos sutis também afetam a confiabilidade das nossas evidências. Vamos voltar ao
+**Preconceitos sutis** também afetam a confiabilidade das nossas evidências. Vamos voltar ao
 caso dos engenheiros do vale do silício? Quando você vê uma FAANG no curriculo, você já 
 supõe que eles são bons engenheiros, correto? E o que você supões por engenheiros que nunca
 trabalharam fora do país? Eu não preciso das respostas para saber que qualquer pessoa tem 
@@ -42,7 +42,7 @@ possíveis. Com certeza o novo produto da empresa X será preterido mesmo ele se
 o da empresa Y. Não vou dar nome aos produtos, mas vamos pensar em provedores de Cloud, temos 
 três grandes players no mercado, e é bem provavel que nossa escolha se paute no preconceito.
 
-E por fim podemos confundir precisão com confiabildiade. Se temos alguém em nosso time que é 
+E por fim podemos confundir **precisão com confiabildiade**. Se temos alguém em nosso time que é 
 preciso nas suas respostas, usa palavras diretas e tem argumentos claros para defender 
 suas posições podemos supor que ele está sempre correto? Se vamos imaginar outra pessoa que 
 não é preciso em suas respostas, ao defender sua posição coloque dúvida em alguns pontos e
