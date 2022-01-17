@@ -48,7 +48,7 @@ O primeiro artigo propõe uma heurística para determinação de padrões e anti
 
 No segundo artigo Haupt propõe uma análise estrutural baseada na documentação da API usando OpenAPI. As documentações de APIs abertas foram analisadas por uma ferramenta para se extrair o modelo da API. Segundo Haupt, cada API constiria de uma série de recursos possuem métodos e relacionamentos. Ele por sua vez se baseia no _Atomic Resource Model_ e no _URI Model_. O primeiro descreve uma API através de seus elementos básicos como recursos, verbos e representações. Já o segundo modelo estende o primeiro, dando a oportunidade ao cliente da API de navegar nos recursos baseados em hyperlinks providos pela propria API. Com essa análise é possivel conhecer a complexidade da API, descrevendo quantos recursos ela possui, quantos desses são _ReadOnly_ e quais as relações entre eles através de links.
 
-![Metamodelo de uma API {w=50%}](/assets/imagens/http/rest-haupt.png)
+![Metamodelo de uma API](/assets/images/http/rest-haupt.png)
 
 E por fim, no terceiro artigo, Svensson faz uma análise de algumas APIs de mercado para IoT e propões 8 padrões de projetos, baseado no modelo no GoF. APIs de IoT são altamente voltada a recursos, pois cada dispositivo é um recurso. Segundo Svensson, os padrões presentes na literatura são mais voltados para garantir a qualidade RESTful das APIs e não para o desenho dos endpoints, por isso todos esses padrões se concentram na URI.
 
@@ -741,7 +741,7 @@ Nosso último parâmetro para avaliar uma API é questionar se existe algum mode
 
 Quando usamos um modelo de maturidade temos uma análise estruturada do que estamos trabalhado, deixamos de ser subjetivos e passamos ser objetivos. Para APIs REST, temos o [_Richardson Maturity Model_](https://www.martinfowler.com/articles/richardsonMaturityModel.html). Ele define quatro nívels para uma API REST, mas o prório Fielding deixou claro que [**o nível 3 é um pre-requisito para chamar uma API de RESTful**](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven). Isso não significa que sua API não é REST se não chegou a esse nível, precisamos ser flexíveis pois todo software evolui. Se ela expõe recursos e usa os verbos HTTP, de certa forma ela é um tipo de REST.
 
-![Modelo de maturidade de Richardson {w=75%}](/assets/imagens/http/richardson-maturity-model.png)
+![Modelo de maturidade de Richardson](/assets/images/http/richardson-maturity-model.png)
 
 No nível zero, podemos qualificar qualquer comunicação HTTP. Existem muitos projetos legados que se encaixam nesse nível, me recordo que pelo ano de 2008, quando comecei a trabalhar com projetos web, era comum encontrar endpoints como `/listarUsuarios.do` em que os parâmetros da busca eram passados pelo corpo da mensagem.
 
