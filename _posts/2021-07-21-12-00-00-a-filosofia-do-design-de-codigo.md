@@ -56,7 +56,7 @@ Todo computador vai compreender bits, um conjunto de instruções básicas e alg
 
 **_- Conseguiu entender?_**
 
-![Olha o código da ignição da Apolo 11! 😲](/assets/images/opcode.png)
+![Exemplo de Opcode](/assets/images/opcode.png)
 
 É óbvio que não! Para escrever código era preciso muita compreensão, muita atenção, além de saber decorado que valores estavam nos registradores e todos os comandos que o processador aceita. Era uma atividade extremamente complexa. Quando estudei linguagem de montagens, o professor nos encorajava a construir fluxogramas detalhados sobre a execução do programa. Era preciso antes de colocar o primeiro _opcode_ (entenda como um número para cada operação e alguns parâmetros) ter o desenho completo do que iria acontecer e onde cada informação seria armazenada.
 
