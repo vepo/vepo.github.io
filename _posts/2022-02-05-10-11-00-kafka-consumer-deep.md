@@ -64,3 +64,12 @@ Mas esse código tem uma séria limitação de processamento pois usamos uma JVM
 # 2. Adicionando mais threads
 
 Então o próximo requisito era que deveríamos parametrizar o número de threads que devem rodar em um mesmo processo. Essa parametrização é muito importante porque durante o processamento da nossa mensagem existe uma troca de mensagens diamenter o que significa que, ao se colocar em produção, deve-se encontrar um número ótimo de threads para maximizar a performance.
+
+Ao se deparar com esse requisito, nosso time chegou a duas possiblidades: 
+
+1. Usar apenas 1 consumidor e distribuir as mensagens por todas as threads
+2. Usar 1 consumidor por thread
+
+A opção 1 pode parecer boa quando pensamos no número de conxões abertas com o broker. Mas esse cálculo revela nosso vício em sistema web. Por mais thread que tivermos, o número de conexões não tende a escalar ao ponto de termos falta de recursos. Em um sistema web, o número de conexões tendem a aumentar de acordo com o número de usuários ativos, mas no nosso caso o que vai aumentar é a latência de processamento.
+
+A opção correta é termos um consumidor por thread, assim cada consumidor irá
