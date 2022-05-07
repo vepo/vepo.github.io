@@ -10,11 +10,11 @@ publish_date: 2020-05-08 17:05:31 +0300
 original: "https://dev.to/vepo/construindo-softwares-resilientes-3d65"
 ---
 
-_- Já ouviu falar de **eXtreme Go Horse (XGH)**?_   
-_- Não?!_ 🙄   
-_- Mas você pratica **XGH**?_ 🤨  
-_- Não?_   
-_- Ainda bem!_ 😀  
+_—  Já ouviu falar de **eXtreme Go Horse (XGH)**?_   
+_—  Não?!_ 🙄   
+_—  Mas você pratica **XGH**?_ 🤨  
+_—  Não?_   
+_—  Ainda bem!_ 😀  
 
 **XGH** é uma piada que gosto muito. Espero que você não o pratique. Mas coloquei ele na roda por seu exato oposto. Um Sênior deve construir softwares estáveis. E para se construir software estáveis você tem que ir pro extremo oposto do **XGH**. Devemos construir software resilientes.
 
@@ -109,7 +109,7 @@ Como eu resolvo isso? Eu crio testes unitários com todos os pressupostos.
 
 ## 3. Um Sênior investiga possíveis erros
 
-_- Então, esse teste falha em 50% dos casos. Mas caso falhe, roda de novo que dá certo._
+_—  Então, esse teste falha em 50% dos casos. Mas caso falhe, roda de novo que dá certo._
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/lefte06h7r9ngi7d4l8b.jpg)
 

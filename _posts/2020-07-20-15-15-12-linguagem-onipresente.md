@@ -26,11 +26,11 @@ Esse usuário já lida com o problema pelo qual você vai resolver e já tem mui
 
 Qualquer desenvolvedor sabe que precisa de Modelos. Os mais inexperientes não conseguem abstrair o que é um modelo, ficando presos a conceitos da linguagem. 
 
-_- "Eu tenho um array aqui com o nome dos meus funcionários"_
+_—  "Eu tenho um array aqui com o nome dos meus funcionários"_
 
 A criação de um modelo é um passo importante para se resolver o problema satisfatoriamente. No caso da frase acima, eu considero que existe a entidade **Funcionário**. Este passa a ser um conceito abstrato no contexto do seu projeto. A **Funcionário** serão dados atribuições relacionamentos.
 
-_- "Tenho 500 **Funcionários** na Base de Dados, e consigo fazer um relatório por departamento."_
+_—  "Tenho 500 **Funcionários** na Base de Dados, e consigo fazer um relatório por departamento."_
 
 Modelos podem ser representados em diagramas, gráficos e textos. Porém eles existem no código, estão amarrados ao código. Uma vez mudando o código o diagrama não é atualizado, o que pode gerar confusão.
 
@@ -50,9 +50,9 @@ O Domínio é algo prexistente, porém cada usuário tem uma visão do mesmo. Um
 
 A atividade de se Modelar um Domínio é um processo em várias etapas. Ela involve questionamos e perguntas e deve ser feita em voz alta.
 
-_- "Um **Funcionário** tem apenas um supervisor?"_
-_- "Não, há **Funcionários** que respondem para seu gerente e para o cliente._
-_- "E quais são as responsabilidades do **Gerente** para com o **Funcionário**? E quando esse responde também ao **Cliente**, qual o papel do mesmo?_
+_—  "Um **Funcionário** tem apenas um supervisor?"_
+_—  "Não, há **Funcionários** que respondem para seu gerente e para o cliente._
+_—  "E quais são as responsabilidades do **Gerente** para com o **Funcionário**? E quando esse responde também ao **Cliente**, qual o papel do mesmo?_
 
 Observe que no dialogo acima, há palavras que aparecem em negrito. Quando coloco elas em negrito, estou afirmando que a mesma foi incorporada ao Modelo de Domínio. Assim nesse pegqueno dialogo, o desenvolvedor acabou de descobrir que na modelagem de um software para RH, deve levar em consideração tanto o **Gerente** do **Funcionário** quanto o **Cliente**, porém o **Cliente** não é um **Funcionário**.
 

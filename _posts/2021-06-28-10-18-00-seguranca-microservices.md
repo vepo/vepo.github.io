@@ -16,7 +16,7 @@ Quando temos um monolito, podemos facilmente garantir a identidade de quem o est
 
 Quando falamos de microsserviços, não estamos mais falando de um serviços, mas vários. Só essa informação já nos dá um panorama interessante do desafio, se temos `n` serviços temos `n` vezes mais chances de termos uma falha se segurança. Não adianta nos iludirmos que nossso software não tem falhas de segurança, ele tem sim. Mas se conhecermos bem alguns padrões podemos reduzir o número de possíveis falhas.
 
-_- Mas como podemos caracterizar uma falha de segurança?_
+_—  Mas como podemos caracterizar uma falha de segurança?_
 
 Ora, não podemos falar de segurança sem entender o que ela significa. Primeiro precisamos entender o que é fundamental. Todo serviço deve ter: confidencialidade, integralidade e disponibilidade. Se qualquer um dessas caracteristicas falharem, temos um problema de segurança. Mas vamos definir cada uma?
 

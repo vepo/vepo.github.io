@@ -10,7 +10,7 @@ cover_image: https://dev-to-uploads.s3.amazonaws.com/i/8tykl2s0ek99gmv13odp.jpg
 original: https://dev.to/vepo/devops-como-comecar-54gk
 ---
 
-_- Porque desenvolvemos software?_
+_—  Porque desenvolvemos software?_
 
 Muitos desenvolvedores não fazem essa pergunta. E tudo bem se você nunca a fez. Agora Engenheiros devem fazer essa pergunta, porque a função de um engenheiro é refletir sobre a natureza do proprio trabalho. Se você nunca se perguntou a diferença entre um desevolvedor e engenheiro, fica uma dica.
 
@@ -67,7 +67,7 @@ A automatização também traz a certeza que um deploy será executado extamente
 
 # Roadmap
 
-_- Ok, mas como eu consigo começar?_
+_—  Ok, mas como eu consigo começar?_
 
 Isso vai depender do seu projeto. Cada um tem um Roadmap especifico. Mas aqui vou te fazer algumas perguntas que pode te ajudar.
 
