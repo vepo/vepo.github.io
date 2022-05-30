@@ -110,7 +110,7 @@ Em Java todo Objeto estende a classe Object, essa classe define alguns Métodos 
 
 Esse é um padrão bem comum nas interfaces gráficas, para cada ação há uma interface **Listerner**. Havendo uma grande variedade de interfaces promove o desacoplamento de uma implementação com outras ações indesejadas. 
 
-Esse princípio tem um efeito negativo que pode deve ser contido. Não se deve criar interfaces indesejadas. Por exemplo, se temos em uma interface gráfica um **Botão** e **Link**, podemos supor que ambos possuem a mesma operação de **Clique**, logo não faz sentido criar mais do que um **CLiqueListerner**.
+Esse princípio tem um efeito negativo que pode deve ser contido. Não se deve criar interfaces indesejadas. Por exemplo, se temos em uma interface gráfica um **Botão** e **Link**, podemos supor que ambos possuem a mesma operação de **Clique**, logo não faz sentido criar mais do que um **CliqueListerner**.
 
 O Java padeceu por muito tempo de uma sobrecarga nas definições de classes por causa desse principio, em um único projeto havia inumeras implementas de Listeners etc... Porém, desde o Java 8 isso pode ser contornado pelo uso de Lambdas e funções como parâmetros. Um bom inicio para se conhecer essa interfaces é o package [java.util.function](https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html). Nele é possível encontrar interfaces como [Consumer](https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html) e [Function](https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html) que nos ajudam a evitar criar novas interfaces.
 
