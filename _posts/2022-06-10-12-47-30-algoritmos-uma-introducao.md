@@ -102,7 +102,7 @@ Para escrever um algoritmo, precisamos:
 * **Pseudocódigo**: Devemos ser capazes de traduzir o algoritmo em qualquer linguagem de programação
 * **Dados de entrada**
 * **Dados de saída**
-* **Atribuições**: Representa quando uma variável assume um novo valor. Normalmente usamos a notação `x ← y`onde significa que `x` será atribuído o valor de `y`.
+* **Atribuições**: Representa quando uma variável assume um novo valor. Normalmente usamos a notação `x ← y` onde significa que `x` será atribuído o valor de `y`.
 
 No **Algoritmo E** temos todas essas características.
 
