@@ -4,8 +4,7 @@ permalink: /posts/algorithms-an-introduction
 published: true
 description: What is an algorithm? How can we define an algorithm?
 tags: [Algorithms, Computer Science]
-cover_image: https://thepracticaldev.s3.amazonaws.com/i/r4m1fxs9otr17hcqfcq9.png
-series: Algorithms
+cover_image: /assets/images/pexels-artem-beliaikin-5456314.jpg
 publish_date: 2020-01-09 12:47:30 +0300
 ---
 
@@ -14,7 +13,7 @@ publish_date: 2020-01-09 12:47:30 +0300
 
 Even you do not care about algorithms, if you program in any programming language you use, produce and read algorithms. 
 
-A Programming Language is the language you can express algorithms to the computer can undestand it. So, here I want to make a difference between Programming Languages and Presentation Languages. HTML for me is not a programming language... No worries if you believe it is. 🤓
+A Programming Language is the language you can express algorithms to the computer can understand it. So, here I want to make a difference between Programming Languages and Presentation Languages. HTML for me is not a programming language... No worries if you believe it is. 🤓
 
 {% dev_post 82209 %}
 
@@ -30,7 +29,7 @@ So a program **SHOULD** follow a Recipe, and that is the algorithm. This is ubiq
 
 ## Characteristics
 
-An algorithm is a recipe, but a recipe is not an algorithm. Why? You can undestand a recipe, but a computer cannot! You are much smarter than a computer. 
+An algorithm is a recipe, but a recipe is not an algorithm. Why? You can understand a recipe, but a computer cannot! You are much smarter than a computer. 
 
 To be an algorithm, a set of rules must have the following features
 
@@ -45,7 +44,7 @@ To be an algorithm, a set of rules must have the following features
 
 An algorithm **SHOULD** always terminate after a finite number of steps. 
 
-There are some algorithms that search infinitely for a optimal value. Even this kind of algorithms should have a end, probably an finite number of iteractions or an _"stable"_ value. 
+There are some algorithms that search infinitely for a optimal value. Even this kind of algorithms should have a end, probably an finite number of iterations or an _"stable"_ value. 
 
 ### 2. Definiteness
 
@@ -53,7 +52,7 @@ Each step of an algorithm **SHOULD** be precisely defined.
 
 You can make assumptions about something you read, but a computer cannot make any assumption. Each step should be precise.
 
-![Alt Text](https://thepracticaldev.s3.amazonaws.com/i/4du0v0ungpy4zaqbe7hr.png)
+[!["Determinism" from monkeyuser.com with description "Assumptions are the mother of all fuck ups!"](/assets/images/monkeyuser/148-determinism.png)](https://www.monkeyuser.com/2019/determinism/)
 
 Imagine an algorithm that says:
 
@@ -61,9 +60,9 @@ Imagine an algorithm that says:
 
 This step is defined? No! You can make questions to this step: _Is x an Integer value?_ If we have `m=4` and `n=3`, the result in `x` can be `x=1` or `x=1.333`. Depending from the algorithm it can be any value.
 
-The correct step shuold be:
+The correct step should be:
 
-> Assign the x (interger) with the value of m divided by n
+> Assign the x (integer) with the value of m divided by n
 
 In an algorithm there is no space for questions in steps.
 
@@ -82,11 +81,11 @@ All steps need to be effective, that means it should be simple enough to be done
 # Notation
 
 For writing an algorithm we need:
-* Numbered steps: We should be able to reffer to steps
+* Numbered steps: We should be able to refer to steps
 * Pseudocode: We should be able to translate the algorithm in any programming language
 * Given inputs
 * Given outputs
-* Assignments: This represents when a variable assume a new value. Normaly we use the notation `x ← y`where means that `x` will be attributed the value of `y`.
+* Assignments: This represents when a variable assume a new value. Normally we use the notation `x ← y`where means that `x` will be attributed the value of `y`.
 
 # Sorting a array
 
