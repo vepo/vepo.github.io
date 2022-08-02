@@ -116,7 +116,7 @@ Assim podemos definir na nossa linguagem:
 Para definir um [Token](https://github.com/antlr/antlr4/blob/master/doc/lexicon.md#identifiers) em ANTLR4, é preciso definir um identificar com letra maiúscula:
 
 
-```g4
+```
 grammar TestSuite;
 
 STRING : DQUOTE (ESC | ~["\\])* DQUOTE;
@@ -158,7 +158,7 @@ Cada regra dessa será uma [Parser Rule](https://github.com/antlr/antlr4/blob/ma
 
 Segue o exemplo de como ficaria nossa Suite definida:
 
-```g4
+```
 grammar TestSuite;
 
 suite:
