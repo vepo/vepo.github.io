@@ -27,6 +27,7 @@ gem 'jekyll-feed'
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do
+  gem 'jekyll-asciidoc'
   gem "jekyll-feed"
   gem "jekyll-sitemap"
   gem "jekyll-paginate"

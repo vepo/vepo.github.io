@@ -9,6 +9,8 @@ permalink: /posts/java-101
 publish_date: 2022-04-29 14:26:00 +0300
 ---
 
+:imagesdir: assets/images/java-101
+
 A intenção dessa série é te apresentar o básico sobre a linguagem Java e te dar ferramentas para que você possa aprender a programar. Nenhum material por sí só fará o trabalho completo, para que você possa se tornar um desenvolvedor é preciso muito exercício, por isso vá lentamente avançando sobre os tópicos propostos e fazendo todos os exercícios propostos. 
 
 Nesse sessão você vai aprender:
@@ -22,21 +24,28 @@ Nos últimos meses muitas pessoas vem me perguntando por onde começar a desenvo
 
 Eu vou tentar seguir a ordem dessa thread que fiz em dezembro.
 
-{% twitter https://twitter.com/vepo/status/1473250093742571521 %}
+[.text-center]
+.Thread que fiz no Twitter em dezembro de 2021
+image::cap-01/java-thread.PNG[id=twitter-thread, link=https://twitter.com/vepo/status/1473250093742571521, align="center"]
 
-# Java é um ecossistema
+[#java-e-um-ecossistema]
+== Java é um ecossistema
 
 Muitos tendem a querer comparar Java com outras linguagens. Alguns tem a pretensão de comparar Java com linguagens como Javascript ou mesmo Scala. Esse é um erro crasso! Java não é apenas uma linguagem, mas um ecossistema.
 
 Primeiro para entender melhor vamos tentar definir o que é uma linguagem de programação...
 
-Quando a computação eletrônica começou a se popularizar, existiam inúmeras plataformas e cada uma delas haviam um conjunto de instruções. Para desenvolver qualquer software era preciso conhecer o hardware e o conjunto de instruções que existem naquele hardware. Quer ver um exemplo? Tenta navegar no [código da Apollo 11](https://github.com/chrislgarry/Apollo-11) para tentar entender algo. É praticamente impossível, até mesmo para quem já desenvolveu em Assembly. Isso acontece porque o conjunto de instruções e a arquitetura do hardware são completamente diferentes das máquinas que temos hoje.
+Quando a computação eletrônica começou a se popularizar, existiam inúmeras plataformas e cada uma delas haviam um conjunto de instruções. Para desenvolver qualquer software era preciso conhecer o hardware e o conjunto de instruções que existem naquele hardware. Quer ver um exemplo? Tenta navegar no https://github.com/chrislgarry/Apollo-11[código da Apollo 11] para tentar entender algo. É praticamente impossível, até mesmo para quem já desenvolveu em Assembly. Isso acontece porque o conjunto de instruções e a arquitetura do hardware são completamente diferentes das máquinas que temos hoje.
 
-![Olha o código da ignição da Apolo 11! 😲](/assets/images/apollo11.png)
+[.text-center]
+.Olha o código da ignição da Apolo 11! 😲
+image::cap-01/apollo11.png[id=apollo11, align="center"]
 
 Com o tempo as máquinas ganharam um padrão, tanto de processadores como de Opcodes. Hoje sabemos que existe um processador, um barramento, memória, registradores, etc... Esses componentes variam um pouco de arquitetura pra arquitetura, mas eles continuam seguindo um padrão. Abaixo você pode ver a documentação de um opcode.
 
-![Exemplo de Opcode](/assets/images/opcode.png)
+[.text-center]
+.Exemplo de Opcode
+image::cap-01/opcode.png[id=opcode, align="center"]
 
 _— Cara qual a relação disso com Java?_
 
@@ -46,7 +55,7 @@ Até 1990 era comum um programa ser compilado para uma máquina especifica. Quem
 
 Essa ideia era pensada porque começavam a existir dispositivos que no futuro poderiam ter um processador de uso genérico. Mas como fazer para encapsular toda a lógica do hardware e do sistema operacional? Por isso surgiu algo que é tão importante quanto a linguagem Java: a **Java Virtual Machine**! Ou JVM para os mais íntimos...
 
-A JVM é um programa que lê um conjunto de classes e executa como se fosse um processador em alto nível. Ela tem uma arquitetura como se fosse uma máquina e tem instruções como se fosse um processador. A [especificação](https://docs.oracle.com/javase/specs/jvms/se18/html/index.html) dela é aberta e pode ser acessada por qualquer fornecedor que queira porta ela em seu sistema operacional. 
+A JVM é um programa que lê um conjunto de classes e executa como se fosse um processador em alto nível. Ela tem uma arquitetura como se fosse uma máquina e tem instruções como se fosse um processador. A https://docs.oracle.com/javase/specs/jvms/se18/html/index.html[especificação] dela é aberta e pode ser acessada por qualquer fornecedor que queira porta ela em seu sistema operacional. 
 
 Então agora para e olha para o transformador que existe na sua rua... E se eu te dissesse que é provável que existe uma JVM rodando perto dele para monitorar ele? Você acreditaria? Em algumas cidades existe. Isso só é possível porque ela é portátil em qualquer sistema operacional.
 
@@ -64,11 +73,11 @@ Além disso houveram projetos para que os componentes fosse a principal forma de
 
 Java Beans é uma especificação que deu origem ao que conhecemos hoje como Jakarta EE. É o falecido Java EE! É um modelo de programação em que seu código não fica dependente de um framework, da mesma forma que seu código não é dependente de uma máquina. Hoje é possível você escrever um programa para _Quarkus_ e usar o mesmo código para OpenLiberty.
 
-## Instalando tudo...
+=== Instalando tudo...
 
-Não gaste tempo procurando cada programa... nem mesmo o Java. Você precisa de apenas uma coisa: o [SDKMan!](https://sdkman.io/). Com ele é possível instalar qualquer versão de Java que você deseja e algumas outras ferramentas como vamos citar mais a frente. 
+Não gaste tempo procurando cada programa... nem mesmo o Java. Você precisa de apenas uma coisa: o https://sdkman.io/[SDKMan!]. Com ele é possível instalar qualquer versão de Java que você deseja e algumas outras ferramentas como vamos citar mais a frente. 
 
-Também recomendo ter uma boa linha de comando. Se você usa Windows... Errado! Brincadeira! hehehe Você pode usar Windows, tanto que eu uso Windows (não por livre e espontânea vontade). No Windows você pode usar o Git Bash que é um porte do MinGW que por sua vez é um porte dos programas GNU para Windows.
+Também recomendo ter uma boa linha de comando. Se você usa Windows... Errado! Brincadeira! _hehehe_ Você pode usar Windows, tanto que eu uso Windows (não por livre e espontânea vontade). No Windows você pode usar o Git Bash que é um porte do MinGW que por sua vez é um porte dos programas GNU para Windows.
 
 Sobre a IDE, escolha a que você mais gosta. Todas as IDEs relevantes tem suporte a Java. Você precisa de uma IDE porque é mais fácil desenvolver usando ferramentas para fazer a marcação da linguagem (_o famoso code highlight_) e para propor código (_o famoso auto-complete_). Desenvolvedores experientes preferem comodidade porque os problemas já são complexos demais para ficar perdendo tempo. Eu recomendo usar ou o Eclipse, ou o IntelliJ Idea ou o VS Code. As três IDEs são boas.
 
@@ -77,69 +86,87 @@ Logo em resumo, o que você precisa é:
 * SDKMan!
 * Maven ou Gradle
 * Java
-* Uma boa IDE ([Eclipse](https://www.eclipse.org/downloads/), [IntelliJ IDEA](https://www.jetbrains.com/pt-br/idea/download/#section=windows) ou [VS Code](https://code.visualstudio.com/download))
+* Uma boa IDE (https://www.eclipse.org/downloads/[Eclipse], https://www.jetbrains.com/pt-br/idea/download/#section=windows[IntelliJ IDEA] ou https://code.visualstudio.com/download[VS Code])
 
-## Construindo meu primeiro programa Java
+=== Construindo meu primeiro programa Java
 
 Então agora que você sabe que o Java é mais que uma linguagem, vamos escrever nosso primeiro código Java?
 
 Se você quiser aprender, recomendo abrir sua IDE preferida e criar um projeto Java. Vou demonstrar primeiro como criar usando o IntelliJ, depois usando o Eclipse e por fim usando o Maven e o Gradle. Usando apenas a IDE é ótimo para estudo, porém usando um sistema de build como Maven ou Gradle você poderá torna seu projeto mais profissional.
 
-### Usando o IntelliJ
+==== Usando o IntelliJ
 
 Com o ItelliJ, selecione Novo Projeto e você verá a tela abaixo. Você precisa adicionar o nome do projeto (_Name_) e o local em que deseja criar o projeto (_Location_). Eu recomendo você ter uma pasta separada para todos os seus projetos. 
 
-![Tela de novo Projeto](/assets/images/java/intellij-novo-projeto-1.png)
+[.text-center]
+.Tela de novo Projeto
+image::cap-01/intellij-novo-projeto-1.png[id=intellij-novo-projeto-1, align="center"]
+
 
 Na tela acima, temos algumas opções que são importantes. A primeira delas é que você pode escolher o sistema de build do seu projeto. O IntelliJ já tem um sistema de build próprio, mas você pode usar Maven ou Gradle. A segunda opção é que você pode escolher a versão da JDK que você vai usar. A JDK é a ferramenta que te possibilitará desenvolver Java, ela contém todos os programas para compilar seu código, executar, debugar e muitas outras ferramentas que podemos falar mais a diante. O IntelliJ permite você selecionar a JDK e fazer o download dela. Eu recomendo você usar a versão mais recente e escolher a Oracle OpenJDK como vendor. Depois você pode escolher já inicializar esse projeto como um repositório git (_Create Git repository_) ou iniciar o projeto com um código de exemplo (_Add sample code_).
 
-Depois de criado o projeto, você terá que adicionar uma classe ao projeto. Todo programa Java precisa de um método de entrada chamado `main`. Apesar de muitos criticarem essa limitação, isso era comum quando o Java foi desenvolvido. Hoje, na verdade, o Java não tem essa limitação, você pode usar o [JShell](https://cr.openjdk.java.net/~rfield/tutorial/JShellTutorial.html) e importar um arquivo `jsh`. Para criar sua primeira classe, selecione o botão direito do mouse na pasta `src` e depois selecione **New → Java Class**.
+Depois de criado o projeto, você terá que adicionar uma classe ao projeto. Todo programa Java precisa de um método de entrada chamado `main`. Apesar de muitos criticarem essa limitação, isso era comum quando o Java foi desenvolvido. Hoje, na verdade, o Java não tem essa limitação, você pode usar o https://cr.openjdk.java.net/~rfield/tutorial/JShellTutorial.html[JShell] e importar um arquivo `jsh`. Para criar sua primeira classe, selecione o botão direito do mouse na pasta `src` e depois selecione **New → Java Class**.
 
-![Criando nova classe](/assets/images/java/intellij-novo-projeto-2.png)
+[.text-center]
+.Criando nova classe
+image::cap-01/intellij-novo-projeto-2.png[id=intellij-novo-projeto-2, align="center"]
 
 Ao selecionar uma nova classe, será necessário dar um nome a ela. O nome de uma classe é o que chamamos de _Fully Qualified Name_, ele é composto pelo nome do pacote e o real nome da classe, no caso estou criando o pacote `io.vepo.helloworld` e a classe `HelloWorld`. Vamos falar mais sobre classes e pacotes quando formos falar de Orientação a Objetos (eu prometo falar disso, tenham paciência!).
 
-![Dando nome a classe](/assets/images/java/intellij-novo-projeto-3.png)
+[.text-center]
+.Dando nome a classe
+image::cap-01/intellij-novo-projeto-3.png[id=intellij-novo-projeto-3, align="center"]
 
 Criada a classe, vou te apresentar uma funcionalidade muito importante. Abra o editor de texto posicione o cursor para editar o texto dentro da classe, adicione o texto `ma` e use a funcionalidade mais fabulosa que se chama **auto-complete** selecionando **CTRL+SPACE**! Magicamente a IDE vai compreender qual é o contexto e vai propor o que você deve escrever. Agora siga para o último _snippet_ desse post. (snippet significa trecho, é normalmente um significado para um trecho de código que serve de exemplo simples).
 
-![Criando método main](/assets/images/java/intellij-novo-projeto-4.png)
+[.text-center]
+.Criando método main
+image::cap-01/intellij-novo-projeto-4.png[id=intellij-novo-projeto-4, align="center"]
 
-### Usando o Eclipse
+==== Usando o Eclipse
 
-Eclipse é uma IDE que pode parecer ultrapassada, mas ela tem uma relação intrínseca com o Java, [hoje uma nova versão do Java](https://www.oracle.com/java/technologies/java-se-support-roadmap.html) é liberado pela Oracle semestralmente, mas para que a Oracle conseguisse essa proeza (antes demorava anos) ela acabou deixando liberando o Java EE para Eclipse Foundation sob o nome de Jakarta EE. Por enquanto você não precisa saber de nada disso, só lembre que Eclipse é a IDE da Eclipse Foundation que controla alguma coisa do Java!
+Eclipse é uma IDE que pode parecer ultrapassada, mas ela tem uma relação intrínseca com o Java, https://www.oracle.com/java/technologies/java-se-support-roadmap.html[hoje uma nova versão do Java] é liberado pela Oracle semestralmente, mas para que a Oracle conseguisse essa proeza (antes demorava anos) ela acabou deixando liberando o Java EE para Eclipse Foundation sob o nome de Jakarta EE. Por enquanto você não precisa saber de nada disso, só lembre que Eclipse é a IDE da Eclipse Foundation que controla alguma coisa do Java!
 
 Porque eu citei o Java EE? Porque é provável que ao tentar fazer o download do Eclipse você veja a opção Enterprise como disponível. Você não precisa por enquanto de uma versão enterprise, tudo que você precisa é do Java Padrão (ou Java Standard Edition, SE para os mais íntimos).
 
 Assim, ao iniciar o Workspace do Eclipse para Java você verá a opção para criar um novo projeto Java.
 
-![Criar novo projeto](/assets/images/java/eclipse-novo-projeto-1.png)
+[.text-center]
+.Criar novo projeto - Atalho
+image::cap-01/eclipse-novo-projeto-1.png[id=eclipse-novo-projeto-1, align="center"]
 
 Ao selecionar, você entrará no Wizard de criação de um novo projeto. Semelhantemente ao IntelliJ, você terá que escolher um nome para o projeto e um local, a diferença é que no Eclipse o local padrão é o workspace. Você não precisa criar o projeto no workspace, você pode usar qualquer diretório, mas será no workspace que o Eclipse salvará alguns arquivos que definem como você está usando o mesmo, por isso caso você tenha mais de um contexto de desenvolvimento, você pode usar vários workspaces e trocar quando necessitar trocar de contextos. Por exemplo, você tem o workspace do trabalho e o workspace da faculdade, ou um workspace para cada projeto que você está trabalhando.
 
 Você também pode selecionar a JDK que vai usar. Eu recomendo selecionar **Finish**, pois as outras telas do wizard são usadas para adicionar novas bibliotecas ou mudar a estrutura de diretórios do projeto.
 
-![Criar novo projeto](/assets/images/java/eclipse-novo-projeto-2.png)
+[.text-center]
+.Criar novo projeto - Wizard
+image::cap-01/eclipse-novo-projeto-2.png[id=eclipse-novo-projeto-2, align="center"]
 
 Da mesma forma que o IntelliJ você tem que selecionar o botão direito do mouse na pasta `src` e depois selecione **New → Java Class**.
 
-![Criar novo projeto](/assets/images/java/eclipse-novo-projeto-3.png)
+[.text-center]
+.Criando classe - Atalho
+image::cap-01/eclipse-novo-projeto-3.png[id=eclipse-novo-projeto-3, align="center"]
 
 E por fim dar um nome a classe, mas diferente do IntelliJ, o Eclipse dá mais liberdade para criar a classe, como já adicionar o método `main`.
 
-![Criar novo projeto](/assets/images/java/eclipse-novo-projeto-4.png)
+[.text-center]
+.Criando classe - Wizard
+image::cap-01/eclipse-novo-projeto-4.png[id=eclipse-novo-projeto-4, align="center"]
 
 Com a classe, você também pode usar o **auto-complete**. Eu pessoalmente acho essa funcionalidade melhor no Eclipse que no IntelliJ. Aliás, se você usa VS Code, você está usando essa funcionalidade porque o VS Code usa o servidor de código do Eclipse.
 
 Uma desvantagem de usar eclipse é que ele não usa coordenadas Maven como veremos a seguir para definir as dependências.
 
-### Usando o Gradle
+==== Usando o Gradle
 
 O erro mais comum de quem vai criar um projeto Java é baixar uma IDE e criar um projeto Java. 🤯 Eu fiz isso por muito tempo, até descobrir que é só dor de cabeça. É mais fácil você usar o Maven ou o Gradle. Eu uso Maven por comodidade, já tive vontade de aprender Gradle, mas... Bom... Vamos ver o Gradle!
 
 Com o Gradle você pode usar ele para gerar a estrutura do seu projeto automaticamente, basta executar `gradle init` no diretório da aplicação e seguir respondendo as perguntas. Eu recomendo criar uma application Java não quebrada em submódulos usando Groovy e JUnit Jupyter conforme abaixo:
 
-```bash
+[source,bash]
+----
 $ gradle init
 
 Select type of project to generate:
@@ -180,21 +207,22 @@ Source package (default: meu.projeto.gradle):
 
 BUILD SUCCESSFUL
 2 actionable tasks: 2 executed
-```
+----
 
 O próximo passo é abrir o diretório em uma IDE, ver a estrutura criada. Para saber como usar o Gradle, use o comando `gradle tasks` e com um pouco de Google Translator você poderá saber tudo o que fazer com o projeto. 
 
 Eu nunca tinha usado o Gradle e ele me parece bem mais fácil que o Maven. Você precisa ficar atento ao arquivo `build.gradle` que é onde todas as propriedades são definidas. Elas serão bem similares as definidas no nosso projeto Maven, mas em uma linguagem diferente, o Groovy.
 
-### Usando o Maven
+==== Usando o Maven
 
-> **Aviso**
->
-> Apesar de Maven usar XML, não se sinta intimidado. Eu deixe um exemplo com comentários. Caso você ainda ache difícil, manda um feedback aí com a sua dificuldade pelo twitter para [@vepo](twitter.com/vepo).
+.Aviso
+[sidebar]
+Apesar de Maven usar XML, não se sinta intimidado. Eu deixe um exemplo com comentários. Caso você ainda ache difícil, manda um feedback aí com a sua dificuldade pelo twitter para https://twitter.com/vepo[@vepo].
 
 Com o Maven você pode facilmente criar um projeto Java e compilar ele independente de IDE. O Maven também vai se encarregará de encontrar todas as dependências em suas versões e dependências. Então para criar um projeto Java basta criar um arquivo `pom.xml` e um arquivo Java, como na estrutura abaixo.
 
-```
+[source]
+----
 .
 ├── src
 │   └── main
@@ -204,15 +232,16 @@ Com o Maven você pode facilmente criar um projeto Java e compilar ele independe
 │                   └── helloworld
 │                       └── HelloWorld.java
 └── pom.xml
-```
+----
 
-Para quem não conhece o Maven (_dê uma olhada nesse [simples tutorial](https://github.com/dev-roadmap/backend-roadmap/blob/main/caso-de-uso-00-configurando-um-projeto-quarkus.md)_), ele vai gerenciar a build do seu projetos Java. O arquivo `pom.xml` vai conter as informações básicas do projeto e as dependências. Você pode achar estranha a estrutura de diretórios, mas ela é bastante útil para evitar configurações. O Maven atua por um padrão chamado [Convenção sobre configuração](https://pt.wikipedia.org/wiki/Conven%C3%A7%C3%A3o_sobre_configura%C3%A7%C3%A3o), ao invés de colocar todas as configurações do projeto, basta seguir essa regrinha básica de estrutura de diretórios.
+Para quem não conhece o Maven (_dê uma olhada nesse https://github.com/dev-roadmap/backend-roadmap/blob/main/caso-de-uso-00-configurando-um-projeto-quarkus.md[simples tutorial]_), ele vai gerenciar a build do seu projetos Java. O arquivo `pom.xml` vai conter as informações básicas do projeto e as dependências. Você pode achar estranha a estrutura de diretórios, mas ela é bastante útil para evitar configurações. O Maven atua por um padrão chamado https://pt.wikipedia.org/wiki/Conven%C3%A7%C3%A3o_sobre_configura%C3%A7%C3%A3o[Convenção sobre configuração], ao invés de colocar todas as configurações do projeto, basta seguir essa regrinha básica de estrutura de diretórios.
 
-Para encontrar dependências Maven, é possível procurar no mvnrepository.com. Cada dependência é definida pelas coordenadas `groupId`, `artifactId` e `version` e elas podem ser encontradas diretamente no mvnrepository.com, como é o caso do Kafka Clientes [mvnrepository.com/artifact/org.apache.kafka/kafka-clients](https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients). Observe o padrão da URL, `mvnrepository.com/artifact/{groupId}/{artifactId}`. É possível também adicionar a versão na URL `mvnrepository.com/artifact/{groupId}/{artifactId}/{version}`. Isso facilita a busca pode dependências.
+Para encontrar dependências Maven, é possível procurar no mvnrepository.com. Cada dependência é definida pelas coordenadas `groupId`, `artifactId` e `version` e elas podem ser encontradas diretamente no mvnrepository.com, como é o caso do Kafka Clientes https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients[mvnrepository.com/artifact/org.apache.kafka/kafka-clients]. Observe o padrão da URL, `mvnrepository.com/artifact/{groupId}/{artifactId}`. É possível também adicionar a versão na URL `mvnrepository.com/artifact/{groupId}/{artifactId}/{version}`. Isso facilita a busca pode dependências.
 
 Para facilitar na execução, já estou colocando o plugin `org.codehaus.mojo:exec-maven-plugin` corretamente configurado para apontar para a classe `io.vepo.helloworld.HelloWorld`, assim para executar basta usar `mvn clean compile exec:java`.
 
-```xml
+[source,xml]
+----
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
@@ -249,13 +278,14 @@ Para facilitar na execução, já estou colocando o plugin `org.codehaus.mojo:ex
         </plugins>
     </build>
 </project>
-```
+----
 
 Observe como é simples... Com isso todas as configurações ficam disponíveis em um único arquivo que pode ser usado pela sua IDE preferida.
 
 Agora é só criar a classe como o exemplo abaixo e pronto! Execute `mvn clean compile exec:java` e você verá o resultado na tela.
 
-```java
+[source,java]
+----
 package io.vepo.helloworld;
 
 public class HelloWorld {
@@ -263,11 +293,12 @@ public class HelloWorld {
         System.out.println("Hello World!");
     }
 }
-```
+----
 
 Agora caso você queira criar um programa usando um framework... Eu recomendo você procurar o tutorial desse framework. Talvez você precisará escrever um `main` específico ou mesmo usar um conjunto de anotações.
 
-# Exercícios
+[#cap-01-exercicios]
+== Exercícios
 
 Os exercícios são propostos como forma de validar que você pode ir para o próximo passo. Nessa sessão vamos apenas pedir para você configurar o ambiente, para isso:
 
@@ -275,8 +306,9 @@ Os exercícios são propostos como forma de validar que você pode ir para o pr�
 2. Crie um programa Java usando a IDE
 3. Crie um programa Java usando um sistema de build (Maven ou Gradle)
 
-# Próximos passos
+[#cap-01-proximos-passos]
+== Próximos passos
 
-Agora que você sabe como escrever e executar um programa Java, você pode conhecer um pouco mais da sintaxe da linguagem. Ela é baseada na linguagem C, mas tem algumas especificidades... Eu recomendei o tutorial do [W3CSchools](https://www.w3schools.com/java/java_syntax.asp) por ter ao menos uma listagem das principais construções do Java 8. Tente saber como declarar uma classe, um método, variáveis, quais são as principais estruturas de loop (`for` e `while`) e suas variações e por fim as estruturas lógicas (`if` e `switch`).
+Agora que você sabe como escrever e executar um programa Java, você pode conhecer um pouco mais da sintaxe da linguagem. Ela é baseada na linguagem C, mas tem algumas especificidades... Eu recomendei o tutorial do https://www.w3schools.com/java/java_syntax.asp[W3CSchools] por ter ao menos uma listagem das principais construções do Java 8. Tente saber como declarar uma classe, um método, variáveis, quais são as principais estruturas de loop (`for` e `while`) e suas variações e por fim as estruturas lógicas (`if` e `switch`).
 
-Depois conheça ao menos alguns dos pacotes básicos da linguagem, a [documentação](https://docs.oracle.com/en/java/javase/18/docs/api/java.base/module-summary.html) está disponível na internet. Eu recomendo que você comece pelo pacote [`java.util`](https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/package-summary.html) ele vai conter as classes básicas de coleções. No próximo post vamos focar exatamente nela!
+Depois conheça ao menos alguns dos pacotes básicos da linguagem, a https://docs.oracle.com/en/java/javase/18/docs/api/java.base/module-summary.html[documentação] está disponível na internet. Eu recomendo que você comece pelo pacote https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/package-summary.html[`java.util`] ele vai conter as classes básicas de coleções. No próximo post vamos focar exatamente nela!
