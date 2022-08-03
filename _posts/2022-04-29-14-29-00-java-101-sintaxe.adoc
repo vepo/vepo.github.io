@@ -9,6 +9,9 @@ permalink: /posts/java-101-sintaxe
 publish_date: 2022-04-29 15:26:00 +0300
 ---
 
+:figure-caption: Figura
+:imagesdir: /assets/images/java-101
+
 A intenção dessa série é te apresentar o básico sobre a linguagem Java e te dar ferramentas para que você possa aprender a programar. Nenhum material por sí só fará o trabalho completo, para que você possa se tornar um desenvolvedor é preciso muito exercício, por isso vá lentamente avançando sobre os tópicos propostos e fazendo todos os exercícios propostos. 
 
 Nesse sessão você vai aprender:
@@ -20,29 +23,31 @@ Nesse sessão você vai aprender:
 
 Na nossa série sobre o básico do Java ficou faltando um tópico muito importante: sintaxe. Qualquer linguagem tem uma sintaxe e se você não sabe porque isso é importante eu preciso te dar uma informação muito importante: o computador é extremamente burro.
 
-# Linguagens Formais e Linguagem Natural
+== Linguagens Formais e Linguagem Natural
 
 Se você nunca estudou formalmente o que é uma linguagem de programação, talvez seja preciso definir corretamente o que difere uma linguagem de programação de outras linguagens. 
 
 Nós somos acostumados a um tipo de linguagem que é extremamente maleável e pode ser compreendida mesmo que esteja **formalmente** errada. São raras as pessoas que amam estudar a estrutura de português, eu mesmo não sou uma delas apesar de gostar de letras. Estudar a lingua que usamos no dia a dia não é comum por dois motivos bem óbvios: podemos ser entendidos mesmo sem uma estrutura formal e é um conjunto de regras chatas.
 
-Português, Inglês, Mandarim, Japonês e até o [Javanês](https://amzn.to/3z8wVdt) são o que conhecemos como linguagens naturais. Elas emergem da experiência humana e são compreendidas por humanos. Computadores não entendem essas linguagens, eles podem apenas capturar símbolos, mas eles não conseguem compreender. 
+Português, Inglês, Mandarim, Japonês e até o https://amzn.to/3z8wVdt[Javanês] são o que conhecemos como linguagens naturais. Elas emergem da experiência humana e são compreendidas por humanos. Computadores não entendem essas linguagens, eles podem apenas capturar símbolos, mas eles não conseguem compreender. 
 
 _— Ah, mas tem o GPT-3 que consegue ler e escrever bons textos._
 
-Calma lá! É preciso entender como funciona um computador para não cair no jornalismo barato e marketing agressivo de companhias de Inteligência Artificial. GPT-3 não é aquilo que foi prometido e tem suas limitações. Eu recomendo ler o artigo ["GPT-3, Falsário: o gerador de linguagem do OpenAI não tem ideia do que está falando"](https://www.technologyreview.com/2020/08/22/1007539/gpt3-openai-language-generator-artificial-intelligence-ai-opinion/) (se não lê inglês, use o Google Translator). E é nesse ponto que vamos demonstrar o que é uma linguagem de programação, pra isso vamos usar uma analogia.
+Calma lá! É preciso entender como funciona um computador para não cair no jornalismo barato e marketing agressivo de companhias de Inteligência Artificial. GPT-3 não é aquilo que foi prometido e tem suas limitações. Eu recomendo ler o artigo https://www.technologyreview.com/2020/08/22/1007539/gpt3-openai-language-generator-artificial-intelligence-ai-opinion/["GPT-3, Falsário: o gerador de linguagem do OpenAI não tem ideia do que está falando"] (se não lê inglês, use o Google Translator). E é nesse ponto que vamos demonstrar o que é uma linguagem de programação, pra isso vamos usar uma analogia.
 
-Imagine que [um computador é como um falante de português que está preso dentro de um quarto com um livro de regras. Sua função é, ao receber caixas com texto em chinês, deve consultar o livro de regras para identificar os símbolos no texto e conseguir formular uma resposta baseado nas regras. Ao formular uma resposta, ela deve ser enviada pra fora do quarto.](https://pt.wikipedia.org/wiki/Quarto_chin%C3%AAs) Esse homem não sabe chinês e nem consegue compreender o que ele está respondendo, ele só está seguindo as regras de quem escreveu o livro.
+Imagine que https://pt.wikipedia.org/wiki/Quarto_chin%C3%AAs[um computador é como um falante de português que está preso dentro de um quarto com um livro de regras. Sua função é, ao receber caixas com texto em chinês, deve consultar o livro de regras para identificar os símbolos no texto e conseguir formular uma resposta baseado nas regras. Ao formular uma resposta, ela deve ser enviada pra fora do quarto.] Esse homem não sabe chinês e nem consegue compreender o que ele está respondendo, ele só está seguindo as regras de quem escreveu o livro.
 
-![Imagem descrevendo O Quarto Chinês](/assets/images/o-quarto-chinês.png)
+[.text-center]
+.O Quarto Chinês
+image::cap-02/o-quarto-chines.png[id=o-quarto-chines, align="center"]
 
 Programas são o livro de regras que é escrito por programadores. Por melhor que seja um programa, um computador não tem compreensão do que está acontecendo. E se houver alguma situação não prevista no livro de regras, não será possível formular uma resposta. 
 
 Para que o computador entenda essas regras, elas devem ser escritas em uma linguagem bem estruturada. Essa linguagem vai ter uma sintaxe bem definida e se por algum motivo ela for violada o computador não será capaz de compreender. Essas são o que chamamos de Linguagens Formais.
 
-Java, C, Javascript, PHP, Python, etc... são linguagens formais. Elas não emergem da experiência humana, mas são propostas por humanos para se comunicar com computadores. Um humano consegue identificar um erro em uma linguagem natural e mesmo assim compreender o que é proposto, mas um erro em uma linguagem formal impossibilita todo o processo. Se você quiser saber como definir uma linguagem formal, eu já escrevi sobre isso em [Como criar uma linguagem usando ANTLR4 e Java](https://vepo.github.io/posts/como-criar-uma-linguagem-usando-antlr4-e-java).
+Java, C, Javascript, PHP, Python, etc... são linguagens formais. Elas não emergem da experiência humana, mas são propostas por humanos para se comunicar com computadores. Um humano consegue identificar um erro em uma linguagem natural e mesmo assim compreender o que é proposto, mas um erro em uma linguagem formal impossibilita todo o processo. Se você quiser saber como definir uma linguagem formal, eu já escrevi sobre isso em https://vepo.github.io/posts/como-criar-uma-linguagem-usando-antlr4-e-java[Como criar uma linguagem usando ANTLR4 e Java].
 
-# A Sintaxe Java
+== A Sintaxe Java
 
 Java é uma linguagem da chamada C-Like. Isso significa que ela herda muitas características do C. Se você não ouviu falar de C, não se preocupe, apesar dela ser uma das linguagens mais influente da história, ela não tem muito espaço desenvolvimento web moderno, está nichada em desenvolvimento embarcado e drivers do sistema operacional. Mas o C emprestou ao Java muito das estruturas que usamos no dia a dia.
 
@@ -50,31 +55,49 @@ Como já falamos anteriormente, o Java é uma linguagem compilada. Isso signific
 
 Abaixo eu listo todas as estruturas que vamos detalhar resumidamente. Ao lado dela temos a documentação oficial (para versão 8) com a especificação formal. Se você não conseguir entender a documentação, não tem problema. Para essa listagem eu vou tomar a liberdade de traduzir os nomes das estruturas, mas é por motivo meramente didático, nunca use esse nome, apenas o nome em inglês. A tradução serve para você ver que tem uma lógica na nomenclatura, é como se o código fosse um tipo de linguagem verbalizável.
 
-1. Bloco ([Block](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.2))
-2. Declaração ([Statement](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.5))
-3. Comentário ([Comments](https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.7))
-4. Se ([if](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.9))
-5. Enquanto ([while](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.11))
-6. Faça enquanto ([do-while](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.13))
-7. Para ([for](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14))
-8. Desvio ([switch](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.11))
-9. Quebra e continua ([break](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.15) e [continue](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.16))
-10. Lance ([throw](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.18))
-11. Sincronizado ([synchronized](https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.19))
-12. Operadores Lógicos
-13. Operadores Binários
-14. Operadores Matemáticos
-15. Operadores Unários
-16. Cast
-17. Operador condicional
+<<cap-02-bloco>>
 
-## 1. Bloco
+<<cap-02-declaracao>>
+
+<<cap-02-comentario>>
+
+<<cap-02-se>>
+
+<<cap-02-enquanto>>
+
+<<cap-02-faca-enquanto>>
+
+<<cap-02-para>>
+
+<<cap-02-desvio>>
+
+<<cap-02-quebra>>
+
+<<cap-02-lance>>
+
+<<cap-02-sincronizado>>
+
+<<cap-02-operador-logico>>
+
+<<cap-02-operador-binario>>
+
+<<cap-02-operador-matemarico>>
+
+<<cap-02-operador-unario>>
+
+<<cap-02-cast>>
+
+<<cap-02-operador-condicional>>
+
+[#cap-02-bloco]
+=== 1. Bloco (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.2[Block])
 
 Um bloco de código é uma estrutura que pode ser tanto obrigatória quanto opcional. Essa estrutura é definida `{}` e dentro desse bloco teremos um novo escopo de variáveis. Isso significa que toda variável definida dentro de um bloco será conhecida apenas por aquele block e todo bloco definido dentro dele.
 
 Observe o código abaixo. Nele temos os blocos `B1` a `B4`. Os blocos `B1` e `B2` fazem parte de estruturas mais complexas, e são obrigatórios, que no caso são uma classe e um método respectivamente. Já os blocos `B3` e `B4` são opcionais e estão aí para mostrar que podemos criar um bloco quanto bem entendermos, apesar dessa não ser uma prática comum no desenvolvimento Java. 🤓
 
-```java
+[source,java]
+----
 public class HelloWorldSintaxe { // B1
     public static void main(String[] args) { // B2
         System.out.println("Olá mundo");
@@ -94,23 +117,26 @@ public class HelloWorldSintaxe { // B1
 
     // private void x() return 1; // Bloco é obrigatório no caso de método, essa construção vai falhar 
 }
-```
+----
 
 Se você começar a brincar com esse código, vai ver que a `variaevel2` só pode ser usada dentro do `B4`. Isso é o que chamamos de escopo, ao finalizar a execução de `B4` ela é completamente desnecessária e poderá ser eliminada da memória. 
 
-## 2. Declaração
+[#cap-02-declaracao]
+=== 2. Declaração (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.5[Statement])
 
 Toda estrutura Java é uma declaração e toda declaração tem significado. Declarações em Java devem ser separadas por `;` ou devem conter um Bloco de código. Tudo que devemos entender de uma declaração é que ela tem um significado e que elas são executadas em sequencia.
 
 Vamos imaginar um código hipotético abaixo. Tudo que podemos supor é que as três declarações são executadas em sequência, desde que não aconteça nada excepcional.
 
-```java
+[source,java]
+----
 metodo1();
 declaracao1();
 metodo2();
-```
+----
 
-## 3. Comentário
+[#cap-02-comentario]
+=== 3. Comentário (https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.7[Comments])
 
 Comentários são trechos que serão removidos durante o processo de compilação. Apesar que alguns autores falam que todo comentário é uma falha, eu discordo veementemente. Comentários são necessários, mas você deve saber o que comentar! Mas primeiro vamos mostrar como comentar...
 
@@ -120,26 +146,29 @@ Para criar um comentário em linha, adicione os dois caracteres `//` e tudo que 
 
 Para criar um bloco de comentário, inicie com `/*` e todo caractere até encontrar o final `*/` será desconsiderado.
 
-```java
+[source,java]
+----
 metodo1(); //  comentário em linha
 metodo2(); 
 /* if(m3()) {
     m4();
 }*/
 metodo5();
-```
+----
 
-Uma das grandes funcionalidades do Java é permitir código como documentação oficial. É o famoso [Javadoc](https://docs.oracle.com/javase/8/docs/api/overview-summary.html) que é gerado a partir do seu código. Mas o Javadoc é um tipo de comentário especifico que fica imediatamente antes da classe, dos métodos ou de um campo e é começado com `/**`. Um Javadoc segue uma linguagem de marcação que pode ser muito útil em alguns projetos. A vantagem de se usar o Javadoc, é que além dele poder ser exportado em HTML, as IDEs o utilizam. Então use-o.
+Uma das grandes funcionalidades do Java é permitir código como documentação oficial. É o famoso https://docs.oracle.com/javase/8/docs/api/overview-summary.html[Javadoc] que é gerado a partir do seu código. Mas o Javadoc é um tipo de comentário especifico que fica imediatamente antes da classe, dos métodos ou de um campo e é começado com `/**`. Um Javadoc segue uma linguagem de marcação que pode ser muito útil em alguns projetos. A vantagem de se usar o Javadoc, é que além dele poder ser exportado em HTML, as IDEs o utilizam. Então use-o.
 
 Agora que você aprendeu a comentar, vamos aprender sobre o que comentar? Comentários são informações auxiliar ao código. Isso significa que você não precisa comentar o que está no código, mas a informação que falta ao código. Não é o **como**, mas o **porque** do código. Eu gosto de comentar pressupostos e escolhas arquiteturais porque em alguns meses eu não vou lembrar e outra pessoa que pegar meu código também não vai lembrar.
 
-## 4. Se
+[#cap-02-se]
+=== 4. Se (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.9[if])
 
 A declaração condicional é a mais comum de todas, é composto por `if (expressão booleana) <bloco> else <bloco>`, onde expressão booleana é qualquer função que retorne um `boolean` ou uma expressão lógica que veremos em Operadores Lógicos.
 
 A declaração condicional pode ser encadeada, se isso acontecer coloque como primeira expressão a mais comum. Um exemplo?
 
-```java
+[source,java]
+----
 int x = leNumeroInteiro();
 
 if (x % 2 == 0) { // o operador % retorna o resto da divisão
@@ -156,50 +185,58 @@ if (x % 3 == 0) {
 } else {
     System.out.println("O valor lido tem a forma f(x) = 3x + 2");
 }
-```
+----
 
 No exemplo acima temos 3 expressões lógica. A primeira calcula se o valor é par então logicamente o bloco else será executado para todo valor impar. A segunda calcula se o valor é divisível por 3, isso significa que o bloco else será chamado para todo valor não divisível, mas com o `if` encadeado fazemos a visão daquele que são no formato `3x + 1` e `3x + 2`.
 
-## 5. Enquanto
+[#cap-02-enquanto]
+=== 5. Enquanto (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.11[while])
 
 Enquanto define que um bloco de código será executado até que uma expressão lógica seja falsa. Exemplo?
 
-```java
+[source,java]
+----
 int x = leValor();
 while(x > 0) {
     System.out.println("Valor é positivo!");
     x = leValor();
 }
-```
+----
 
 O bloco de código será executado continuamente até que venha um valor 0 ou negativo.
 
-## 6. Faça enquanto
+[#cap-02-faca-enquanto]
+=== 6. Faça enquanto (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.13[do-while])
 
 O Faça enquanto funciona de forma bem similar, a diferença é que o teste é feito depois que o bloco de código é executado. 
 
-```java
+[source,java]
+----
 do {
     executa();
 } while (emExecução)
-```
+----
 
-## 7. Para
+[#cap-02-para]
+=== 7. Para (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14[for])
 
 O famoso `for` é um pouco mais complexo. Ele é composto por 3 blocos que podem ser chamados de **inicialização**, **condição** e **passo**. Ao iniciar será executado uma única vez o trecho de código **inicialização** e em cada iteração será executado o trecho de código **condição**, que deve retornar uma expressão booleana, depois será executado o bloco de código para depois ser executado o trecho **passo**. O exemplo mais comum é para se iterar em um array.
 
-```java
+[source,java]
+----
 int[] array = new int[] {0 , 1, 2, 3, 4, 5};
 for (int i = 0; i < array.length; i++) {
     // bloco de código
 }
-```
+----
 
-## 8. Desvio
+[#cap-02-desvio]
+=== 8. Desvio (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.11[switch])
 
 O `switch` desvia o código de acordo com o valor de uma variável. O `switch` é uma estrutura que pode facilmente induzir a erros porque cada bloco não é exclusivo, o fluxo de execução passar de um bloco ao outro até que seja encontrada a instrução `break`. Vamos ver um exemplo?
 
-```java
+[source,java]
+----
 int x = leValor();
 switch (x) {
     case 1:
@@ -215,20 +252,22 @@ switch (x) {
     default
         System.out.println("É maior que 5 ou menor que 1!");
 }
-```
+----
 
 O que aconteceria se o valor de `x` for igual a 3? Seriam executados os blocos de 3 até o `default`.
 
-```
+[source]
+----
 É maior ou igual a 3!
 É maior ou igual a 4!
 É maior ou igual a 5!
 É maior que 5 ou menor que 1!
-```
+----
 
 Se quisermos um valor exato, podemos usar o break:
 
-```java
+[source,java]
+----
 int x = leValor();
 switch (x) {
     case 1:
@@ -249,19 +288,21 @@ switch (x) {
     default
         System.out.println("É maior que 5 ou menor que 1!");
 }
-```
+----
 
 Agora você deve ter se perguntado porque no texto do bloco `default` eu usei _menor que 1_? Isso porque o `switch` não é usado para intervalos de valores, mas para valores exatos e caso nenhum valor seja igual aos valores declarados é chamado o bloco `default`. 
 
 Vale lembrar que o switch pode ser usado para números, enumeradores e qualquer valor constante, inclusive String.
 
-## 9. Quebra e continua
+[#cap-02-quebra]
+=== 9. Quebra e continua (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.15[break] e https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.16[continue])
 
 Uma quebra deve ser chamada dentro bloco `switch`, `while`, `do` ou `for`. Ao se deparar com essa instrução o programa irá finalizar a execução do bloco externo imediatamente.
 
 Vamos demonstrar isso com um exemplo básico? No código abaixo vamos criar um `for` que será finalizado usando `break`. Observe que o ponto de parada do for seria no máximo inteiro possível, mas através do break finalizamos em 10.
 
-```java
+[source,java]
+----
 System.out.println("Iniciando for...");
 for (int i = 0; i < Integer.MAX_VALUE; i++) {
     System.out.println("Valor: " + i);
@@ -269,13 +310,14 @@ for (int i = 0; i < Integer.MAX_VALUE; i++) {
         break;
     }
 }
-```
+----
 
 Quando usamos `break` dentro de um switch evitamos que os blocos de códigos abaixo dele seja executados.
 
 O `continue` tem um comportamento parecido, mas ao invés de finalizar o bloco será apenas finalizada a iteração. Ele só é aceito em iterações como `while`, `do` ou `for`. Vamos incrementar o exemplo acima para imprimir apenas números impares. Observe que no código abaixo foi preciso mudar a condição de execução do `break` porque ele nunca seria executado se usássemos `i == 10`.
 
-```java
+[source,java]
+----
 System.out.println("Iniciando for...");
 for (int i = 0; i < Integer.MAX_VALUE; i++) {
     if (i % 2 == 0) {
@@ -286,11 +328,12 @@ for (int i = 0; i < Integer.MAX_VALUE; i++) {
         break;
     }
 }
-```
+----
 
 Se você leu a documentação atentamente, viu que `break` e `continue` podem aceitar rótulos. O que isso significa? Vamos imaginar que temos um loop encadeado em que buscamos um valor dentro de uma matrix. Como as linhas dessa matrix são ordenadas, se o valor em uma coluna for maior que o valor desejado, podemos pular para próxima linha. A decisão do `break` e do `continue` é feita usando os rótulos que todo bloco de código aceita.
 
-```java
+[source,java]
+----
 int[][] matrix = new int[][] {
         { 2, 2, 2, 3, 4, 5 },
         { 2, 4, 8, 8, 9, 9 },
@@ -314,11 +357,12 @@ linhas: for (int linha = 0; linha < matrix.length; ++linha) {
         System.out.println("Código nunca executado!");
     }
 }
-```
+----
 
 Se não fosse usado um rótulo, o `break` e o `continue` iriam atuar somente no bloco de código mais interno.
 
-## 10. Lance
+[#cap-02-lance]
+=== 10. Lance (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.18[throw])
 
 O `throw` deve ser usado quando algo excepcional acontece. Algo inesperado, tanto que ele lança uma `Exception`, que significa exceção.
 
@@ -326,7 +370,8 @@ Exceções podem ser tratadas em código, mas as vezes elas não podem ser trata
 
 Para entender o que é uma Stacktrace, é preciso entender como um programa lida com contextos. Quando executamos um bloco de código é criado uma posição no topo da pilha de execução (_stack_ é pilha em inglês). Ao terminar esse bloco, essa posição é removida da pilha. Vamos olhar o programa abaixo:
 
-```java
+[source,java]
+----
 public class StacktraceHelloWorld {
     private static void m1(int x) {
         if (x % 2 == 0 && x > 100) {
@@ -346,7 +391,7 @@ public class StacktraceHelloWorld {
         m1(0);
     }
 }
-```
+----
 
 A pilha vai ter como fundação o método `main`, depois ela será formada por um encadeamento de chamadas ao métodos `m1` e `m2`. Nenhum dos elementos é removido da pilha porque os métodos nunca terminam, els ficam se chamando até que a exceção do tipo `RuntimeException` seja lançada.
 
@@ -362,13 +407,15 @@ Uma `RuntimeException` é uma exceção que acontece em tempo de execução, mas
 
 Os demais casos devem estender a classe `Exception`, mas ela adicionará uma peculiaridade ao código. Se um método não trata um `Exception`, ele deve declarar que lança a mesma. Isso porque ela é um resultado esperado, mas que pode ou não ser tratado em código. Um exemplo? Quando estamos lidando com conexões de rede, sempre existe a possibilidade de a conexão ser finalizada, por isso sempre temos a `IOException`. Essa declaração se dá usando o `throws` e este não pode ser ignorado. Ou a exceção é tratado no método acima ou lançada para o próximo método.
 
-```java
+[source,java]
+----
 public void conecta() throws IOException {
     // abre e fecha conexão
 }
-```
+----
 
-## 11. Sincronizado
+[#cap-02-sincronizado]
+=== 11. Sincronizado (https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.19[synchronized])
 
 `synchronized` deve ser usada com muita parcimônia. Nós vamos ver o seu uso mais a fundo quando formos falar de threads. Mas sendo sucinto, ela pode ser usada tanto para métodos quanto para objetos.
 
@@ -378,7 +425,8 @@ Difícil de entender, não? Então vamos criar um modelo real. Digamos que uma l
 
 `synchronized` irá definir sob qual objeto será definida a sincronia da execução. Ele pode ser usado tanto para método (estático ou de instância) ou objeto avulso.
 
-```java
+[source,java]
+----
 class Concorrente {
     public static synchronized void syncStaticMethod() {
         // Toda execução desse método será concorrente
@@ -394,11 +442,12 @@ class Concorrente {
         }
     }
 }
-```
+----
 
-Para que a sincronia seja bem elaborada, devem ser usados também os métodos `wait`, `notify` e `notifyAll`. Mas nós veremos como isso deve ser feito mais a frente, caso você precise lidar com valores compartilhados, prefira usar [`AtomicReference`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicReference.html) ou outras classes do pacote [`java.util.concurrent.atomic`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html).
+Para que a sincronia seja bem elaborada, devem ser usados também os métodos `wait`, `notify` e `notifyAll`. Mas nós veremos como isso deve ser feito mais a frente, caso você precise lidar com valores compartilhados, prefira usar https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/AtomicReference.html[`AtomicReference`] ou outras classes do pacote https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html[`java.util.concurrent.atomic`].
 
-## 12. Operadores Lógicos
+[#cap-02-operador-logico]
+=== 12. Operadores Lógicos
 
 Os operadores lógicos do Java são usados para se criar expressões booleanas. Uma expressão booleana só pode retornar dois tipos de valores: verdadeiro ou falso. 
 
@@ -408,85 +457,100 @@ Como vimos no uso do `if`, devemos sempre definir um valor booleano, mas as veze
 
 No Java tempos três operadores booleanos `&&`, `||` e `!`
 
-| Operador | Descrição | Exemplo  | Significado                                   |
-|:--------:|-----------|----------|-----------------------------------------------|
-| `&&`     | E         | `a && b` | `true` somente se `a` e `b` forem verdadeiras |
-| `||`     | OU        | `a || b` | `true` qualquer um dos valores for verdadeiro |
-| `!`      | Negação   | `!a`     | `true` se `a` for `false e vice versa         |
+[options="header"]
+|=====================================================================================
+^| Operador  ^| Descrição  ^| Exemplo     | Significado                                  
+^| `&&`      ^| E          ^| `a && b`    | `true` somente se `a` e `b` forem verdadeiras
+^| `\|\|`    ^| OU         ^| `a \|\| b`  | `true` qualquer um dos valores for verdadeiro
+^| `!`       ^| Negação    ^| `!a`        | `true` se `a` for `false e vice versa        
+|=====================================================================================
 
-## 13. Operadores Binários
+[#cap-02-operador-binario]
+=== 13. Operadores Binários
 
 Operadores binários realizam operações binárias. Para entender como funcionam operações binárias é preciso entender que toda informação é armazenada em formato binário, isso significa que o número `6544` é o mesmo valor de `0b0001100110010000` e `0x1990`.
 
-| Operador | Descrição |
-|:--------:|-------------|
-| `<<` | Translada os bits para esquerda  |
-| `>>` | Translada os bits para a direita |
-| `&`  | Faz a operação E bit a bit   |
-| `|`  | Faz a operação OU bit a bit  |
-| `^`  | Faz a operação XOU bit a bit |
-| `~`  | Inverte (complemento) os valores dos bits |
+[options="header"]
+|======================================================
+^| Operador  | Descrição                                
+^| `<<`      | Translada os bits para esquerda          
+^| `>>`      | Translada os bits para a direita         
+^| `&`       | Faz a operação E bit a bit               
+^| `\|`      | Faz a operação OU bit a bit              
+^| `^`       | Faz a operação XOU bit a bit             
+^| `~`       | Inverte (complemento) os valores dos bits
+|======================================================
 
-
-## 14. Operadores Matemáticos
+[#cap-02-operador-matemarico]
+=== 14. Operadores Matemáticos
 
 Operadores matemáticos realizam operações matemáticas básicas.
 
-| Operador | Descrição |
-|:--------:|-------------|
-| + | Operador aditivo (também usado para concatenação de String) |
-| - | Operador de subtração |
-| * | Operador de multiplicação |
-| / | Operador de divisão |
-| % | Operador restante |
+[options="header"]
+|========================================================================
+^| Operador  | Descrição                                                  
+^| +         | Operador aditivo (também usado para concatenação de String)
+^| -         | Operador de subtração                                      
+^| *         | Operador de multiplicação                                  
+^| /         | Operador de divisão                                        
+^| %         | Operador restante                                          
+|========================================================================
 
-## 15. Operadores Unários
+[#cap-02-operador-unario]
+=== 15. Operadores Unários
 
 Operadores unários realizam operações matemáticas básicas usando uma única variável. Os operadores unários mais comuns são `++` e `--` que fazem duas operações sequenciais: retornam o valor e alteram o valor da variável. A posição do operador irá influenciar na ordem das operações. Veja o código abaixo a diferença.
 
-```java
+[source,java]
+----
 int x = 0;    // x=0
 int y = ++x;  // x=1 y=1
 int z = 0;    // z=0
 int w = z++;  // z=1 w=0
-```
+----
 
 O operador unário pode ser usado também com expressões, mas para isso deve acompanhar o `=`. Veja no código abaixo.
 
-```java
+[source,java]
+----
 int x = 0;         // x=0
 x += 10;           // x=10
 int y=2;           // x=10 y=2
 x-=y;              // x=8 y=2
 boolean w = true;  // w=true
 boolean v != x;    // w=true v=false
-```
+----
 
-## 16. Cast
+[#cap-02-cast]
+=== 16. Cast
 
 O cast é uma conversão. Java é uma linguagem orientada a objetos, por isso todo valor estende a classe Object, mas todo valor tem uma própria classe. Usamos o cast em duas situações distintas, quando vamos lidar com classes mais especificas ou quando precisamos mudar o tipo de números.
 
 O primeiro caso vamos ver mais a frente, já o segundo é quando precisamos alterar um tipo de valor para calculo matemático.
 
-```java
+[source,java]
+----
 float x = 1.23121f;
 int y = ((int) (x * 100.0f)) / 2;
 System.out.println("x= " + x + " y=" + y);  // x= 1.23121 y=61
-```
+----
 
-## 17. Operador condicional
+[#cap-02-operador-condicional]
+=== 17. Operador condicional
 
 O operador condicional é como se fosse um `if` em uma só linha. Ele é composto de uma expressão booleana e dois blocos que devem retornar um valor.
 
 Vamos supor que precisamos calcular o valor absoluto de um número inteiro, isso pode ser feito com uma linha só.
 
-```java
+[source,java]
+----
 void int abs(int valor) {
     return valor > 0 ? valor : -valor;
 }
-```
+----
 
-# Exercícios
+[#cap-02-exercicios]
+== Exercícios
 
 Os exercícios são propostos como forma de validar que você pode ir para o próximo passo. Para fixar o conteúdo dessa sessão implemente alguns algoritmos básicos como:
 
@@ -494,6 +558,6 @@ Os exercícios são propostos como forma de validar que você pode ir para o pr�
 2. Implemente o calculo da média aritmética
 3. Implemente o calculo da mediana
 
-Para implementar os exercícios procure por **// [EXERCÍCIO SINTAXE]**, implemente e execute `mvn clean test` para validar.
+Para implementar os exercícios procure por **// [EXERCÍCIO][CAP 02]**, implemente e execute `mvn clean test` para validar.
 
 {% github https://github.com/vepo/java-101-codigo %}

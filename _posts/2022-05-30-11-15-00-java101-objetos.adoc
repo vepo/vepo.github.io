@@ -9,11 +9,15 @@ permalink: /posts/java-101-objetos
 publish_date: 2022-05-30 11:15:00 +0300
 ---
 
-Java tem um fã clube enorme! São pessoas que usam a linguagem no dia a dia e resolvem problemas importantes para a nossa sociedade. Quando Java completou 25 anos houve até a hashtag [#MovedByJava](https://twitter.com/search?q=lang%3Apt%20%23MovedByJava&src=typed_query&f=top) para mostrar que o mundo é movido por software desenvolvido em Java, são bilhões de transações em Java em serviços altamente escaláveis.
+:figure-caption: Figura
+:imagesdir: /assets/images/java-101
 
-MAS... existe um pequeno grupo raivoso e ruidoso que [odeia Java](https://twitter.com/search?q=java%20lento&src=typed_query&f=live). Eu não desejaria nem citar esse grupo, mas creio que isso tem que estar em qualquer tutorial de Java, não para dar voz a esse povo, mas para desmentir. Java não é lento, talvez você que não está sabendo usar e vamos mais a frente falar sobre _tuning_. Essas pessoas usam argumentos bem simples como "tudo tem que estar em objetos", "eu tenho que escrever um main dentro de um objeto", "nada disso faz sentido"... Resolvi citar eles aqui, porque eles não odeiam Java, eles odeiam Orientação a Objetos e com esse post eu vou te convencer que além de ser uma ótima forma de pensar, Orientação a Objetos ajudou a pavimentar os outros paradigmas que estão por aqui no ano de 2022.
+Java tem um fã clube enorme! São pessoas que usam a linguagem no dia a dia e resolvem problemas importantes para a nossa sociedade. Quando Java completou 25 anos houve até a hashtag https://twitter.com/search?q=lang%3Apt%20%23MovedByJava&src=typed_query&f=top[#MovedByJava] para mostrar que o mundo é movido por software desenvolvido em Java, são bilhões de transações em Java em serviços altamente escaláveis.
 
-## Um pouco de história
+MAS... existe um pequeno grupo raivoso e ruidoso que https://twitter.com/search?q=java%20lento&src=typed_query&f=live[odeia Java]. Eu não desejaria nem citar esse grupo, mas creio que isso tem que estar em qualquer tutorial de Java, não para dar voz a esse povo, mas para desmentir. Java não é lento, talvez você que não está sabendo usar e vamos mais a frente falar sobre _tuning_. Essas pessoas usam argumentos bem simples como "tudo tem que estar em objetos", "eu tenho que escrever um main dentro de um objeto", "nada disso faz sentido"... Resolvi citar eles aqui, porque eles não odeiam Java, eles odeiam Orientação a Objetos e com esse post eu vou te convencer que além de ser uma ótima forma de pensar, Orientação a Objetos ajudou a pavimentar os outros paradigmas que estão por aqui no ano de 2022.
+
+[#cap-04-um-pouco-de-historia]
+== Um pouco de história
 
 Orientação a Objetos surgiu nos anos 60 e era usado para fazer simulações no Simula 67. Esta linguagem, por sua vez, acabou por influenciar o C++ (1979), que na verdade é uma tentativa de adicionar objetos a linguagem C. Por muitos anos o C++ foi uma das linguagens mais influentes do mercado, ela não era, puramente, uma linguagem orientada a objetos, era até possível intercalar código C com código C++. A primeira linguagem que surge como puramente orientada a objetos e ainda por cima compilada em _bytecode_ para ser executado em uma Máquina Virtual foi... 
 
@@ -23,13 +27,14 @@ O Smalltalk! O que foi? 🧐 Achou que era o Java? O Java só surge em 1991, e e
 
 _— Mas porque essa preocupação em ser Orientada a Objetos?!_
 
-Porque na verdade a computação não começou com essas linguagens e nem com esses paradigmas, mas como Programação Funcional (ver _[Conception, evolution, and application of functional programming languages](https://dl.acm.org/doi/abs/10.1145/72551.72554)_). Linguagens funcionais são excelentes para modelarem problemas matemáticos e alguns problemas computacionais, pois elas são declarativas. Podemos transpor a definição de um problema para a linguagem de programação facilmente, podendo até mesmo aplicar uma lógica equacional, pois, se as funções são puras, o valor de `f(x)` só precisa ser calculado uma vez. Logica equacional é o mesmo que tratar uma função como uma equação matemática, isso implica que símbolos iguais terão valores iguais. 
+Porque na verdade a computação não começou com essas linguagens e nem com esses paradigmas, mas como Programação Funcional (ver _https://dl.acm.org/doi/abs/10.1145/72551.72554[Conception, evolution, and application of functional programming languages]_). Linguagens funcionais são excelentes para modelarem problemas matemáticos e alguns problemas computacionais, pois elas são declarativas. Podemos transpor a definição de um problema para a linguagem de programação facilmente, podendo até mesmo aplicar uma lógica equacional, pois, se as funções são puras, o valor de `f(x)` só precisa ser calculado uma vez. Logica equacional é o mesmo que tratar uma função como uma equação matemática, isso implica que símbolos iguais terão valores iguais. 
 
 MAS linguagens funcionais apresentam uma certa dificuldade de modelar alguns tipos de sistemas e, com a popularização da computação, foi necessário outros paradigmas para os novos sistemas que foram sendo desenvolvidos. O primeiro desses paradigmas foi a Programação Procedural, popularizado pela linguagens como C. Nesse tipo de linguagem a lógica de programação pode ser estruturada dentro de procedimentos que podem ser tanto funções quanto procedimentos, a diferença entre os dois é que uma função não altera o valor dos parâmetros e sempre retorna um valor, já os procedimentos alteram o valor dos parâmetros e não retornam nenhum valor. Em C, podemos escrever tanto funções quanto procedimentos.
 
-Linguagens procedurais apresentam bastante dificuldade para encapsular complexidade porque é difícil criar abstrações com ela. Em C, os dados são sempre modelados usando tipos primitivos ou estruturas, que nada mais são que agrupamentos de tipos primitivos. Mesmo quem desenvolve C hoje em dia, não consegue compreender o que era desenvolver nos anos 70, pois a linguagem continuou avançando. Eu tenho uma leve ideia porque, na universidade, desenvolvi programas para um microcontrolador com o compilador bem limitado. O exemplo abaixo eu retirei de um [visualizador de CSV](https://github.com/vepo/csvi) que eu desenvolvi por necessidade. 
+Linguagens procedurais apresentam bastante dificuldade para encapsular complexidade porque é difícil criar abstrações com ela. Em C, os dados são sempre modelados usando tipos primitivos ou estruturas, que nada mais são que agrupamentos de tipos primitivos. Mesmo quem desenvolve C hoje em dia, não consegue compreender o que era desenvolver nos anos 70, pois a linguagem continuou avançando. Eu tenho uma leve ideia porque, na universidade, desenvolvi programas para um microcontrolador com o compilador bem limitado. O exemplo abaixo eu retirei de um https://github.com/vepo/csvi[visualizador de CSV] que eu desenvolvi por necessidade. 
 
-```c
+[source,c]
+----
 matrix_config_t *matrix_config_initialize(size_t width, size_t height)
 {
     matrix_config_t *config = (matrix_config_t *)malloc(sizeof(matrix_config_t));
@@ -39,7 +44,7 @@ matrix_config_t *matrix_config_initialize(size_t width, size_t height)
     config->line_height = (size_t *)calloc(height, sizeof(size_t));
     return config;
 }
-```
+----
 
 Observe que no código há a preocupação de se alocar a posição de memória necessária para uma determinada estrutura chamada `matriz_config_t` e que essa alocação é feita através de duas funções diferentes `calloc` e `malloc`. Esse código pode parecer simples, mas tem diversidades camadas de complexidades, como simplesmente diferenciar essas duas funções.
 
@@ -54,11 +59,12 @@ Errado! O objetivo de um desenvolvedor é resolver problemas através da escrita
 
 Vamos tentar explicar de outra forma...
 
-## O que é Programação Orientada a Objetos
+[#cap-04-o-que-e-poo]
+== O que é Programação Orientada a Objetos
 
 Vamos estabelecer algumas hipóteses....
 
-### E se eu puder lidar com tipos complexos
+=== E se eu puder lidar com tipos complexos
 
 Uma linguagem OO irá sempre lidar com tipos de dados cada vez mais complexos pois não estamos apenas falando de programação, mas de encapsulamento de complexidades.
 
@@ -66,7 +72,7 @@ Vamos supor que eu desejo desenvolver uma API para navegação robótica e eu se
 
 Quando falamos de Orientação a Objetos, devemos pensar em design de código. Não estamos falando de programação pura, mas de uma modelagem de dados e conceitos. Os detalhes internos devem ser escondidos para quem só sejam visíveis para os próprios times de manutenção.
 
-### E se eu puder associar comportamento aos meus tipos complexos
+=== E se eu puder associar comportamento aos meus tipos complexos
 
 Todo código tem um contexto para ser executado. Quando eu tenho um robô e eu desejo que ele vá para uma posição, se essa ordem é diferente para cada robô e produz diferentes resultados, mas ela sempre está associada a um robô, ou seja, não faz sentido um outro objeto que não seja um robô se mover (_ainda falarei de herança_). 
 
@@ -74,13 +80,14 @@ Mas podem existir outros objetos que se movem, certo? E como fica se a função 
 
 Em uma linguagem orientada a objetos, não temos funções e nem procedimentos, mas métodos. A diferença é que uma função transforma dados, procedimentos executa uma série de alterações nos parâmetros, mas um método envia uma mensagem (_essas definições não tem caráter acadêmico, se alguém tiver alguma referência me manda no Twitter_). Logo um método vai pertencer a um objeto, assim se formos modelar um Avião, podemos criar um outro método mover que existirá somente para um Avião e que será diferente do método mover de um robô.
 
-### E se puder compartilhar o comportamento entre tipos diferentes
+=== E se puder compartilhar o comportamento entre tipos diferentes
 
 Objetos tem um tipo especifico, por exemplo nós estamos falando de um robô. Mas eu posso assumir que um robô é um tipo de objeto móvel? Posso eu criar métodos nesse objeto móvel? O que essa implementação desse método faz para um robô é a mesma coisa que se faz para um avião?
 
 Para cada pergunta acima, existe uma resposta no mundo da Programação Orientada a Objetos e é o que vamos ver na próxima sessão.
 
-# Orientação a Objetos
+[#cap-04-orientacao-a-objetos]
+== Orientação a Objetos
 
 Nós falamos um pouco sobre Programação Funcional e Programação Procedural, então vamos definir o que é Programação Orientada a Objetos (POO) antes de ver como Java faz POO.
 
@@ -88,55 +95,61 @@ Programação Orientada a Objetos é um modelo de design, analise e desenvolvime
 
 Quando falamos de orientação a objeto, focamos na definição do que é um objeto e das operações que esse objeto pode realizar, ao contrário da lógica necessária para realizar a operação. Os principais benefícios da POO é a reutilização de código, escalabilidade e eficiência no desenvolvimento. Então podemos definir que POO vai ter alguns elementos.
 
-## Elementos
+=== Elementos
 
 Abaixo vemos as descrições de cada elemento da POO, elas não se referem a linguagem Java, mas ao paradigma em si.
 
-### Classes
+==== Classes
 
 **Classes** são tipos de dados definidos pelo usuário que atuam como modelo para objetos, atributos e métodos.
 
-### Objetos
+==== Objetos
 
 **Objetos** são instâncias de uma classe criada com dados específicos. 
 
-### Métodos
+[#cap-04-elementos-metodos]
+==== Métodos
 
 **Métodos** são funções definidas dentro de uma classe que descrevem o comportamento de um objeto. Cada método contido nas definições de classe começa com uma referência a um objeto de instância. Além disso, as sub-rotinas contidas em um objeto são chamadas de métodos de instância. Os programadores usam métodos para reutilização ou para manter a funcionalidade encapsulada dentro de um objeto por vez.
 
-### Atributos
+==== Atributos
 
 **Atributos** são definidos no modelo de classe e representam o estado de um objeto. Os objetos terão dados armazenados no campo de atributos. Os atributos de classe pertencem à própria classe.
 
-## Princípios
+[#cap-04-principios]
+=== Princípios
 
 Quando falamos em Orientação a Objetos, temos em mente alguns princípios.
 
-### Encapsulamento.
+==== Encapsulamento
 
 Encapsulamento significa que um objeto não é obrigado a expor a sua implementação e nem os seus atributos. Cabe ao design do objeto escolher como será feita essa exposição. Essa característica de ocultação de dados fornece maior segurança ao programa e evita corrupção de dados não intencional.
 
-### Abstração
+==== Abstração
 
 Objetos criam abstrações que tornam possível controlar a complexidade. Ao se criar uma classe, o restante do sistema deverá interagir através da interface que ela propõe não tendo acesso a sua lógica interna.
 
-### Herança
+[#cap-04-principios-heranca]
+==== Herança
 
 As classes podem reutilizar o código de outras classes. Relacionamentos e subclasses entre objetos podem ser atribuídos, permitindo que os desenvolvedores reutilizem a lógica comum enquanto ainda mantêm uma hierarquia única. Essa propriedade da OOP força uma análise de dados mais completa, reduz o tempo de desenvolvimento e garante um maior nível de precisão.
 
-### Polimorfismo
+==== Polimorfismo
 
 Os objetos são projetados para compartilhar comportamentos e podem assumir mais de uma forma. O sistema poderá definir como vê um objeto e como interage por ele baseado na sua própria classe ou em alguma classe pai, reduzindo a complexidade ou a necessidade de duplicar código. Quando uma classe filha é criada, que estende a funcionalidade da classe pai, ambas podem ser tratada pelo mesmo código usando a classe pai como interface. O polimorfismo permite que diferentes tipos de objetos usem a mesma interface.
 
-## Como Java faz Programação Orientada a Objetos
+=== Como Java faz Programação Orientada a Objetos
 
 Java é uma linguagem primariamente orientada a objetos, logo você deve primeiro entender o que é uma classe. Classe é o arquétipo de um objeto. Arquétipo, resumidamente, é o tipo comum de algo. Por exemplo, se eu falar que existe o tipo Gato, você vai imaginar o formato desse animal e algumas outras características, mas se eu falar que existe o Garfield você vai imaginar que ele é um Gato laranja, gordo e preguiçoso. O Garfield é um indivíduo do arquétipo Gato.
 
-![Significado de Arquétipo da Wikipedia](/assets/images/java/arquetipo.png)
+[.text-center]
+.Significado de Arquétipo da Wikipedia
+image::cap-04/arquetipo.png[id=significado-arquetipo, align="center"]
 
 Vamos transpor isso pra Java? Podemos ter uma classe Gato, mas o objeto será um Garfield. Assim, podemos ter...
 
-```java
+[source,java]
+----
 package org.animais.mamiferos;
 
 import org.fisica.luz.Cor;
@@ -154,27 +167,31 @@ public class Gato {
 
     // MÉTODOS
 }
-```
+----
 
 Isso significa que podemos modelar qualquer Gato por esse modelo, assim se quisermos ter um Garfield...
 
 
-```java
+[source,java]
+----
 Gato garfield = new Gato(15.0, Cor.LARANJA, Temperamento.PREGUICOSO);
-```
+----
 
 No primeiro trecho de código tempo a declaração da classe `Gato` no pacote `org.animais.mamiferos`. Isso significa que só pode existir um tipo de `Gato` nesse pacote, mas isso não implica que eu possa criar o tipo `Gato` para descrever, por exemplo, _instalações elétricas não-oficiais_, que obviamente não fazem parte do pacote `org.animais.mamiferos`, mas `org.humanos.civilizacoes.brasil.infraestrutura`. Classe é usada para definir o tipo do objeto, mas o pacote é o contexto na qual ele existe. Classe e Pacote tem uma relação umbilical, uma Classe sempre deve estar ligada a um Pacote.
 
 A segunda coisa que vamos detalhar nesse trecho de código são os modificadores de acesso. Como disse uma linguagem orientada a objetos é usada para se encapsular detalhes, logo os modificadores de acesso servem para definir quem pode acessar o quê. Eles podem ser aplicados para Classes, Métodos e Campos e existem os seguintes modificadores de acesso.
 
-| Tipo | token | Descrição |
-|------|-------|-----------|
-| Package Private | - | Define que o elemento será acessível dentro do pacote. Esse é o modificador padrão, isso significa que nesse caso pode ser omitido. |
-| Privado | `private` | Define que o elemento só pode ser acessado dentro da própria classe. |
-| Protegido | `protected` | Define que o elemento é acessível dentro do mesmo pacote ou através de herança. |
-| Público | `public` | Define que o elemento é acessível em qualquer contexto. |
-| Final | `final` | Se aplicada a classe, ela não poderá ser estendida. Se aplicada a um campo ele não poderá ter seu valor alterado. Se aplicado a um método, ele não poderá ser reimplementado em uma classe que herda ele. |
-| Estático | `static` | Pode ser usado tanto em campos como em classes internas. Se usado no campo, ele vai ter apenas um valor e está associado a classe. Campos não estáticos são associados a objetos. Se aplicado a classes internas, ela não dependerá de um objeto. |
+[options="header"]
+|====================================================================================================================================================================================================================================================================================
+| Tipo             ^| Token        | Descrição                                                                                                                                                                                                                                        
+| Package Private  ^| -            | Define que o elemento será acessível dentro do pacote. Esse é o modificador padrão, isso significa que nesse caso pode ser omitido.                                                                                                              
+| Privado          ^| `private`    | Define que o elemento só pode ser acessado dentro da própria classe.                                                                                                                                                                             
+| Protegido        ^| `protected`  | Define que o elemento é acessível dentro do mesmo pacote ou através de herança.                                                                                                                                                                  
+| Público          ^| `public`     | Define que o elemento é acessível em qualquer contexto.                                                                                                                                                                                          
+| Final            ^| `final`      | Se aplicada a classe, ela não poderá ser estendida. Se aplicada a um campo ele não poderá ter seu valor alterado. Se aplicado a um método, ele não poderá ser reimplementado em uma classe que herda ele.                                        
+| Estático         ^| `static`     | Pode ser usado tanto em campos como em classes internas. Se usado no campo, ele vai ter apenas um valor e está associado a classe. Campos não estáticos são associados a objetos. Se aplicado a classes internas, ela não dependerá de um objeto.
+|====================================================================================================================================================================================================================================================================================
+
 
 Ainda existem dois mais dois modificadores (`volatile` e `transiente`), mas eles não são importantes quando falamos de OO. `transiente` será importante quando falarmos de serialização e `volatile` quando falarmos de threads. Dos outros, podemos agrupar o `private`, `protected`, `public` e a ausência de um desses, pois eles são mutualmente excludentes.
 
@@ -184,7 +201,8 @@ Métodos sempre tem parâmetros e valor de retorno (pode ser `void` que signific
 
 Vamos ver melhor como os métodos funcionam? E se nós criássemos 3 métodos na nossa classe gato. O primeiro seria um método para mesclar características de 2 gatos, o segundo seria o método `meow` e o terceiro o método de reprodução (`cruza`).
 
-```java
+[source,java]
+----
 public class Gato {
     public static Gato mistura(Gato gatoA, Gato gatoB) {
         // Mágica acontece
@@ -204,11 +222,12 @@ public class Gato {
         return mistura(this, outro);
     }
 }
-```
+----
 
 O método `meow` é o exemplo clássico que veremos em herança, ele não retorna nada, só executa uma ação. Aqui vamos focar nos métodos `cruza` e `mistura` (ok, focar na parte reprodutiva foi péssimo... mas estou falando de gatos!). `mistura` é um método que aleatoriamente vai gerar um novo gato baseado nas características de dois gatos. Nele podemos ver que o método recebe dois parâmetros e retorna um valor. No caso desse método, estamos retornando um novo objeto, mas nada impede de o retorno ser um dos parâmetros. Outra característica é que os parâmetros são uma passagem por referência e não por valor como vamos ver um pouco mais a frente. Sobre o método `cruza`, nele podemos acessar os campos do objeto local e campos da referência. Quero ressaltar o uso do `this` que é a forma de acessar a referência ao objeto pela qual o método é referenciado, o `this` não pode ser usado para métodos estáticos.
 
-## Como Java implementa Herança
+[#cap-04-principios-heranca-implemenacao]
+==== Como Java implementa Herança
 
 Falamos sobre classes e alguns detalhes, mas agora precisamos falar de herança.
 
@@ -224,13 +243,14 @@ Uma classe abstrata é uma classe que não pode ser instanciada. Normalmente usa
 
 E por fim uma classe é uma implementação pela qual podemos instanciar objetos. Classes podem ser estendidas também quando queremos modificar um comportamento específico. Por exemplo, e se quisermos modificar a forma como o Garfield mia?
 
-```java
+[source,java]
+----
 Gato garfield = new Gato(15.0, Cor.LARANJA, Temperamento.PREGUICOSO) {
     public void meow() {
         System.out.println("Miaaaaaaau!");
     }
 };
-```
+----
 
 Quando adicionamos um bloco de código lodo após a instanciação da classe, estamos criando uma classe anônima. Esse comportamento será especifico dessa instância. Nós poderíamos evitar isso usando o modificador `final` no método ou na classe. Se usarmos no método, nenhuma subclasse poderá estender esse método, mas se usarmos na classe, ela não poderá ser estendida.
 
@@ -238,21 +258,25 @@ Quando falamos de herança normalmente usamos as palavras estende e implementa. 
 
 O Java tem algumas limitações em heranças. Uma classe SÓ pode estender uma classe, mas pode implementar quantas interfaces forem necessárias. MAS interfaces com mesma assinatura e tipo de retorno diferentes não são possíveis de serem implementas por uma mesma classe. No caso abaixo, temos que um `Gato` estende um `Felino` e implementa as interfaces `Miador` e `Ronronador`.
 
-```java
+[source,java]
+----
 public class Gato extends Felino implements Miador, Ronronador {
     // Implementação
 }
-```
+----
 
-## Conceitos da Orientação a Objetos
+[#cap-04-conceitos-oo]
+=== Conceitos da Orientação a Objetos
 
 Agora vamos discutir alguns conceitos comuns da orientação a objetos que podem nos auxiliar no dia a dia.
 
-### Herança
+==== Herança
 
 Para entender herança, podemos pensar em herança genética. Todo objeto ele tem um arquétipo e ele vai possuir uma hierarquia de tipos. Um `Gato` é um `Felino` que é um `Animal`. Cada uma dessas classes podem ter comportamentos associados ou apenas assinaturas de métodos. Se voltarmos no post anterior, sobre a biblioteca `Collections`, vamos ver o mais comum tipo de herança.
 
-![Pacote Java Collections](/assets/images/java/Collections.png)
+[.text-center]
+.Pacote Java Collections
+image::cap-03/Collections.png[id=jdk-lib-collections, align="center"]
 
 Vamos ver o caso da `LinkedList` que estende uma `AbstractSequentialList` e implementa as interface `List`, `Deque`, `Cloneable` e `Serializable`.
 
@@ -262,21 +286,23 @@ Da mesma forma `LinkedList` e `ArrayList` são tipos de `List`, enquanto apenas 
 
 Quando temos uma classe que herda tipos de outras classe, podemos definir nossos objetos com o tipo que desejarmos. Eu recomendo sempre usar a interface que você deseja usar e não a implementação final. Quer um exemplo? Vamos imaginar que eu quero definir um método que fará uma busca especifica pelo Gato mais gordo. Ao invés de declarar que desejo receber uma `LinkedList`, posso declarar que desejo receber apenas uma `List`.
 
-```java
+[source,java]
+----
 public class Gatos {
     public static Gato maisGordo(List<Gato> gatos) {
         // encontra o Garfield aqui que não tem erro.
     }
 }
-```
+----
 
 Uma dúvida clássica é se perguntar porque não devo usar o tipo mais específico. Nunca devemos usar as classes porque isso limita o uso do nosso código. Ao usar um `List`, eu posso aceitar qualquer implementação de `List`, mesmo implementações que eu não conheço. Essa preocupação será muito mais real quando estivermos falando de frameworks em que a geração de código ou classes do tipo proxy são comuns. 
 
-## Override
+==== Override
 
 Chamamos de _Override_ a prática de sobrescrever implementações de métodos em classes filhos. Vamos voltar ao nosso exemplo de Gatos, e se existe uma raça especifica de gatos que não mia, são gatos mudos. Como esse característica é muito especifica mas ele definitivamente são gatos, podemos criar essa nova classe de gatos e sobrescrever o método.
 
-```java
+[source,java]
+----
 public class GatoMudo extends Gato {
 
     @Override
@@ -285,17 +311,18 @@ public class GatoMudo extends Gato {
     }
 
 }
-```
+----
 
 Se tivermos um objeto da classe `GatoMudo`, mesmo que ele esteja definido como `Gato`, será chamado o método da classe `GatoMudo`.
 
 O uso da anotação `@Override` não é obrigatório, mas é altamente recomendável.  
 
-## Overload
+==== Overload
 
 Chamamos de _Overload_ quando criamos um novo método para um tipo diferente de parâmetros. Essa técnica é excelente quando queremos criar métodos semelhantes para tipos diferentes. Vamos supor que nosso método de `mistura` vai ser migrado para a classe abstrata de animais e que queremos criar esse método para alguns tipos de animais, não para todos, mas ele será diferente para alguns grupos (tem animal que se divide e não reproduz). Assim podemos criar um método mistura para os tipos `Mamifero`, `Ave`, `Reptil` e `Peixe`, cada método terá uma implementação completamente diferente.
 
-```java
+[source,java]
+----
 public class Gato {
     public static Mamifero mistura(Mamifero mamiferoA, Mamifero mamiferoB) {
         // Mágica acontece
@@ -316,14 +343,16 @@ public class Gato {
         // Mágica acontece
         return peixeC;
     }
-```
+}
+----
+
 Nós fizemos _overload_ de um método estático, mas poderíamos ter feito de um método de instância.
 
-## HashCode, Equals e ToString
+==== HashCode, Equals e ToString
 
 Uma outra reclamação constante de quem não gosta de Java é a necessidade de se implementar esses três métodos que as vezes parecem inúteis.
 
-Primeiro devemos esclarecer que `hashCode`, `equals` e `toString` são métodos extremamente úteis e usados constantemente pela JVM. É sempre recomendável a leitura da documentação da classe [Object](https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Object.html) sobre esses três métodos.
+Primeiro devemos esclarecer que `hashCode`, `equals` e `toString` são métodos extremamente úteis e usados constantemente pela JVM. É sempre recomendável a leitura da documentação da classe https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Object.html[Object] sobre esses três métodos.
 
 `hashCode` é um método usado para o calculo do _Hash_ do objeto. O hash é um valor inteiro que será usado para identificar cada objeto. Dois objetos iguais devem ter o mesmo hash, mas dois objetos com o mesmo hash não são iguais. Toda e qualquer classe usando o nome Hash usar esse método, assim se você tem um `HashMap` ou um `HashSet`, você tem o uso do método.
 
@@ -331,7 +360,8 @@ Primeiro devemos esclarecer que `hashCode`, `equals` e `toString` são métodos 
 
 `toString` é usado para se criar um valor String para a classe. Sempre implemente o toString para melhorar o rastreamento de erros em logs de execução.
 
-## Passagem por valor e Passagem por referência
+[#cap-04-passagem-por-valor-e-referencia]
+=== Passagem por valor e Passagem por referência
 
 Quando estudamos linguagem como C, estudar o tipo de passagem como argumento de uma função é muito importante, porque é possível controlar o que queremos fazer ao se escolher o tipo de parâmetro. Já em Java não nos preocupamos muito, mas em ambas a linguagem temos a possibilidade de se passar um argumento como valor ou como referência. Vamos primeiro definir para depois mostrar como pode ser feito?
 
@@ -339,7 +369,8 @@ Falamos de **Passagem por valor** de um argumento para uma função quando ao se
 
 Em C, isso é meio óbvio porque podemos passar o valor ou a referência. Vou tentar mostrar aqui:
 
-```c
+[source,c]
+----
 #include <stdio.h>
 
 int incrementaValor(int valor) {
@@ -360,23 +391,24 @@ int main() {
     printf("Valor: %d\n", incrementaReferencia(&contador));  // Imprime "Valor: 2"
     return 0;
 }
-```
+----
 
 O que acontece quando eu chamo a função `incrementaValor` é que uma cópia do contador é enviado para a função, mas quando chamo `incrementaReferencia` o próprio contador é enviado para a função.
 
 Em Java só temos passagem por valor quando usamos tipos primitivos (`byte`, `short`, `int`, `long`, `float`, `double` ou `char`). Quando definimos um objeto, sempre estamos passando a referência do mesmo para funções. Por isso é muito importante entender o que é e como garantir imutabilidade. Quando formos falar de memória, vou explicar o que é o conceito de memória e como isso funciona na prática, mas, resumidamente, tipos primitivos são armazenados na stack do programa enquanto todas as classes são armazenados na memoria heap do programa. Ao se criar um objeto, um ponteiro na stack é criado para um novo espaço de memoria alocado na Heap. _Calma, você não tem obrigação de entender isso facilmente_!!!
 
-## Imutabilidade e Mutabilidade
+=== Imutabilidade e Mutabilidade
 
 Chamamos de mutabilidade a capacidade de um objeto ter seu estado interno alterado. Em orientação a objetos mutabilidade é um requisito desejado para quase todas as classes, por isso que só recentemente o Java incorporou o conceito de imutabilidade a linguagem através dos Records. Antes dos Records era comum se usar POJOs em que existia para cada campo um respectivo `get` e um `set`.
 
-> **POJO**
->
-> POJO é um acrônimo para _Plain Old Java Object_, que significa velho e simples objeto Java. É um termo usado para referenciar um padrão de classes Java que não dependem da herança de interfaces ou classes de frameworks externos.
+.POJO
+[sidebar]
+POJO é um acrônimo para _Plain Old Java Object_, que significa velho e simples objeto Java. É um termo usado para referenciar um padrão de classes Java que não dependem da herança de interfaces ou classes de frameworks externos.
 
 Records é o tipo que adiciona o conceito de imutabilidade ao código Java. Abaixo vou definir a classe **Usuario** três vezes. Na primeira vez ela é mutável, na segunda imutável usando POJO e na terceira usando record.
 
-```java
+[source,java]
+----
 public class Usuario {
     private int id;
     private String username;
@@ -414,11 +446,12 @@ public class Usuario {
 
     // Implementa hashCode, equals e toString
 }
-```
+----
 
 Para implementar um campo imutável, devemos usar o modificador de acesso `final`. Um campo final terá seu valor definido no construtor e não poderá ser alterado em todo ciclo de vida do objeto.
 
-```java
+[source,java]
+----
 public class Usuario {
     private final int id;
     private final String username;
@@ -444,15 +477,17 @@ public class Usuario {
 
     // Implementa hashCode, equals e toString
 }
-```
+----
 
 Ao usar records, é como se todos os campos já fossem definidos como final, mas a grande vantagem se dá que não precisamos implementar os métodos `hashCode`, `equals` e `toString`.
 
-```java
+[source,java]
+----
 public record Usuario(int id, String username, String email) {}
-```
+----
 
-# Conclusão
+[#cap-04-conclusao]
+== Conclusão
 
 Orientação a Objeto é uma ótima técnica para fazer design de código. Ela é melhor utilizada quando tempos que modelar problemas do mundo real, mas haverá dificuldade se o modelo for mais próximo de um modelo matemático.
 
