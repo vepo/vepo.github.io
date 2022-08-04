@@ -9,10 +9,7 @@ permalink: /posts/java-101
 publish_date: 2022-04-29 14:26:00 +0300
 ---
 
-:figure-caption: Figura
-:imagesdir: /assets/images/java-101
-
-A intenção dessa série é te apresentar o básico sobre a linguagem Java e te dar ferramentas para que você possa aprender a programar. Nenhum material por sí só fará o trabalho completo, para que você possa se tornar um desenvolvedor é preciso muito exercício, por isso vá lentamente avançando sobre os tópicos propostos e fazendo todos os exercícios propostos. 
+A intenção desse material é te apresentar o básico sobre Java oferecendo ferramentas para que você possa aprender a programar. Nenhum material por sí só fará o trabalho completo, para que você possa se tornar um desenvolvedor é preciso muito exercício, por isso vá lentamente avançando sobre os tópicos propostos e fazendo todos os exercícios propostos. 
 
 Nesse sessão você vai aprender:
 
@@ -27,60 +24,82 @@ Eu vou tentar seguir a ordem dessa thread que fiz em dezembro.
 
 [.text-center]
 .Thread que fiz no Twitter em dezembro de 2021
-image::cap-01/java-thread.PNG[id=twitter-thread, link=https://twitter.com/vepo/status/1473250093742571521, align="center"]
+image::java-101/cap-01/java-thread.PNG[id=twitter-thread, link=https://twitter.com/vepo/status/1473250093742571521, align="center", scaledwidth=50%]
 
 [#java-e-um-ecossistema]
 == Java é um ecossistema
 
-Muitos tendem a querer comparar Java com outras linguagens. Alguns tem a pretensão de comparar Java com linguagens como Javascript ou mesmo Scala. Esse é um erro crasso! Java não é apenas uma linguagem, mas um ecossistema.
+Muitos tendem a querer comparar Java com outras linguagens. Alguns tem a pretensão de comparar Java com linguagens como Javascript ou mesmo Scala. Esse é um erro crasso! Essa comparação não tem sentido porque o Java não é apenas uma linguagem, mas um ecossistema.
 
-Primeiro para entender melhor vamos tentar definir o que é uma linguagem de programação...
+Primeiro para entender melhor vamos tentar compreender melhor o que é uma linguagem de programação...
 
 Quando a computação eletrônica começou a se popularizar, existiam inúmeras plataformas e cada uma delas haviam um conjunto de instruções. Para desenvolver qualquer software era preciso conhecer o hardware e o conjunto de instruções que existem naquele hardware. Quer ver um exemplo? Tenta navegar no https://github.com/chrislgarry/Apollo-11[código da Apollo 11] para tentar entender algo. É praticamente impossível, até mesmo para quem já desenvolveu em Assembly. Isso acontece porque o conjunto de instruções e a arquitetura do hardware são completamente diferentes das máquinas que temos hoje.
 
+.Assembly
+[sidebar]
+**Assembly** ou linguagem de montagem é uma notação legível por humanos para o código de máquina que uma arquitetura de computador específica usa, utilizada para programar códigos entendidos por dispositivos computacionais.
+
 [.text-center]
 .Olha o código da ignição da Apolo 11! 😲
-image::cap-01/apollo11.png[id=apollo11, align="center"]
+image::java-101/cap-01/apollo11.png[id=apollo11, align="center", scaledwidth=75%]
 
 Com o tempo as máquinas ganharam um padrão, tanto de processadores como de Opcodes. Hoje sabemos que existe um processador, um barramento, memória, registradores, etc... Esses componentes variam um pouco de arquitetura pra arquitetura, mas eles continuam seguindo um padrão. Abaixo você pode ver a documentação de um opcode.
 
 [.text-center]
 .Exemplo de Opcode
-image::cap-01/opcode.png[id=opcode, align="center"]
+image::java-101/cap-01/opcode.png[id=opcode, align="center", scaledwidth=75%]
 
 _— Cara qual a relação disso com Java?_
 
-Bom, vamos lá! Eu vou chegar lá! Eu prometo! Tudo que um computador reconhece são opcodes! Nenhum computador entende nenhuma linguagem de programação. Ah, mas você vai me dizer que algumas pessoas desenvolvem assembly... Sim! Mas mesmo para quem faz esses programas é preciso transcrever o programa em linguagem de máquina. Por exemplo, no opcode acima, o computador não sabe o que é `NOP`, ele só sabe que a operação `01` não deve produzir nenhum efeito. Então todo programa precisa ser compilado para uma série de instruções que chegam a praticamente o formato de máquina. Estou falando do famoso `EXE` do Windows. Mas esses programas também dependem de uma série de bibliotecas do sistema operacional para o qual foram compilados.
+Bom, vamos lá! Eu vou chegar lá! Eu prometo! Tudo que um computador reconhece são opcodes! Nenhum computador entende nenhuma linguagem de programação. Ah, mas você vai me dizer que algumas pessoas desenvolvem assembly... Sim! Mas mesmo para quem faz esses programas é preciso transcrever o programa em linguagem de máquina. Por exemplo, no opcode acima, o computador não sabe o que é `NOP`, ele só sabe que a operação `01` não deve produzir nenhum efeito. Então todo programa precisa ser compilado para uma série de instruções que chegam a praticamente o formato de máquina. Estou falando do famoso `EXE` do Windows. E esses programas também dependem de uma série de bibliotecas do sistema operacional para o qual foram compilados.
 
-Até 1990 era comum um programa ser compilado para uma máquina especifica. Quem já trabalhou com Linux nos anos 2000 sabe o que é isso. MAS uma grande empresa do Vale do Silício teve uma grande ideia! E se escrevêssemos uma linguagem em que ao se escrever um código ele poderá ser executado em qualquer lugar? 
+Até 1990 era comum um programa ser compilado para uma máquina especifica. Quem já trabalhou com Linux nos anos 2000 sabe o que é isso, você tinha que baixar o código fonte de um programa e compilar ele para a sua distribuição pois na maioria dos casos as versões de dependência eram muito especificas. Por isso uma grande empresa do Vale do Silício teve uma grande ideia! E se escrevêssemos uma linguagem em que ao se escrever um código ele poderá ser executado em qualquer lugar?
 
-Essa ideia era pensada porque começavam a existir dispositivos que no futuro poderiam ter um processador de uso genérico. Mas como fazer para encapsular toda a lógica do hardware e do sistema operacional? Por isso surgiu algo que é tão importante quanto a linguagem Java: a **Java Virtual Machine**! Ou JVM para os mais íntimos...
+O ano era 1991 e a Sun já começava a se preparar para embarcar software em dispositivos portáveis e eletrodomésticos. Para isso era preciso de uma linguagem em que se pudesse criar programas sem nenhuma dependência com a arquitetura do processador e nem com o sistema operacional. Mas existia um grande desafio: como fazer para encapsular toda a lógica do hardware e do sistema operacional? Por isso surgiu algo que é tão importante quanto a linguagem Java: a **Java Virtual Machine**! Ou JVM para os mais íntimos...
 
-A JVM é um programa que lê um conjunto de classes e executa como se fosse um processador em alto nível. Ela tem uma arquitetura como se fosse uma máquina e tem instruções como se fosse um processador. A https://docs.oracle.com/javase/specs/jvms/se18/html/index.html[especificação] dela é aberta e pode ser acessada por qualquer fornecedor que queira porta ela em seu sistema operacional. 
+A JVM é um programa que lê um conjunto de classes e executa como se fosse um processador em alto nível. Ela tem uma arquitetura similar a uma máquina e instruções, como se fosse um processador. Se você for curioso, pode ler a https://docs.oracle.com/javase/specs/jvms/se18/html/index.html[especificação] dela, pois é aberta e pode ser acessada por qualquer fornecedor que queira porta ela em seu sistema operacional.
 
-Então agora para e olha para o transformador que existe na sua rua... E se eu te dissesse que é provável que existe uma JVM rodando perto dele para monitorar ele? Você acreditaria? Em algumas cidades existe. Isso só é possível porque ela é portátil em qualquer sistema operacional.
+_— Ah, mas Java nem é tão popular!_
 
-Para criar o Java, foi preciso criar uma máquina virtual poderosa e é ela quem tem grande parte do crédito porque ao abstrair as particularidades de vários sistemas operacionais e hardwares, foi possível se economizar tempo escrevendo código.
+Então agora para e olha para o transformador que existe na sua rua... E se eu te dissesse que é provável que existe uma JVM rodando perto dele para monitorar esse transformador específico? Você acreditaria? Em algumas cidades isso existe. E só é possível porque a JVM é portátil em qualquer tipo de dispositivo.
+
+Como eles tinha requisitos de portabilidade para criar o Java, foi preciso criar uma máquina virtual poderosa e é ela quem tem grande parte do crédito da popularidade da linguagem. Ao abstrair as particularidades de vários sistemas operacionais e hardwares, foi possível se economizar tempo escrevendo e compilando código.
 
 _— Então você tá falando que o Java é famoso só por causa da JVM?_
 
-Óbvio que não! A JVM já vem com uma biblioteca padrão que é muito poderosa. Podemos ter acesso a biblioteca de coleções que é poderosa, a biblioteca de Reflections foi a base da grande maioria dos frameworks dos anos 2000, etc... A JVM era poderosa e ela era umbilicalmente ligada ao Java. Ela era tão boa que surgiram linguagens que compilavam para rodar JVM.
+Óbvio que não! A JVM já vem com uma biblioteca padrão que é muito poderosa. Podemos ter acesso a biblioteca de coleções que é poderosa, a biblioteca de Reflections foi a base da grande maioria dos frameworks dos anos 2000, etc... A JVM era poderosa e ela era parte do que chamamos Java. Ela era tão boa que surgiram linguagens que compilavam para rodar JVM e algumas delas são bem populares como: Kotlin, Groovy, Scala e Clojure.
 
-_— Mas porque tudo tem que ser um objeto em Java? Quem teve essa ideia infeliz?_
+_— Ah, mas Java é chato. Não dá nem pra escrever um programa sem ter um objeto! Porque tem que sempre escrever um objeto? Quem teve essa ideia infeliz?_
 
-Eu poderia colocar essa pergunta como um _ageísmo_, mas eu prefiro o tempo _esnobismo cronológico_. Porque você está certo! Na minha humilde opinião, essa ideia é infeliz! Mas sabemos disso porque a linguagem Java nos mostrou isso. Quando ela foi desenvolvida a crença comum era de que Orientação Objeto era a panaceia para todos os males da computação. Se quiser reclamar, pode! Houveram até ideias bem horrendas como Banco de Dados OO.
+Eu poderia colocar essa pergunta como um _ageísmo_, mas eu prefiro o tempo _esnobismo cronológico_. Mas você está certo! Na minha humilde opinião, essa ideia é infeliz! Hoje nós sabemos disso porque a experiência desenvolvendo na linguagem Java nos mostrou isso. Quando ela foi desenvolvida a crença comum era de que Orientação Objeto era a panaceia para todos os males da computação. Se quiser reclamar, pode! Mas lhe garanto que não foi a pior ideia envolvendo OO, tentaram criar um banco de dados OO. Isso é bem pior do que escrever uma linguagem puramente OO.
 
-Além disso houveram projetos para que os componentes fosse a principal forma de desenvolvimento de software. Na época existia um grande esforço para que não fosse mais necessário se escrever código. Por isso existiu um projeto, o qual não lembro o nome, que prometia um software altamente customizável sem código. Nem preciso dizer que ele falhou completamente, mas dele surgiram algumas boas ideias como o Java Beans. 
+Houveram projetos focados em fazer que componentes fosse a principal forma de desenvolvimento de software. Se acreditava que toda programação seria feita através do arrasto e do clique do mouse. Foi muito esforço para que não fosse mais preciso escrever código e nós estamos em 2022 escrevendo código. Quando o JavaBeans foi criado, a intenção era que ele pudesse ser manipulado por uma ferramenta visual, a BeanBox. Seria uma IDE que se conectaria vários componentes para que a dependência do desenvolvimento fosse reduzida. Como vemos pela história: deu errado! Mas esse esforço gerou muitas boas tecnologias que temos hoje.
 
 Java Beans é uma especificação que deu origem ao que conhecemos hoje como Jakarta EE. É o falecido Java EE! É um modelo de programação em que seu código não fica dependente de um framework, da mesma forma que seu código não é dependente de uma máquina. Hoje é possível você escrever um programa para _Quarkus_ e usar o mesmo código para OpenLiberty.
 
+Já que falamos um pouco da história do Java, vamos começar a escrever nossa primeira linha Java?
+
 === Instalando tudo...
 
-Não gaste tempo procurando cada programa... nem mesmo o Java. Você precisa de apenas uma coisa: o https://sdkman.io/[SDKMan!]. Com ele é possível instalar qualquer versão de Java que você deseja e algumas outras ferramentas como vamos citar mais a frente. 
+Para desenvolver programas Java é preciso instalar a JDK. JDK é a sigla para _Java Development Kit_ que são uma série de programas para compilar, empacotar e monitorar seu programa Java. Desde de 2017 o Java adotou um processo chamado Release Train, em que uma nova versão é lançada a cada 6 meses com as funcionalidades prontas, então não gaste tempo procurando qual versão instalar... Você precisa de apenas uma coisa: o https://sdkman.io/[SDKMan!]. Com ele é possível instalar qualquer versão de Java que você deseja e algumas outras ferramentas como vamos citar mais a frente.
 
-Também recomendo ter uma boa linha de comando. Se você usa Windows... Errado! Brincadeira! _hehehe_ Você pode usar Windows, tanto que eu uso Windows (não por livre e espontânea vontade). No Windows você pode usar o Git Bash que é um porte do MinGW que por sua vez é um porte dos programas GNU para Windows.
+Outra habilidade importante é saber usar a linha de comando, você pode ser um desenvolvedor sem usar ela, mas eu recomendo ter um pouco de intimidade com o Bash e usar constantemente. 
 
-Sobre a IDE, escolha a que você mais gosta. Todas as IDEs relevantes tem suporte a Java. Você precisa de uma IDE porque é mais fácil desenvolver usando ferramentas para fazer a marcação da linguagem (_o famoso code highlight_) e para propor código (_o famoso auto-complete_). Desenvolvedores experientes preferem comodidade porque os problemas já são complexos demais para ficar perdendo tempo. Eu recomendo usar ou o Eclipse, ou o IntelliJ Idea ou o VS Code. As três IDEs são boas.
+_— Bash não é do Linux?! Eu uso Windows e não quero mudar meu sistema operacional!_
+
+Calma. Se você usa Windows... Tá errado! Brincadeira! _hehehe_ Você pode usar Windows, eu mesmo uso Windows (não por livre e espontânea vontade). Para usar Bash no Windows você pode instalar o https://git-scm.com/downloads[cliente GIT] que ele já vem com uma ferramenta chamada Git Bash, um console MinGW que é um porte dos programas GNU para Windows.
+
+.GNU
+[sidebar]
+GNU é um conjunto de programas que são criados pela comunidade de Software Livre. Software Livre é muito mais que Open Source, vale a pena conhecer mais a iniciativa **Free Software Foundation** que é responsável pelo GNU, é por causa dela que você não precisa pagar pra usar um compilador ou outras ferramentas que até sua criação eram pagas.
+
+Para desenvolver, é recomendável que você use uma IDE. IDEs ou _Integrated Development Environment_ (Ambiente de Desenvolvimento Integrado) são programas que integram editores de textos e ferramentas para desenvolvimento, build e analise de código. Escolha a que você mais gosta. Todas as IDEs relevantes no mercado tem suporte a Java. 
+
+_— Ah, mas eu não posso usar o Notepad++?!?_
+
+Pode, mas você precisa de uma IDE porque é mais fácil desenvolver usando ferramentas. Elas provem funcionalidades que diminuem o número de bugs e facilitam o desenvolvimento como fazer a marcação da linguagem (_o famoso code highlight_) e para propor código (_o famoso auto-complete_). Desenvolvedores experientes preferem comodidade porque os problemas já são complexos demais para ficar perdendo tempo. Eu recomendo usar ou o Eclipse, o IntelliJ Idea ou o VS Code. As três IDEs são boas.
+
+Usando uma IDE você pode construir seu projetinho Java, mas será muito difícil compartilhar ele com outras pessoas ou mesmo criar um executável a partir dele. Para facilitar a build do seu projeto existem ferramentas de gerenciamento de build: o Maven e o Gradle. Para instalar ele, procure no SDKMan!. Usando Maven/Gradle você pode definir o seu projeto e as dependências dele em um arquivo e ele será responsável pro baixar todas as dependências, compilar e gerar o que você precisa para colocar o seu software em produção.
 
 Logo em resumo, o que você precisa é:
 
@@ -89,42 +108,42 @@ Logo em resumo, o que você precisa é:
 * Java
 * Uma boa IDE (https://www.eclipse.org/downloads/[Eclipse], https://www.jetbrains.com/pt-br/idea/download/#section=windows[IntelliJ IDEA] ou https://code.visualstudio.com/download[VS Code])
 
-=== Construindo meu primeiro programa Java
+== Construindo meu primeiro programa Java
 
 Então agora que você sabe que o Java é mais que uma linguagem, vamos escrever nosso primeiro código Java?
 
-Se você quiser aprender, recomendo abrir sua IDE preferida e criar um projeto Java. Vou demonstrar primeiro como criar usando o IntelliJ, depois usando o Eclipse e por fim usando o Maven e o Gradle. Usando apenas a IDE é ótimo para estudo, porém usando um sistema de build como Maven ou Gradle você poderá torna seu projeto mais profissional.
+Se você quiser aprender, recomendo abrir sua IDE preferida e criar um projeto Java. Tente explorar sua IDE, ela tem uma infinidade de recursos que muitas vezes são poucos conhecidos principalmente por desenvolvedores mais experientes. Vou demonstrar primeiro como criar usando o IntelliJ, depois usando o Eclipse e por fim usando o Gradle e o Maven. Se você deseja apenas estudar, sinta-se a vontade para usar apenas a IDE, mas se você usar um sistema de build será mais fácil você trabalhar em equipes e seu projeto terá uma aparência mais "_profissional_".
 
-==== Usando o IntelliJ
+=== Usando o IntelliJ
 
 Com o ItelliJ, selecione Novo Projeto e você verá a tela abaixo. Você precisa adicionar o nome do projeto (_Name_) e o local em que deseja criar o projeto (_Location_). Eu recomendo você ter uma pasta separada para todos os seus projetos. 
 
 [.text-center]
 .Tela de novo Projeto
-image::cap-01/intellij-novo-projeto-1.png[id=intellij-novo-projeto-1, align="center"]
+image::java-101/cap-01/intellij-novo-projeto-1.png[id=intellij-novo-projeto-1, align="center", scaledwidth=50%]
 
 
-Na tela acima, temos algumas opções que são importantes. A primeira delas é que você pode escolher o sistema de build do seu projeto. O IntelliJ já tem um sistema de build próprio, mas você pode usar Maven ou Gradle. A segunda opção é que você pode escolher a versão da JDK que você vai usar. A JDK é a ferramenta que te possibilitará desenvolver Java, ela contém todos os programas para compilar seu código, executar, debugar e muitas outras ferramentas que podemos falar mais a diante. O IntelliJ permite você selecionar a JDK e fazer o download dela. Eu recomendo você usar a versão mais recente e escolher a Oracle OpenJDK como vendor. Depois você pode escolher já inicializar esse projeto como um repositório git (_Create Git repository_) ou iniciar o projeto com um código de exemplo (_Add sample code_).
+Na tela acima, temos algumas opções que são importantes. A primeira delas é que você pode escolher o sistema de build do seu projeto. O IntelliJ já tem um sistema de build próprio, mas você pode usar Maven ou Gradle. A segunda opção é que você pode escolher a versão da JDK que você vai usar. A JDK é a ferramenta que te possibilitará desenvolver Java, ela contém todos os programas para compilar seu código, executar, debugar e muitas outras ferramentas que podemos falar mais a diante. O IntelliJ permite você selecionar a JDK e fazer o download dela. Eu recomendo você usar a versão mais recente e escolher a Oracle OpenJDK como _vendor_. Depois você pode escolher já inicializar esse projeto como um repositório git (_Create Git repository_) ou iniciar o projeto com um código de exemplo (_Add sample code_).
 
 Depois de criado o projeto, você terá que adicionar uma classe ao projeto. Todo programa Java precisa de um método de entrada chamado `main`. Apesar de muitos criticarem essa limitação, isso era comum quando o Java foi desenvolvido. Hoje, na verdade, o Java não tem essa limitação, você pode usar o https://cr.openjdk.java.net/~rfield/tutorial/JShellTutorial.html[JShell] e importar um arquivo `jsh`. Para criar sua primeira classe, selecione o botão direito do mouse na pasta `src` e depois selecione **New → Java Class**.
 
 [.text-center]
 .Criando nova classe
-image::cap-01/intellij-novo-projeto-2.png[id=intellij-novo-projeto-2, align="center"]
+image::java-101/cap-01/intellij-novo-projeto-2.png[id=intellij-novo-projeto-2, align="center", scaledwidth=50%]
 
 Ao selecionar uma nova classe, será necessário dar um nome a ela. O nome de uma classe é o que chamamos de _Fully Qualified Name_, ele é composto pelo nome do pacote e o real nome da classe, no caso estou criando o pacote `io.vepo.helloworld` e a classe `HelloWorld`. Vamos falar mais sobre classes e pacotes quando formos falar de Orientação a Objetos (eu prometo falar disso, tenham paciência!).
 
 [.text-center]
 .Dando nome a classe
-image::cap-01/intellij-novo-projeto-3.png[id=intellij-novo-projeto-3, align="center"]
+image::java-101/cap-01/intellij-novo-projeto-3.png[id=intellij-novo-projeto-3, align="center"]
 
 Criada a classe, vou te apresentar uma funcionalidade muito importante. Abra o editor de texto posicione o cursor para editar o texto dentro da classe, adicione o texto `ma` e use a funcionalidade mais fabulosa que se chama **auto-complete** selecionando **CTRL+SPACE**! Magicamente a IDE vai compreender qual é o contexto e vai propor o que você deve escrever. Agora siga para o último _snippet_ desse post. (snippet significa trecho, é normalmente um significado para um trecho de código que serve de exemplo simples).
 
 [.text-center]
 .Criando método main
-image::cap-01/intellij-novo-projeto-4.png[id=intellij-novo-projeto-4, align="center"]
+image::java-101/cap-01/intellij-novo-projeto-4.png[id=intellij-novo-projeto-4, align="center", scaledwidth=75%]
 
-==== Usando o Eclipse
+=== Usando o Eclipse
 
 Eclipse é uma IDE que pode parecer ultrapassada, mas ela tem uma relação intrínseca com o Java, https://www.oracle.com/java/technologies/java-se-support-roadmap.html[hoje uma nova versão do Java] é liberado pela Oracle semestralmente, mas para que a Oracle conseguisse essa proeza (antes demorava anos) ela acabou deixando liberando o Java EE para Eclipse Foundation sob o nome de Jakarta EE. Por enquanto você não precisa saber de nada disso, só lembre que Eclipse é a IDE da Eclipse Foundation que controla alguma coisa do Java!
 
@@ -134,7 +153,7 @@ Assim, ao iniciar o Workspace do Eclipse para Java você verá a opção para cr
 
 [.text-center]
 .Criar novo projeto - Atalho
-image::cap-01/eclipse-novo-projeto-1.png[id=eclipse-novo-projeto-1, align="center"]
+image::java-101/cap-01/eclipse-novo-projeto-1.png[id=eclipse-novo-projeto-1, align="center"]
 
 Ao selecionar, você entrará no Wizard de criação de um novo projeto. Semelhantemente ao IntelliJ, você terá que escolher um nome para o projeto e um local, a diferença é que no Eclipse o local padrão é o workspace. Você não precisa criar o projeto no workspace, você pode usar qualquer diretório, mas será no workspace que o Eclipse salvará alguns arquivos que definem como você está usando o mesmo, por isso caso você tenha mais de um contexto de desenvolvimento, você pode usar vários workspaces e trocar quando necessitar trocar de contextos. Por exemplo, você tem o workspace do trabalho e o workspace da faculdade, ou um workspace para cada projeto que você está trabalhando.
 
@@ -142,29 +161,29 @@ Você também pode selecionar a JDK que vai usar. Eu recomendo selecionar **Fini
 
 [.text-center]
 .Criar novo projeto - Wizard
-image::cap-01/eclipse-novo-projeto-2.png[id=eclipse-novo-projeto-2, align="center"]
+image::java-101/cap-01/eclipse-novo-projeto-2.png[id=eclipse-novo-projeto-2, align="center", scaledwidth=50%]
 
 Da mesma forma que o IntelliJ você tem que selecionar o botão direito do mouse na pasta `src` e depois selecione **New → Java Class**.
 
 [.text-center]
 .Criando classe - Atalho
-image::cap-01/eclipse-novo-projeto-3.png[id=eclipse-novo-projeto-3, align="center"]
+image::java-101/cap-01/eclipse-novo-projeto-3.png[id=eclipse-novo-projeto-3, align="center", scaledwidth=50%]
 
 E por fim dar um nome a classe, mas diferente do IntelliJ, o Eclipse dá mais liberdade para criar a classe, como já adicionar o método `main`.
 
 [.text-center]
 .Criando classe - Wizard
-image::cap-01/eclipse-novo-projeto-4.png[id=eclipse-novo-projeto-4, align="center"]
+image::java-101/cap-01/eclipse-novo-projeto-4.png[id=eclipse-novo-projeto-4, align="center", scaledwidth=50%]
 
 Com a classe, você também pode usar o **auto-complete**. Eu pessoalmente acho essa funcionalidade melhor no Eclipse que no IntelliJ. Aliás, se você usa VS Code, você está usando essa funcionalidade porque o VS Code usa o servidor de código do Eclipse.
 
 Uma desvantagem de usar eclipse é que ele não usa coordenadas Maven como veremos a seguir para definir as dependências.
 
-==== Usando o Gradle
+=== Usando o Gradle
 
-O erro mais comum de quem vai criar um projeto Java é baixar uma IDE e criar um projeto Java. 🤯 Eu fiz isso por muito tempo, até descobrir que é só dor de cabeça. É mais fácil você usar o Maven ou o Gradle. Eu uso Maven por comodidade, já tive vontade de aprender Gradle, mas... Bom... Vamos ver o Gradle!
+O erro mais comum de quem trabalha em grandes times é baixar uma IDE e criar um projeto Java. 🤯 Eu fiz isso por muito tempo, até descobrir que é só dor de cabeça. Quando fazemos isso acabamos por obrigar todo mundo do time a usar a mesma IDE e a ter que alterar arquivos de configuração complicados para fazer o projeto funcionar. Por isso, é mais fácil você usar o Maven ou o Gradle. Usar um sistema de build não significa não usar uma IDE, as IDEs conseguem importar a estrutura desses projetos e a partir daí toda as configurações serão feitas usando o sistema de build, mesmo se forem feitas através da IDE. A minha opção pessoal é o Maven, mas é por pura comodidade pois sou usuário há bastante tempo. Já tive vontade de aprender Gradle, mas... Bom... Vamos ver o Gradle!
 
-Com o Gradle você pode usar ele para gerar a estrutura do seu projeto automaticamente, basta executar `gradle init` no diretório da aplicação e seguir respondendo as perguntas. Eu recomendo criar uma application Java não quebrada em submódulos usando Groovy e JUnit Jupyter conforme abaixo:
+O Gradle te permite gerar toda a estrutura do seu projeto automaticamente, basta executar `gradle init` no diretório da aplicação e seguir respondendo as perguntas. Eu recomendo criar uma application Java não quebrada em submódulos usando Groovy e JUnit Jupyter conforme as opções abaixo.
 
 [source,bash]
 ----
@@ -192,7 +211,7 @@ Split functionality across multiple subprojects?:
 Enter selection (default: no - only one application project) [1..2] 1
 
   1: Groovy
-  2: Kotlin EXECUTING [10s]
+  2: Kotlin
 Enter selection (default: Groovy) [1..2] 1
 
 Select test framework:
@@ -214,11 +233,11 @@ O próximo passo é abrir o diretório em uma IDE, ver a estrutura criada. Para 
 
 Eu nunca tinha usado o Gradle e ele me parece bem mais fácil que o Maven. Você precisa ficar atento ao arquivo `build.gradle` que é onde todas as propriedades são definidas. Elas serão bem similares as definidas no nosso projeto Maven, mas em uma linguagem diferente, o Groovy.
 
-==== Usando o Maven
+=== Usando o Maven
 
 .Aviso
 [sidebar]
-Apesar de Maven usar XML, não se sinta intimidado. Eu deixe um exemplo com comentários. Caso você ainda ache difícil, manda um feedback aí com a sua dificuldade pelo twitter para https://twitter.com/vepo[@vepo].
+Apesar de Maven usar XML, não se sinta intimidado. Eu deixe um exemplo com comentários. Caso você ainda ache difícil, manda um feedback aí com a sua dificuldade pelo twitter para mim (https://twitter.com/vepo[@vepo]).
 
 Com o Maven você pode facilmente criar um projeto Java e compilar ele independente de IDE. O Maven também vai se encarregará de encontrar todas as dependências em suas versões e dependências. Então para criar um projeto Java basta criar um arquivo `pom.xml` e um arquivo Java, como na estrutura abaixo.
 
@@ -296,7 +315,7 @@ public class HelloWorld {
 }
 ----
 
-Agora caso você queira criar um programa usando um framework... Eu recomendo você procurar o tutorial desse framework. Talvez você precisará escrever um `main` específico ou mesmo usar um conjunto de anotações.
+Agora caso você queira criar um programa usando um framework... Eu recomendo você procurar o tutorial desse framework. Talvez você precisará escrever um `main` específico ou mesmo usar um conjunto de anotações, adicionar uma série de dependências e um plugin.
 
 [#cap-01-exercicios]
 == Exercícios
@@ -306,6 +325,10 @@ Os exercícios são propostos como forma de validar que você pode ir para o pr�
 1. Configure usa IDE preferida
 2. Crie um programa Java usando a IDE
 3. Crie um programa Java usando um sistema de build (Maven ou Gradle)
+4. Tente criar um programa linha de comando usando os https://pt.wikipedia.org/wiki/C%C3%B3digo_escape_ANSI[código de escape ANSI]. Você pode fazer usando o `System.out.println` ou uma biblioteca (por exemplo a https://github.com/fusesource/jansi[github.com/fusesource/jansi])
+5. [Opcional] Tente criar e rodar um projeto **Spring Boot** usando o https://start.spring.io[Spring Initializr]
+6. [Opcional] Tente criar e rodar um projeto **Quarkus** usando o https://code.quarkus.io/[Quarkus - Start coding with code.quarkus.io]
+7. [Opcional] Tente criar e rodar um projeto **Microprofile.io** usando https://start.microprofile.io[Starter | MicroProfile]
 
 [#cap-01-proximos-passos]
 == Próximos passos

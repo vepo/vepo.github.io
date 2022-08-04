@@ -65,12 +65,12 @@ Para entender melhor é preciso pensar em como era feito antes... As bibliotecas
 
 [.text-center]
 .Documentação da função read
-image::cap-05/read.PNG[id=cap-05-c-read, link=https://man7.org/linux/man-pages/man2/read.2.html, align="center"]
+image::java-101/cap-05/read.PNG[id=cap-05-c-read, link=https://man7.org/linux/man-pages/man2/read.2.html, align="center"]
 
 
 [.text-center]
 .Documentação da função write
-image::cap-05/write.PNG[id=cap-05-c-write, link=https://man7.org/linux/man-pages/man2/write.2.html, align="center"]
+image::java-101/cap-05/write.PNG[id=cap-05-c-write, link=https://man7.org/linux/man-pages/man2/write.2.html, align="center"]
 
 Em Java foi decidido que haveria uma diferenciação lógica entre leitura e escrita. Ao se ler um arquivo poderíamos ter o fluxo de leitura (InputStream ou Reader) e o fluxo de escrita (`OutputStream` ou `Writer`). Cada um desses fluxos teria uma orientação única, isso significa que um InputStream apenas lê e o `OutputStream` apenas escreve. É por isso que se usa o nome Stream.
 
@@ -80,11 +80,11 @@ Outro ponto da biblioteca C que explica o funcionamento do pacote `java.io` são
 
 [.text-center]
 .Documentação da função open
-image::cap-05/open.PNG[id=cap-05-c-open, link=https://man7.org/linux/man-pages/man2/open.2.html, align="center"]
+image::java-101/cap-05/open.PNG[id=cap-05-c-open, link=https://man7.org/linux/man-pages/man2/open.2.html, align="center"]
 
 [.text-center]
 .Documentação da função close
-image::cap-05/close.PNG[id=cap-05-c-close, link=https://man7.org/linux/man-pages/man2/close.2.html, align="center"]
+image::java-101/cap-05/close.PNG[id=cap-05-c-close, link=https://man7.org/linux/man-pages/man2/close.2.html, align="center"]
 
 Agora volta ao Java... Em C era preciso criar mecanismos de garantir que o arquivo estava fechado antes que o programa finalizasse. Em Java isso foi internalizado na linguagem através de alguns mecanismos. Por isso temos as interfaces `Closeable` e `AutoCloseable`. Se um objeto precisa liberar recursos depois de usado, ele deve implementar a interface `Closeable` e o método `close` deve ser chamado. Até a versão 6 do Java era comum ver o `close` sendo chamado dentro do bloco `finally` de um `try {} catch {} finally {}`.
 
@@ -229,7 +229,7 @@ InputStreamReader <|-- FileReader
 
 [.text-center]
 .Java I/O classes de leitura
-image::cap-05/IO-Read.png[id=cap-05-io-read, align="center"]
+image::java-101/cap-05/IO-Read.png[id=cap-05-io-read, align="center"]
 
 ////
 @startuml
@@ -340,7 +340,7 @@ OutputStreamWriter <|-- FileWriter
 
 [.text-center]
 .Java I/O classes de escrita
-image::cap-05/IO-Write.png[id=cap-05-io-write, align="center"]
+image::java-101/cap-05/IO-Write.png[id=cap-05-io-write, align="center"]
 
 == Casos de Uso
 
