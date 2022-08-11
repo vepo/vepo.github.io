@@ -211,7 +211,7 @@ Para criar um comentário em linha, adicione os dois caracteres `//` e tudo que 
 int partition = partition(record, serializedKey, serializedValue, cluster);
 ----
 
-Para criar um comentário tradicional, inicie com `/*` e todo caractere até encontrar o final `*/` será desconsiderado. Abaixo temos mais um comentário retirado do código do https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/security/authenticator/SaslClientAuthenticator.java#L289[Apache Kafka], ele explica a decisão de não existir um `break` naquela posição como veremos mais a frente.
+Para criar um comentário tradicional, inicie com `/**` e todo caractere até encontrar o final `**/` será desconsiderado. Abaixo temos mais um comentário retirado do código do https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/common/security/authenticator/SaslClientAuthenticator.java#L289[Apache Kafka], ele explica a decisão de não existir um `break` naquela posição como veremos mais a frente.
 
 
 [source,java]
@@ -235,7 +235,7 @@ case REAUTH_INITIAL:
     break
 ----
 
-O Javadoc é um tipo especial de comentário tradicional que nos permite gerar uma documentação oficial a partir do código. Ele se diferencia do comentário tradicional por iniciar com `/**`, não apenas `/*`, e pode estar acima de classes, métodos e campos. Javadoc segue uma linguagem de marcação deve ser usada sempre, pois além de poder ser usada como documentação oficial, ela também será exibida pelas IDEs em funcionalidades que irão lhe auxiliar durante o desenvolvimento. Javadoc também aceita tags HTML, as não tente usar CSS e Javascript. 
+O Javadoc é um tipo especial de comentário tradicional que nos permite gerar uma documentação oficial a partir do código. Ele se diferencia do comentário tradicional por iniciar com `/****`, não apenas `/**`, e pode estar acima de classes, métodos e campos. Javadoc segue uma linguagem de marcação deve ser usada sempre, pois além de poder ser usada como documentação oficial, ela também será exibida pelas IDEs em funcionalidades que irão lhe auxiliar durante o desenvolvimento. Javadoc também aceita tags HTML, as não tente usar CSS e Javascript. 
 
 No exemplo abaixo temos um trecho da documentação oficial do https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/producer/KafkaProducer.java#L1234[Apache Kafka]. É interessante notar que o autor desse código se preocupou em descrever a funcionalidade do método, e os motivos pelo qual as exceções são lançadas, mas ignorou a descrição do parâmetro porque é intuitivo. Evite comentários desnecessários.
 
