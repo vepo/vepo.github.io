@@ -25,7 +25,7 @@ RIP! ☠️☠️☠️
 
 Long live to Jakarta EE! 👑👑👑
 
-Java EE não era um framework. Era um conjunto de especificações que serviam de base para implementação de Frameworks. O intuido dessas especificações era tornar qualquer aplicação Java EE livre de implementações. Assim qualquer projeto Java EE, poderia ser facilmente migrável para qualquer uma das implementações compatíveis. Evitando assim o que podemos chamar de [Vendor Lock-in](https://en.wikipedia.org/wiki/Vendor_lock-in).</p>
+Java EE não era um framework. Era um conjunto de especificações que serviam de base para implementação de Frameworks. O intuido dessas especificações era tornar qualquer aplicação Java EE livre de implementações. Assim qualquer projeto Java EE, poderia ser facilmente migrável para qualquer uma das implementações compatíveis. Evitando assim o que podemos chamar de [Vendor Lock-in](https://en.wikipedia.org/wiki/Vendor_lock-in).
 
 Java EE tinha um sério problema. O _timing_ das especificações era mais lento que o passo da comunidade. Isso se devia ao processo imposto pela Oracle ao desenvolvimento, que ao ser _[Specification First](https://www.oracle.com/java/technologies/java-ee-glance.html)_ já impunha um passo lento às inovações.
 
@@ -33,9 +33,7 @@ Mas....
 
 ## Microprofile.io
 
-<p>Por volta de 2017, alguns nomes da comunidade perceberam que o Java EE não estava acompanhando o desenvolvimento de
-    aplicações <a href="https://12factor.net/pt_br/">Cloud Native</a>, suas especificações englobavam tudo que havia de
-    novo em 2007, mas estavamos em 2017! Era preciso fazer algo! </p>
+Por volta de 2017, alguns nomes da comunidade perceberam que o Java EE não estava acompanhando o desenvolvimento de aplicações [Cloud Native](https://12factor.net/pt_br/), suas especificações englobavam tudo que havia de novo em 2007, mas estavamos em 2017! Era preciso fazer algo!
 
 ![Microprofile.io](https://thepracticaldev.s3.amazonaws.com/i/eidzpplis9ehe42q46z6.png)
 
