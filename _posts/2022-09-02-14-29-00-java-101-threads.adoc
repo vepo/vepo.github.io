@@ -1,6 +1,6 @@
 ---
 title: Concorrência e Paralelismo
-published: true
+published: false
 description: O que eu preciso saber de concorrência e paralelismo para desenvolver usando Java?
 tags: [Java]
 cover_image: /assets/images/java/duke-tumble.png
@@ -78,7 +78,7 @@ Vamos agora mostrar algumas classes que podemos usar para manipular processos e 
 
 Para que possamos acessar as informações de todos os processos em execução podemos usar a classe https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html[ProcessHandle] (_adicionada no Java 9_). Navegue pela documentação dela para perceber que processos podem ter uma relação de parentescos como podemos perceber através dos métodos `children()`, `descendants​()` e `parent​()`. Na execução abaixo vemos as informações do processo atual e a listagem de todos os processos em execução.
 
-[source,bash]
+[source]
 ----
 $ jshell
 |  Welcome to JShell -- Version 18
@@ -99,6 +99,7 @@ ProcessHandle.allProcesses  .forEach(System.out::println);
 72
 [...] 
 ----
+
 Caso você deseje criar um novo processo, é preciso fazer uma chamada de sistema usando a classe https://docs.oracle.com/javase/9/docs/api/java/lang/Runtime.html[Runtime]. No trecho de código abaixo usamos o método `exec` para criar um novo processo. 
 
 [source,bash]
@@ -145,3 +146,119 @@ Não! Porque é praticamente impossível rodar 32.768 processos concorrentes e a
 _— Mas o que acontece quando o Java pede uma thread nova?_
 
 Para entender isso, precisamos compreender outro conceito importante de Sistemas Operacionais o espaço do usuário e o espaço do kernel (https://pt.wikipedia.org/wiki/Espa%C3%A7o_de_usu%C3%A1rio[_user space_ e _kernel space_]). Espaço do usuário é todo o código dos nossos programas, já o espaço do kernel é o código do sistema operacional que nossos programas usam para realizar algumas operações. Toda operação que sai do espaço do usuário e vai para o espaço do kernel é custosa porque pode envolver recursos compartilhados como sockets, arquivos ou threads. Logo, criar uma nova thread é custoso porque tem que criar uma nova thread no sistema operacional que não é apenas alocar um espaço na memória.
+
+No código abaixo uma thread é criada que sua única função é pegar o instante em que é iniciada, dormir por 500ms e armazenar o instante em que ela é finalizada. Os tempos deve ser armazenados no array tempos porque nenhuma variável pode ser alterada diretamente entre duas threads que não seja uma variável `final`, pois estamos falando de duas pilhas de execução diferentes.
+
+[source,java]
+----
+long[] tempos = new long[4];
+tempos[0] = System.nanoTime();
+Thread t = new Thread() {
+    @Override
+    public void run() {
+        tempos[1] = System.nanoTime();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        tempos[2] = System.nanoTime();
+    }
+};
+t.start();
+try {
+    t.join();
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+}
+tempos[3] = System.nanoTime();
+System.out.println(String.format("Tempo de inicialização: %dµs", (tempos[1] - tempos[0]) / 1000));
+System.out.println(String.format("Tempo de execução     : %dµs", (tempos[2] - tempos[1]) / 1000));
+System.out.println(String.format("Tempo total           : %dµs", (tempos[3] - tempos[0]) / 1000));
+----
+
+O resultado da execução é o visto abaixo, observe que demora quase meio milissegundo para que a thread seja iniciada. Esse tempo pode parecer pouco, mas se houver um uso abusivo dessa classe pode impactar a performance, pois esse tempo é latência adicionada ao processamento.
+
+[source]
+----
+Tempo de inicialização: 436µs
+Tempo de execução     : 510061µs
+Tempo total           : 510643µs
+----
+
+Observe também que usamos os métodos `start` e `join`, eles servem para controlar a thread. Uma thread não inicia sua execução imediatamente, é preciso que o código que a instanciou dispare a execução. Mas quando a execução se inicia os dois códigos começam a ser executados em paralelo, para que se aguarde a finalização da thread é preciso usar o método `join` que fará com que a thread corrente seja bloqueada até que a outra seja finalizada.
+
+Outro ponto importante é o uso da exceção `InterruptedException`, ela é lançada pela JVM toda vez que a thread é interrompida pelo sistema operacional. 
+
+_— Mas o que significa a thread ser interrompida pelo sistema operacional?_
+
+Ora, já teve vezes em que uma janelinha do Windows ficou não responsiva e você foi lá forçou ela a ser fechada? Ou você executou um comando no bash e não quis esperar a resposta e pressionou **CRTL + C**. Nessa hora o sistema operacional envia um sinal ao programa que ele deve finalizar, o https://pt.wikipedia.org/wiki/SIGTERM[SIGTERM]. Quando esse sinal é recebido pela thread, ela deve liberar todos os recursos e se finalizar, por isso quanto tempos uma `InterruptedException` é hora de limpar a casa e fechar tudo.
+
+Se você ignorar essa exception, o seu processo pode virar um https://pt.wikipedia.org/wiki/Processo_zombie[processo zumbi], pois outras threads podem ter obedecido o sinal e já ter finalizada criando instabilidade para a execução. Então, recebeu um `InterruptedException`, fecha tudo e chama `Thread.currentThread().interrupt()`.
+
+Há um outro sinal que não fornece essa informação, o https://pt.wikipedia.org/wiki/SIGKILL[SIGKILL], o sistema operacional simplesmente mata a execução sem nenhuma educação e protocolo.
+
+Por fim, você deve ter reparado que implementamos o método `run` na thread. Esse método é definido na classe https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Runnable.html[Runnable], essa classe é muito importante porque nem sempre precisamos definir uma thread nova, podemos estender essa classe e criar quantas threads forem necessária com o mesmo código.
+
+Existe a possibilidade de se criar grupos de threads com a classe https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadGroup.html[ThreadGroup], mas não vamos abordar ela porque todas as funcionalidades delas podem ser endereçadas com Executors.
+
+=== Executors
+
+Executors são a nova, _em relação a Thread_, biblioteca adicionada no Java 5 que permite um controle melhor sobre Threads e grupos de threads. A vantagem do uso da classe Executors é que temos uma interface bem mais interessante, como veremos a diante. Primeiro vamos focar em performance.
+
+Como falamos, criar thread pode ser uma operação cara, com executors podemos criar pool de threads ou reutilizar threads já existentes sem a necessidade de se criar novas threads. Se compararmos a execução vemos que o uso de pools de thread diminuem o tempo gasto com a inicialização dessas threads. Nos teste que executamos, vemos que o tempo de inicialização e o tempo médio total são menores, somente o tempo médio de execução é maior, mas isso é devido a fatores externos ao código já que executamos o mesmo código em ambos o caso.
+
+[source]
+----
+Usando Threads
+Tempo de inicialização: 402µs
+Tempo de execução     : 511415µs
+Tempo total           : 511939µs
+
+Tempo médio de inicialização: 77370µs
+Tempo médio de execução     : 50792817µs
+Tempo médio total           : 50880048µs
+
+Usando Executors
+Tempo de inicialização: 2829µs    (+2.427µs)
+Tempo de execução     : 509877µs  (-1.538µs)
+Tempo total           : 513237µs  (+1.298µs)
+
+Tempo médio de inicialização: 19708µs    (-57.662µs)
+Tempo médio de execução     : 50806122µs (+13.305µs)
+Tempo médio total           : 50839674µs (-40.374µs)
+----
+
+Para se criar um https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/ExecutorService.html[`ExecutorService`] deve se usar a classe https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Executors.html[`Executors`]. Nessa classe tempos vários tipos de ExecutorServices, mas os mais importantes são os **FixedThreadPool**, **CachedThreadPool** e **ScheduledThreadPool**. Cada um desses tem suas peculiaridades que não vamos abordar aqui, apenas vamos ressaltar que **ScheduledThreadPool** deve ser usado quando precisamos criar threads que executam em intervalos pré definidos.
+
+[source,java]
+----
+long[] tempos = new long[4];
+tempos[0] = System.nanoTime();
+ExecutorService executor = Executors.newSingleThreadExecutor();
+Future<?> ft = executor.submit(() -> {
+        tempos[1] = System.nanoTime();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        tempos[2] = System.nanoTime();
+    });
+try {
+    ft.get();
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+}
+tempos[3] = System.nanoTime();
+System.out.println(String.format("Tempo de inicialização: %dµs", (tempos[1] - tempos[0]) / 1000));
+System.out.println(String.format("Tempo de execução     : %dµs", (tempos[2] - tempos[1]) / 1000));
+System.out.println(String.format("Tempo total           : %dµs", (tempos[3] - tempos[0]) / 1000));
+executor.shutdown();
+----
+
+A grande diferença é que quando criamos uma nova execução o ExecutorService retorna um https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Future.html[`Future`] que irá prover informações sobre a execução e o retorno da execução. Um executor não aceita apenas um `Runnable`, mas também https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Callable.html[`Callable`] que retorna valores. A opção por usar `Callable` irá tornar seu código mais legível.
+
+Outro ponto importante do uso de `ExecutorService` é que assim que uma nova atividade é submetida, ela entrará na fila de execução. É preciso ressaltar que ela só será executada quando houver thread disponível. Isso significa que um `ExecutorService` deve ser usado para atividades rápidas e não com longa duração. Se você precisar executar algo que dure toda execução crie um ExecutorService de tamanho pré-definido, usando `newFixedThreadPool` ou cria a thread manualmente.
+
+Por fim um ExecutorService não finaliza automaticamente, ele deve ser finalizado através do método `shutdown`. Caso você não chame esse método o seu programa vai virar um processo zumbi.
