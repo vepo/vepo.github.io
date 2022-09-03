@@ -85,12 +85,12 @@ $ jshell
 |  For an introduction type: /help intro
 
 jshell> System.out.println(ProcessHandle.current().pid());
-System.out.println\(ProcessHandle.current  .pid()  );
+System.out.println(ProcessHandle.current  .pid()  );
 20092
 
 jshell> System.out.println(ProcessHandle.current().info());
 System.out.println(ProcessHandle.current  .info  );
-[user: Optional\[VEPO\], cmd: C:\\Users\\vepo\\.sdkman\\candidates\\java\\18-open\\bin\\java.exe, startTime: Optional\[2022-09-02T18:49:28.093Z], totalTime: Optional\[PT0.328125S\]\]
+[user: Optional[VEPO], cmd: C:\Users\vepo\.sdkman\candidates\java\18-open\bin\java.exe, startTime: Optional[2022-09-02T18:49:28.093Z], totalTime: Optional[PT0.328125S]]
 
 jshell> ProcessHandle.allProcesses().forEach(System.out::println);
 ProcessHandle.allProcesses  .forEach(System.out::println);
@@ -119,4 +119,29 @@ $5 ==> 0
 
 Percebeu que o método `waitFor` retornou **0**? Todo processo precisa finalizar com um número e zero significa sucesso. Qualquer número diferente de zero significa que o programa foi finalizado com erro. O programa que eu executei acima é o `pwd` que retorna o diretório corrente em Linux, apesar de usar Windows uso o Git Bash que é um porte do MinGW que simula um bash Linux.
 
-_Threads_ também são criadas pelo sistemas operacional, mas o Java dá suporte a duas bibliotecas bem interessantes que precisamos demonstrar
+=== Threads
+
+_Threads_ também são criadas pelo sistemas operacional, mas o Java dá suporte a duas bibliotecas bem interessantes que precisamos demonstrar. A primeira é a classe https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Thread.html[Threads] que deve ser usada com muita parcimônia essa classe, o livro Java Efetivo nos diz no **Item 80: Dê preferência aos executores, às tarefas e às streams em vez de threads**. Os https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Executors.html[Executors] são a proxima classe que vamos ver que podem entregar as mesmas funcionalidades.
+
+_— Então porque entender Threads?!?!_
+
+_Threads_ são importantes porque são um conceito do sistema operacional. Um executor não elimina uma thread, ele apenas facilita a implementação delas e otimiza o seu uso. Threads são gerenciadas pelo Sistema Operacional. O tempo de CPU será dividido entre os processos e as threads. Isso significa que se seu computador tem 4 CPUs e seu programa tem ao menos 2 threads, é provável que em algum momento seu programa esteja rodando em 2 CPUs ao mesmo tempo, mas quem define isso é o sistema operacional.
+
+Threads são um recurso do sistema operacional limitado e caro. No Windows isso não é transparente, mas no Linux é possível acessar essas informações facilmente através do arquivo `/proc/sys/kernel/threads-max`. Na execução abaixo vemos que essa instância do Linux só pode rodar 32.768 processos concorrentes e 100.435 threads concorrentes, o que dá em média 3 threads por processo.
+
+[source,bash]
+----
+$ cat /proc/sys/kernel/threads-max
+100435
+
+$ cat /proc/sys/kernel/pid_max 
+32768
+----
+
+_— Mas 3 threads por processo não é muito pouco?!?!_
+
+Não! Porque é praticamente impossível rodar 32.768 processos concorrentes e a grande maioria dos processos tem apenas uma thread rodando.
+
+_— Mas o que acontece quando o Java pede uma thread nova?_
+
+Para entender isso, precisamos compreender outro conceito importante de Sistemas Operacionais o espaço do usuário e o espaço do kernel (https://pt.wikipedia.org/wiki/Espa%C3%A7o_de_usu%C3%A1rio[_user space_ e _kernel space_]). Espaço do usuário é todo o código dos nossos programas, já o espaço do kernel é o código do sistema operacional que nossos programas usam para realizar algumas operações. Toda operação que sai do espaço do usuário e vai para o espaço do kernel é custosa porque pode envolver recursos compartilhados como sockets, arquivos ou threads. Logo, criar uma nova thread é custoso porque tem que criar uma nova thread no sistema operacional que não é apenas alocar um espaço na memória.
