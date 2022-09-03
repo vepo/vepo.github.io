@@ -1,0 +1,122 @@
+---
+title: Concorrência e Paralelismo
+published: true
+description: O que eu preciso saber de concorrência e paralelismo para desenvolver usando Java?
+tags: [Java]
+cover_image: /assets/images/java/duke-tumble.png
+series: Java 101
+permalink: /posts/java-101-threads
+publish_date: 2022-09-02 14:47:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/java-101
+
+Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections, como Java faz Orientação a Objetos e o que é a biblioteca I/O, esses tópicos são necessários para o que vamos falar agora: **Concorrência e Paralelismo**.
+
+[#cap-06-o-que-e-concorrencia-e-paralelismo]
+== O que é Concorrência e Paralelismo?!?
+
+Nos frameworks modernos é muito raro lidarmos com paralelismo, apesar que podemos lidar com concorrência o tempo inteiro. Para entender isso precisamos primeiro compreender a diferença entre esses dois conceitos. Para isso vamos imaginar que estamos em uma biblioteca, nessa biblioteca tem dois tipos de livros: os comuns e os raros. Os livros comuns estão acessíveis na estantes para que todos possam ler e pegar emprestado, mas os livros raros estão disponíveis em uma sala especifica em que você precisa pedir para um bibliotecário pegar ele e deve ler somente na sala.
+
+Vamos imaginar que surgiu um estranho interesse por se ler livros raros na cidade e isso gerou uma procura inesperada que surpreendeu até mesmo a direção da biblioteca.
+
+_—  Todos estão disponíveis na internet! Só acessar o https://www.gutenberg.org/browse/languages/pt[Projeto Gutenberg]!!!_
+
+Isso gerou uma fila enorme na sessão de livros raros pois só tinha um bibliotecário para encontrar o livro, registrar a saída e ele ainda precisava observar se o livro estava sendo manipulado corretamente. Logo surgiram várias opções de como melhorar o atendimento da biblioteca, mas só poderiam ser consideradas as opções que mantivessem o cuidado para com as obras.
+
+[.text-center]
+.Biblioteca da Escola Sá de Miranda
+image::java-101/cap-06/biblioteca-antiga.jpg[id=cap-06-biblioteca-antiga, align="center"]
+
+A primeira opção foi contratar mais um bibliotecário. Feita a contratação ele começou a dividir as tarefas com o mais antigo. Enquanto o primeiro cuidava de encontrar as obras e registrar as saídas, o segundo fiscalizava se todos os usuários da biblioteca estavam manuseando corretamente o livro.
+
+A direção da biblioteca achou a opção boa, mas eles perceberam que o aumento da eficiência foi de apenas 30% enquanto se esperava 100% de eficiência com a contratação de um novo funcionário. Isso aconteceu porque as atividades foram distribuídas, mas nenhuma atividade era feita em paralelo. A atividade que mais demandava tempo era encontrar a obra e registrar a sua saída com cerca de 90% do tempo, logo essa atividade deveria ser feita em paralelo. **Paralelismo** acontece quando a mesma tarefa é realizada simultaneamente por mais de um bibliotecário. Assim os dois bibliotecários decidiram que iriam trabalhar em todo o conjunto de atividades aumentando a eficiência de 30% para 50%.
+
+Mas eles encontraram um pequeno problema, só havia um computador na bancada e por isso eles precisavam se revesar para usar o computador. No começo eles replicavam a atividade que faziam quando havia apenas 1 bibliotecário: atendiam o cliente, encontravam o livro e registravam a saída. Mas perceberam que o tempo de registrar o livro também era demorado, ele demorava cerca de 3 vezes o tempo de pegar o livro, pois o software era bem lento e implementado em Javascript. Logo eles foram procurar solução para o problema deles e descobriram que estavam enfrentando um problema de concorrência. **Concorrência** acontece quando dois ou mais bibliotecários desejam acessar recursos limitados.
+
+Eles perceberam que o mais demorado era entrar no sistema, logo resolveram atender 3 clientes por vez. Assim cada bibliotecário pegava o pedido de 3 clientes e depois registravam no sistema. Essa abordagem fez com que o atendimento se tornasse 70% mais eficiente do que era quando se tinha apenas um funcionário. 
+
+Por fim a biblioteca decidiu contratar uma bibliotecária para fiscalizar o manuseio dos livros porque percebeu que só tinha homens nessa história. E o aumento de eficiência passou para 150% pois ela conseguia fiscalizar e atender na bancada quando possível.
+
+Eu espero que com essa história você tenha compreendido que esse processo acontece com qualquer servidor web. É EXATAMENTE ASSIM! Pense que a biblioteca é o servidor, os bibliotecários são _threads_, os livros são os recursos que o servidor usa e os clientes são os clientes que estão acessando a API do servidor. Eu não sei se os conceitos de concorrência e paralelismo são usado na bibliotecas, eles são conceitos da computação que foram usado nesse texto para descrever e diferenciar eles. Logo podemos redefinir **Paralelismo** quando a mesma tarefa é realizada simultaneamente por mais de uma _thread_ ou processo e **Concorrência** quando acontece duas ou mais _threads_, ou processos desejam acessar recursos limitados.
+
+[#cap-06-thread-e-processo]
+== O que é Thread e Processo?!?
+
+Falar de Paralelismo e Concorrência não é uma tarefa fácil porque envolve vários conceitos de vários níveis. Até agora nós falamos de conceitos abstratos, mas agora vamos falar de algo bem mais concreto. Eu citei Thread e Processo e esses são conceitos sobre o sistema operacional. 
+
+Um processo é um programa rodando na memória. Ele é instanciado pelo sistema operacional e terá seu ciclo de vida até ser encerrado por si mesmo ou pelo próprio sistema operacional. Cada processo tem um identificador único e compartilha os recursos da máquina com outros processo. No trecho abaixo vemos a listagem dos 9 primeiros processos iniciados pelo Linux que ainda estão em execução, observe que o `PID` é o identificado único de cada processo, se eu quiser finalizar um processo preciso enviar um comando `kill -15 <PID>` onde **-15** é o sinal que o programa deve ser encerrado, se eu usar **-9** ele será encerrado imediatamente.
+
+[source,bash]
+----
+$ ps -aux | head
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0 202552  5172 ?        Ss   Jul01  70:40 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+root           2  0.0  0.0      0     0 ?        S    Jul01   0:05 [kthreadd]
+root           4  0.0  0.0      0     0 ?        S<   Jul01   0:00 [kworker/0:0H]
+root           6  0.0  0.0      0     0 ?        S    Jul01   0:35 [ksoftirqd/0]
+root           7  0.0  0.0      0     0 ?        S    Jul01   0:07 [migration/0]
+root           8  0.0  0.0      0     0 ?        S    Jul01   0:00 [rcu_bh]
+root           9  0.0  0.0      0     0 ?        S    Jul01  37:47 [rcu_sched]
+root          10  0.0  0.0      0     0 ?        S<   Jul01   0:00 [lru-add-drain]
+root          11  0.0  0.0      0     0 ?        S    Jul01   0:22 [watchdog/0]
+----
+
+Se fossemos falar em processos no nosso exemplo da biblioteca, teríamos que criar uma biblioteca nova. Como eu disse, dois processo compartilham recursos mas isso não significa que eles podem acessar o mesmo recurso ao mesmo tempo. Por exemplo, se eu tenho um servidor rodando na porta 80, não posso iniciar outro processo na porta 80. Um processo não tem acesso a memória de outro processo, isso significa que para um mesmo objeto não pode existir em dois processos diferentes. (_Até pode, mas não vamos falar de RMI porque é complicado e já foi removido da biblioteca padrão do Java_.)
+
+_—  E se eu quiser que as requisições que cheguem na porta 80 sejam processadas em paralelo, como faço?!?!_
+
+Lembra da nossa biblioteca? Pois é, cada biblioteca é um processo, mas cada bibliotecário é uma _Thread_. _Thread_ são dois fluxos que compartilham o mesmo espaço de memória, ou seja, é quando um processo tem dois fluxos de execução em paralelo compartilhando recursos. Threads podem acessar a mesma porta, assim como podem acessar os mesmo objetos. Mas ele não podem ser feitas ao mesmo momento. Lembra do computador do balcão da biblioteca? A metáfora da biblioteca foi construída para similar exatamente o que acontece em um computador.
+
+[#cap-06-thread-e-processo-em-java]
+== Thread e Processo em Java
+
+Vamos agora mostrar algumas classes que podemos usar para manipular processos e threads usando Java. Uma das preocupações da plataforma Java foi criar uma abstração para que o mesmo código possa ser usado em qualquer sistema operacional, logo todo o código demonstrado pode ser executando tando em Linux quando Windows e sistemas derivados do Unix como o MacOS.
+
+=== Processos
+
+Para que possamos acessar as informações de todos os processos em execução podemos usar a classe https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html[ProcessHandle] (_adicionada no Java 9_). Navegue pela documentação dela para perceber que processos podem ter uma relação de parentescos como podemos perceber através dos métodos `children()`, `descendants​()` e `parent​()`. Na execução abaixo vemos as informações do processo atual e a listagem de todos os processos em execução.
+
+[source,bash]
+----
+$ jshell
+|  Welcome to JShell -- Version 18
+|  For an introduction type: /help intro
+
+jshell> System.out.println(ProcessHandle.current().pid());
+System.out.println\(ProcessHandle.current  .pid()  );
+20092
+
+jshell> System.out.println(ProcessHandle.current().info());
+System.out.println(ProcessHandle.current  .info  );
+[user: Optional\[VEPO\], cmd: C:\\Users\\vepo\\.sdkman\\candidates\\java\\18-open\\bin\\java.exe, startTime: Optional\[2022-09-02T18:49:28.093Z], totalTime: Optional\[PT0.328125S\]\]
+
+jshell> ProcessHandle.allProcesses().forEach(System.out::println);
+ProcessHandle.allProcesses  .forEach(System.out::println);
+0
+4
+72
+[...] 
+----
+Caso você deseje criar um novo processo, é preciso fazer uma chamada de sistema usando a classe https://docs.oracle.com/javase/9/docs/api/java/lang/Runtime.html[Runtime]. No trecho de código abaixo usamos o método `exec` para criar um novo processo. 
+
+[source,bash]
+----
+jshell> Runtime.getRuntime().exec("pwd")
+Runtime.getRuntime  .exec("pwd")
+$4 ==> Process[pid=19628, exitValue="not exited"]
+----
+
+Na resposta da execução podemos ver que o método `exec` retorna o novo processo, mas não espera por ele terminar, retornando apenas um objeto https://docs.oracle.com/javase/9/docs/api/java/lang/Process.html[Process] para poder ser manipulado. Em posse desse objeto, podemos esperar por ele terminar e ver se a execução foi um sucesso.
+
+[source,bash]
+----
+jshell> Runtime.getRuntime().exec("pwd").waitFor()
+Runtime.getRuntime  .exec("pwd").waitFor
+$5 ==> 0
+----
+
+Percebeu que o método `waitFor` retornou **0**? Todo processo precisa finalizar com um número e zero significa sucesso. Qualquer número diferente de zero significa que o programa foi finalizado com erro. O programa que eu executei acima é o `pwd` que retorna o diretório corrente em Linux, apesar de usar Windows uso o Git Bash que é um porte do MinGW que simula um bash Linux.
+
+_Threads_ também são criadas pelo sistemas operacional, mas o Java dá suporte a duas bibliotecas bem interessantes que precisamos demonstrar
