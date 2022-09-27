@@ -1,0 +1,104 @@
+---
+title: Modelos e Domínio em Software
+published: true
+description: 
+tags: [DDD, Documentação, Modelagem de Software]
+series: Um pouco de DDD
+permalink: /posts/ddd-01-modelos-e-dominio
+cover_image: https://thepracticaldev.s3.amazonaws.com/i/x6xpao28ktzva7sinrym.JPG
+publish_date: 2022-09-27 13:45:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+Todo software existe para resolver um problema real. Não há sentido um software existir sem um problema, se isso acontecer, ele será apenas um trecho de código que demonstra alguma coisa da linguagem em que foi escrito, mas não terá nenhuma utilidade. A computação moderna surgiu como uma ferramenta, pela tentativa de descriptografar mensagens do Eixo, depois foi usada para tratar registros bancários ou processar arquivos de telefonia. Hoje a computação é usada ubiquamente.
+
+[#linguagem-commum-a-computacao]
+== Linguagem Comum a computação
+
+A linguagem que usamos no dia a dia da computação carrega muito dessa história. Da segunda guerra ainda carregamos muitas das definições que criaram a computação moderna, Turing teve um papel importante tanto na guerra quanto no desenvolvimento da computação. Mas foi o desenvolvimento civil da computação que nos deixou termos como "processamento", "batch" (_lote_ em tradução livre), "transações", "record", etc... Todos esses termos podem parecer apenas termos comuns da computação para você, mas eles vem de outras areas.
+
+Para demonstrar isso, vamos olhar para a https://openjdk.org/jeps/395[JEP 395] que definiu Records na linguagem Java. Segundo a JEP, _Records_ são classes que atuam como transportadoras de dados imutáveis. Mas você sabe de onde vem o nome record? No primeiro livro de programação que eu li, o https://amzn.to/3RmMCnu[C Programming Language], muito se falava de leitura e transformação de arquivos. Da mesma forma, o livro https://amzn.to/3SdpXLf[Programming Pearls], trás vários desafios de leitura e ordenação de registro em arquivos. Não é por acaso que se fala de arquivo e não de comunicação de redes, pois nessa época o grande desafio da computação não era interconectar pessoas e computadores, mas processar registros (_Records_) gerados por outros sistemas.
+
+Esses dois livros citados foram escritos nas décadas de 70 e 80, nessa época já existia algo chamado _Call Detail Records_ (**Registro de Detalhes da Chamada** em tradução livre), ou CDRs para os mais íntimos. Esses eram registros imutáveis gerados pelos sistemas de telefonia para posterior processamento, eles são a fonte de verdade quando queremos saber como está o uso da rede ou quanto deve ser cobrado de um cliente. 
+
+Apesar de muito antigos, CDRs ainda existem hoje e são gerados a cada interação do seu celular com a rede de telefonia, ainda existem softwares que processam esses registros e eu trabalho no desenvolvimento de um deles. E até hoje Record é usado como sinônimo de registro imutável. Eu fiz uma busca rápida para encontrar a primeira referência a CDR na literatura e encontrei e na revista https://www.computer.org/csdl/magazine/co/1979/06/01658776/13rRUwInv9r[Computer da IEEE de junho 1979], já se vão 43 anos.
+
+[.text-center]
+.Trecho da revista Computer da IEEE de 1979 citando CDRs. 
+image::CDRs.png[id=cdrs, align="center"]
+
+Outro uso da computação que marcou época foi o famoso software de video locadora. Creio que muitos que me leem são nativos de uma era posterior a esse dinossauro chamado **Video Locadora** e não conseguem nem imaginar o que era a vida sem Netflix e afins. As mais famosas tinham sempre sistemas super simples que se limitavam a um CRUD de Usuário, um CRUD de filme, um sistema de registro de aluguel, busca por filmes e relatórios gerenciais. Eu comecei a ver o surgimento desses softwares por volta do meio dos anos 1990 quando começamos a perguntar se **Exterminador do Futuro 2** estava locado ou não e o atendente ia olhar no computador. Antes disso não existia um meio de responder a essa pergunta que não fosse procurar o filme na prateleira.
+
+Muitos desses sistemas eram implementados em Clipper e mantidos pelo nerd cabeludo da cidade, Lá nos longínquos anos 1990 eu conheci alguém que fazia a manutenção do sistema da video locadora que eu alugava filme e até ganhei o livro https://linguagemclipper.com.br/clipper-summer%C2%B487[Clipper Summer 87] que foi meu primeiro contato com programação, apesar de nunca ter escrito uma linha em Clipper.
+
+Esses sistemas antigos criaram uma linguagem comum para a computação e essa linguagem, que usamos até hoje, que contém termos que só são entendidos por quem é da área. Quer ver? Vamos supor que eu esteja criando um sistema médico e precise reportar o que estou fazendo no momento, se eu disser que _"estou finalizando o CRUD de Anamnese mas estou com problemas para salvar a entidade no Postgres"_. Um médico não vai entender absolutamente nada porque ele não sabe o que é CRUD, nem entidade e muito menos Postgres. Tudo que ele vai entender é que a atividade é relacionada a Anamnese, sua principal atividade em uma consulta médica.
+
+[#linguagem-ubiqua]
+== Linguagem Ubíqua
+
+Ao modelar um sistema, o primeiro passo que precisamos fazer é capturar termos. Todo sistema já tem um domínio e uma linguagem própria (não estou falando de linguagem de programação), ela precisa ser mapeada, definida e compreendida por todos os times envolvidos no desenvolvimento do produto, que em muitos casos podem ter pessoas que não são desenvolvedoras. Essa linguagem não é criada, ela existe, mas precisa ser definida. Cada software tem um domínio especifico e ele ainda pode ser composto de outros subdomínios que vem ou das tecnologias escolhidas ou dos pontos de contato que o software possui.
+
+_— Mas o que é **domínio**?!?!?_
+
+Bom, **domínio** é a área de interesse que o software busca mapear. Vamos voltar ao exemplo do software para consulta médica para tentar entender melhor. Ele deverá ser focado na **Anamnese** do **Paciente** realizada pelo **Médico**, mas também será responsável por realizar agendamentos de **Consultas** e **Retornos** e receber **Resultados de Exames**. Somente na sentença anterior podemos encontrar alguns termos que serão comuns a todo o domínio de um software de atendimento médico, mas que não fazem nenhum sentido fora dele. Faz todo sentido diferenciar o usuário que tem a função Médica, do usuário que tem a função Secretária e o Paciente, mas em outros sistemas só existem Usuário. Esses termos e as suas definições devem ser usados para se construir o modelo do software, tanto de dados como dos sistemas.
+
+Para ser enfático, o modelo é o coração do design de software e ele deve gerar uma linguagem que deve ser usada por todos os times envolvidos no desenvolvimento para se comunicarem entre si. O modelo é o conhecimento do domínio destilado e organizado com o intuito de todos terem uma melhor compreensão do que está sendo desenvolvido. Eric Evans, em seu livro https://amzn.to/3fl0voT[Domain Driven Design], descreve essa linguagem como Linguagem Onipresente, ou Linguagem Ubíqua, pois ela deve estar presente em todas as interações do desenvolvimento, mas ela existe só para o contexto do software em questão. (_Aliás, grande parte desse texto é composto por citações do livro de Evans._)
+
+[#codigo-conceito-linguagem]
+== Código, Conceitos e Linguagem
+
+Quando vamos escrever software temos que colocar no código as regras negócio, mas um erro comum que fazemos é escrever o código como um elemento a parte do negócio. Em muitos casos o desenvolvedor pensa em termos computacionais e esquecem que o software tem que mapear um domínio, inclusive usando a nomenclatura da linguagem onipresente. A atividade de modelar um software consiste na atividade de capturar um modelo, identificar substantivos, verbos, relações e transformar esse modelo em código.
+
+Para que essa atividade de modelagem seja bem feita é preciso treinar algumas habilidades, que não são técnicas, como leitura e atenção. Não podemos só pensar em termos computacionais, precisamos pensar no domínio, no negócio, e na relação do negócio com o código. Devemos aprender a ler o domínio e fazer perguntas certas para conseguir modelar o que está acontecendo. Um código será expressivo se ele reflete o modelo, para isso é preciso.
+
+. **Ligar o modelo a implementação**: A implementação deve usar os mesmo termos e verbos do modelo
+. **Cultivar uma linguagem baseada no modelo**: Toda a comunicação nas equipes deve usar os termos do modelo.
+. **Desenvolver um modelo rico em conhecimento**: O modelo não contém só substantivos, mas verbos e relações. Isso pode ser expresso através de sentenças como "O Médico é responsável por fazer a Anamnese" ou "O Laboratório envia o Exame através de uma API" ou "O Paciente pode acessar os resultados do Exame, mas não pode acessar a Anamnese".
+. **Destilar o modelo**: O modelo irá obrigatoriamente evoluindo com o software. Novos conceitos e relações são adicionadas durante o desenvolvimento.
+. **Colher e experimentar ideias**: Com o modelo, novas ideas podem ser validadas usando a linguagem onipresente. Seriam as ideias válidas ou elas não podem ser usadas. Por exemplo, eu não sei se é ético um médico expor a Anamnese dele ao paciente, mas sei que é completamente anti-ético expor a terceiros. Mas quando dois médicos de especialidades diferentes acompanham o mesmo paciente, eles normalmente compartilham certas informações. As validações de ideias relacionadas a esse domínio só poderão ser feitas se existir uma linguagem onipresente bem trabalhada.
+
+_— Cara, você tá sendo muito subjetivo. Vamos ser mais prático!_
+
+Então vamos lá. Em muitas discussões no Twitter vamos pessoal discutindo sobre https://martinfowler.com/eaaCatalog/dataTransferObject.html[DTO] (_Data Transfer Object_ ou Objeto de Transferência de Dados em tradução livre). O objetivo de se ter um DTO é ser capaz de serializar e deserializar objetos em sistemas distintos facilmente, são objetos sem lógica de negócio e completamente focados no dado a ser transferido, ou seja, fazem parte da **API pública**. Na definição anterior eu fiz um grifo proposital em API pública porque na grande maioria dos casos usamos o nome DTO como parte do modelo, como se ele fosse parte do vocabulário do domínio.
+
+Se voltarmos ao nosso sistema de consultas médicas, é capaz que alguém comece a modela um `AnamneseDTO`, o que na minha opinião é errado e eu posso provar.
+
+_— COMO ASSIM!!! ERRADO!?!?!?! Todo mundo faz isso!_
+
+Sim e muitas das regras de negócio não podem ser modeladas facilmente tornando o código difícil de ser compreendido. Além de deixar a documentação mais pobre. Vamos pensar nos DTOs da Anamnese, para que eu vou usar ele? Eu posso pensar em três condições obvias: (C)riar, (E)ditar e (L)er. Só ficou faltando o D do CRUD porque normalmente não precisa de um DTO para ele. Nessas operações, se estivermos falando de uma API REST, sempre teremos os DTOs de Request e Response. LOGO, porque não termos os DTOs: `CriarAnamneseRequest`, `CriarAnamneseResponse`, `AtualizarAnamneseRequest`, `AtualizarAnamneseResponse`, `LerAnamneseResponse`.
+
+_— Usar Request e Response no nome?! Eu nunca vi isso!_
+
+Talvez nós não vemos isso sendo comumente usado porque pouco se fala de modelagem de software back-end. Muito se debate de modelagem front-end e se tem até modelos pre-implementados nos frameworks da moda, mas é comum usar memes mostrando o back-end como um monstro. Eu recomendo você procurar em APIs públicas para ver como é feito. Se interessar a API do 5G é pública e foi modelada por um consórcio, olha como é o serviço de https://jdegre.github.io/editor/?url=https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS32291_Nchf_ConvergedCharging.yaml[Nchf_ConvergedCharging] (_basicamente o serviço que controla a cobrança do seu celular_).
+
+Usando essa forma de nomenclatura você consegue trazer mais intencionalidade ao seu código, assim como a sua API e consegue facilitar a validação das requisições pela API. Vamos supor que ao criar uma Anamnese todos os campos sejam obrigatórios, mas para se editar nenhum campo seja obrigatório, se você usa Jakarta EE com https://vepo.github.io/posts/using-bean-Validation-on-quarkus[Bean Validation], você pode fazer isso facilmente usando algumas anotações nos DTOs e a anotação `@Valid` no método exposto pela API. Se usarmos classes diferentes, vamos poder criar anotações diferentes.
+
+_— Ahhhh... MAS AÍ EU TENHO CÓDIGO DUPLICADO!!!!_
+
+Sim e não. Código duplicado é ruim quando ele não é óbvio e quando ele define comportamento. Quando estamos falando de modelagem de dados, o código duplicado é bem vindo pois estamos representando uma entidade do mundo real. Então vai com calma e pode duplicar código sim pois cada classe representa um objeto e uma operação distinta. Fica atento somente se ao usar uma classe abstrata a geração da documentação OpenAPI vai ficar interessante, pois essas classes também podem gerar uma documentação viva que pode ser até distribuída se você usar o https://microprofile.io/project/eclipse/microprofile-open-api[MicroProfile.io OpenAPI].
+
+== Modelos, Diagramas e Documentação
+
+Já discutimos como a linguagem influi no código, mas ela tem alguma importância para os diagramas que normalmente construímos?
+
+A função de um diagrama é representar uma arquitetura, e em muitos casos construímos diagramas que não tem nenhuma significância. Por exemplo, se eu colocar dois servidores conversando por HTTP, eles podem representar a gigantesca maioria dos software em produções hoje em dia. Podem ser que seja um Blog ou um Sistema de Gerenciamento de Linhas de Ônibus. Um diagrama só tem significância se é acompanhado por um modelo e isso implica um domínio e uma linguagem.
+
+Vamos supor que no CRUD de Anamnese que estamos desenvolvendo, a Anamnese só possa ser visualizada quando digitada uma senha. Todo o conteúdo dela é criptografada para que, mesmo que haja um vazamento de dados, a informação seja mantida em sigilo. A forma como descrevemos essa atividade tem que ser acompanhada de conceitos porque ela pode parecer com outras atividades, mas existe um requisito especifico e só acessível ao negócio.
+
+Um diagrama representa uma pequena parte do modelo e nunca pode ser compreendido sem o seu contexto. Ele servirá para capturar informações sobre comportamento, mas nunca definições de conceitos ou substantivos. Conceitos e substantivos devem ser expressos através de uma documentação textual (WIKI ou Markdown). Um documento não deve fazer aquilo que o código já faz, ela deve conter conceitos que são ortogonais ao código. Por exemplo, falamos que é anti-ético que alguém que não seja o médico de um paciente ver a Anamnese dele, essa informação deve estar em uma documentação externa ao código. O código só irá implementar a lógica de visualização da Anamnese (observe como eu posso usar a palavra e ela tem significância), mas a documentação pode trazer referências, implicações éticas e legais. Essa é uma informação que deve estar documentada textualmente. Já o diagrama vai usar a linguagem desenvolvida para contextualizar o comportamento com os componentes.
+
+== Como escreve a documentação
+
+Agora para finalizar temos que desmistificar a documentação. Sendo sincero é muito difícil encontrar um desenvolvedor que goste de documentar. Não se sinta culpado por ter dificuldades, pois é realmente difícil se expressar em Português, as vezes preferimos em código. Mas temos que lembrar que toda atividade é um treino e escrever uma boa documentação é uma habilidade que também pode ser desenvolvida.
+
+Quando eu comecei a colocar meus pensamos em forma de texto, eu tinha uma dificuldade enorme para elaborar as frases. Isso porque o pensamento não é linear como as linhas de um caderno, ou no caso, as linhas de um editor de texto (_VS Code_ no caso). Foram com os anos de blog e depois com a escrita de livros (_confere lá na https://www.casadocodigo.com.br/products/livro-roadmap-backend[Casa do Código]_) que eu comecei a ganhar habilidades de escrever uma boa documentação. Quem trabalha em grandes corporações deve ser habituado a escrever e-mails... É quase parecido, mas tem outro objetivo. Eu escrevi sobre o que eu acho que uma boa documentação tem em https://vepo.github.io/posts/inicie-um-projeto-pelo-readme[_Inicie um projeto pelo README.md_].
+
+Se você leu o post citado, vai perceber que eu defendo que um projeto deve ser começado pelo arquivo README.md. Eu escrevi isso antes de conhecer o livro https://amzn.to/3LNVTDV[Domain-Driven Design: Atacando as complexidades no coração do software], mas eu continua acreditando que essa abordagem ainda é essencial, mas com uma pequena diferença. Quando falamos de DDD, ou modelagem de domínio, estamos falando de softwares completos e não apenas um projeto. Para contextualizar, esse post acima foi escrito quando eu estava implementando um framework em uma empresa anterior e precisei me preparar para documentar ele de forma que pudesse tanto ser usado para desenvolvimento de funcionalidades para o cliente quanto para manutenção. Logo o enfoque o post é um framework em que o domínio é o próprio trabalho de desenvolver software. Você vai perceber que quando estamos falando de frameworks, bibliotecas e plataformas o foco da documentação é a atividade de desenvolvimento, pois esse é o domínio desse software. 
+
+Mas, como já falamos, modelagem de software é onipresente hoje em dia. Podemos escrever software para usuários que nunca se imaginaram desenvolvendo software. Você imagina que quem trabalha com medicina tem algum intuito de escrever algum código algum dia? Pode até escrever, mas será uma exceção.
+
+Mas voltando a documentação, primeiro é se definir que tipo de documentação precisamos fazer e quem é o público alvo dessa documentação. Se for o desenvolvedor do projeto, ela pode ser escrita o mais próximo do código possível e isso implica que é possível se usar Markdown ou https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[AsciiDoc]. Eu recomendaria o uso do AsciiDoc porque com esse formato podemos gerar tanto páginas simples, documentações robustas ou, quem sabe, até um livro. Se o público for mais amplo, incluído desenvolvedores de outros projetos ou pessoas de negócio, é preferível que se use uma wiki. O importante ao se usar uma wiki é definir um padrão para que o conhecimento não se perca. 
+
+Não importando qual são nossas escolhas, o importante é tratar a documentação como um entregável, como ela realmente é. Documentação é parte de um projeto e ela vai detalhar o que o nosso software faz. A ausência de documentação pode resultar em retrabalho ou implementações incorretas.

@@ -1,0 +1,65 @@
+---
+title: Programação funcional
+published: false
+description: É possível escrever código funcional em Java?
+tags: [Java, Programação funcional]
+cover_image: /assets/images/java/duke-tumble.png
+series: Java 101
+permalink: /posts/java-101-funcional
+publish_date: 2022-09-03 18:00:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/java-101
+
+Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections, como Java faz Orientação a Objetos, o que é a biblioteca I/O e como Java implementa paralelismo e concorrência, esses tópicos são necessários para o que vamos falar agora: **Programação Funcional**
+
+
+[#cap-06-o-que-e-programacao-funcional]
+== O que é Programação Funcional?!?
+
+Java é uma linguagem que começou com o proposito de ser puramente Orientada a Objetos. Você, hoje, pode acreditar que isso é um tremendo erro e que uma linguagem puramente funcional seria uma ideia melhor. Você poderia até estar certo, mas você está olhando para uma decisão feita no começo dos anos 1990 e avaliando com toda a experiência dos últimos 30 anos. Como já falamos anteriormente, nos anos 1990 se acreditava que o paradigma orientado a objetos era a panaceia que iria ser o último paradigma de programação. Eles estavam redondamente errado assim como, se você acreditar que uma linguagem hoje é uma panaceia, você também está errado.
+
+Os problemas mudam com o tempo e as soluções também, tudo é circular e uma solução que hoje pode parecer uma péssima ideia em poucos anos pode voltar como uma excelente ideia. Linguagens evoluem e ferramentas também. 
+
+Mas voltando ao Java... Java foi desenvolvido para ser puramente Orientado a Objetos, mas hoje ainda é orientada a objetos, mas hoje aceita alguns conceitos da programação funcional. Para entender isso precisamos primeiro entender o que é programação funcional.
+
+Existem dois tipos de programação: declarativa e imperativa. Java é uma linguagem derivada do C que é uma linguagem imperativa, mas Java tem a biblioteca padrão da JVM e muito mais funcionalidades que podem permitir escrever alguns códigos declarativos. Vamos entender melhor cada um?
+
+Quando falamos de programação imperativa estamos falando de um paradigma em que cada passo deve ser declarado e cada comando que deve ser executado deve ser enunciado. Vamos supor que precisamos iterar em uma lista, para isso é preciso acessar cada elemento e executar as ações.
+
+
+[source,java]
+----
+List<Integer> valores = leValores();
+for (int i = 0; i < valores.size(); valores++) {
+    processaValor(valores.get(i));
+}
+----
+
+No código acima declaramos uma variável `i` que será o valor que irá acessar sequencialmente todos os elementos da lista para que eles sejam processados. Se formos descrever textualmente o que está sendo feito podemos dizer que para cada item da lista ele deve ser processado pelo método `processaValor`. Será que poderíamos escrever esse texto mais próximo da descrição textual?
+
+A programação declarativa é quando declaramos o que deve ser feito e não os passo a passo das ações a serem realizadas. Para entender melhor a diferença entre os dois métodos é preciso entender como a máquina funciona. Nós temos valores, tipos e a memória quando falamos em programação imperativa estamos pensando em como a máquina transforma esses valores, mas quando falamos em programação declarativa estamos falando como esses valores devem ser transformados apesar da máquina. 
+
+Na programação declarativa a máquina é abstraída e se torna algo irrelevante. Vamos reescrever o código acima para entender?
+
+
+[source,java]
+----
+leValores().stream()
+           .forEach(MinhaClass::processaValor);
+----
+
+O código acima tem três peculiaridades que podem passar desapercebidas. Primeiro não há atribuição de variáveis, há um encadeamento de chamadas de funções e a função `processaValor` é usada como referência. Essas peculiaridades são abstrações criadas para que seja possível uma programação declarativa, mas o código imperativo é o que realmente acontece na máquina, ou o que pode acontecer.
+
+Se compararmos friamente os dois códigos, o código declarativo é muito melhor que o código imperativo porque o código imperativo implica em se conhecer o modo como as classes são implementadas. No exemplo acima declaramos uma variável `i` que será usada para acessar todos os elementos da lista, o comportamento da função `get` será completamente diferente se tivermos um `ArrayList` ou uma `LinkedList`. O pior caso é a `LinkedList` em que cada caso será diretamente proporcional a posição do elemento na lista. Isso significa que para acessar o elemento 14 será preciso o dobro do tempo que é necessário para acessar o elemento 7. Se tivermos um `ArrayList` o tempo de acessar os dois elementos será exatamente o mesmo.
+
+Já quando temos o código declarativo, as classes `ArrayList` e `LinkedList` vão definir a forma como será o acesso a cada elemento da lista o que não implicará na penalidade de se definir que em cada iteração será feita uma chamada de função que durará o tempo proporcional a posição (posteriormente chamaremos isso de _O(n)_ em que _n_ é a posição do elemento na lista).
+
+Na memória do computado se tivermos um ArrayList, todos os elementos da lista serão posições sequenciais de memória que deverão ser alocados em variáveis para serem passados como valor para função `processaValor`, isso significa que o paradigma imperativo é mais próximo do que realmente acontece na máquina.
+
+_— Então o paradigma imperativo é o mais antigo!_
+
+Óbvio que NÃO! Computação começou no mundo da física e da matemática onde funções são objetivo final de qualquer código. Na segunda guerra mundial a computação era essencial para se descriptografar mensagens nazistas. Na corrida espacial os algoritmos eram usados para calcular a rota de foguetes. Nos dois casos implementar funções são o objetivo final.
+
+_— Mas o que é uma função?!_
