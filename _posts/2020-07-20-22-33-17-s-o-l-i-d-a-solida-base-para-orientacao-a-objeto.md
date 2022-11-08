@@ -134,4 +134,4 @@ Uma outra dica é sempre refatorar seu código. Procure pelos sinais de putrefa�
 
 # Livros Recomendados
 
-* [Java Efetivo: as Melhores Práticas Para a Plataforma Java](https://amzn.to/30tVPSh) de Joshua Bloch
+* [Java Efetivo: as Melhores Práticas Para a Plataforma Java](https://www.amazon.com.br/Java-Efetivo-Melhores-Pr%C3%A1ticas-Plataforma/dp/8550804622?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2WMKZ78ONZQ85&dchild=1&keywords=java+efetivo&qid=1595295115&s=books&sprefix=java+ef%2Caps%2C281&sr=1-1&linkCode=ll1&tag=vepo0f-20&linkId=c2642a6b2cbf9bbe71fd0f272208ffe2&language=pt_BR&ref_=as_li_ss_tl) de Joshua Bloch

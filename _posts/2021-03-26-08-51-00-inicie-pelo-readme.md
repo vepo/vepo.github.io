@@ -8,11 +8,11 @@ tags: [Documentação de Software, README, Documentação, Engenharia de Softwar
 cover_image: https://thepracticaldev.s3.amazonaws.com/i/x6xpao28ktzva7sinrym.JPG
 ---
 
-Quando comecei a trabalhar oficialmente como Arquiteto de Software, identifiquei uma grande deficiência: _documentar_. Documentar não é uma atividade fácil, e você pode sentir essa dor ao usar qualquer software, biblioteca ou framework proprietário ou open source. Investi parte do meu tempo para [ler sobre](https://amzn.to/3sCJvMg) o assunto e praticar tanto nos meus projetos pessoais quanto da empresa que trabalhava.
+Quando comecei a trabalhar oficialmente como Arquiteto de Software, identifiquei uma grande deficiência: _documentar_. Documentar não é uma atividade fácil, e você pode sentir essa dor ao usar qualquer software, biblioteca ou framework proprietário ou open source. Investi parte do meu tempo para [ler sobre](https://www.amazon.com.br/Documenting-Software-Architectures-Views-Beyond/dp/0321552687?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2LKF8X7AVG95S&dchild=1&keywords=documenting+software+architectures&qid=1616765005&sprefix=documenting+so%2Caps%2C299&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=526aaf0393ca484d229ae901a6ab7cfb&language=pt_BR&ref_=as_li_ss_tl) o assunto e praticar tanto nos meus projetos pessoais quanto da empresa que trabalhava.
 
 Pela minha própria experiência, posso afirmar que praticar é uma boa tática. Documentar não é uma atividade natural para nenhum desenvolvedor, muitas vezes supomos que as coisas são obvias e quem vai usar nosso software irá compreender o que está feito imediatamente. As vezes quando chega uma pergunta, sempre vem aquele pensamento _"Como ele é burro?"_, mas isso deve ser evitado. Nenhum usuário é burro, ele só não compreendeu o que está posto.
 
-Vale uma reflexão aqui... Quantas horas você já gastou tentando entender alguma coisa? Pode ser que seja a implementação mais simples que existe, mas se existe um conceito (ou uma convenção) desconhecido, você não irá compreender. John Ousterhout em seu livro [A Philosophy of Software Design](https://amzn.to/3cp1TTh) chama isso de _Unknown unknowns_, Desconhecido desconhecidos em tradução livre. Falei um pouco sobre complexidade e da experiência da leitura desse livro em [Sobre Design de Software (I): O que é complexidade?](https://vepo.substack.com/p/sobre-design-de-software-i).
+Vale uma reflexão aqui... Quantas horas você já gastou tentando entender alguma coisa? Pode ser que seja a implementação mais simples que existe, mas se existe um conceito (ou uma convenção) desconhecido, você não irá compreender. John Ousterhout em seu livro [A Philosophy of Software Design](https://www.amazon.com.br/Philosophy-Software-Design-2nd-English-ebook/dp/B09B8LFKQL?keywords=Philosophy-Software-Design-English&qid=1667927943&sr=8-5&ufe=app_do%3Aamzn1.fos.6121c6c4-c969-43ae-92f7-cc248fc6181d&linkCode=ll1&tag=vepo0f-20&linkId=191bf91d38700ad4d84885900b3b695a&language=pt_BR&ref_=as_li_ss_tl) chama isso de _Unknown unknowns_, Desconhecido desconhecidos em tradução livre. Falei um pouco sobre complexidade e da experiência da leitura desse livro em [Sobre Design de Software (I): O que é complexidade?](https://vepo.substack.com/p/sobre-design-de-software-i).
 
 Então em Junho de 2019 coloquei no papel o que tinha em mente [Start a project by the README](https://vepo.github.io/posts/start-a-project-by-the-readme). Está em inglês porque precisava praticar minha escrita. 🙃
 
@@ -107,9 +107,9 @@ Qualquer idea importante **DEVE** ser descrita brevemente. Se mais informações
 
 Cada software tem seus termos com seus próprios significados. O [MongoDB](https://docs.mongodb.com/manual/core/document/) fala de documentos e não são os mesmo documentos do [Apache POI](https://poi.apache.org/). O [Apache Kafka](https://kafka.apache.org/documentation/streams/) fala de Stream, mas não é o mesmo definido pela biblioteca padrão do [Java](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html).
 
-Sua documentação deve definir esses conceitos de maneira clara. Há algum termo que você comumentesa? Vale apena definir ele? Cria uma sessão para isso. Explique _o que é_ e _o que não é_ esse termo.
+Sua documentação deve definir esses conceitos de maneira clara. Há algum termo que você comum que você usa com outro sentido? Vale apena definir ele? Cria uma sessão para isso. Explique _o que é_ e _o que não é_ esse termo.
 
-O livro [Domain-Driven Design: atacando as complexidades no coração do software](https://amzn.to/3wdFroe) trás um conceito que acho bastante interessante. Ele chama de Linguagme Onipresente. Ela é as definições dos termos comuns usadas no contexto de um projeto, se você está criando uma biblioteca, você também pode criar termos. Comece definindo eles, depois use em toda a documentação e código.
+O livro [Domain-Driven Design: atacando as complexidades no coração do software](https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1D2KUNV054DKA&dchild=1&keywords=domain+driven+design&qid=1616796613&sprefix=domain+d%2Caps%2C319&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=3386cdec4271f3774f6cfa591c57224d&language=pt_BR&ref_=as_li_ss_tl) trás um conceito que acho bastante interessante. Ele chama de Linguagem Onipresente. Ela é as definições dos termos comuns usadas no contexto de um projeto, se você está criando uma biblioteca, você também pode criar termos. Comece definindo eles, depois use em toda a documentação e código.
 
 ### 4. Explique o comportamento e as interações
 
@@ -117,7 +117,7 @@ Como as coisas acontecem? Como as coisas se relacionam? Isso também deve ser de
 
 Um dos projetos Jakarta EE que eu mais gosto é o [Java CDI](http://cdi-spec.org/), ele possibilita um baixo acoplamento em projetos Java. Mas... Ao usar ele, muitas coisas podem parecer mágica. Ao implementar meu primeiro _CDI Bean_, eu fiquei me perguntando quem cria os objetos? Isso não está respondido na documentação, mas é o CDI Container.
 
-Se eu fosse reescrever a documentação do Java CDI, iria fazer um pequeno diagrama com o ciclo de vida de um objecto. Além disso, iria usar o termo Beans Gerenciado (Managed Beans) largamente no texto, para que o desenvolvedor saiba que quem controla o Ciclo de Vida desse objeto é o próprio framework e não o meu código.
+Se eu fosse reescrever a documentação do Java CDI, iria fazer um pequeno diagrama com o ciclo de vida de um objeto. Além disso, iria usar o termo Beans Gerenciado (Managed Beans) largamente no texto, para que o desenvolvedor saiba que quem controla o Ciclo de Vida desse objeto é o próprio framework e não o meu código.
 
 ### 5. Descreva como usar
 

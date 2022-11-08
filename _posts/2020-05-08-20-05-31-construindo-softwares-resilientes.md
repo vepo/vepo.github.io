@@ -137,6 +137,6 @@ Esse é um caminho a ser trilhado....
 
 # Livros Recomendados
 
-1. [O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vence](https://amzn.to/3ceZIzm)
-2. [Test Driven Development: By Example](https://amzn.to/3bi9wHg)
-3. [Código Limpo: Habilidades Práticas do Agile Software](https://amzn.to/3chO9r6)
+1. [O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vence](https://www.amazon.com.br/projeto-f%C3%AAnix-Gene-Kim/dp/8550801895?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2AYVJTDQGN55J&keywords=projeto+phoenix&qid=1588968692&sprefix=projeto+ph%2Caps%2C272&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=45c6f18224bfe9cf0d82b737331a5761&language=pt_BR&ref_=as_li_ss_tl)
+2. [Test Driven Development: By Example](https://www.amazon.com.br/Test-Driven-Development-Kent-Beck/dp/0321146530?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=BXKYM1LP3IQH&keywords=test+driven+development&qid=1588968574&sprefix=test+dr%2Caps%2C275&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=b9ad00a6e5089e02d277bed813cb0283&language=pt_BR&ref_=as_li_ss_tl)
+3. [Código Limpo: Habilidades Práticas do Agile Software](https://www.amazon.com.br/C%C3%B3digo-limpo-Robert-C-Martin/dp/8576082675?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=clean+code&qid=1588968796&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=7ff5c1abee4d3b6a1860924b6f392698&language=pt_BR&ref_=as_li_ss_tl)

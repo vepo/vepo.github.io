@@ -118,6 +118,6 @@ Modela um software é uma atividade muito importante. Cada software tem o seu Do
 
 # Livros Recomendados
 
-1. [Domain-Driven Design: Atacando as Complexidades no Coração do Software](https://amzn.to/3jodm7i) de Eric Evans
-2. [Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://amzn.to/30ua0H3) de Pete Goodliffe
-3. [Código Limpo: Habilidades Práticas do Agile Software](https://amzn.to/3chO9r6) de Robert C. Martin
+1. [Domain-Driven Design: Atacando as Complexidades no Coração do Software](https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1ZIEQ6223BW12&dchild=1&keywords=domain+driven+design&qid=1595274795&s=books&sprefix=domai%2Caps%2C293&sr=1-1&linkCode=ll1&tag=vepo0f-20&linkId=8f0de1abfc56f235286a41828f4019fc&language=pt_BR&ref_=as_li_ss_tl) de Eric Evans
+2. [Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://www.amazon.com.br/Como-Ser-Um-Programador-Melhor/dp/8575224158?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2WIBH8YTQLN6C&dchild=1&keywords=como+ser+um+programador+melhor&qid=1595274941&s=books&sprefix=como+ser+um%2Cstripbooks%2C287&sr=1-1&linkCode=ll1&tag=vepo0f-20&linkId=98a599ceadf5e966cf2675305e638090&language=pt_BR&ref_=as_li_ss_tl) de Pete Goodliffe
+3. [Código Limpo: Habilidades Práticas do Agile Software](https://www.amazon.com.br/C%C3%B3digo-limpo-Robert-C-Martin/dp/8576082675?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&keywords=clean+code&qid=1588968796&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=936ea100df5aa63c041438ac166948ed&language=pt_BR&ref_=as_li_ss_tl) de Robert C. Martin

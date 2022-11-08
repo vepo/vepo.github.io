@@ -38,7 +38,7 @@ Em Redes Sociais, o relacionamento é digital e não analógico. Antes você era
 
 Com a intensa comunicação, acabamos por escolher apenas as vozes que concordam conosco. Isso acontece porque a socialização e o debate não acontecem somente após o fim de expediente, mas o dia inteiro. O debate sobre política, que acontecia na mesa de bar, agora acontece durante o trabalho e sem nenhum _“lubrificante social”_.
 
-A hiperconectividade nos deu a sensação que devemos emitir opinião o tempo inteiro. São opiniões sem reflexão, sem contraditório. O aplauso é praticamente imediato. Enquanto eu escrevia esse texto, postei no Twitter a citação do [Guia dos Mochileiros das Galáxias](https://amzn.to/38UiUna) e já tive algumas curtidas, mesmo meu perfil tendo pouca visiblidade.
+A hiper-conectividade nos deu a sensação que devemos emitir opinião o tempo inteiro. São opiniões sem reflexão, sem contraditório. O aplauso é praticamente imediato. Enquanto eu escrevia esse texto, postei no Twitter a citação do [Guia dos Mochileiros das Galáxias](https://www.amazon.com.br/guia-mochileiro-das-gal%C3%A1xias/dp/8599296574?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=1HC5TO146ATBQ&dchild=1&keywords=o+guia+dos+mochileiros+da+galaxia&qid=1605712857&sprefix=o+guia+dos+%2Caps%2C364&sr=8-2&linkCode=ll1&tag=vepo0f-20&linkId=b3d48cd6646a8f07df37c99c5e39ad73&language=pt_BR&ref_=as_li_ss_tl) e já tive algumas curtidas, mesmo meu perfil tendo pouca visibilidade.
 
 [![Tweet Sobre Guia dos Mochileiros](/assets/images/twitter-guia.png)](https://twitter.com/vepo/status/1329056700557561856?s=20)
 
@@ -99,7 +99,7 @@ Não precisamos ganhar nenhuma discussão, a internet tem que ser o espaço da e
 
 [![Cartoon Duty Calls do XKCD](https://imgs.xkcd.com/comics/duty_calls.png)](https://xkcd.com/386/)
 
-Podemos gastar menos tempo online também. Isso é um pouco difícil em tempos de pandemia, mas devemos valorizar quem tá perto. Estou relendo o livro ]**Cem Anos de Solidão**](https://amzn.to/35F17hK). E no primeiro capitulo conta as inúmeras invenções do José Arcadio Buendía, ele sempre estava tendo ideias geniais e gastava seu tempo dentro de um quarta dando vida a suas ideias. Até em que um momento sua esposa fala.
+Podemos gastar menos tempo online também. Isso é um pouco difícil em tempos de pandemia, mas devemos valorizar quem tá perto. Estou relendo o livro ]**Cem Anos de Solidão**](https://www.amazon.com.br/anos-solid%C3%A3o-Gabriel-Garcia-M%C3%A1rquez/dp/8501012076?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2KIS3OVVRRHBX&dchild=1&keywords=cem+anos+de+solid%C3%A3o&qid=1605712365&sprefix=cem+anos+%2Caps%2C369&sr=8-2&linkCode=ll1&tag=vepo0f-20&linkId=6d73ec9e5c7f4b4ce52ad1430a1bd189&language=pt_BR&ref_=as_li_ss_tl). E no primeiro capitulo conta as inúmeras invenções do José Arcadio Buendía, ele sempre estava tendo ideias geniais e gastava seu tempo dentro de um quarta dando vida a suas ideias. Até em que um momento sua esposa fala.
 
 > — Em vez de andar por aí com essas novidades malucas, você devia era se ocupar dos seus filhos — replicou. — Olhe como estão, abandonados ao deus-dará, como os burros.
 >

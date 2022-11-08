@@ -18,7 +18,7 @@ Quando você pega um problema e abre sua IDE favorita, você logo começa a pens
 
 E se seu problema já tiver sido solucionado por uma infinidade de pessoas? Você não estaria perdendo tempo em pensar como resolvê-lo?
 
-São aí que surgem os **Design Patterns**. Na verdade esse nome vem do livro escrito por 4 engenheiros de software, `<ironia>` em uma época um tanto remota 1994`</ironia>`, [***Padrões de Projetos: Soluções Reutilizáveis de Software Orientados a Objetos***](https://amzn.to/3cbqOaw)
+São aí que surgem os **Design Patterns**. Na verdade esse nome vem do livro escrito por 4 engenheiros de software, `<ironia>` em uma época um tanto remota 1994`</ironia>`, [***Padrões de Projetos: Soluções Reutilizáveis de Software Orientados a Objetos***](https://www.amazon.com.br/gp/product/8573076100?ie=UTF8&linkCode=ll1&tag=vepo0f-20&linkId=8d150eef8cf1e085cf2064c5de0357ba&language=pt_BR&ref_=as_li_ss_tl)
 
 Pra ser sincero eu não li o livro, mas ainda pretendo ler ele.
 
@@ -104,7 +104,6 @@ Design Patterns é o pão de cada dia do desenvolvedor. Ele deve ser básico, us
 
 _Estão em ordem de prioridade!_ 😉
 
-* [	
-Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://amzn.to/3cbsJvM)
-* [Código Limpo: Habilidades Práticas do Agile Software](https://amzn.to/3dgOmuC)
-* [Padrões de Projetos: Soluções Reutilizáveis de Software Orientados a Objetos](https://amzn.to/2YEMms5)
+* [Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://www.amazon.com.br/gp/product/8575224158?ie=UTF8&linkCode=ll1&tag=vepo0f-20&linkId=d0f9586ee355bbed4caec0e1c4eb57e8&language=pt_BR&ref_=as_li_ss_tl)
+* [Código Limpo: Habilidades Práticas do Agile Software](https://www.amazon.com.br/gp/product/8576082675?ie=UTF8&linkCode=ll1&tag=vepo0f-20&linkId=1790bc18757d15dc12820f4b286bb3e5&language=pt_BR&ref_=as_li_ss_tl)
+* [Padrões de Projetos: Soluções Reutilizáveis de Software Orientados a Objetos](https://www.amazon.com.br/gp/product/8573076100?ie=UTF8&linkCode=ll1&tag=vepo0f-20&linkId=2294e03e9fc5e276cb2d1ec14ef9f053&language=pt_BR&ref_=as_li_ss_tl)

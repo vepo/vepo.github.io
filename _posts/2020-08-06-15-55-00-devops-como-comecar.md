@@ -30,7 +30,7 @@ Nos últimos 10 anos, entre as 10 palavras da moda do mundo do TI, com certeza, 
 
 **DevOps** normalmente é apresentado em palestras como um **Estado da Arte**, normalmente o palestrante apresenta em 50 minutos um dashboard que demorou anos a ser construido por várias mãos. Então calma lá! Sua equipe não terá isso tão fácil. Mas podemos pegar desses pipelines o que pode ser automatizado.
 
-O livro [**O Projeto Fênix**](https://amzn.to/3kfbRZg) é novela sobre o que o **DevOps** pode trazer de beneficios a uma equipe de desenvolvimento. Na narrativa, um dos métodos que é usado para se escolher "onde vamos gastar esforço automatizando" é onde há o gargalo do projeto. Segundo o livro, todos esforço que você investir em melhoria de processo, se não for onde está o gargalho será esforço perdido. Logo, se você for escolher por onde começar, veja seu processo desenvolvimento, mapei e procure os gargalos.
+O livro [**O Projeto Fênix**](https://www.amazon.com.br/projeto-f%C3%AAnix-Gene-Kim/dp/8550801895?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=O+Projeto+F%C3%AAnix&qid=1596651256&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=442bd0b794b6f97a6d321b732c5196b0&language=pt_BR&ref_=as_li_ss_tl) é novela sobre o que o **DevOps** pode trazer de benefícios a uma equipe de desenvolvimento. Na narrativa, um dos métodos que é usado para se escolher "onde vamos gastar esforço automatizando" é onde há o gargalo do projeto. Segundo o livro, todos esforço que você investir em melhoria de processo, se não for onde está o gargalho será esforço perdido. Logo, se você for escolher por onde começar, veja seu processo desenvolvimento, mapei e procure os gargalos.
 
 Agora sendo mais práticos, o que pode ser automatizado? Podemos citar Montagem de Ambiente, Testes, Build e Deploy. Uma frase bem comum antes da moda do DevOps era **"na minha máquina funciona"**. Bom, se você já ouviu essa frase, comece a pensar em automatizar algumas coisas.
 
@@ -142,9 +142,8 @@ Todo mudança envolve risco. Se não o risco de uma falha, mas o risco de um suc
 
 # Sugestões de Leitura
 
-* [O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vencer](https://amzn.to/31s77XD) de Gene Kim
-* [Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://amzn.to/3ikc8Z5) de  	
-Pete Goodliffe
+* [O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vencer](https://www.amazon.com.br/projeto-f%C3%AAnix-Gene-Kim/dp/8550801895?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2QE72H1Y32GFM&dchild=1&keywords=projeto+fenix&qid=1596739246&s=books&sprefix=projeto+fe%2Caps%2C279&sr=1-1&linkCode=ll1&tag=vepo0f-20&linkId=005d6032487c59d4f41beb4746efac08&language=pt_BR&ref_=as_li_ss_tl) de Gene Kim
+* [Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código](https://www.amazon.com.br/Como-Ser-Um-Programador-Melhor/dp/8575224158?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2GX9IEL9WQHAI&dchild=1&keywords=programador+melhor&qid=1596739303&s=books&sprefix=programador+melh%2Cstripbooks%2C275&sr=1-1&linkCode=ll1&tag=vepo0f-20&linkId=87c311e1edea749a351a14fe98c7a59d&language=pt_BR&ref_=as_li_ss_tl) de Pete Goodliffe
 
 ---
 ![Roadmap](https://dev-to-uploads.s3.amazonaws.com/i/8tykl2s0ek99gmv13odp.jpg)
