@@ -1,0 +1,174 @@
+---
+title: Elementos do Design de Software
+published: true
+description: Quais são os elementos básicos de um modelo de software? Existem tipos de elementos que podemos usar para construir qualquer modelo?
+tags: [DDD, Documentação, Modelagem de Software]
+series: Um pouco de DDD
+permalink: /posts/ddd-02-elementos-do-design-de-software
+cover_image: https://thepracticaldev.s3.amazonaws.com/i/x6xpao28ktzva7sinrym.JPG
+publish_date: 2022-11-08 13:30:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+Esse post faz parte de uma série sobre Domain-Driven Design, se você não leu os posts anteriores, recomendo ler antes de seguir com a leitura. Nesse vamos expandir o nosso vocabulário de Design de Software detalhando alguns elementos (_building blocks_) de design.
+
+[#experiencia-e-vivencia]
+== Experiência e Vivência
+
+Quando começamos a escrever software enfrentamos um grande desafio que é não saber dar nomes as coisas. Estamos muito focados em aprender estruturas de dados, sintaxes e bibliotecas. Nosso repertório é formado por tudo aquilo que vimos e em muitos casos foram apenas alguns exemplos que demonstram funcionalidades da linguagem. Falamos de listas, arrays, Strings, inteiros, float e booleans, mas não sabemos como abstrair a partir desse ponto.
+
+_— É mesmo! Eu vejo o trabalho de pessoa mais velhas e acho que nunca vou conseguir fazer algo igual!_
+
+Mas sabe qual é a diferença entre alguém mais velho na área e alguém que entrou agora? Experiência. Experiência traz vocabulário, vocabulário expande nossas capacidades de ver e compreender o mundo. Quanto mais projetos nós trabalhamos mais capacidade temos de compreender o que está acontecendo ao nosso redor. 
+
+E essa lição não deve se limita ao **ofício** de desenvolvimento de software, ela deve ser holística, isso é, deve englobar o todo da sua vida. Sabe porque eu grifei a palavra **ofício**? Porque o desenvolvimento de software é apenas um trabalho como todos os outros, mas ele deve intercambiar conhecimento com os outros trabalhos. Devemos aprender a perguntar e dar nomes a trabalhos e ofícios, pois no final estamos codificando experiências do mundo real.
+
+Podemos definir que todo o trabalho do desenvolvimento de software é automatizar corretamente atividades que existem hoje e estão em plena operação. Antes de existir aplicativos de entrega de comida, já existia entrega de comida e vai continuar existindo se um dia os aplicativos deixarem de existir. O trabalho é sempre o mesmo, um cliente entra em contato com alguém que vende comida, a pessoa que vende comida contrata um entregador e esse deve traçar uma rota para otimizar a entrega.
+
+(_Não pense que isso é algo moderno. Na cidade da minha avó tinha um senhor que a vida toda entregou pão de casa em casa até quando existia uma ÚNICA CENTRAL TELEFÔNICA na cidade. SIM! Lá nos anos 80 nas pequenas cidades do nordeste se precisássemos ligar pra capital precisava ir na central telefônica que era em uma praça. NÃO! Não foi a privatização do sistema de telefonia que popularizou o telefone, isso aconteceu um pouco antes de privatizar._)
+
+Logo, modelar software envolve conhecimento do mundo real e esse conhecimento deve ser destilado usando estruturas e tipos de dados do mundo do software. Para ajudar nessa modelagem vamos ver algumas categorias de elementos que podemos usar em nosso software. Um software sempre será composto por elementos que podem ser categorizados como Entidades, Objetos de Valor, Serviços e Módulos.
+
+Essa atividade de caracterizar algo é o que a filosofia chama de Ontologia, ou seja, a busca pela natureza do ser, da existência e da realidade. Não precisamos ser filósofos e conhecer toda a história da filosofia, mas é sempre bom treinar o modo de fazer filosofia pois modelar software é um processo filosófico. No momento que começamos a pensar e questionar o que são e o que fazem estruturas reais para modelar elas em uma forma de conhecimento, estamos praticando filosofia.
+
+[.text-center]
+.A Escola de Atenas (Scuola di Atenas, no original) de Rafael. Contém uma representação dos grandes filósofos clássicos e dicas sobre seu discurso.
+image::filosofia.jpg[id=filosofia, align="center"]
+
+[#definindo-categorias]
+== Definindo Categorias
+
+Já que vamos criar nosso modelo usando 4 categorias de elementos precisamos entender o que são essas categorias e como identificar elas na linguagem que estamos usando no nosso software. Para começar vamos jogar várias sentenças que poderiam fazer parte dos requisitos de um projeto de software para clínica médica e depois vamos trabalhar com esse domínio para tentar o modelar. Isso é um exercício de imaginação, não foi feito nenhum levantamento de requisitos, logo são apenas requisitos hipotéticos.
+
+* "Durante a consulta o médico/médica fará a anamnese do paciente"
+* "A anamnese consiste de uma série de perguntas que o médico/médica faz para tentar chegar a um diagnóstico"
+* "O médico/médica pode pedir exames para chegar a um diagnóstico"
+* "A anamnese é usada para avaliar a evolução do paciente"
+* "O diagnóstico pode levar várias consultas para ser feito"
+* "O prontuário de um paciente é composto de todas as informações coletadas"
+* "Um médico/médica pode compartilha um prontuário de um paciente, mas deve escolher quais informações vão ser compartilhadas"
+* "O prontuário é estritamente sigiloso. Somente o médico/médica pode ter acesso e só pode ser compartilhada para outro médico/médica que atende ao mesmo paciente."
+* "A consulta pode ser marcada pelo paciente diretamente pelo site"
+* "Se o paciente não comparecer a consulta, deve ser cobrada uma taxa dele, mesmo que seja por plano"
+* "O reagendamento de consulta pode ser feito pelo médico/médica ou secretário/secretária e deve ser aprovado pelo paciente"
+
+A primeira atividade que precisamos fazer é identificar todos os substantivos e verbos que fazem parte do nosso modelo. Todo substantivo pode executar uma atividade ativamente ou fazer parte de uma atividade passivamente, a atividade será definida pelo verbo. Então vamos rever a lista de requisitos marcando todo substantivo?
+
+* "Durante a **consulta** o **médico/médica** fará a **anamnese** do **paciente**"
+* "A **anamnese** consiste de uma série de **perguntas** que o **médico/médica** faz para tentar chegar a um **diagnóstico**"
+* "O **médico/médica** pode pedir **exames** para chegar a um **diagnóstico**"
+* "A **anamnese** é usada para avaliar a **evolução** do **paciente**"
+* "O **diagnóstico** pode levar várias **consultas** para ser feito"
+* "O **prontuário** de um paciente é composto de todas as **informações** coletadas"
+* "Um **médico/médica** pode compartilha um **prontuário** de um **paciente**, mas deve escolher quais **informações** vão ser compartilhadas"
+* "O **prontuário** é estritamente sigiloso. Somente o **médico/médica** pode ter acesso e só pode ser compartilhada para outro **médico/médica** que atende ao mesmo **paciente**."
+* "A **consulta** pode ser marcada pelo **paciente** diretamente pelo site"
+* "Se o **paciente** não comparecer a **consulta**, deve ser cobrada uma **taxa** dele, mesmo que seja por **plano**"
+* "O reagendamento de **consulta** pode ser feito pelo **médico/médica** ou **secretário/secretária** e deve ser aprovado pelo **paciente**"
+
+Os substantivos selecionados acima vão nos ajudar a entender os dois primeiros elementos de um modelo de negócios usando DDD: Entidades e Objetos de Valor. Então vamos ver a definição de cada um? Primeiro vamos ver o que o livro do Eric Evans fala sobre eles.
+
+[.text-center]
+.Uma médica conversando com um Paciente, imagem do Pexels.com.
+image::pexels-medico-paciente.jpg[id=pexels-medico-paciente, align="center"]
+
+.Entidades
+[sidebar]
+Alguns objetos não são definidos principalmente por seus atributos. Eles representam uma linha de identidade que atravessa o tempo e geralmente representações distintas. Às vezes, um objeto como esse pode ser combinado com outros objetos, embora os atributos possam diferir. Um objeto deve ser distinguido de outros objetos, embora eles possam ter os mesmos atributos. Um erro de identidade pode levar à dados corrompidos.
+
+.Objetos de Valor
+[sidebar]
+Quando você só se preocupa com os atributos de um elemento do modelo, classifique-o como um OBJETO DE VALOR. Faça com que ele expresse o significado dos atributos que ele transmite e dê a ele uma funcionalidade relacionada. Trate o OBJETO DE VALOR como imutável. Não dê a ele nenhuma identidade e evite complexidades de design desnecessárias para manter ENTIDADES.
+
+Pode parecer confuso, e realmente é, por isso vou tentar reescrever o que ele quer dizer com minhas próprias palavras.
+
+Uma **Entidade** é um objeto do modelo de negócios que tem sua identidade própria definida apesar valores definido nela. Os valores podem e vão mudar com o tempo pois o objeto tem uma identidade própria.
+
+Um **Objeto de Valor** é um objeto do modelo de negócios que não tem identidade própria, mas ela é definida pelos valores definido nela. Os valores não mudam pois eles são a identidade do objeto.
+
+_— E como podemos correlacionar esses conceitos nos substantivos acima?_
+
+Ora, qual dos substantivos tem uma identidade própria apesar dos valores? Vou citar os que acredito ter:
+* **Paciente**
+* **Médico/Médica**
+* **Consulta**
+* **Exames**
+* **Prontuário**
+* **Plano**
+* **Secretário/Secretária**
+
+_— Tem algum meio fácil de identificar esses objetos?_
+
+Tem sim! Tenta imagina o que aconteceria se eu reusasse um objetos desse pra outro valor. Imagina que pegar um **Paciente** e mudar todos os valores para ser outro paciente, o que você imagina dessa possibilidade? Parece meio improvável porque o paciente é uma pessoa, ela existe e não dá pra mudar os valores dele, confere? Exato! Por isso **Paciente** é uma Entidade.
+
+Já os objetos de valores tem entidade caracterizadas por seus atributos, então para saber se um objeto de valor podemos fazer uma pergunta. Posso mudar os valores dos atributos? Se a resposta para a primeira pergunta for **não**, temos um objeto de valor que é imutável. Na verdade todo objeto de valor pode ser considerado imutável, pois não faz sentido alterar um valor dele, apenas o substituir por completo. 
+
+Do nosso exemplo podemos considerar a **Anamnese** como um objeto de valor. Ela é o registro das perguntas que o médica fez durante a consulta, mas ela não existe sem a consulta e nem pode ser reutilizada em outra consulta. Do mesmo modo podemos definir **Diagnóstico** como um objeto de valor. 
+
+Existe outros objetos de valores que são inerentes ao nosso modelo mas não estão citados porque são tão básicos que nem seriam citados em uma lista de requisitos. Vamos pensar em um **Paciente**, o que o paciente tem que é útil para a administração do relacionamento dele com o consultório? A resposta deve contar **Endereço**, **Contatos**, **Forma de Pagamentos**, etc... A lista vai depender de um levantamento de requisitos real, quem vai modelar esse negócio precisa conversar, não só com a médica, mas, PRINCIPALMENTE, com a secretária.
+
+_— E os outros dois elementos do modelo? Serviço e Módulo?_
+
+Bom, esse deixamos por final propositadamente! Vamos ver como Eric Evans define eles?
+
+.Serviços
+[sidebar]
+Quando um processo significativo ou uma transformação no domínio não é responsabilidade natural de uma ENTIDADE ou OBJETO DE VALOR, acrescente uma operação no modelo como uma interface autônoma declara como SERVIÇO. Defina a interface em termos da linguagem do modelo e certifique-se de que o nome da operação faça parte da LINGUAGEM ONIPRESENTE. Faça com que o SERVIÇO não tenha um estado.
+
+.Módulos
+[sidebar]
+Todo mundo utiliza MÓDULOS, mas poucas pessoas os tratam como partes do modelo já completamente desenvolvidas. O código é dividido em vários tipos de categorias, desde aspectos da arquitetura técnica até as atribuições de trabalho dos desenvolvedores. Mesmo os desenvolvedores que refatoram muito tendem a se contentar com MÓDULOS concebidos na fase inicial do projeto.
+
+O livro se torna complicado porque não traz definições coesas, mas as definições são trabalhadas na discussão que o capitulo faz. Mas ele quer dizer que **Serviços** são operações que não são responsabilidades de um objeto especifico. E **Módulo** são formas de agrupar o código pelo modelo e não pelas características arquiteturais.
+
+Sobre serviços podemos chegar a primeira conclusão que existem operações que DEVEM ser efetuadas pelas Entidades ou Objetos de Valor e existem operações que DEVEM ser efetuadas por Serviços. Como definir quem vai implementar essa operação?
+
+É nessa hora que surge o grande responsável por implementar toda atividade que não tem dono: o MANAGER (ou gerente em tradução livre). Esse na minha opinião é o maior anti-pattern na modelagem de domínios que existe. Toda vez que definimos uma classe como Manager, estamos criando uma classe sem personalidade e que provavelmente terá pouca coesão. O correto seria fazer mais perguntas a classe, ou mesmo criar classes mais especificas.
+
+Vamos a um exemplo prático? Quem faz o agendamento das consultas? Se você pensou em responder quem tem o papel de secretária está errado. Essa é uma função desse papel, mas ele também tem nome e é mais comum do que imaginamos. Podemos chamar essa classe de `AgendadorDeConsultas`. Agora coloca ao lado os dois nomes `GerenciadorDeConsultas` e `AgendadorDeConsultas`, você consegue ver o ganho semântico que a escolha do papel correto trás? Consegue ver como nomes podem até ser mais óbvios do que eles podemos imaginar? Porque as respostas são obvias, quem faz o agendamento de consultas é o agendador, não há segredos em dar nomes. E quais operações esse serviço pode fazer? Todas relacionadas ao agendamento de consultas. No caso do não comparecimento a consultas, deve ser outro serviço que vai executar a cobrança da taxa.
+
+_— E os Módulos?_
+
+Os Módulos são divisões lógicas dentro do código. Vamos olhar para os nossos requisitos e procurar alguma divisão lógica ali? Será que eu conseguiria dividir eles em ao menos 3 módulos?
+
+* Consulta
+    * "Durante a **consulta** o **médico/médica** fará a **anamnese** do **paciente**"
+    * "A **anamnese** consiste de uma série de **perguntas** que o **médico/médica** faz para tentar chegar a um **diagnóstico**"
+    * "A **anamnese** é usada para avaliar a **evolução** do **paciente**"
+    * "O **diagnóstico** pode levar várias **consultas** para ser feito"
+    * "O **prontuário** de um paciente é composto de todas as **informações** coletadas"
+    * "Um **médico/médica** pode compartilha um **prontuário** de um **paciente**, mas deve escolher quais **informações** vão ser compartilhadas"
+    * "O **prontuário** é estritamente sigiloso. Somente o **médico/médica** pode ter acesso e só pode ser compartilhada para outro **médico/médica** que atende ao mesmo **paciente**."
+    * "A **consulta** pode ser marcada pelo **paciente** diretamente pelo site"
+    * "O reagendamento de **consulta** pode ser feito pelo **médico/médica** ou **secretário/secretária** e deve ser aprovado pelo **paciente**"
+* Exame
+    * "O **médico/médica** pode pedir **exames** para chegar a um **diagnóstico**"
+* Cobrança
+    * "Se o **paciente** não comparecer a **consulta**, deve ser cobrada uma **taxa** dele, mesmo que seja por **plano**"
+
+Eu fiz o exercício de separar esses requisitos em 3 módulos distintos: Consulta, Exame e Cobrança. Essa divisão não é ótima e não deveria ser final. Dependendo da evolução das funcionalidades, ou do entendimento do modelo, os módulos podem ser quebrados ou unidos. Um módulo deve contar uma unidade dentro do modelo.
+
+[#criando-interfaces]
+== Criando Interfaces
+
+O grande ganho que temos quando dividimos um software em módulos é encapsular complexidades. Um módulo para acessar outro deve acessar uma funcionalidade ou um serviço e não o código diretamente. 
+
+Quando temos todo o código sendo implementado no mesmo projeto, processo ou time, temos a tentação de acessar diretamente o código de módulos distintos. Mas esse é um pecado capital em desenvolvimento de software pois vamos diminuir a coesão e aumentar o acoplamento. Módulos diferentes devem ser comunicar através de interfaces bem definidas e comuns aos dois contextos.
+
+_— O que isso significa na prática?!?!?!_
+
+Devemos olhar os módulos como caixas pretas e não precisamos de todas as informações contidas em um determinado módulo, somente a que é necessária no contexto requerido. Vamos ver isso no contexto das consultas?
+
+Para cada **Paciente** existe a informação de qual **Plano** ele possui. Ora um plano de saúde é importante se uma cobrança é realizada ou se um exame é pedido, mas em nada influência quando estamos falando da consulta. Será que essa informação é relevante durante a consulta? Eticamente ela deveria ser omitida. E papel de um módulo omitir as informações não relevantes aos outros módulos.
+
+Se olharmos agora para o módulo de Exame, como é feito o pedido de Exame? Será que os vários laboratórios tem APIs distintas? Será que o formato retornado pelo laboratório é único? Tudo isso não importa para o módulo de Consulta, a médica na proxima consulta deve ter como informação apenas o resultado dos exames em um formato padronizado.
+
+Se a divisão de módulos for respeitada e uma API for utilizada, a divisão de módulos entre processos distintos será feita sem grandes complexidades. Antigamente, em Java, era comum criar interfaces e implementações em objetos pois um serviço pode ser implementado por um servidor distinto e chamado remotamente usando Java RMI. O mesmo ainda pode acontecer hoje quando usamos APIs, ao invés de usarmos o protocolo RMI, que tem uma série de limitações, inclusive isso foi pontuado por Eric Evans ao se referir ao "estado" de um serviço, podemos usar a API como uma interface comum entre cliente e servidor.
+
+
+[#conclusao]
+== Conclusão
+
+Esses quatro elementos da modelagem de software vai possibilitar você a construir um modelo rico e detalhado. É sempre bom relembrar que dar o nome correto as coisas é muito importante e para isso é importante fazer as perguntas corretas, construindo assim a Linguagem Onipresente que falamos no post anterior.
