@@ -15,7 +15,7 @@ Nesse post vou mostrar algumas configurações de tópicos que deve ser feitas p
 
 # Partições e Segmentos
 
-Espero que você já conheça alguns elementos importantes de um tópico, como Partições e Fator de Replicação. Caso não conheça, leia [Anatomia de um Tópico](https://vepo.github.io/posts/anatomia-de-um-topico) para podermos conhecer basicamente como funciona um tópico.
+Espero que você já conheça alguns elementos importantes de um tópico, como Partições e Fator de Replicação. Caso não conheça, leia [Anatomia de um Tópico](/posts/anatomia-de-um-topico) para podermos conhecer basicamente como funciona um tópico.
 
 No post anterior, só entrei até o detalhe do número de partição, pois essa é a parte importante quando falamos de **ordenação de mensagens**. 
 

@@ -23,7 +23,7 @@ For this project it was used:
 To install it, just execute:
 
 ```bash
-curl https://vepo.github.io/assets/bin/get-csvi | sudo bash
+curl https://blog.vepo.dev/assets/bin/get-csvi | sudo bash
 ```
 
 Then you can easily see your csv files with:

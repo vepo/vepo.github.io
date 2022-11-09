@@ -14,7 +14,7 @@ Pela minha própria experiência, posso afirmar que praticar é uma boa tática.
 
 Vale uma reflexão aqui... Quantas horas você já gastou tentando entender alguma coisa? Pode ser que seja a implementação mais simples que existe, mas se existe um conceito (ou uma convenção) desconhecido, você não irá compreender. John Ousterhout em seu livro [A Philosophy of Software Design](https://www.amazon.com.br/Philosophy-Software-Design-2nd-English-ebook/dp/B09B8LFKQL?keywords=Philosophy-Software-Design-English&qid=1667927943&sr=8-5&ufe=app_do%3Aamzn1.fos.6121c6c4-c969-43ae-92f7-cc248fc6181d&linkCode=ll1&tag=vepo0f-20&linkId=191bf91d38700ad4d84885900b3b695a&language=pt_BR&ref_=as_li_ss_tl) chama isso de _Unknown unknowns_, Desconhecido desconhecidos em tradução livre. Falei um pouco sobre complexidade e da experiência da leitura desse livro em [Sobre Design de Software (I): O que é complexidade?](https://vepo.substack.com/p/sobre-design-de-software-i).
 
-Então em Junho de 2019 coloquei no papel o que tinha em mente [Start a project by the README](https://vepo.github.io/posts/start-a-project-by-the-readme). Está em inglês porque precisava praticar minha escrita. 🙃
+Então em Junho de 2019 coloquei no papel o que tinha em mente [Start a project by the README](/posts/start-a-project-by-the-readme). Está em inglês porque precisava praticar minha escrita. 🙃
 
 Aqui vou revisitar o post e expandir ele, muita coisa muda em 3 anos.
 
