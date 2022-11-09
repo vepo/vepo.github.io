@@ -14,7 +14,7 @@ module Jekyll
         end
 
         def render(context)
-            output = <<~EOS
+            return <<~EOS
             <div class="github-repo">
                 <h2>
                     <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
