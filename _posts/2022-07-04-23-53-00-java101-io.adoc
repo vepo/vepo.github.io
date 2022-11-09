@@ -374,7 +374,7 @@ JsonNode root = mapper.readTree(newState);
 int age = root.at("/personal/age").getValueAsInt(); 
 ----
 
-Mas isso não impede que se use eles para ler dados de um arquivo. A primeira missão que temos é mapear o objeto que devemos ler como um POJO. Em um projeto pessoal eu criei uma interface para inspecionar Cluster Kafka, o /projects/kafka-tool[Kafka Tool]. Nesse projeto, todas as configurações são salvas em arquivos JSON no diretório `~/.kafka-tool` (arquivos começados com `.` são considerados ocultos no Linux), assim para armazenar as informações de Brokers é preciso primeiro mapear um broker. Depois de mapeador o broker é preciso carregar a lista de brokers do arquivo, para isso basta usar o código abaixo.
+Mas isso não impede que se use eles para ler dados de um arquivo. A primeira missão que temos é mapear o objeto que devemos ler como um POJO. Em um projeto pessoal eu criei uma interface para inspecionar Cluster Kafka, o https://blog.vepo.dev/projects/kafka-tool[Kafka Tool]. Nesse projeto, todas as configurações são salvas em arquivos JSON no diretório `~/.kafka-tool` (arquivos começados com `.` são considerados ocultos no Linux), assim para armazenar as informações de Brokers é preciso primeiro mapear um broker. Depois de mapeador o broker é preciso carregar a lista de brokers do arquivo, para isso basta usar o código abaixo.
 
 [source,java]
 ----
