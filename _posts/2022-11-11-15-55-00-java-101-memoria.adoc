@@ -1,0 +1,202 @@
+---
+title: Memória
+published: true
+description: Como funciona o gerenciamento de memória com Java
+tags: [Java, Gerenciamento de Memória, Tuning]
+cover_image: /assets/images/java/duke-tumble.png
+series: Java 101
+permalink: /posts/java-101-memoria
+publish_date: 2022-11-11 15:55:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/java-101
+
+Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections, como Java faz Orientação a Objetos, o que é a biblioteca I/O e como Java implementa paralelismo e concorrência, esses tópicos são necessários para o que vamos falar agora: **Gerenciamento de Memória**
+
+
+[#cap-07-o-que-e-memoria]
+== O que é Memória
+
+Antes de falar de Memória em programas Java, precisamos definir o que é Memória. Memória é o principal recurso de um computador junto com a CPU. A função da CPU é executar operações que alteram a memória e a memória é responsável por quase todas as operações de um computador. Tudo se comunica através da memória. Mas como Java é uma linguagem de alto nível, não temos acesso a memória completa, ela é gerenciada pelo Sistema Operacional e pela JVM.
+
+Programas Java rodam dentro de uma Máquina Virtual, logo não precisamos nos preocupar com a alocação de memória. Toda vez que nosso programa precisar de mais memória ela será fornecida automaticamente. Esse tópico é muito importante quando formos falar sobre o _tuning_ de aplicações Java, uma forma de garantir a performance. Precisamos entender que cada objeto e cada linha de comando ocupa um posição da memória. A memória é como um caderno de papel que pegamos pra fazer conta, cada operação realizada ocupa um espaço e quando não há mais espaço na folha temos a opção de pegar uma nova folha ou apagar uma conta já finalizada.
+
+[.text-center]
+.Memória é como uma folha de caderno que usamos como rascunho.
+image::java-101/cap-07/pexels-david-bares-204511.jpg[id=cap-07-folha-de-caderno, align="center"]
+
+A memória é volátil. Isso significa que toda vez que precisamos salvar uma informação que é relevante ou escrevemos ela em um banco de dados ou escrevemos em um arquivo. O "caderno" é apagado toda vez que o computador reinicia.
+
+[#cap-07-topologia-da-memoria]
+== Topologia da Memória
+
+Talvez você já tenha ouvido falar de _heap_ ou _stack_, essa são dois tidos de memória distintas que existem em todos os programas. Vamos tentar entender elas sem falar de Java?
+
+_Stack_ significa pilha que é um conceito fundamental em computação. Toda pilha é uma estrutura que você pode apenas remover o elemento superior e quando você adiciona elementos você adiciona em cima do último elemento. Você não pode pegar o terceiro item de uma pilha, você tem que remover os 3 itens superiores. Essa é a memória responsável pela execução do seu programa, cada vez que você entra em um bloco de execução, você adiciona elementos a pilha, quando você sai de um bloco de execução você remove. Para cada execução existe uma _stack_ especifica, isso significa que um programa single thread vai existir apenas uma _stack_, já um multi-thread terá várias _stacks_.
+
+Já _heap_ significa amontoado, ou seja, é uma memória sem organização, sem hierarquia. A memória _heap_ é usada conforme a necessidade do programa e pode ser compartilhada entre as várias pilhas de execução. Cada programa deve alocar e desalocar espaços na memória _heap_, a alocação é feita por uma chamada de sistema (_system call_) https://man7.org/linux/man-pages/man3/free.3.html[_malloc_] (ou _calloc_) e deve ser liberada pelo programa usando _free_.
+
+[.text-center]
+.Documentação das funções de gerenciamento de memória oferecidas pelo Sistema Operacional.
+image::java-101/cap-07/malloc.png[id=cap-05-c-close, link=https://man7.org/linux/man-pages/man3/free.3.html, align="center"]
+
+Quando uma porção da memória é alocada, tudo que o sistema operacional precisa saber é o tamanho da memória que o programa necessita, assim o sistema operacional retorna o endereço de memória onde essa porção de memória foi alocada. Quando o programa não precisa mais dessa posição de memória ela deve ser liberada, para liberar o sistema operacional precisa do endereço de memória que deve ser desalocada. Quando falamos "endereço de memória" estamos falando de um endereço físico mesmo, é a posição da memória que o sistema operacional achou conveniente oferecer ao programa. Com a posse desse endereço o programa pode manipular a memória, por exemplo se estamos falando de um array, o programa pode fazer operações matemática para acessar as posições. Esse é o conceito de ponteiro, ele aponta para uma posição de memória, mas é apenas um número que representa um endereço físico.
+
+_— E se eu não desalocar a posição de memória?_
+
+Todo programa tem que ter muito cuidado ao usar a memória por dois motivos. Primeiro memória é um recurso finito, compartilhado e escasso. Isso significa que se seu servidor tem 10GiB de memória RAM, todos os processos só podem usar 10GiB de memória RAM. Caso seja necessário mais memória, o sistema operacional vai criar um arquivo de paginação que podem degradar a eficiência dos programas em execução. Depois cada programa deve operar com o mínimo de memória possível, logo a alocação e liberação de memória deve ser feita de maneira consciente, se seu programa começa a alocar memória a eficiência dele vai degradar até que o sistema operacional simplesmente, e sem cerimônia, vai finalizar a execução. Então quando um programa simplesmente para de funcionar sem nenhum motivo aparente, a primeira coisa que um desenvolvedor observar é o consumo de memória, se ele está crescendo até o programa ser finalizado isso pode ser um sintoma de um problema chamado _Memory Leak_ (vazamento de memória em tradução livre).
+
+_Memory Leak_ acontece quando porções de memória são alocados mas não são desalocados criando porções da memória não utilizadas até não haver mais memória disponível. Um programa com _memory leak_ pode comprometer a eficiente de um servidor ou até de um cluster.
+
+[.text-center]
+.Topologia de uma memória de um programa C. Todo gerenciamento das alocações é feita manualmente.
+image::java-101/cap-07/memoria-c.png[id=cap-07-memoria-c, align="center"]
+
+_— E porque eu preciso saber disso se vou programar em Java?_
+
+Porque esses conceitos são importantes para você fazer um uso consciente da memória. Você já parou para pensar que ao declara um objeto você ocupa um espaço físico? Mas agora vamos rever todos esses conceitos em Java.
+
+[#cap-07-topologia-da-memoria-na-jvm]
+== Topologia da Memória na JVM
+
+Na JVM também existe a memória _heap_ e a _stack_. A _stack_ irá conter todas as informações de execução e os valores das variáveis primitivas, quando uma variável é um objeto a _stack_ contém uma https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-2.html#jvms-2.4[**referência**] para a _heap_. Todo objeto é alocado na _heap_, mas ele não ocupa uma posição fixa pois a _heap_ é gerenciada pela JVM. Diferentemente das linguagens de baixo nível, em Java um novo objeto já cria uma nova alocação de memória sem precisar interagir diretamente com o sistema operacional, mas quando o objeto não é mais necessário ele não precisa ser liberado, pois a JVM tem um processo chamado Garbage Collector que remove da _heap_ todo objeto que não é mais referenciado.
+
+
+Já a _heap_ será dividida entre várias regiões. As primeiras regiões são a _Young Generation_ e a _Old Generation_, como o nome já demonstra na _Young Generation_ estão localizados os objetos gerados recentemente e na _Old Generation_ estão os objetos mais antigos. Da mesma forma a _Young Generation_ é dividida entre _Eden_, _S1_ e _S2_ (S de _Suvivor_ 1 e 2, que significa sobrevivente) onde _Eden_ é a região onde os objetos nascem e depois migram pra _S1_ e depois pra _S2_.
+
+[.text-center]
+.Topologia de uma memória de um processo Java. Todo gerenciamento das alocações é automaticamente pela JVM.
+image::java-101/cap-07/memoria-java.png[id=cap-07-memoria-java, align="center"]
+
+_— Mas como acontecem essas migrações? Porque eu preciso saber disso?!?_
+
+Essa informação é importante por dois motivos. O primeiro deles é que o ciclo de vida de um objeto impacta na performance pois a operação feita pelo _Garbage Collector_ é uma operação custosa, já vi processos que 30% do tempo de execução era gasto para liberar memória. O segundo motivo é que, conhecendo o ciclo de vida de um objeto, podemos ajudar o Garbage Collector a eliminar objetos descartáveis.
+
+_— Mas qual é o ciclo de vida de um objeto?_
+
+Quando a JVM encontra um `new ObjetoX()`, ela vai alocar o espaço necessário na _Eden_. Se há espaço suficiente, tudo bem. Se não há espaço suficiente o _Garbage Collector_ vai fazer uma limpeza na _Eden_ descartando todos objetos que não são referenciados na _stack_ e movendo todos os objetos restante para a _S1_. Se há espaço suficiente na _S1_, tudo bem. Se não há espaço suficiente o _Garbage Collector_ vai fazer uma limpeza na _S1_ descartando todos objetos que não são referenciados na _stack_ e movendo todos os objetos restante para a _S2_. Se há espaço suficiente na _S2_, tudo bem. Se não há espaço suficiente o _Garbage Collector_ vai fazer uma limpeza na _S2_ descartando todos objetos que não são referenciados na _stack_ e movendo todos os objetos restante para a _Old Generation_. Se há espaço suficiente na _Old Generation_, tudo bem. Se não há espaço suficiente o _Garbage Collector_ vai fazer uma limpeza na _Old Generation_ descartando todos objetos que não são referenciados na _stack_. Quando essa operação for executada e a JVM não conseguir alocar espaço, a JVM vai lançar uma exceção: **Exception in thread thread_name: java.lang.OutOfMemoryError: Java heap space**.
+
+As informações sobre a classe `ObjetoX` ficam armazenadas no _Metaspace_ que fica responsável por armazenar as informações de classes e _ClassLoaders_. O _Metaspace_ pode também ser alvo de uma limpeza do _Garbage Collector_, mas ele só irá atuar se não houver mais espaço no _Metaspace_. O _Metaspace_ pode, também, conter referências a objetos que estão na _heap_, qualquer campo _estático_ (que usa _static_) faz parte da classe e não do objeto e criará uma referência do _Metaspace_ para a _heap_.
+
+_— Mas na descrição do Garbage Collector só se falou de referência da heap?_
+
+SIM! Por precisamos entender que uma classe pertence a um _ClassLoader_ e se o _ClassLoader_ não for mais usado na heap, ele pode ser eliminado. Um campo estático só será liberado se o _ClassLoader_ for descartado pelo _Garbage Collector_ ou se o valor dele for alterado para _null_. O _ClassLoader_ é um objeto que tem como responsabilidade ler as informações da classe, ele pode ser definido dinamicamente e sempre tem uma estrutura em árvore, ou seja, se a classe não for encontrada nele será procurada no _ClassLoader_ pai, se não houver _ClassLoader_ pai a JVM lança uma `ClassNotFoundException`.
+
+[#cap-referencias-e-ponteiros]
+=== Referências e Ponteiros
+
+Agora quero levantar uma provocação:
+
+**Seriam as referências a objetos estruturas similares aos ponteiros?**
+
+A primeira resposta pode parecer sim, mas é não. Primeiro porque ponteiros apontam diretamente para posições de memória, já nossas referências apontam para um objeto que pode ser realocado fisicamente na memória. Depois o gerenciamento dos ponteiros é de total responsabilidade do desenvolvedor, já as referências são parte do design do código, uma vez que a referência não existe na _stack_ a JVM está ciente e pode remover a posição porque ela é gerenciada pela JVM.
+
+Mas referências podem ser declaras em código também, por isso existe a interface java.lang.ref.Reference[https://docs.oracle.com/javase/8/docs/api/java/lang/ref/Reference.html] que é implementada por https://docs.oracle.com/javase/8/docs/api/java/lang/ref/PhantomReference.html[PhantomReference], https://docs.oracle.com/javase/8/docs/api/java/lang/ref/SoftReference.html[SoftReference] e https://docs.oracle.com/javase/8/docs/api/java/lang/ref/WeakReference.html[WeakReference]. Essas classes recebem um tratamento especial do _Garbage Collector_ e podem ser usadas para tornar mais eficiente o uso da memória. Elas devem ser usadas com muita parcimônia pois não são de fácil compreensão. 
+
+Uma `PhantomReference` é usada para verificar se um objeto é elegível para o _Garbage Collector_. Quando não há nenhuma referência ao objeto, ele é removido do PhantomReference e adicionado ao https://docs.oracle.com/javase/8/docs/api/java/lang/ref/ReferenceQueue.html[ReferenceQueue] que é uma pilha especial. Se o objeto está dentro da pilha ou o método `get` retorna `null`, significa que ele pode ser eliminado pela JVM. A `PhantomReference` pode ser usada para verificar se um objeto foi descartado ou não. Se o objeto não for removido da pilha, pode gerar uma _memory leak_.
+
+A classe `SoftReference` tem um comportamento similar, mas apresenta a possibilidade de não se usar a pilha. Ela pode ser usada para construir cache sensível ao uso da memória. Se um objeto é apenas armazenado dentro de um `SoftReference` pode ser descartado pelo `Garbage Collector` quando não há espaço disponível na _heap_ sendo necessário criar uma nova instância.
+
+A classe `WeakReference` é muito similar a classe `SoftReference`, exceto que o _Garbage Collector_ irá eliminar o objeto na primeira oportunidade ao invés de esperar a necessidade de alocação de espaço.
+
+Essas classes podem ser usadas para construção de Caches inteligentes que otimizam o uso da memória. Imagina se você tem um requisito que é manter um valor até que ele não seja mais necessário, basta criar uma `HashMap` que armazena `PhantomReference`. Existe também uma mapa chamado https://docs.oracle.com/javase/8/docs/api/java/util/WeakHashMap.html[WeakHashMap] que traz um comportamento semelhante, mas a referência fraca é a chave e não o valor.
+
+
+[#cap-07-ferramentas-de-diagnostico]
+== Ferramentas de Diagnóstico
+
+Como falamos, o principal problema que o mau uso da memória pode nos trazer é lentidão ou vazamento de memória, mas como podemos analisar se nosso programa tem esses problemas?
+
+Podemos usar ferramentas que a própria JVM nos dá para ver o que está acontecendo na memória. 
+
+=== VisualVM
+
+Uma das mais importantes ferramentas é a https://visualvm.github.io/[VisualVM]. Com ela é possível monitorar a memória para ver como a alocação da memória está evoluindo. Para os testes usei um código simples que consumia uma API e envia para um Apache Kafka, e podemos ver abaixo que o uso da memória é bem estável. Um programa em uso estável de memória vai sempre apresentar um uso de memória serrilhado, esse padrão acontece porque objetos são criados até que sejam finalizados pelo _Garbage Collector_, então podemos afirmar que cada vez que o uso de memória cai houve uma execução do _Garbage Collector_.
+
+[.text-center]
+.Interface do VisualVM mostrando o uso de memória de um programa simples.
+image::java-101/cap-07/visualvm.png[id=cap-07-visualvm, align="center"]
+
+Ao executar o VisualVM você consegue atrelar a qualquer JVM em execução na máquina local ou a uma JVM que exponha o gerenciamento através de uma porta JMX. A linha de comando abaixo mostra como executar um processo Java que seja acessível pela porta 8080 sem nenhuma segurança.
+
+[source,bash]
+----
+$ java -Dcom.sun.management.jmxremote.port=8080 \
+       -Dcom.sun.management.jmxremote.ssl=false \
+       -Dcom.sun.management.jmxremote.authenticate=false \
+       -jar target/produtor.jar --appId $APP_ID --timeout 1
+----
+
+_— Será que eu consigo saber quando o Garbage Collector foi chamado? Ou chamar ele manualmente?_
+
+A resposta simples é não! De dentro do seu código Java não dá pra escutar o funcionamento do _Garbage Collector_ e nem é recomendável chamar ele através da biblioteca. A VisualVM possibilita que ele seja chamada manualmente através da interface gráfica (e não da biblioteca padrão). Mas existe a possibilidade de que salvar o log do _Garbage Collector_ para futura analise. Por exemplo, no comando bash abaixo estamos ordenando a JVM a salvar as informações no arquivo `gc.log`.
+
+[source,bash]
+----
+$ java -XX:+PrintGCDetails -Xloggc:gc.log -jar target/produtor.jar --appId $APP_ID --timeout 1
+----
+
+Vamos observar o que temos o cabeçalho desse arquivo de log?
+
+[source]
+----
+[0.009s][info][gc,init] CardTable entry size: 512
+[0.009s][info][gc     ] Using G1
+[0.011s][info][gc,init] Version: 18+36-2087 (release)
+[0.011s][info][gc,init] CPUs: 8 total, 8 available
+[0.011s][info][gc,init] Memory: 16099M
+[0.011s][info][gc,init] Large Page Support: Disabled
+[0.011s][info][gc,init] NUMA Support: Disabled
+[0.011s][info][gc,init] Compressed Oops: Enabled (Zero based)
+[0.011s][info][gc,init] Heap Region Size: 2M
+[0.011s][info][gc,init] Heap Min Capacity: 8M
+[0.011s][info][gc,init] Heap Initial Capacity: 252M
+[0.011s][info][gc,init] Heap Max Capacity: 4026M
+[0.012s][info][gc,init] Pre-touch: Disabled
+[0.012s][info][gc,init] Parallel Workers: 8
+[0.012s][info][gc,init] Concurrent Workers: 2
+[0.012s][info][gc,init] Concurrent Refinement Workers: 8
+[0.012s][info][gc,init] Periodic GC: Disabled
+[0.012s][info][gc,metaspace] CDS archive(s) mapped at: [0x0000000800000000-0x0000000800b90000-0x0000000800b90000), size 12124160, SharedBaseAddress: 0x0000000800000000, ArchiveRelocationMode: 0.
+[0.012s][info][gc,metaspace] Compressed class space mapped at: 0x0000000800c00000-0x0000000840c00000, reserved size: 1073741824
+[0.012s][info][gc,metaspace] Narrow klass base: 0x0000000800000000, Narrow klass shift: 0, Narrow klass range: 0x100000000
+----
+
+Observe que temos várias informações sobre a máquina e a configuração da JVM. Temos o total de CPU (_CPUs: 8 total, 8 available_), memória (_Memory: 16099M_), versão da JVM, _Garbage Collector_ selecionado (_Using G1_) e configurações do _Garbage Collector (_Parallel Workers: 8_, _Concurrent Workers: 2_, _Concurrent Refinement Workers: 8_ e _Periodic GC: Disabled_). Os valores específicos da JVM podem ser configurados através de parâmetros.
+
+Com o log habilitado toda atividade do _Garbage Collector_ estará registrada, vamos analisar uma delas?
+
+[source]
+----
+[48.661s][info][gc,start    ] GC(7) Pause Young (Normal) (G1 Evacuation Pause)
+[48.662s][info][gc,task     ] GC(7) Using 2 workers of 8 for evacuation
+[48.671s][info][gc,phases   ] GC(7)   Pre Evacuate Collection Set: 0.1ms
+[48.671s][info][gc,phases   ] GC(7)   Merge Heap Roots: 0.1ms
+[48.672s][info][gc,phases   ] GC(7)   Evacuate Collection Set: 8.8ms
+[48.672s][info][gc,phases   ] GC(7)   Post Evacuate Collection Set: 0.7ms
+[48.672s][info][gc,phases   ] GC(7)   Other: 0.2ms
+[48.672s][info][gc,heap     ] GC(7) Eden regions: 6->0(6)
+[48.672s][info][gc,heap     ] GC(7) Survivor regions: 1->1(1)
+[48.672s][info][gc,heap     ] GC(7) Old regions: 5->5
+[48.672s][info][gc,heap     ] GC(7) Archive regions: 0->0
+[48.672s][info][gc,heap     ] GC(7) Humongous regions: 0->0
+[48.672s][info][gc,metaspace] GC(7) Metaspace: 30289K(31040K)->30289K(31040K) NonClass: 27043K(27392K)->27043K(27392K) Class: 3245K(3648K)->3245K(3648K)
+[48.672s][info][gc          ] GC(7) Pause Young (Normal) (G1 Evacuation Pause) 21M->10M(34M) 10.497ms
+[48.672s][info][gc,cpu      ] GC(7) User=0.00s Sys=0.00s Real=0.01s
+----
+
+Primeiro vamos observar a topologia dessa mensagem de log. O primeiro parâmetro é de suma importância, ele vai registrar o momento em que a mensagem foi gerada, podemos dizer por exemplo eu que essa execução começou exatamente em `48.661s` e terminou `48.672s`. Por fim temos a mensagem de log, e veja que na penúltima linha temos o tempo total da execução `10.497ms`. Temos os registros de como as regiões foram impactadas, no caso acima os 6 objetos residentes no Eden foram removidos deixando as outras regiões intactas.
+
+Qual outra informação esse log trás? Talvez você não tenha percebido, mas se você somar todas as linhas que contém a string `[info][gc          ]` você tem o tempo total gasto em _Garbage Collector_ que pode ser usado com o tempo de execução que está na primeira coluna e temos a porcentagem de tempo de execução que o _Garbage Collector_ usa. Essa informação é importante porque a maioria das implementações de _Garbage Collector_ para as threads para não criar inconsistências.
+
+[#cap-07-solucoes-comuns]
+== Soluções Comuns
+
+Se seu processo está gastando muito tempo com o _Garbage Collector_ pode ser que algumas ações devam ser tomadas. Não existe uma regra padrão sobre como se otimiza a memória pois cada programa tem um comportamento diferente.
+
+O ideal é construir um modelo de otimização, você precisa de dados para isso. Primeiro coloque seu programa em execução com determinada configuração, depois registre o número máximo de requisições por segundo, o tempo usado com _Garbage Collector_ e a latência de resposta de uma requisição. Depois vá alterando as configurações e veja como esses valores se comportam. 
+
+Eu já trabalhei em um sistema que era possível configurar o número de threads de execução e a performance estava degradada porque a pessoa que dava suporte configurou um elevado número de threads. A solução nesse caso foi reduzir o número de threads e rodar outra instância em paralelo.
+
+Com esse experimento, você será capaz de dizer o que acontece com o sistema se você reduzir o tamanho da _heap_ ou se você aumentar o tamanho do _Eden_, etc.
