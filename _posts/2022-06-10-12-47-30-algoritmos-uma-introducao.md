@@ -4,7 +4,7 @@ permalink: /posts/algoritmos-uma-introducao
 published: true
 description: O que é um algoritmo? O que define um algoritmo?
 tags: [Algoritmo, Ciência da Computação]
-cover_image: /assets/images/pexels-artem-beliaikin-5456314.jpg
+cover_image: /assets/images/pexels-artem-beliaikin-5456314.avif
 series: Algoritmos
 publish_date: 2022-06-10 12:47:30 +0300
 ---

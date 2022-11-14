@@ -6,7 +6,7 @@ tags: [Jakarta-EE, Java-EE, Java, Framework]
 series: Especificações Jakarta EE & Microprofile.io
 publish_date: 2019-09-30 09:44:36 +0300
 original: "https://dev.to/vepo/jakarta-ee-e-microprofile-io-4gbg"
-cover_image: "https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jpeg"
+cover_image: "/assets/images/web.avif"
 ---
 
 Talvez você como desenvolvedor Java não conheça esses dois nomes. Talvez quando você vai pensar em desenvolver Java já pensa em Spring. Caso você esteja nesses dois grupos, essa série é para você!

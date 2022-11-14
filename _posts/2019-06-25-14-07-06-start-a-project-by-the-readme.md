@@ -5,7 +5,7 @@ published: true
 publish_date: 2019-06-25 14:07:06 +0300
 description: Before start code, describe what you are doing...
 tags: [Software Documentation, README, Documentation]
-cover_image: https://thepracticaldev.s3.amazonaws.com/i/x6xpao28ktzva7sinrym.JPG
+cover_image: /assets/images/docs.avif
 original: "https://dev.to/vepo/start-a-project-by-the-readme-4c49"
 ---
 

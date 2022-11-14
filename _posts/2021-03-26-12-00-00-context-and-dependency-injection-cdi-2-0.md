@@ -4,7 +4,7 @@ published: true
 permalink: /posts/context-and-dependency-injection-cdi-2-0
 description: Nesse post vou detalhar um pouco as funcionalidades do Java CDI e como podem ser usadas para melhorar seu código.
 tags: [Jakarta-EE, Java-EE, Java, Java CDI, CDI]
-cover_image: https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jpeg
+cover_image: /assets/images/web.avif
 series: Especificações Jakarta EE & Microprofile.io
 original: https://dev.to/vepo/contexts-and-dependency-injection-cdi-2-0-1ae4
 publish_date: 2021-03-26 20:00:00 +0300

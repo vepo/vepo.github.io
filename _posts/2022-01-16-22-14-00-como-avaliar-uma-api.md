@@ -3,7 +3,7 @@ title: Como avaliar uma API
 published: true
 description: Esse é um capítulo descartado do livro que escrevi para Casa do Código. Aqui apresento alguns padrões para melhorar sua API. Não repara na bagunça, ele deu muito trabalho até resolvermos descartar ele.
 tags: [HTTP, REST]
-cover_image: https://thepracticaldev.s3.amazonaws.com/i/rt90zdwn2g9yaf3hifpl.jpeg
+cover_image: /assets/images/web.avif
 permalink: /posts/como-avaliar-uma-api
 publish_date: 2022-01-16 22:14:00 +0300
 ---
