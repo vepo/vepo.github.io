@@ -14,10 +14,10 @@
 </div>
 <div class="cover-image">
     {% if page.noimage %}
-    <img alt="{{ page.title }}" src="/assets/images/top.avif" class="img-responsive" />
+    <img alt="{{ page.title }}" src="/assets/images/top.avif" width="{% imagesize /assets/images/top.avif:width %}" height="{% imagesize /assets/images/top.avif:height %}" class="img-responsive" />
     {% elsif page.cover_image %}
-    <img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-responsive" />
+    <img alt="{{ page.title }}" src="{{ page.cover_image }}" width="{% imagesize post.cover_image:width %}" height="{% imagesize post.cover_image:height %}" class="img-responsive" />
     {% else %}
-    <img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.avif" class="img-responsive" />
+    <img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.avif"  class="img-responsive" />
     {% endif %}
 </div>
