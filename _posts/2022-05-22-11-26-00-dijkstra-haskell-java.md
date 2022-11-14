@@ -3,7 +3,7 @@ title: "Carta do Edsger W. Dijkstra: \"Aos membros do Conselho de Orçamento\""
 published: false
 description: Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? 
 tags: [Orientação a Objeto, Java]
-cover_image: /assets/images/java/duke-plug.png
+cover_image: /assets/images/java/duke-plug.webp
 permalink: /posts/java-carta-dijkstra
 publish_date: 2022-05-06 17:38:00 +0300
 ---
