@@ -5,7 +5,7 @@ published: true
 series: Pensamento Crítico
 description: Qual a relevância de uma evidência? Como podemos fazer para avaliar se ela impacta ou não no nosso julgamento?
 tags: [Filosofia, Pensamento Crítico, Evidências]
-cover_image: /assets/images/filosofia.jpg
+cover_image: /assets/images/filosofia.avif
 publish_date: 2021-11-10 12:04:00 +0300
 ---
 

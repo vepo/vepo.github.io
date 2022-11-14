@@ -18,7 +18,7 @@ Desconhecimento só se resolve com conhecimento, e por isso que levanto o seguin
 
 Antes de tudo, precisamos antes entender ao que a filosofia se propõe. Temos no nosso imaginário a ideia do filósofo como alguém depressivo que vive pensando na vida, alguém solitário. Esse estereótipo não é verdadeiro. Para quem lembra do desenho Peanuts (ou Turma do Charlie Brown ou Snoopy), o Charlie Brown é só um cara meio depressivo e inteligente.
 
-![Essa imagem é o resumo da filosofia clássica.](/assets/images/filosofia.jpg)
+![Essa imagem é o resumo da filosofia clássica.](/assets/images/filosofia.avif)
 
 Mas nós não estamos aqui para falar de filosofia, mas da filosofia do design de código…
 

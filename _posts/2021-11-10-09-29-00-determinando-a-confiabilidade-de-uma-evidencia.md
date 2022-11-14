@@ -5,7 +5,7 @@ published: true
 series: Pensamento Crítico
 description: Para ter um pensamento crítico, não podemos apenas acreditar nas evidências, precisamos criticar elas. Nem toda evidência é confiável. Vamos entender o porque?
 tags: [Filosofia, Pensamento Crítico, Evidências]
-cover_image: /assets/images/filosofia.jpg
+cover_image: /assets/images/filosofia.avif
 publish_date: 2021-11-10 09:29:00 +0300
 ---
 

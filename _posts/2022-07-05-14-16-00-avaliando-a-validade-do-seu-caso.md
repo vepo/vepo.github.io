@@ -5,7 +5,7 @@ published: true
 series: Pensamento Crítico
 description: As informações que você tem são válidas para uma tomada de decisão?
 tags: [Filosofia, Pensamento Crítico, Evidências]
-cover_image: /assets/images/filosofia.jpg
+cover_image: /assets/images/filosofia.avif
 publish_date: 2022-07-05 14:16:00 +0300
 ---
 
