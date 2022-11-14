@@ -36,4 +36,5 @@ group :jekyll_plugins do
   gem "jekyll-seo-tag"
   gem "jekyll-compose", "~> 0.5"
   gem "jekyll-redirect-from"
+  gem 'jekyll-image-size'
 end
