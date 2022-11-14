@@ -9,7 +9,7 @@ module Jekyll
         end
 
         def render(context)
-            "<script src=\"#{@gist_url}.js\"></script>"
+            "<script async src=\"#{@gist_url}.js\"></script>"
         end
     end
 end
