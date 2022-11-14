@@ -113,7 +113,7 @@ i {
 
 .series .serie-contents .serie-article::before {
     counter-increment: post;
-    content: counter(post) ": ";
+    content: "  " counter(post) ": ";
 }
 
 .series .description {
@@ -125,6 +125,10 @@ i {
     color: #000000;
 }
 
+.series .serie-article {
+    position: relative;
+}
+
 .series .serie-article.selected {
     font-weight: bolder;
     background: #888;
@@ -132,7 +136,9 @@ i {
 }
 
 .series .serie-article.selected:before {
-    content: ">";
+    content: "> " counter(post) ": ";
+    position: absolute;
+    left: 1vw;
 }
 
 .series .serie-contents .serie-article:not(.selected):hover {
