@@ -9,6 +9,9 @@ series: Quarkus Tutorial
 publish_date: 2020-11-25 23:50:00 +0300
 ---
 
+> **Warning**
+> This post was updated to use Java 19 with the latest Quarkus version.
+
 JPA is a specification from Jakarta EE that controls the Data Access Layer. The most common implementation for it is [Hibernate ORM](https://hibernate.org/orm/).
 
 # Trade-offs
@@ -403,6 +406,25 @@ public User get(int userId) {
 ### Transactional Objects
 
 As we are using a transactional object, all changes we do in the JPA object it will be updated on the database. Each object read from the database is attached to the current session.
+
+## Integrating Endpoing and Database
+
+The last step we need to add is injecting the pass `Users` inside our `UserEndpoint` as we show on the previous posts. So we need to use the Java CDI, inject it using the annotation `@Inject`.
+
+```java
+@Path("/user")
+@ApplicationScoped
+public class UserEndpoing {
+    @Inject
+    Users users;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<User> list() {
+        return users.list();
+    }
+}
+```
 
 ## Executing and Testing
 
