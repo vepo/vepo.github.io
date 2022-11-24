@@ -1,4 +1,5 @@
-navigator.sayswho= (function(){
+navigator.googleAgent = navigator.userAgent.indexOf('Googlebot') > 0;
+navigator.detectedAgent = (function(){
     var ua= navigator.userAgent;
     var tem; 
     var M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -40,6 +41,5 @@ $(document).ready(() => {
         elm.parentNode.insertBefore(iframeContainer, elm);
         iframeContainer.appendChild(elm);
     });
-    
-    $("body").setAttribute("browser", navigator.sayswho);
+    $("body").setAttribute("browser", navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
 });
