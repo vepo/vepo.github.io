@@ -41,5 +41,5 @@ $(document).ready(() => {
         iframeContainer.appendChild(elm);
     });
     
-    $("body").addClass("browser", navigator.sayswho);
+    $("body").setAttribute("browser", navigator.sayswho);
 });
