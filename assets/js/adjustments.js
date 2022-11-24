@@ -41,5 +41,5 @@ $(document).ready(() => {
         elm.parentNode.insertBefore(iframeContainer, elm);
         iframeContainer.appendChild(elm);
     });
-    $("body").setAttribute("browser", navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
+    $("body").attr("browser", navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
 });
