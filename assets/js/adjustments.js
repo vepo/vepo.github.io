@@ -16,6 +16,8 @@ navigator.detectedAgent = (function(){
     return M.join(' ');
 })();
 
+document.body.setAttribute('browser', navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
+
 $(document).ready(() => {
     $("p > img").each((index, elm) => {
         if (elm.parentElement.children.length == 1) {
@@ -41,5 +43,4 @@ $(document).ready(() => {
         elm.parentNode.insertBefore(iframeContainer, elm);
         iframeContainer.appendChild(elm);
     });
-    $("body").attr("browser", navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
 });
