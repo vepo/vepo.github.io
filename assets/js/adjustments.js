@@ -16,7 +16,9 @@ navigator.detectedAgent = (function(){
     return M.join(' ');
 })();
 
-document.body.setAttribute('browser', navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
+window.onload = () => {
+    document.body.setAttribute('browser', navigator.googleAgent ? "Googlebot" : navigator.detectedAgent);
+};
 
 $(document).ready(() => {
     $("p > img").each((index, elm) => {
