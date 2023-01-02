@@ -1,0 +1,50 @@
+---
+title: O que são Sistemas Distribuídos?
+published: true
+description: Como podemos definir Sistemas Distribuídos? 
+tags: [Ciência da Computação, Sistemas Distribuídos, Microsserviços]
+cover_image: /assets/images/coral.jpeg
+series: Sistemas Distribuídos & Microsserviços
+permalink: /posts/sistemas-distribuidos-definicao
+publish_date: 2023-01-02 18:00:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+Nos últimos 10 anos a internet se tornou onipresente. Isso nos levou a estarmos sempre conectados ao nosso smartphone que se torna um tela de acesso a todo o mundo. Mas isso não mudou somente as nossas vidas, mas a arquitetura de software como um todo. Quase todos os sistemas hoje são conectados a internet e interagem com outros sistemas como se fossem parte de uma inteligência distribuída. Nessa série vou tentar colocar no "papel" o que são sistemas distribuídos e como podemos avaliar eles.
+
+[#cap-01-procurando-definicao]
+## Procurando uma definição
+
+Antes de começarmos a falar sobre sistemas distribuídos que tal procurar definir o que são sistemas distribuídos? Vou aceitar a definição do livro do https://amzn.to/3Q6BhsD[Maarten van Steen e Andrew S. Tanenbaum].
+
+.Definição
+[sidebar]
+Um **Sistema Distribuído** é uma coleção de elementos computacionais autônomos que aparecem para seus usuários como um único sistema coerente.
+
+Dessa definição podemos realçar duas características muito importantes para quando analisamos os sistemas distribuídos. A primeira é que estamos falando de **elementos computacionais autônomos**, ou seja, estamos falando de uma arquitetura de software/hardware que contém elementos distintos e independentes. Mas também estamos falando sobre **usuários** que veem esses sistemas como um único e coerente sistema, ou seja, estamos falando de vários uma arquitetura de software que conterá vários elementos autônomos que podem ser compreendidos como um só pela colaboração de seus elementos.
+
+_— Se fala o tempo inteiro de Microsserviços... Qual seria a diferença entre um Microsserviço e um Sistema Distribuído?!_
+
+A discussão sobre microsserviços é uma discussão paralela aos Sistemas Distribuídos. Para termos essa percepção precisamos olhar para a definição que o Sam Newman traz no primeiro capitulo do livro https://amzn.to/3IAcRpN[Criando Microsserviços].
+
+.Definição
+[sidebar]
+**Microsserviços** (_microservices_) são serviços que podem ser lançados (_deploy_) de forma independentes e são modelados com base em um domínio de negócios. [...] A arquitetura de microsserviços é um tipo de arquitetura orientada a serviços, com uma definição bem clara sobre como as fronteiras dos serviços devem ser traçadas, e para a qual a possibilidade de implantações independentes é fundamental.
+
+Através dessa definição podemos perceber que a discussão de microsserviços é atrelada a implantação e ao deploy. Nós estamos falando de software em produção de um domínio especifico que evolui e não sobre uma arquitetura estática.
+
+Ouso dizer que toda arquitetura de Microsserviço é uma arquitetura de um sistema distribuído, mas nem todo sistema distribuído tem uma arquitetura em microsserviço. Isso porque um sistema composto por microsserviços pode ser visto como um sistema único, mas um sistema distribuído pode não se adequar a uma arquitetura em microsserviço.
+
+_— COMO ASSIM?!?!_
+
+Deixa eu exemplificar! A análise de um Sistema Distribuído vai focar em qualidades do software que são comuns a uma gama maior que os sistemas que abrangem o foco dos Microsserviços. Por exemplo, se você olhar o https://thepiratebays.com/pt/[The Pirate Bay] vai ver o maior catálogo de Torrents que existe. Torrents são baixados em uma arquitetura https://pt.wikipedia.org/wiki/Peer-to-peer[Peer-to-Peer] que é um Sistema Distribuído mas de forma alguma pode ser encarado como um Microsserviço. O The Pirate Bay pode até ter uma arquitetura de microsserviços, mas ele faz parte de um sistema maior que é uma arquitetura mais complexa com protocolos e algoritmos próprios.
+
+// https://excalidraw.com/?#json=MX96U5UcZVriOebAJVSlF,RkgJ3arhpN06awjEy6CSNA
+
+[.text-center]
+.Arquitetura Peer-to-Peer
+image::peer-to-peer.svg[id=peer-to-peer, align="center"]
+
+Quando falamos de Sistemas Distribuídos estamos preocupados em como os softwares vão interagir, quais algoritmos eles irão usar para alcançar um objetivo e qual é o modelo de falha. Já quando falamos em Microsserviços estamos falando de um subconjunto dessa analise mais focado em como o software vai se manter em produção, qual a fronteira de cada elemento da arquitetura, como será o design do sistema, etc.
