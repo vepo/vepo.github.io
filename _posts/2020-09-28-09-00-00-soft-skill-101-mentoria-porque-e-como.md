@@ -10,6 +10,8 @@ publish_date: 2020-09-28 09:14:00 +0300
 original: "https://dev.to/vepo/soft-skill-101-mentoria-porque-e-como-3lcd"
 ---
 
+**PS.: Eu não estou com tempo livre para fazer mentorias. Desculpe, fiz isso por 1 ano, mas agora está impraticável. Fica aqui o registro do método que eu usava para mentorias 1:1.**
+
 # Porque?
 
 Porque eu mentoro gratuitamente é a primeira pergunta que respondo quando me procuram. A resposta é simples: eu sei o que a falta de mentoria pode fazer com a carreira de uma pessoa. Passei meus 10 primeiros anos sem a ajuda de ninguém e evolui muito pouco. Não sabia como estudar, não conhecia o mercado, não sabia o que era uma postura profissional, não conhecia os frameworks, etc... As empresas que eu trabalhavam gostavam do perfil do herói. O cara que chega lá e mata o leão. E eu era esse perfil, mas sempre reinventando a roda.
