@@ -12,10 +12,16 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
+          ref: source
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
           restore-keys: |
             ${{ runner.os }}-gems-
-      - uses: helaili/jekyll-action@2.0.5    # Choose any one of the Jekyll Actions
-        with:                                # Some relative inputs of your action
+      - uses: helaili/jekyll-action@2
+        with:
+          target_branch: gh-pages
+          target_path: /
+          keep_history: true
+          provider: pages
+          fqdn: blog.vepo.dev
           token: ${{ secrets.GITHUB_TOKEN }}
