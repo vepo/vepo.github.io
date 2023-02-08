@@ -12,7 +12,7 @@ module Jekyll
             ##    https://api.github.com/repos/OWNER/REPO
             super
             repo = repo.start_with?('https://github.com/') ? repo[19..-1] : repo
-            github_token = ENV["GITHUB_TOKEN"]
+            github_token = ENV["MY_GITHUB_SECRET"]
             @repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}", {:authorization => "Bearer #{github_token}", :accept => "application/vnd.github+json", :'x-gitHub-api-version' => '2022-11-28'}))
             puts @repo_info
         end
