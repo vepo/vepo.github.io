@@ -9,9 +9,6 @@ jobs:
   github-pages:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' 
       - uses: actions/checkout@v2
         with:
           ref: source
@@ -23,6 +20,7 @@ jobs:
             ${{ runner.os }}-gems-
       - uses: helaili/jekyll-action@v2
         with:
+          pre_build_commands: apk --update add python3
           target_branch: master
           target_path: /
           keep_history: true
