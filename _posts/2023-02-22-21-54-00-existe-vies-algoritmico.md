@@ -33,6 +33,8 @@ Agora que compreendemos o que é viés e o que é viés algorítmico, vou tentar
 
 Inteligência Artificial é um campo da computação muito rico, ela via tentar emular a inteligência humana em sistemas que apresentam uma forma de raciocínio ou buscam soluções de forma eficiente. Os algoritmos de IA podem ser classificados em vários tipos, chamarei aqui de IA Clássica todo algoritmo que racionaliza a estrutura do problema para buscar uma solução. Por exemplo, quando implementamos uma IA para jogar xadres, podemos implementar o [algoritmo Minimax](https://pt.wikipedia.org/wiki/Minimax) que é uma busca em uma árvore de possibilidades tentando maximizar a pontuação de um jogador pressuponto que o outro jogador vai também tentar maximizar a sua pontuação.
 
+![Desenho de uma árvore gerada pelo algoritmo Minimax](/assets/images/minimax.gif)
+
 Quer ver uma implementação do Minimax? Tenta jogar a [minha versão do jogo da velha em Scala](https://github.com/vepo/tic-tac-toe/).
 
 Já os algoritmos de Machine Learning em sua grande maioria vão tentar resolver problemas taxonômicos. São algoritmos que vão tentar fazer identificações baseados em features. Uma feature é uma caracteristica do objeto desejado. O exemplo mais clássico é a classificação de um algoritmo para identificação da flor Iris entre Iris Setosa, Iris Versicolour ou Iris Virginica. Já existe um [dataset composto com a largura e tamanho da pétala e da sépala e a respectiva classificação](https://archive.ics.uci.edu/ml/datasets/iris) e baseado nele é possível construir um sistema para identificação de qualquer flor desse tipo.
@@ -41,11 +43,17 @@ Durante alguns anos da minha vida eu construi sistemas de reconhecimento de fala
 
 Por fim temos os algoritmos de Deep Learning que são baseados em Redes Neurais. Uma rede neural é baseada na ideia do Perceptron. O perceptron é uma estrutura que permite a criação de uma função para transformação de dados inpirado no neuronio. Um neuronio recebe vários sinais eletricos de suas sinapses e produz um novo sinal que é uma função de todas as entradas. Um perceptron seria composto por um conjunto de entradas, uma função de transformação e um conjunto de parâmetros.
 
+![Desenho esquemático do Perceptron](/assets/images/perceptron.webp)
+
 Para que o perceptron tenha uma utilidade, ele precisa ser treinado para que os parâmetros sejam escolhidos. Por muitos anos esse treinamento não era fácil pela ausência de um bom método, mas em 1986 foi proposto o algoritmo _Backpropagation_ que possibilitou o treinamento de uma rede neural composta de várias camadas de perceptrons alinhados.
+
+![Desenho esquemático do Backpropagation](/assets/images/backpropagation.webp)
 
 Então quando falamos de _Deep Laerning_ temos uma base de dados que alimentará uma rede neural complexa e será treinada para que se encontre uma função de transformação com um erro mínimo. Esse treinamento é a escolha dos coeficientes afim de se reduzir o erro usando Gradiente Descendente e Backpropagation. Caso tenha interesse em ver um código que implementa tudo isso, em 2020, durante um periodo de tédio e ócio e com a necessidade de relembrar como é programar em C++ [eu fiz uma POC de implementar um NN em C++](https://github.com/vepo/cerebro).
 
 Podems então resumir que os algoritmos de _Deep Learning_ são um subconjunto dos algoritmos de _Machine Learning_ que por sua vez é um subconjunto dos algoritmos de Inteligência Artificial. Estamos falando na construção de programas que emulem as carateristicas da inteligência humana, mas esses programas nunca vão ser inteligentes como os humanos.
+
+![Tipos de Redes Neurais](/assets/images/tipos-de-nn.png)
 
 ## Pressupostos do _Deep Learning_
 
