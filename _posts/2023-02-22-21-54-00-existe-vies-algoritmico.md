@@ -108,7 +108,7 @@ Essa versão que os EUA tomaram Berlin é tão comum nos EUA que foi até ironiz
 
 Podemos então concluir que o ChatGPT tem o compromisso de tentar soar como um texto fluido em que as ideias sejam realmente apresentadas e verossímeis, mas ele não tem compromisso que essas ideias sejam verdadeiras. Ele não foi desenhado pra isso e isso está na documentação e nos papers apresentados no site da OpenIA.
 
-## IA como commoditie
+## IA como commodity
 
 Qualquer algoritmo de IA é um algoritmo que pode ser reimplementado, mas as Big Techs tentam vender IA como uma commiditie. Apesar de ser muito dificil de replicar esses algoritmos, eles são frutos de anos de investimento em pesquisa e inovação e muito dos estudos que poossibilitaram a contrução deles estão aí a nossa disposição.
 
