@@ -98,10 +98,10 @@ Um fluxo de eventos <mathml><mrow><mi>s</mi></mrow></mathml> é uma sequência d
         <mi>s</mi> 
         <mo>=</mo>
         (<mrow>
-            (<msub><mo>e</mo><mn>1</mn></msub>, 1</mi>), <mspace/> 
-            (<msub><mo>e</mo><mn>2</mn></msub>, 2</mi>), <mspace/> 
-            <mi>&hellip;</mi>,
-            (<msub><mo>e</mo><mn>n</mn></msub>, n</mi>)
+            (<msub><mo>e</mo><mn>1</mn></msub>, 1), <mspace/> 
+            (<msub><mo>e</mo><mn>2</mn></msub>, 2), <mspace/> 
+            <mi>&hellip;</mi>, <mspace/> 
+            (<msub><mo>e</mo><mn>n</mn></msub>, n)
         </mrow>)
    </mrow>
 </math>
