@@ -91,7 +91,7 @@ Cada evento é armazenado junto com um número de sequência. Seu número de seq
 
 ### Stream de eventos
 
-Um fluxo de eventos $$s$$ é uma sequência de tuplas, cada tupla contendo um evento e seu número de sequência
+Um fluxo de eventos <mathml><mrow><mi>s</mi></mrow></mathml> é uma sequência de tuplas, cada tupla contendo um evento e seu número de sequência
 
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
     <mrow>
@@ -117,19 +117,19 @@ A função de projeção pega um ou mais fluxos de eventos e cria uma projeção
 
 ### Projeções 
 
-Uma projeção $$&pi;$$ é uma seleção dos dados armazenados em eventos, transformados em um modelo específico. A seleção e transformação depende da finalidade da projeção. Os dados em uma projeção são transitórios, uma projeção pode ser reconstruída a partir de seus eventos de origem a qualquer momento.
+Uma projeção <mathml><mrow><mi>&pi;</mi></mrow></mathml> é uma seleção dos dados armazenados em eventos, transformados em um modelo específico. A seleção e transformação depende da finalidade da projeção. Os dados em uma projeção são transitórios, uma projeção pode ser reconstruída a partir de seus eventos de origem a qualquer momento.
 
 ### Função de aceitação 
 
-A função aceitar leva uma projeção $$&pi;$$ e um comando $$c$$. O comando é validado usando os dados da projeção e a função de aceitação resulta em um erro ou em um evento.
+A função aceitar leva uma projeção <mathml><mrow><mi>&pi;</mi></mrow></mathml> e um comando <mathml><mrow><mi>c</mi></mrow></mathml>. O comando é validado usando os dados da projeção e a função de aceitação resulta em um erro ou em um evento.
 
 ### Esquema de evento 
 
-Um esquema de evento $$e$$ descreve o tipo e a forma dos eventos. $$con forms(e, e)## detém se o evento estiver em conformidade com a especificação $$e$$.
+Um esquema de evento <mathml><mrow><mi>&epsilon;</mi></mrow></mathml> descreve o tipo e a forma dos eventos. <mathml><mrow><mi>com forms (e, &epsilon;)</mi></mrow></mathml> detém se o evento <mathml><mrow><mi>e</mi></mrow></mathml> estiver em conformidade com a especificação <mathml><mrow><mi>&epsilon;</mi></mrow></mathml>.
 
 ### Esquema de stream de eventos 
 
-Um esquema de stream de eventos $$&sigma;$$ descreve um stream de eventos e os eventos que podem ocorrer no stream. O esquema do stream de eventos contém os esquemas dos eventos que podem ocorrer no stream, juntamente com os padrões de ocorrência. $$con forms (s, &sigma;)$$ detém se o stream de eventos $$s$$s estiver em conformidade com a especificação $$&sigma;$$.
+Um esquema de stream de eventos <mathml><mrow><mi>&sigma;</mi></mrow></mathml> descreve um stream de eventos e os eventos que podem ocorrer no stream. O esquema do stream de eventos contém os esquemas dos eventos que podem ocorrer no stream, juntamente com os padrões de ocorrência. <mathml><mrow><mi>con forms (s, &sigma;)</mi></mrow></mathml> detém se o stream de eventos <mathml><mrow><mi>s</mi></mrow></mathml> estiver em conformidade com a especificação <mathml><mrow><mi>&sigma;</mi></mrow></mathml>.
 
 ### Banco de esquema de eventos
 
