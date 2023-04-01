@@ -1,6 +1,6 @@
 ---
 title: Arquitetura Event-Sourcing
-published: true
+published: false
 permalink: /posts/event-sourcing-systems
 description: Nesse post vamos fazer uma pequena introdução do que é uma Arquitetura Event-Sourcing (EDA) e como ela pode ser implementada. Para minha surpresa Event-Sourcing é diferente de Event-Driven.
 tags: [Event-Sourcing Systems, Arquitetura]
