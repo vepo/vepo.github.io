@@ -1,6 +1,6 @@
 ---
 title: Arquitetura Event-Sourcing
-published: false
+published: true
 permalink: /posts/event-sourcing-systems
 description: Nesse post vamos fazer uma pequena introdução do que é uma Arquitetura Event-Sourcing (EDA) e como ela pode ser implementada. Para minha surpresa Event-Sourcing é diferente de Event-Driven.
 tags: [Event-Sourcing Systems, Arquitetura]
@@ -64,7 +64,7 @@ Em um SES, nós não temos uma entidade única em uma base de dados representand
 
 ## Caracterização de Sistemas Event Sourcing
 
-Para termos uma definição mais formal de SES, precisamos trazer uma definição formal para cada componente que integra o sistema. Vou me basear na definição de Michiel Overeem em _An empirical characterization of event sourced systems and their schema evolution — Lessons from industry_<sup>[[5]](#reference-5)</sup>, onde ele define Evento (_Event_), Sequência de eventos (_Event sequence_), Stream de eventos (_Event stream_), Reserva de eventos (_Event store_), Função de projeção (_Project function_), Projeções (_Projections_), Função de aceitação (_Accept function_), Esboço de evento (_Event schema_), Esboço de stream de eventos (_Event stream schema_) e Reserva de esboço de eventos (_Event store schema_).
+Para termos uma definição mais formal de SES, precisamos trazer uma definição formal para cada componente que integra o sistema. Vou me basear na definição de Michiel Overeem em _An empirical characterization of event sourced systems and their schema evolution — Lessons from industry_<sup>[[5]](#reference-5)</sup>, onde ele define Evento (_Event_), Sequência de eventos (_Event sequence_), Stream de eventos (_Event stream_), Banco de eventos (_Event store_), Função de projeção (_Project function_), Projeções (_Projections_), Função de aceitação (_Accept function_), Esquema de evento (_Event schema_), Esquema de stream de eventos (_Event stream schema_) e Banco de esquema de eventos (_Event store schema_).
 
 ### Event
 
@@ -92,6 +92,48 @@ Cada evento é armazenado junto com um número de sequência. Seu número de seq
 ### Stream de eventos
 
 Um fluxo de eventos $$s$$ é uma sequência de tuplas, cada tupla contendo um evento e seu número de sequência
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+    <mrow>
+        <mi>s</mi> 
+        <mo>=</mo>
+        (<mrow>
+            (<msub><mo>e</mo><mn>1</mn></msub>, 1</mi>), <mspace/> 
+            (<msub><mo>e</mo><mn>2</mn></msub>, 2</mi>), <mspace/> 
+            <mi>&hellip;</mi>,
+            (<msub><mo>e</mo><mn>n</mn></msub>, n</mi>)
+        </mrow>)
+   </mrow>
+</math>
+
+### Banco de eventos
+
+Um banco de eventos é um conjunto de fluxos de eventos. Esses fluxos formam as partições do armazenamento de eventos e são separados.
+
+
+### Função de projeção 
+
+A função de projeção pega um ou mais fluxos de eventos e cria uma projeção com os dados dos eventos fornecidos. A própria projeção pode assumir diferentes formas, por exemplo, pode ser um banco de dados relacional atualizado por meio de instruções SQL ou um índice de pesquisa manipulado por meio do sistema de arquivos.
+
+### Projeções 
+
+Uma projeção $$&pi;$$ é uma seleção dos dados armazenados em eventos, transformados em um modelo específico. A seleção e transformação depende da finalidade da projeção. Os dados em uma projeção são transitórios, uma projeção pode ser reconstruída a partir de seus eventos de origem a qualquer momento.
+
+### Função de aceitação 
+
+A função aceitar leva uma projeção $$&pi;$$ e um comando $$c$$. O comando é validado usando os dados da projeção e a função de aceitação resulta em um erro ou em um evento.
+
+### Esquema de evento 
+
+Um esquema de evento $$e$$ descreve o tipo e a forma dos eventos. $$con forms(e, e)## detém se o evento estiver em conformidade com a especificação $$e$$.
+
+### Esquema de stream de eventos 
+
+Um esquema de stream de eventos $$&sigma;$$ descreve um stream de eventos e os eventos que podem ocorrer no stream. O esquema do stream de eventos contém os esquemas dos eventos que podem ocorrer no stream, juntamente com os padrões de ocorrência. $$con forms (s, &sigma;)$$ detém se o stream de eventos $$s$$s estiver em conformidade com a especificação $$&sigma;$$.
+
+### Banco de esquema de eventos
+
+Um banco de esquema de eventos $$&theta;$$ descreve um banco de eventos e os streams armazenados no banco de eventos. $$con forms (es, &theta;)$$ detém se o banco de eventos $$es$$ estiver em conformidade com a especificação $$&theta;$$.
 
 ## Referências
 
