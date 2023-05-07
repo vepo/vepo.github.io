@@ -25,6 +25,7 @@ group :jekyll_plugins do
   gem 'jekyll-asciidoc'
   gem 'jekyll-image-size'
   gem 'jekyll-date-localization'
+  gem 'jekyll-redirect-from'
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
