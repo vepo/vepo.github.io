@@ -1,109 +1,99 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 {% include head.html %}
-    
 <body>
-    <div>
-        <div class="menu">
-        {% include menu.html %}
-        </div>
-        {% assign container_classes = "container" %}
+    <div class="container">
+        <header class="site-header">
+            <h3 class="site-title">Victor Osório</h3>
+            {% include menu.html %}
+        </header>
+        {% include page-header.html %}
         {% if page.id %}
-            {% assign container_classes = "container-fluid post" %}
+        {% if page.publish_date %}
+        <div class="publish_date">
+            <strong>
+                <time datetime="{{ page.publish_date | date_to_xmlschema }}">
+                    {{ page.publish_date | localize: '%d/%B/%Y' }}
+                </time>
+            </strong> 
+        </div>
         {% endif %}
-        <div class="flex-grow-1" style="max-width: 100%;">
-            <div class="{{ container_classes }}">
-                {% include page-header.html %}
-                {% if page.id %}
-                <p>
-                    {% if page.publish_date %}
-                    <strong>
-                        <time datetime="{{ page.publish_date | date_to_xmlschema }}">
-                            {{ page.publish_date | date: '%B %d, %Y' }}
-                        </time>
-                    </strong> 
-                    {% endif %}
-                </p>
-                <div class="tag-container">
-                    {% for tag in page.tags %}
-                    <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a> 
-                    {% endfor %}
-                </div>
-                    {%if page.github %}
-                <p>
-                    <a href="{{ page.github }}" class="btn btn-default">
-                        <i class="fa fa-github fa-2x"></i> {{ page.github }}
-                    </a>
-                </p>
-                    {% endif %}
-                    {% if page.original %}
-                <div>
-                    Post originally published on <a href="{{ page.original }}">{{ page.original | domain }}</a>.
-                </div>
-                    {% endif %}
-                <hr> 
-                {% endif %}
-                {% include serie.html %}
-                <article>
-                    {{ content }}
-                </article>
-                {% include serie.html %}
-                {% if page.id %}
-                <div style="text-align: center;margin: 10px auto;max-width: 50%;">
-                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-                        <img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
-                    </a>
-                    <br />
-                    Este obra está licenciado com uma Licença 
-                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-                        Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
-                    </a>.
-                </div>
-                <div class="published">
-                    {% if page.publish_date %}
-                    <div>Originally published {{ page.publish_date| date: '%B %d, %Y' }}</div>
-                    {% endif %}
-                </div>
+        <div class="tag-container">
+            {% for tag in page.tags %}
+            <i class="fas fa-tags"></i>
+            <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a> 
+            {% endfor %}
+        </div>
+            {%if page.github %}
+        <p>
+            <a href="{{ page.github }}" class="btn btn-default">
+                <i class="fa fa-github fa-2x"></i> {{ page.github }}
+            </a>
+        </p>
+            {% endif %}
+            {% if page.original %}
+        <div>
+            Post originally published on <a href="{{ page.original }}">{{ page.original | domain }}</a>.
+        </div>
+            {% endif %}
+        <hr> 
+        {% endif %}
+        {% include serie.html %}
+        <article>
+            {{ content }}
+        </article>
+        {% include serie.html %}
+        {% if page.id %}
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                <img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+        <div class="article-footer">
+            {% if page.publish_date %}
+            <div class="published">
+                <div>Originally published {{ page.publish_date| localize: '%d/%B/%Y' }}</div>
+            </div>
+            {% endif %}
 
-                {% assign related_posts_counter = 0 %}
+            {% assign related_posts_counter = 0 %}
+            {% for allpost in site.posts %} 
+                {% for tag in page.tags %} 
+                    {% if allpost.tags contains tag and allpost.id != page.id %}
+                    {% assign related_posts_counter = related_posts_counter | plus:1 %}
+                    {% break %}
+                    {% endif %} 
+                {% endfor %} 
+            {% endfor %}
+            {% if related_posts_counter > 0 %}
+            <div class="related-posts">
+                <h2>Posts relacionados</h2>
                 {% for allpost in site.posts %} 
                     {% for tag in page.tags %} 
                         {% if allpost.tags contains tag and allpost.id != page.id %}
-                        {% assign related_posts_counter = related_posts_counter | plus:1 %}
-                        {% break %}
+                <a href="{{ allpost.url }}">
+                        {% if allpost.series %}
+                            {{ allpost.series }}: {{ allpost.title }}
+                        {% else %}
+                            {{ allpost.title }}
+                        {% endif %}
+                </a>
+                            {% break %} 
                         {% endif %} 
                     {% endfor %} 
                 {% endfor %}
-                {% if related_posts_counter > 0 %}
-                <div class="related-posts">
-                    <div class="related-post-header">Posts relacionados</div>
-                    {% for allpost in site.posts %} 
-                        {% for tag in page.tags %} 
-                            {% if allpost.tags contains tag and allpost.id != page.id %}
-                    <div class="related-post-item">
-                        <a href="{{ allpost.url }}">
-                                {% if allpost.series %}
-                                    {{ allpost.series }}: {{ allpost.title }}
-                                {% else %}
-                                    {{ allpost.title }}
-                                {% endif %}
-                        </a>
-                    </div>
-                                {% break %} 
-                            {% endif %} 
-                        {% endfor %} 
-                    {% endfor %}
-                {% endif %} 
-                </div>
-                {% endif %} 
-                {% include disqus.html %}
-                {% include twitter.html %}
-            </div>
+            {% endif %}
+        </div>
+        {% endif %}
         </div>
     </div>
- 
-    {% include footer.html %}
-    {% include analytics.html %} 
-</body>
 
+    {% include footer.html %}
+    {% include analytics.html %}
+ </body>
 </html>

@@ -1,16 +1,16 @@
 FROM ubuntu
 
-RUN apt-get update
-RUN apt-get install -y ruby-full build-essential zlib1g-dev python3
-ENV GEM_HOME="$HOME/gems"
-ENV PATH="$HOME/gems/bin:$PATH"
-ENV LANGUAGE=en_US.UTF-8
-ENV LANG=en_US.UTF-8
-ENV LC_ALL=en_US.UTF-8
-RUN gem install jekyll bundler
-WORKDIR /site
-ADD Gemfile /site/
-ADD Gemfile.lock /site/
-RUN bundle install
+RUN apt update 
+RUN apt -y install ruby-dev build-essential
+RUN gem install bundler jekyll
 
-CMD ["bundle", "exec", "jekyll", "serve", "--trace"]
+RUN mkdir /app
+COPY ./start-script.sh /app
+
+WORKDIR /app
+EXPOSE 4000
+
+ARG MY_GITHUB_SECRET
+ENV MY_GITHUB_SECRET=$MY_GITHUB_SECRET
+
+CMD  ./start-script.sh

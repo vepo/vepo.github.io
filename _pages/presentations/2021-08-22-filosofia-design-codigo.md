@@ -1,2 +1,0 @@
-O primeiro passo ao se falar da Filosofia do Design de Código é definir o que é filosofia. Alguns pensam que filosofia é o ato de pensar, muitas vezes sozinho e depressivo. Não há imagem mais errada que essa. Filosofia é a atividade de dar um passo atrás. Ao fazer a atividade filosófica, tempos que para o que estamos fazendo e discutir a natureza das coisas que estamos fazendo. É o modo de treinar o modo como pensamos as coisas. Ao invês de usar conceitos, vamos discutir os conceitos, pensar sobre eles.
-

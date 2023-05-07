@@ -1,6 +1,3 @@
-require 'rest-client'
-require 'json'
-
 module Jekyll
     class GistTag < Liquid::Tag
         def initialize(tag_name, gist_url, tokens)
@@ -9,7 +6,7 @@ module Jekyll
         end
 
         def render(context)
-            "<script async src=\"#{@gist_url}.js\"></script>"
+            "<div data-gist=\"#{@gist_url}\"></div>"
         end
     end
 end
