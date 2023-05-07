@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN apt update 
-RUN apt -y install ruby-dev build-essential
+RUN apt -y install ruby-dev build-essential python3
 RUN gem install bundler jekyll
 
 RUN mkdir /app
