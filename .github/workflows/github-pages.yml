@@ -20,7 +20,7 @@ jobs:
             ${{ runner.os }}-gems-
       - uses: helaili/jekyll-action@v2
         with:
-          pre_build_commands: apk --update add python3
+          pre_build_commands: apk --update add python3 & git config --global http.version HTTP/1.1 & apk fetch git-lfs;
           target_branch: master
           target_path: /
           token: ${{ secrets.GITHUB_TOKEN }}
