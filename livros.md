@@ -16,6 +16,10 @@ permalink: /livros
 
 [**Anatomia do Protocolo HTTP: A internet se faz de protocolos e não de frameworks**](https://amzn.to/42vPvrG) foi o precursor do Roadmap back-end. Nele eu fiz um experimento de descrever o que é o protocolo HTTP e como ele pode ser utilizado. A ideia inicial desse livro surgiu quando fazia mentorias e muitas das pessoas com quem eu conversava não conheciam o protocolo.
 
+![Capa do livro](/assets/images/books/capa-http.jpg)
+
 ## Não seja essa pessoa
 
 [**Não seja essa pessoa: Ética ou como não agir no trabalho**](https://amzn.to/43oeb6D) é um projeto não concluído (e por enquanto sem andamento) de se escrever um livro sobre ética no trabalho. Essa ideia surgiu depois de um tweet em que várias pessoas responderam contando suas experiências negativas.
+
+![Capa do livro](/assets/images/books/etica.jpg)
