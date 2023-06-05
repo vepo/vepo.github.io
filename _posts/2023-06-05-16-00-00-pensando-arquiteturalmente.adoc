@@ -1,0 +1,159 @@
+---
+title: Pensando Arquiteturalmente
+published: true
+description: Como é pensar em uma arquitetura de software? Como podemos descrever uma aquitetura de um sotware?
+tags: [Arquitetura de Software, Sistemas Distribuídos, Microsserviços]
+cover_image: /assets/images/pexels-tima-miroshnichenko-5846251.avif
+series: Sistemas Distribuídos & Microsserviços
+permalink: /posts/sistemas-distribuidos-definicao
+publish_date: 2023-06-05 10:00:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+
+Quando falamos de Sistemas Distribuídos e Microsserviços, estamos tentando descrever o mesmo sistema de duas formas diferentes. São pontos de vistas diferentes, mas, na verdade, **estamos tentando descrever um sistema**, ou seja, estamos documentando a arquitetura de um software. No post anterio trabalhamos a definição do que são Sistemas Distribuídos e do que são Microsserviços, agora vamos tentar responder uma outra pergunta: _como podemos definir uma Arquitetura de Software?_
+
+Para responder essa pergunta vou usar como referência a https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm[disertação de doutorado de Roy Fielding] que ficou famosa por propor o padrão REST. Por sua vez essa disertação usa como referência o livro https://amzn.to/3OyDL41[Software Architecture in Practice] do Len Bass. Ambas as leituras são recomendáveis, mas a dissertação do Fielding é mais acessível.
+
+E como ele define Arquitetura de Software?
+
+[quote]
+____
+A **Arquitetura** é uma abstração do software que temos em execução em um determinado nível.
+____
+
+Dessa definição precisamos extrair dois pontos interessantes. O primeiro é que arquitetura é uma abstração. Existe software em produção e a arquitetura também é uma forma de se representar esse software em produção. Ela também pode ser usada para se representar o software que se deseja colocar em produção. Esses dois tipos de representação é o que podemos chamar de arquitetura _**AS-IS**_ (_como é_ em tradução livre) e arquitetura _**TO-BE**_ (_a ser_ em tradução livre).
+
+O segundo ponto interessante é que existem níveis de detalhamento de uma arquitetura. Assim, podemos definir uma arquitetura alto nível, só olhando cada elemento como uma caixa preta e como eles se comunicam, ou podemos entrar nessas caixas e ignorar os componentes externos. Existe um detalhamanto arquitetural para cada nível de software, desde o micro que olha para apenas um processo ao macro que engloba todos os sistemas em produção.
+
+Em resumo, arquitetura é uma documentação que define como o nosso software é, ou pretende ser.
+
+Seguindo na leitura, vemos que ele define alguns elementos que uma arquitetura possui. Os elementos básicos são os componentes, os conectores e os dados. Cada um desses elementos pode ser definido em diversos níveis, mas nesse post vamos focar apenas na comunicação interprocessos (IPC).
+
+[quote]
+____
+Uma arquitetura de software é definida por uma conjunto de elementos arquiteturais - componentes, conectores e dados - restritos em seus relacionamentos para atingir um conjunto desejado de propriedades arquitetônicas.
+____
+
+== Comunicação Interprocessos
+
+Para ser didático precisamos primeiro definir o que é **comunicação interprocessos**, correto? E para termos a clareza dessa definição temos que dar mais um passo atrás e definir o que são processos e threads.
+
+**Processo** é a instância de um programa em execução. Cada processo tem um identificador único, um espaço reservado na memória e ocupa porções da execução de um processador. Todos os processo de uma máquina compartilham os mesmos processadores e a memória total, mas um processo não pode acessar a memória de outro processo e os processadores são compartilhados através da divisão de fatias de tempo do processador. 
+
+Já **Threads** são fluxos de processamentos independentes dentro de um mesmo processo. Todas as threads de um mesmo processo compartilham de um mesmo espaço de memória e ela podem ser executadas em paralelo, isso significa que uma thread pode acessar a memória de outra thread desde que ela seja executada pelo mesmo processo.
+
+Threads e Processos são gerenciados pelo Sistema Operacional e são recursos limitados. Caso um processo requeira muita memória o sistema operacional poderá conceder ou não. Em determinados momentos o sistema operacional pode para a execução de um programa para que esse não consuma mais memória ou CPU.
+
+_— Se um processo não pode acessar a memória de outro processo, como há comunicação entre processos?_
+
+Essa é a pergunta que levou a se criar os mecanismos de comunicação interprocessos. Existem vários desses mecanismos, mas quase todos os softwares usam apenas um. Abaixo vemos todos os mais coumns e o Socket é o mais importante deles pois é o único que permite uma comunicação entre processos que estão alocados em máquinas distintas.
+
+* Pipes
+* FIFOs
+* Filas de Mensagens
+* Memória Compartilhada
+* Semáforos
+* Sinais
+* Sockets
+
+Caso você tenha interesse em conhecer mais a fundo, já vá avisado que muitos deles não tem suporte em linguagens alto níveis, apenas e C.
+
+=== Socket
+
+A API Socket (o termo API na época era usado para bibliotecas) é talvez uma das mais antigas em uso até hoje. Ela foi lançada em 1983 como Berkeley sockets e depois evoluiu para POSIX sockets se tornando um padrão de fato para a comunicação entre processos e para internet.
+
+Praticamente toda a nossa comunicação via redes é feita através dela e ela é um divisor de camadas no modelo OSI. Aplicações que usam diretamente a biblioteca acessam a camada de transporte para implementar as camadas de sessão, apresentação e aplicação.
+
+// https://excalidraw.com/#json=_TQzA1y1ZD2RVK7QhADQ0,YGOXRaCY7gTY6gROrcCdGg
+
+[.text-center]
+.Modelo OSI: TCP/IP & Socket
+image::microservices/modelo-osi.png[id=modelo-osi, align="center"]
+
+Hoje grande parte das aplicações são implementadas usando TCP/IP usando protocolos de aplicação muito bem conhecidos como HTTP.
+
+A  comunicação socket é importante mas ela não é representada em uma arquitetura pois o protocolo que usa ela é mais importante e é indissociável dos protocolos inferiores. Por exemplo, ao falarmos que usamos HTTP sabemos que é bem provavél que estejamos usando TCP/IP. Mas se especificarmos que é o HTTP/3 isso significa que estamos usando QUIC sobre UDP.
+
+== Desenhando uma arquitetura
+
+Falamos dos Elementos de uma arquitetura e do que são os mecanismo de comunicação interprocessos. Mas e como desenhamos uma arquitetura. Podemos demonstrar documentando a arquitetura de um sistema distribuído para internet bem simples: o monólito!
+
+O monólito é composto de uma aplicação backend e uma base de dados. No nosso monólito vamos adotar a tecnologia server rendering que existem desde o começo da web. Nosso monólito não terá uma API REST, ele servirá apenas para responder requisições de um navegador. E, se me permitem, vamos usar tecnologias bem antiguadas para podermos no futuro evoluir esse exemplo.
+
+O primeiro passo para definir nossa arquitetura é identificar quais são os componentes que ela possui. Como nosso monólito é composto de apenas um servidor Web podemos considerar ele um elemento e a base de dados que vamos escolher o outro. Bem simples, não? Mais ou menos... Estão faltando componentes nessa arquitetura.
+
+Para compreender melhor, temos que olhar a definição que Fielding usou para componente. Nela qualquer unidade de software que oferece transformação de dados e tem um estado interno.
+
+[quote]
+____
+Um **componente** é uma unidade abstrata de instruções de software e estado interno que fornece uma transformação de dados por meio de sua interface.
+____
+
+Logo, segundo a definição acima, todos os clientes do nosso servidor web também são componentes da nossa arquitetura. Será que o nosso servidor irá apenas responder requisições de navegadores em desktops? Ou será que ele irá responder requisições de dispositivos móveis? Em ambos os casos temos navegadores do outro lado, pois se falarmos dispositivos móveis vamos ter que supor que estamos implementando um aplicativo móvel, o que não é o caso.
+
+// https://excalidraw.com/#json=gre9C9p6cjR3KvhO56x9F,nCIfLzhti8Q1HCmR-oC3Ng
+
+
+[.text-center]
+.Arquitetura: Componentes
+image::microservices/arq-componentes.png[id=arq-componentes, align="center"]
+
+
+O próximo passo é identificar quais são os conectores que ligam nosso componentes. Segundo Fielding todo mecanismo que faz a mediação entre os componentes é considerado um conector. No nosso caso podemos dizer que o protocolo HTTP e a biblioteca JDBC são conectores.
+
+[quote]
+____
+Um **conector** é um mecanismo abstrato que faz a mediação da comunicação, coordenação ou cooperação entre os componentes.
+____
+
+Observe que no diagrama da Figura 3 os conectore tem direção pois a conexão é iniciada por um componente que elabora requisições e outro componente responde essa requisições. Se nossos protocolos tivesse dupla via, deveriamos usar setas para os dois lados.
+
+// https://excalidraw.com/#json=GDZoX6cpd0SjoAOYWNYWC,D1e4ots26HIU08DNapsSVQ
+
+[.text-center]
+.Arquitetura: Conectores
+image::microservices/arq-conectores.png[id=arq-conectores, align="center"]
+
+Por fim precisamos definir os dados... Para isso vamos ver como Fielding define?
+
+[quote]
+____
+Um datum é um elemento de informação que é transferido de um componente, ou recebido por um componente, por meio de um conector.
+____
+
+Documentos de arquiteturas são bem flexíveis e podem ser desenhando sem regras pre-estabelecidas, logo temos a liberdade de definir que dados vamos registrar. Se nosso sistema fosse uma API REST, usar uma documentação OpenAPI seria uma boa solução. Já para nossa base de dados, um diagrama de entidades também é uma solução. Toda essa documentação seria anexa ao diagrama que já criamos.
+
+== Evoluindo uma arquitetura
+
+Como dissemos na introdução, existem dois tipos de arquitetura a atual (_**AS-IS**_) e a desejada (_**TO-BE**_). Na sessão anterior nós documentamos um sistema monolito com uma arquitetura propositadamente antiquada.
+
+Mas vamos imaginar que nosso sistema está em processo continuo de atualização e precisamos desenhar uma nova arquitetura quer será migrada ao logo de 1 ano de desenvolvimento.
+
+Como nosso sistema está tendo que responder a uma crescente número de requisições e estamos precisando fazer atualizações mais frequentes em diversas partes, decidimos por dividir o sistema em 3 partes: catalago, loja e lojística. Cada componente terá uma API REST e teremos algumas aplicações front-end especificas para os times internos.
+
+Assim podemos desenhar nosso sistema de acordo com o diagrama abaixo.
+
+// https://excalidraw.com/#json=DzKQP7tx4rS6q4uDKE2eW,vzTCAj9OJ2XKElygEJkUvA
+
+[.text-center]
+.Arquitetura: Microsserviços
+image::microservices/arq-microsservicos.png[id=arq-microsservicos, align="center"]
+
+Como essa arquitetura é uma "arquitetura desejada", o desenvolvimento das próximas funcionalidades podem ser guiada por ela para se aumentar a modularização para que a quebra das APIs em componentes separados não seja crítica.
+
+_— E porque nessa arquitetura não estão representadas as base de dados?_
+
+Bem observado! Quando adotamos uma arquitetura em microsserviços, a base de dados é de responsabilidade do componente. Assim a base de dados que cada API escolhe é de responsabilidade dela e deve ser documentada somente internamente. Isso significa que para um usuário externo desse componente qualquer especificidade do armazenamento é uma informação inútil e a API externa deve encapsular toda essa complexidade.
+
+_— E cadê a informação do protocolo nos conectores?_
+
+Essa informação foi omitida porque é óbvia. Estamos falando de uma API REST, logo estamos falando de HTTP.
+
+== Conclusão
+
+Quando falamos de Microsserviços estamos falando de uma escolha arquitetural, logo precisamos aprender a desenhar uma arquitetura de software. Mas quando estamos falando de Sistemas Distribuídos, estamos falando de coordenação e comunicação de diversos serviços, logo também estamos falando de uma arquitetura de software.
+
+Desenha uma arquitetura de software é útil para que possamos compreender melhor o que está acontecendo e qual é a iteração entre os vários serviços que temos em execução.
