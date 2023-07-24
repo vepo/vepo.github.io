@@ -3,15 +3,41 @@ title: O que é um Middleware?
 published: false
 description: Um dos conceitos chaves para Sistemas Distribuídos é o conceito de Middleware. Nesse post nós vamos entrar um pouco nesse conceito e apresentar quais componentes do nosso software se adequa a ele.
 tags: [Middleware, Sistemas Distribuídos, Microsserviços]
-cover_image: /assets/images/pexels-tima-miroshnichenko-5846251.avif
+cover_image: /assets/images/pexels-vinicius-pontes-4048062.jpg
 series: Sistemas Distribuídos & Microsserviços
-permalink: /posts/pensando-arquiteturalmente
+permalink: /posts/o-que-e-um-middleware
 publish_date: 2023-06-06 10:00:00 +0300
 ---
 
 :figure-caption: Figura
 :imagesdir: /assets/images/
 
-Nos úlitmos posts definimos o que são Sistemas Distribuídos e como se desenha informalmente uma Arquitetura de Software. Nesse nós vamos entrar no conceito de Middleware que 
-fazem o papel de conectores em uma Arquitetura. Primeiro vamos definir o que são Middlewares, depois vamos especificar os tipos de Middlewares que temos em uma arquitetura de
-Microsserviços e por fim vamos caracterizar esses Middlewares.
+Nos úlitmos posts definimos o que são Sistemas Distribuídos e como se desenha informalmente uma Arquitetura de Software. Nesse nós vamos entrar no conceito de Middleware que faz o papel dos conectores em uma Arquitetura. Primeiro vamos definir o que são Middlewares, depois vamos especificar os tipos de Middlewares que temos em uma arquitetura de Microsserviços e por fim vamos caracterizar esses Middlewares.
+
+== Definição
+
+Sistemas Distribuídos, por definição, rodam e diversos tipos de ambientes. É comum termos aplicações rodando simultaneamente em vários sistemas operacionais, em várias linguagens, várias infraestruturas de rede ou mesmo em várias arquiteturas de hardware diferentes porém comunicando harminicamente. Para que essa comunicação ocorra sem dificuldades para os desenvolvedores normalmente temos um conjunto de código, protocolos e ferramentas que facilitam a integração dos serviços.
+
+Essa camada de software que torna transparente toda a complexidade de sistemas heterogêneos é o que chamamos de Middleware. Logo podemos definir que **Middleware é a camada de software que abstrai a complexidade de comunicação entre processos de um sistema distribuído em ambientes heterogêneos facilitando a integração e promovendo a conexão transparente**.
+
+// https://excalidraw.com/#json=XhmLHVSHyfJICxVz6bxcI,-THZ752QKffaGbaIgGC5_A
+
+[.text-center]
+.Middlware
+image::microservices/middleware.png[id=middleware, align="center"]
+
+Já que definimos o que são middlewares, vamos listar alguns tipos de middlewares para depois fazermos uma analise mais aprofundada.
+
+* Remote Procedure Call (RPC)
+* Message-Oriented Middleware (MOM)
+* Object-Relational Mapping (ORM)
+* Transaction Processing (TP) Middleware
+* Application Programming Interface (API)
+
+== Remote Procedure Call (RPC)
+
+Remote Procedure Call (RPC) é um estilo arquitetural onde toda a complexidade de comunicação é encapsulada através de interfaces e bibliotecas. Um desenvolvedor ao criar, ou usar, uma interface RPC deve se preocupar mais com o código que está implementando do que com a complexidade do protocolo. Na verdade, a gestão do protocolo, assim como a implementação, será de responsabilidade do middlware.
+
+Esse é um dos estilos arquiteturais mais antigos que existem, seu inicio se deu nos anos 1970, mas o primeiro uso comercial foi em 1981 pela Xerox e até hoje é muito usado através das diversas implementações como SOAP e gRPC. Para exemplificar como funciona um RPC, vamos usar o gRPC como exemplo.
+
+RPC tem uma linguagem para definição de interfaces, a Interface Definition Language (ILD). No SOAP existe um XML chamado de WSDL e no gRPC temos o protocol buffers. 
