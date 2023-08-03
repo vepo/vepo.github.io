@@ -1,6 +1,6 @@
 ---
 title: Soft-Skill 101 - Mentoria. Porque e como?
-published: true
+published: false
 description: Um breve relato de como é o meu processo de mentoria. Como faço e porque faço.
 tags: [Soft Skills, Mentoria, Carreira]
 cover_image: https://dev-to-uploads.s3.amazonaws.com/i/lifgkggmy9gglx235vdr.jpg
