@@ -87,11 +87,13 @@ Em um SES, nós não temos uma entidade única em uma base de dados representand
 
 :reference-5: footnote:[M. Overeem, M. Spoor, S. Jansen, e S. Brinkkemper, “An empirical characterization of event sourced systems and their schema evolution — Lessons from industry”, Journal of Systems and Software, vol. 178, p. 110970, ago. 2021, doi: 10.1016/j.jss.2021.110970.]
 
-Para termos uma definição mais formal de SES, precisamos trazer uma definição formal para cada componente que integra o sistema. Vou me basear na definição de Michiel Overeem em _An empirical characterization of event sourced systems and their schema evolution — Lessons from industry_{reference-5}, onde ele define Evento (_Event_), Sequência de eventos (_Event sequence_), Stream de eventos (_Event stream_), Banco de eventos (_Event store_), Função de projeção (_Project function_), Projeções (_Projections_), Função de aceitação (_Accept function_), Esquema de evento (_Event schema_), Esquema de stream de eventos (_Event stream schema_) e Banco de esquema de eventos (_Event store schema_).
+Para termos uma definição mais formal de SES, precisamos trazer uma definição formal para cada componente que integra o sistema. Vou me basear na definição de Michiel Overeem em _An empirical characterization of event sourced systems and their schema evolution — Lessons from industry_{reference-5}, onde ele define Evento (_Event_), Sequência de eventos (_Event sequence_), Fluxo de eventos (_Event stream_), Banco de eventos (_Event store_), Função de projeção (_Project function_), Projeções (_Projections_), Função de aceite (_Accept function_), Esquema de evento (_Event schema_), Esquema de fluxo de eventos (_Event stream schema_) e Banco de esquema de eventos (_Event store schema_).
+
+Abaixo vou descrever os termos propostos por Overeem mas com pequenas alterações para que a definição se adéque a Sistemas Event Sourcing Distribuídos.
 
 === Event
 
-Um evento é um objeto de dados discreto especificado em termos de domínio que representa uma mudança de estado em um SES.
+_Um evento é um objeto de dados discreto especificado em termos de domínio que representa uma mudança de estado em um SES._
 
 Por ser um objeto de domínio ele deve estar intrinsecamente ligado a regra de negócios da aplicação. Domínio{reference-4} no contexto de Domain-Driven Desing é o conjunto de conceitos e processos especifico da área de negócios que a aplicação se insere.
 
@@ -112,11 +114,13 @@ Usuário Criado {
 
 === Sequência de eventos
 
-Cada evento é armazenado junto com um número de sequência. Seu número de sequência representa a posição do evento no fluxo.
+_Cada evento é armazenado junto com um número de sequência. Seu número de sequência representa a posição do evento no fluxo._
 
-=== Stream de eventos
+Eventos são ordenados no tempo e sua ordem importa. O estado da aplicação é definido pela sequência de eventos e um evento.
 
-Um fluxo de eventos \(s\) é uma sequência de tuplas, cada tupla contendo um evento e seu número de sequência
+=== Fluxo de eventos
+
+_Um fluxo de eventos \(s\) é uma sequência de tuplas, cada tupla contendo um evento e seu número de sequência._
 
 ++++
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
@@ -142,35 +146,95 @@ Um fluxo de eventos \(s\) é uma sequência de tuplas, cada tupla contendo um ev
 </math>
 ++++
 
+_O número de sequência são números naturais consecutivos, iniciando no número 1._
+
 === Banco de eventos
 
-Um banco de eventos é um conjunto de fluxos de eventos. Esses fluxos formam as partições do armazenamento de eventos e são separados.
+_Um banco de eventos é um conjunto de fluxos de eventos. Esses fluxos formam as partições do armazenamento de eventos e são separados._
 
+Um banco de eventos tem apenas duas operações _ler_ e _inserir_, todo evento é inserido no final da sua respectiva sequência e um número de sequência é associado a ele.
 
 === Função de projeção 
 
-A função de projeção pega um ou mais fluxos de eventos e cria uma projeção com os dados dos eventos fornecidos. A própria projeção pode assumir diferentes formas, por exemplo, pode ser um banco de dados relacional atualizado por meio de instruções SQL ou um índice de pesquisa manipulado por meio do sistema de arquivos.
+_A função de projeção pega um ou mais fluxos de eventos e cria uma projeção com os dados dos eventos fornecidos. A própria projeção pode assumir diferentes formas, por exemplo, pode ser um banco de dados relacional atualizado por meio de instruções SQL, um índice de pesquisa manipulado por meio do sistema de arquivos ou um novo fluxo de eventos._
+
+Funções de projeções devem definir um SES, elas representam a transformações dos dados que serão fornecidos pelo sistema. Um sistema não armazena só eventos capturados, mas novos eventos que são produzidos através da manipulação e correlação desses eventos com dados de outras fontes.
 
 === Projeções 
 
-Uma projeção \(&pi;\) é uma seleção dos dados armazenados em eventos, transformados em um modelo específico. A seleção e transformação depende da finalidade da projeção. Os dados em uma projeção são transitórios, uma projeção pode ser reconstruída a partir de seus eventos de origem a qualquer momento.
+_Uma projeção \(&pi;\) é uma seleção dos dados armazenados em eventos, transformados em um modelo específico. A seleção e transformação depende da finalidade da projeção. Os dados em uma projeção são transitórios, uma projeção pode ser reconstruída a partir de seus eventos de origem a qualquer momento._
 
-=== Função de aceitação 
+=== Função de aceite
 
-A função aceitar leva uma projeção \(&pi;\) e um comando \(c\). O comando é validado usando os dados da projeção e a função de aceitação resulta em um erro ou em um evento.
+_A função aceite leva uma projeção \(&pi;\) e um comando \(c\). O comando é validado usando os dados da projeção e a função de aceite resulta em um erro ou em um evento._
 
 === Esquema de evento 
 
-Um esquema de evento \(&epsilon;\) descreve o tipo e a forma dos eventos. \(con forms (e, &epsilon;)\) detém se o evento \(e\) estiver em conformidade com a especificação \(&epsilon;\).
+_Um esquema de evento \(&epsilon;\) descreve o tipo e a forma dos eventos. \(con forms (e, &epsilon;)\) detém se o evento \(e\) estiver em conformidade com a especificação \(&epsilon;\)._
 
-=== Esquema de stream de eventos 
+=== Esquema de fluxo de eventos 
 
-Um esquema de stream de eventos \(&sigma;\) descreve um stream de eventos e os eventos que podem ocorrer no stream. O esquema do stream de eventos contém os esquemas dos eventos que podem ocorrer no stream, juntamente com os padrões de ocorrência. \(con forms (s, &sigma;)\) detém se o stream de eventos \(s\) estiver em conformidade com a especificação \(&sigma;\).
+_Um esquema de fluxo de eventos \(&sigma;\) descreve um fluxo de eventos e os eventos que podem ocorrer no fluxo. O esquema do fluxo de eventos contém os esquemas dos eventos que podem ocorrer no fluxo, juntamente com os padrões de ocorrência. \(con forms (s, &sigma;)\) detém se o fluxo de eventos \(s\) estiver em conformidade com a especificação \(&sigma;\)._
 
 === Banco de esquema de eventos
 
-Um banco de esquema de eventos \(&theta;\) descreve um banco de eventos e os streams armazenados no banco de eventos. \(con forms (es, &theta;)\) detém se o banco de eventos \(es\) estiver em conformidade com a especificação \(&theta;\).
+_Um banco de esquema de eventos \(&theta;\) descreve um banco de eventos e os fluxos armazenados no banco de eventos. \(con forms (es, &theta;)\) detém se o banco de eventos \(es\) estiver em conformidade com a especificação \(&theta;\)._
+
+## Implementações
+
+Sistemas Event Sourcing podem ser implementados de diversas formas, aqui descreveremos duas implementações possíveis. A primeira será expondo os eventos através de uma API REST, os eventos são armazenados em bases de dados relacionais ou NoSQL. Já a segunda será usando Apache Kafka onde veremos que Event Sourcing se torna um padrão visto que a plataforma já provê as funcionalidades padrão.
+
+=== Arquitetura Event Sourcing usando REST
+
+Uma API REST não apresenta formas óbvias de implementação de Event Sourcing, o desenho abaixo foi baseado em vários posts de blogs<sup>[[6]](#reference-6)</sup><sup>[[7]](#reference-7)</sup><sup>[[10]](#reference-10)</sup> que descreviam como devem ser feitos. Nenhuma das implementações lidavam com o desafio da escalabilidade.
+
+![Implementação de um sistema event sourcing](/assets/images/event-sourcing/event-sourcing.png)
+
+Fonte: https://excalidraw.com/#json=Xg9Kn_8j2tqjO8JiIznGw,Ji9Isu8ioGyQltU4r3_QrA
+
+Uma das opções é usar eventos apenas para criar um mecanismo de comunicação intra-serviço<sup>[[7]](#reference-7)</sup><sup>[[11]](#reference-11)</sup>. Dessa forma eventos serão visíveis somente dentro do processo em que foram gerados, mas se houver um função de projeção que guarda esses eventos dentro da base de dados, eles podem ser consultados posteriormente. A princípio as descrições encontradas desse caso não se caracterizam como aplicações Event Sourcing, mas somente como uma aplicação Event Driven com limitações que não serão exploradas aqui.
+
+=== Arquitetura Event Sourcing usando Apache Kafka
+
+Apache Kafka é uma plataforma desenvolvida para lidar com dados em tempo real na forma de fluxos de eventos distribuídos e escalável<sup>[[12]](#reference-12)</sup>. Um dos primeiros requisitos da plataforma é ser distribuída e resiliente, por isso a plataforma provê particionamento e replicação como funcionalidades básicas. O particionamento permite aumentar o número de processos consumindo um Fluxo de Eventos, enquanto a replicação permite diminuir o tempo de indisponibilidade<sup>[[13]](#reference-13)</sup>. Para que o log de eventos não cresça indefinidamente, existe um mecanismo de truncamento do log que pode ser baseado em janelas de tempo ou espaço e um mecanismo de compactação baseado na chave da mensagem<sup>[[14]](#reference-14)</sup>.
+
+![Diagrama de um sistema apache kafka em produção](/assets/images/event-sourcing/event-sourcing-kafka.png)
+
+Fonte: https://excalidraw.com/#json=4NxIaGF18yWuIXsurSTDW,h2Jw2sGhKL0w1BAnh9g04w
 
 ## Referências
+
+<a name="reference-1" href="https://martinfowler.com/eaaDev/EventSourcing.html" target="_blank">[1] M. Fowler, “Event Sourcing”, martinfowler.com, 12 de dezembro de 2005. https://martinfowler.com/eaaDev/EventSourcing.html (acessado 9 de agosto de 2022).</a>
+
+<a name="reference-2" href="https://martinfowler.com/eaaDev/AuditLog.html" target="_blank">[2] M. Fowler, “Audit Log”, martinfowler.com, 7 de março de 2004. https://martinfowler.com/eaaDev/AuditLog.html (acessado 31 de março de 2023).</a>
+
+<a name="reference-3" href="https://martinfowler.com/articles/patterns-of-distributed-systems/log-segmentation.html" target="_blank">[3] U. Joshi, “Segmented Log”. https://martinfowler.com/articles/patterns-of-distributed-systems/log-segmentation.html (acessado 31 de março de 2023).</a>
+
+<a name="reference-4" href="https://amzn.to/40zKNc4" target="_blank">[4] E. Evans, Domain-Driven Design: Atacando as complexidades no coração do software. Alta Books, 2016.</a>
+
+<a name="reference-5" href="https://www.sciencedirect.com/science/article/pii/S0164121221000674" target="_blank">[5] M. Overeem, M. Spoor, S. Jansen, e S. Brinkkemper, “An empirical characterization of event sourced systems and their schema evolution — Lessons from industry”, Journal of Systems and Software, vol. 178, p. 110970, ago. 2021, doi: 10.1016/j.jss.2021.110970.</a>
+
+<a name="reference-6" href="https://www.baeldung.com/cqrs-event-sourcing-java" target="_blank">[6] K. Chandrakant, “CQRS and Event Sourcing in Java | Baeldung”, 20 de maio de 2020. https://www.baeldung.com/cqrs-event-sourcing-java (acessado 1º de abril de 2023).</a>
+
+<a name="reference-7" href="https://blog.bitsrc.io/microservices-with-cqrs-and-event-sourcing-in-typescript-with-nestjs-831fba1e068b" target="_blank">[7] S. Kumar, “Microservices with CQRS and Event Sourcing in TypeScript with NestJS”, Medium, 24 de fevereiro de 2023. https://blog.bitsrc.io/microservices-with-cqrs-and-event-sourcing-in-typescript-with-nestjs-831fba1e068b (acessado 1º de abril de 2023).</a>
+
+<a name="reference-8" href="https://event-driven.io/en/uniqueness-in-event-sourcing/" target="_blank">[8] O. Dudycz, “How to ensure uniqueness in Event Sourcing”, 3 de setembro de 2022. https://event-driven.io/en/uniqueness-in-event-sourcing/ (acessado 1º de abril de 2023).</a>
+
+<a name="reference-9" href="https://event-driven.io/en/uniqueness-in-event-sourcing/" target="_blank">[9] “Marten”, 24 de março de 2023. https://martendb.io (acessado 1º de abril de 2023).</a>
+
+<a name="reference-10" href="http://graemef.com/blog/2012/09/02/Reconciling-ReST-and-CQRS/" target="_blank">[10] G. Foster, “Reconciling ReST, CQRS and Event Sourcing”, 2 de setembro de 2012. http://graemef.com/blog/2012/09/02/Reconciling-ReST-and-CQRS/ (acessado 1º de abril de 2023).</a>
+
+<a name="reference-11" href="https://dzone.com/articles/an-overview-of-cdi-events" target="_blank">[11] P. Pscheidl, “An Overview of CDI Events - DZone”, DZone, 30 de maio de 2017. https://dzone.com/articles/an-overview-of-cdi-events (acessado 1º de abril de 2023).</a>
+
+<a name="reference-12" href="https://kafka.apache.org/documentation/#design" target="_blank">[12] “Apache Kafka”, Apache Kafka. https://kafka.apache.org/documentation/#design (acessado 1º de abril de 2023).</a>
+
+<a name="reference-13" href="https://ieeexplore.ieee.org/abstract/document/9832981" target="_blank">[13] T. P. Raptis e A. Passarella, “On Efficiently Partitioning a Topic in Apache Kafka”, em 2022 International Conference on Computer, Information and Telecommunication Systems (CITS), Piraeus, Greece: IEEE, jul. 2022, p. 1–8. doi: 10.1109/CITS55221.2022.9832981.</a>
+
+<a name="reference-14" href="https://dl.acm.org/doi/10.14778/2824032.2824063" target="_blank">[14] G. Wang et al., “Building a replicated logging system with Apache Kafka”, Proc. VLDB Endow., vol. 8, nº 12, p. 1654–1655, ago. 2015, doi: 10.14778/2824032.2824063.</a>
+
+
+
+
+---
 
 <a name="reference-5" href="https://martinfowler.com/articles/patterns-of-distributed-systems/fixed-partitions.html" target="_blank">[5] U. Joshi, “Fixed Partitions”, martinfowler.com. https://martinfowler.com/articles/patterns-of-distributed-systems/fixed-partitions.html (acessado 31 de março de 2023).</a>
