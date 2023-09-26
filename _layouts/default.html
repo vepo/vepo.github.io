@@ -71,19 +71,24 @@
                 {% endfor %} 
             {% endfor %}
             {% if related_posts_counter > 0 %}
+                {% assign related_posts = 0 %}
             <div class="related-posts">
                 <h2>Posts relacionados</h2>
-                {% for allpost in site.posts %} 
+                {% for allpost in site.posts | sort: 'last_updated' | reverse %} 
+                    {% if related_posts > 10 %}
+                        {% break %}
+                    {% endif %}
                     {% for tag in page.tags %} 
                         {% if allpost.tags contains tag and allpost.id != page.id %}
                 <a href="{{ allpost.url }}">
-                        {% if allpost.series %}
-                            {{ allpost.series }}: {{ allpost.title }}
-                        {% else %}
-                            {{ allpost.title }}
-                        {% endif %}
+                            {% if allpost.series %}
+                                {{ allpost.series }}: {{ allpost.title }}
+                            {% else %}
+                                {{ allpost.title }}
+                            {% endif %}
                 </a>
-                            {% break %} 
+                            {% assign related_posts = related_posts | plus:1 %}
+                            {% break %}
                         {% endif %} 
                     {% endfor %} 
                 {% endfor %}
