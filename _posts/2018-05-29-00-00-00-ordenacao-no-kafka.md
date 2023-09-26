@@ -5,7 +5,7 @@ published: true
 description: Procurando entender melhor o Kafka, fiz um resumo de como o Kafka garante a ordenação das mensagens entregues a ele.
 tags: [Apache Kafka]
 cover_image: /assets/images/rio-fluindo.webp
-publish_date: 2008-05-29 12:00:00 +0300
+publish_date: 2018-05-29 12:00:00 +0300
 last_modified_at: 2023-09-05 19:40:00 +0300
 original: "https://medium.com/@vepo/ordena%C3%A7%C3%A3o-no-kafka-953721ee7468"
 ---
