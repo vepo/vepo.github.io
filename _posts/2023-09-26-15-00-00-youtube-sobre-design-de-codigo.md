@@ -9,4 +9,4 @@ publish_date: 2023-09-26 15:00:00 +0300
 ---
 
 
-{% youtube 2GJW-kDoDYIHBL3p %}
+{% youtube Ih1SoBpAvFs %}
