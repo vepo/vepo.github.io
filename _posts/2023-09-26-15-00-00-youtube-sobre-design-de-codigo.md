@@ -5,7 +5,7 @@ description: Nesse vídeo falo sobre design de código e qual é a minha visão 
 tags: [Youtube, Design de Código, Programação]
 cover_image: /assets/images/peanuts.jpg
 permalink: /posts/youtube-sobre-design-de-codigo
-publish_date: 2023-08-06 15:55:00 +0300
+publish_date: 2023-09-26 15:00:00 +0300
 ---
 
 
