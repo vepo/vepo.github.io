@@ -8,6 +8,8 @@ permalink: /posts/como-avaliar-uma-api
 publish_date: 2022-01-16 22:14:00 +0300
 ---
 
+> Esse post era para ter sido um capítulo do meu livro ["_Roadmap back-end: Conhecendo o protocolo HTTP e arquiteturas REST_"](https://www.casadocodigo.com.br/products/livro-roadmap-backend) mas acabou sendo descartado na edição final. Por isso decidi publica ele no blog sem revisão, ou seja, pode existir erros de ortografia. 
+
 Nos capítulos anteriores vimos as especificações do que é o protocolo HTTP e do que são APIs REST. Agora vamos caminhar tentando trazer mais elementos a nossas APIs. Para tentar responder a pergunta _como podemos avaliar uma API_ podemos levantar algumas possíbilidades, desde a identificação de padrões e antipadroes, análise da complexidade, até por fim chegarmos a maturidade. Então nosso primeiro desafio será responder à seguinte pergunta: _existe alguma definição de padrões de projetos para APIs REST?_
 
 Antes de responder a essa pergunta precisamos definir o que é um padrão de projeto, o que é um antipadrão e como eles podem nos ajudar.
