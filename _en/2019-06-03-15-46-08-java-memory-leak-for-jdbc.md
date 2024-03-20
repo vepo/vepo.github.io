@@ -1,6 +1,5 @@
 ---
 title: "Java Memory Leak for JDBC"
-permalink: /posts/java-memory-leak-for-jdbc
 published: true
 description: "Have you ever used custom ClassLoaders in Java? This is a troubleshooting for whom is using it."
 noimage: true
@@ -8,6 +7,9 @@ publish_date: 2019-06-03 15:46:08 +0300
 tags: [Java, JDBC, Memory Leak, Garbage Collector]
 original: "https://dev.to/vepo/java-memory-leak-for-jdbc-5dnn"
 replicated: ["https://medium.com/@vepo/outofmemory-why-occurs-and-how-to-fix-it-c28a7fa16690"]
+permalink: /en/java-memory-leak-for-jdbc
+redirect_from:
+  - /posts/java-memory-leak-for-jdbc
 ---
 
 # The Context
