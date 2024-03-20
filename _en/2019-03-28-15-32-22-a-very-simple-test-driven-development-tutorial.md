@@ -1,6 +1,5 @@
 ---
 title: A very simple Test Driven Development Tutorial
-permalink: /posts/a-very-simple-test-driven-development-tutorial
 published: true
 description: Some small tips for who wants to beggan with TDD
 tags: [Testing, Java, Test, TDD]
@@ -9,6 +8,9 @@ series: Thoughts on TDD
 publish_date: 2019-07-24 15:32:22 +0300
 original: "https://dev.to/vepo/a-very-simple-test-driven-development-tutorial-3309"
 replicated: ["https://medium.com/@vepo/a-very-simple-test-driven-development-tutorial-d11d22276bad"]
+permalink: /en/a-very-simple-test-driven-development-tutorial
+redirect_from:
+  - /posts/a-very-simple-test-driven-development-tutorial
 ---
 
 Now I'm addicted with Test Driven Development, but... Somewhere in the past I thought it was a bad idea. Now I can't develop any code without this technique.
