@@ -237,3 +237,39 @@ E se a sessão de usuário do conector fosse precisar ser reutlizada? Qual solu�
 
 A grande diferença entre as soluções está em limitar a complexidade ao se encapsular ela. Interfaes existem para que a 
 complexidade seja dividida. Uma interface deve ser sas operações comuns entre todos os objetoss similares.
+
+## Porque não vejo problemas no meu tweet? 
+
+Muitos me criticaram porque afirmaram que meu tweet induz ao erro. Bom, vamos analisar ele! Quero aqui analisar textualmente o meu tweet,
+mas primeiro quero fazer uma reflexão sobre como consumimos as mídias.
+
+O Twitter (É TWITTER O NOME) é uma rede social de **ideias fragmentas** em trechos com até 280 caracteres. Por ser uma mídia tão reduzida 
+é comum encadearmos twitters em um fio. Meu tweet está em um fio, mas vamos ignorar esse fato.
+
+O texto do meu tweet é composto de 3 afirmações:
+
+1. Constatação de um sentimento associado a padrão
+2. Elaboração da ideia do padrão
+3. Promessa de discussão futura
+
+Agora tente procurar as palavras mais relevanes em cada frase? Já vou respondendo: exatamente, abstração e encapsular.
+Por uma limitação de caracteres a primeira frase tem como palavra mais significativa um adjetivo e não um nome ou verbo 
+como as frases seguintes.
+
+Tente ler o tweet sem esse adjetivo:
+
+> Uma das coisas que mais me irrita em código é quando o nome da função diz o que ela faz. 
+> Isso traz zero abstração ao código, não ajuda a reduzir a complexidade.
+> Creio que amanhã ou quinta gravo um vídeo sobre isso. OO é sobre ENCAPSULAR complexidade.
+
+Não faz sentido, certo? O que eu estaria defendendo com esse tweet? Não tenho ideia, mas é bem provável que um dia faça um tweet assim
+por um esforço de contenção de caracteres! Aliás, já fiz muito e creio que você também o faça!
+
+Digamos aqui que eu queria escrever um único tweet com uma ideia completa, mas para isso precise de 350 caracteres! Após escrito, começa 
+o trabalho de edicão e reescrita para se limitar aos 280. Isso pode levar a uma desconexão entre o que existe no texto e o que desejo dizer.
+Logo nossa postura ao não entender um texto é ARGUMENTAR compreensível. Não é que as ideias colocadas ali sejam bizarras, mas que o espaço limitado
+gera limitações argumentativas.
+
+Outra questão é que não somos acostumados a adjetivar. Mas creio que se você leu esse post consegue compreender essas questões. 
+
+MAS... voltando ao meu tweet. Responde aí, você compreendeu que o exatamente? 
