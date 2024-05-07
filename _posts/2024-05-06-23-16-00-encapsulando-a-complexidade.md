@@ -3,7 +3,7 @@ title: Encapsulando a complexidade
 published: true
 description: 'Qual é a melhor forma de dar nome a métodos?'
 tags: [Design de Código, Orientação a Objetos]
-cover_image: /assets/images/a-persistencia-da-memoria-de-salvador-dali-og.webp
+cover_image: /assets/images/pexels-pixabay-60049.jpg
 permalink: /posts/encapsulando-a-complexidade
 publish_date: 2024-05-06 23:00:00 +0300
 ---
