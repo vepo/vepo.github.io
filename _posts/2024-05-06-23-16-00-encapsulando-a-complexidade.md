@@ -273,3 +273,6 @@ gera limitações argumentativas.
 Outra questão é que não somos acostumados a adjetivar. Mas creio que se você leu esse post consegue compreender essas questões. 
 
 MAS... voltando ao meu tweet. Responde aí, você compreendeu que o exatamente? 
+
+_Provavelmente vou publicar um vídeo amanhã em sequência a esse._
+{% youtube https://youtu.be/3SvVY6eceP4 %}
