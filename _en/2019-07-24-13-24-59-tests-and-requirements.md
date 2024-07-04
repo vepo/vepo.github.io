@@ -1,6 +1,5 @@
 ---
 title: Tests and Requirements
-permalink: /posts/tests-and-requirements
 tags: [Java, TDD, Bugs, Requirement]
 series: Thoughts on TDD
 publish_date: 2019-07-24 13:24:59 +0300
@@ -8,6 +7,9 @@ published: true
 description: How can we ensure that any new development does not create an undesired behaviour?
 cover_image: https://cdn.pixabay.com/photo/2015/05/11/13/28/software-762486_960_720.jpg
 original: "https://dev.to/vepo/thoughts-on-tdd-tests-and-requirements-e02"
+permalink: /en/tests-and-requirements
+redirect_from:
+  - /posts/tests-and-requirements
 ---
 
 In the last days I'm facing a huge question: *With several teams working with several projects, how to avoid new bugs?*
