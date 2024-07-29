@@ -84,7 +84,7 @@ Para adicionar dependências ao seu projeto, você precisa editar o arquivo `pom
 ```xml
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databing</artifactId>
+    <artifactId>jackson-databind</artifactId>
     <version>2.17.1</version>
 </dependency>
 ```
@@ -99,6 +99,22 @@ Para adicionar dependências ao seu projeto, você precisa editar o arquivo `pom
 
 Para fazer busca por dependências, procure no site [MVN Repository](https://mvnrepository.com/).
 
+Vamos usar o Jackson databind para criar a classe Usuario.
+
+```java
+public record Usuario(String nome, int idade, String email) {
+
+    public static Usuario fromJson(String jsonContent) {
+        var mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(jsonContent, Usuario.class);
+        } catch (Exception e) {
+            throw new InvalidParameterException("Erro ao converter json para Usuario", e);
+        }
+    }
+}
+```
+
 ## Passo 4 - Compile o projeto
 
 Para compilar o projeto, navegue até o diretório do projeto (meu-projeto) e execute:
@@ -109,6 +125,48 @@ mvn compile
 Isso irá compilar as classes Java no diretório `src/main/java`.
 
 ## Passo 5 - Execute os testes
+
+Antes de executar os testes, vamos atualizar o JUnit para a versão 5. O JUnit é um dos mais famosos frameworks de testes para Java. Com ele os testes podem ser criados e serão automaticamente identificados desde que tenha as anotações `@Test`.
+
+Para atualizar a biblioteca, remova a antiga dependência e adicione a nova versão. Observe que além das coordenadas maven, ela define o escopo de utilização. Os escopos possíveis são `compile`, `provided`, `runtime`, `test`, `system` e `import`. O escopo padrão é o `compile` e quando definimos o escopo como `test` elá será usada apenas durante os testes da aplicação.
+
+```xml
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <version>5.10.3</version>
+    <scope>test</scope>
+</dependency>
+```
+
+Agora vamos criar uma classe de testes a classe `UsuarioTest` em `src/test/java/com/exemplo/UsuarioTest.java` que deve ser automaticamente identificada pelo Maven.
+
+```java
+package com.exemplo;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Test;
+
+class UsuarioTest {
+
+    @Test
+    public void parserTest() {
+        var usuario = Usuario.fromJson("""
+                                       {
+                                         "nome": "John Doe",
+                                         "idade": 30,
+                                         "email": "john.doe@corp.com"
+                                       }
+                                       """);
+        assertNotNull(usuario, "Usuário não pode ser nulo");
+        assertEquals("John Doe", usuario.nome(), "Nome do usuário não confere");
+        assertEquals(30, usuario.idade(), "Idade do usuário não confere");
+        assertEquals("john.doe@corp.com", usuario.email(), "Email do usuário não confere");
+    }
+}
+``` 
 
 Para executar os testes, use o comando:
 
