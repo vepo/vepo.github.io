@@ -103,6 +103,8 @@ A qualidade do projeto pode ser verificada. Como o projeto é muito simples não
 
 ![Qualidade geral do projeto](/assets/images/sonar/sonar.png)
 
+![Problemas encontrados](/assets/images/sonar/issues.png)
+
 ## Conclusão
 
 Neste tutorial, abordamos a configuração do SonarQube para análise estática de código em um projeto Maven. Aprendemos a gerar um token de autenticação, configurar as propriedades do projeto no `pom.xml` e definir o token como uma variável de ambiente para garantir a segurança. Além disso, vimos como executar a análise de código usando o Maven e verificar a qualidade do projeto através da interface do SonarQube.
