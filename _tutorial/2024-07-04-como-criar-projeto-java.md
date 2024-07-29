@@ -59,7 +59,7 @@ meu-projeto
 
 O arquivo `pom.xml` (Project Object Model) é o coração do projeto Maven. Ele contém todas as informações sobre o projeto e as dependências necessárias. Aqui está um exemplo básico de um `pom.xml`:
 
-```xml`
+```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
