@@ -92,6 +92,10 @@ Em (5), procuraremos entender a real intenção por trás da criação da tecnol
 
 As demais perguntas podem guiar na implantação da tecnologia. Uma grande precupação deve ser o que acontecerá se a tecnologia/produto for descontinuado, não podemos atrelar nosso produto as vontades de empresas terceiras.
 
+Ao responder a todas essas perguntas, a ideia é criar um documento que oriente o uso da tecnologia. Esse documento deve ser visual, podendo assumir a forma de um guia ou diagrama. O mais importante é que a empresa não deve ser como uma hidra sem cabeça, com cada parte agindo de forma independente e até conflitante; em vez disso, deve atuar de forma coordenada, com um objetivo claro em mente.
+
+![Hidra com várias cabeças](/assets/images/hidra.jpg)
+
 # Conclusão
 
-Escolhas técnicas não devem ser baseadas apenas na hype! Hypes vêm e vão, mas nossas empresas permanecem. Devemos criar produtos que agreguem valor às nossas empresas, enquanto as Big Techs querem que desenvolvamos produtos que utilizem suas próprias tecnologias.
+Escolhas técnicas não devem ser baseadas apenas na hype! Hypes vêm e vão, mas nossas empresas permanecem. Devemos criar produtos que agreguem valor às nossas organizações, enquanto as Big Techs querem que desenvolvamos produtos que utilizem suas próprias tecnologias. A gerência da organização deve liderar a inovação, estabelecendo centros de experimentação e criando guias para o uso das novas tecnologias.
