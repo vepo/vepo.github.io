@@ -60,7 +60,7 @@ Dessas ferramentas eu vou destacar duas importantes: a [Análise SWOT](https://s
 
 Claro! Aqui está uma versão revisada do parágrafo:
 
-Existem outras formas de análise, como os [Architecture Decision Records](https://adr.github.io/) (ADR), que são registros simples e numerados das decisões arquitetônicas, armazenados em um repositório. A intenção de um ADR é documentar o motivo por trás das escolhas arquiteturais. Outra abordagem interessante são os Request For Comments (RFC), documentos construídos colaborativamente. Em Java, temos o JDK Enhancement Proposal (JEP) e, no Kafka, o Kafka Improvement Proposal. Todos esses documentos fornecem uma argumentação arquitetural para a adoção de novas tecnologias.
+Existem outras formas de análise, como os [Architecture Decision Records](https://adr.github.io/) (ADR), que são registros simples e numerados das decisões arquitetônicas, armazenados em um repositório. A intenção de um ADR é documentar o motivo por trás das escolhas arquiteturais. Outra abordagem interessante são os Request For Comments (RFC), documentos construídos colaborativamente. Em Java, temos o [JDK Enhancement Proposal (JEP)](https://openjdk.org/projects/jdk/23/) e, no [Kafka, o Kafka Improvement Proposal (KIP)](https://cwiki.apache.org/confluence/display/KAFKA/Kafka+Improvement+Proposals). Todos esses documentos fornecem uma argumentação arquitetural para a adoção de novas tecnologias.
 
 Podemos concluir que as empresas frequentemente utilizam questionários e documentos para criar documentações arquiteturais. Portanto, uma boa ferramenta seria um documento que reúna informações sobre necessidades de negócio, limitações tecnológicas e oportunidades de uso.
 
