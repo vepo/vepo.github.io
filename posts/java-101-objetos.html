@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Java 101: OO: Eu vejo objetos por todos os cantos!</title>
+  <meta property="og:title" content="Java 101: OO: Eu vejo objetos por todos os cantos!" />
+  <meta name="twitter:title" content="Java 101: OO: Eu vejo objetos por todos os cantos!">
+  
+
+
+  
+  <meta name="description" content="Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema." />
+  <meta property="og:description" content="Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema." />
+  <meta name="twitter:description" content="Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.">
+  
+
+  
+  <meta name="keywords" content="Orientação a Objeto, Tutorial, Java">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/posts/java-101-objetos" />
+  <meta property="og:url" content="https://blog.vepo.dev/posts/java-101-objetos" />
+  <meta name="twitter:url" content="https://blog.vepo.dev/posts/java-101-objetos">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/java/duke-plug.webp" />
+  <meta name="twitter:image" content="https://blog.vepo.dev/assets/images/java/duke-plug.webp">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2022-05-30T08:15:00+00:00" />
+  <meta property="article:modified_time" content="2022-05-30T08:15:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Orientação a Objeto" property="article:tag">
+  
+  <meta content="Tutorial" property="article:tag">
+  
+  <meta content="Java" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "OO: Eu vejo objetos por todos os cantos!",
+      "datePublished": "2022-05-30T08:15:00+00:00",
+      
+      "description": "Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.",
+      
+      
+      "url": "https://blog.vepo.dev/posts/java-101-objetos"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header class="site-header">
+            <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+            <nav class="menu-list">
+	
+	<a href="/computacao-critica" class="menu-link">Computação Crítica</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutorais</a>
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+        </header>
+        <div class="title">
+    
+    <h1 class="serie-title">
+        Java 101
+    </h1>
+    <h2>
+        OO: Eu vejo objetos por todos os cantos!
+    </h2>
+    
+</div>
+<div class="article cover-image">
+    
+    <img alt="OO: Eu vejo objetos por todos os cantos!" src="/assets/images/java/duke-plug.webp" width="0" height="0" />
+    
+</div>
+        
+        
+        <div class="publish_date">
+            <strong>
+                <time datetime="2022-05-30T08:15:00+00:00">
+                    30/maio/2022
+                </time>
+            </strong> 
+        </div>
+        
+        <div class="tag-container">
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default orientação-a-objeto" href="/tags/#orientação-a-objeto">Orientação a Objeto</a> 
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default tutorial" href="/tags/#tutorial">Tutorial</a> 
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default java" href="/tags/#java">Java</a> 
+            
+        </div>
+            
+            
+        <hr> 
+        
+        
+
+
+
+
+
+<div class="series">
+    <div class="serie-contents">
+        
+        <h2>
+            Java 101<br/>
+            <span class="description">(série de 7 partes)</span>
+        </h2>
+        
+            
+            <a href="/posts/java-101">
+                <div class="serie-article">Como começar a aprender Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-sintaxe">
+                <div class="serie-article">A sintaxe do Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-collections">
+                <div class="serie-article">Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!</div>
+            </a>
+            
+        
+            
+            <div class="serie-article selected">OO: Eu vejo objetos por todos os cantos!</div>
+            
+        
+            
+            <a href="/posts/java-101-io">
+                <div class="serie-article">Java I/O</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-threads">
+                <div class="serie-article">Concorrência e Paralelismo</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-memoria">
+                <div class="serie-article">Memória</div>
+            </a>
+            
+        
+    </div>
+</div>
+
+        <article>
+            <div class="paragraph">
+<p>Java tem um fã clube enorme! São pessoas que usam a linguagem no dia a dia e resolvem problemas importantes para a nossa sociedade. Quando Java completou 25 anos houve até a hashtag <a href="https://twitter.com/search?q=lang%3Apt%20%23MovedByJava&amp;src=typed_query&amp;f=top">#MovedByJava</a> para mostrar que o mundo é movido por software desenvolvido em Java, são bilhões de transações em Java em serviços altamente escaláveis.</p>
+</div>
+<div class="paragraph">
+<p>MAS&#8230;&#8203; existe um pequeno grupo raivoso e ruidoso que <a href="https://twitter.com/search?q=java%20lento&amp;src=typed_query&amp;f=live">odeia Java</a>. Eu não desejaria nem citar esse grupo, mas creio que isso tem que estar em qualquer tutorial de Java, não para dar voz a esse povo, mas para desmentir. Java não é lento, talvez você que não está sabendo usar e vamos mais a frente falar sobre <em>tuning</em>. Essas pessoas usam argumentos bem simples como "tudo tem que estar em objetos", "eu tenho que escrever um main dentro de um objeto", "nada disso faz sentido"&#8230;&#8203; Resolvi citar eles aqui, porque eles não odeiam Java, eles odeiam Orientação a Objetos e com esse post eu vou te convencer que além de ser uma ótima forma de pensar, Orientação a Objetos ajudou a pavimentar os outros paradigmas que estão por aqui no ano de 2022.</p>
+</div>
+<div class="sect1">
+<h2 id="cap-04-um-pouco-de-historia">Um pouco de história</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Orientação a Objetos surgiu nos anos 60 e era usado para fazer simulações no Simula 67. Esta linguagem, por sua vez, acabou por influenciar o C (1979), que na verdade é uma tentativa de adicionar objetos a linguagem C. Por muitos anos o C foi uma das linguagens mais influentes do mercado, ela não era, puramente, uma linguagem orientada a objetos, era até possível intercalar código C com código C++. A primeira linguagem que surge como puramente orientada a objetos e ainda por cima compilada em <em>bytecode</em> para ser executado em uma Máquina Virtual foi&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>PAUSA DRAMÁTICA&#8230;&#8203; 🥶</p>
+</div>
+<div class="paragraph">
+<p>O Smalltalk! O que foi? 🧐 Achou que era o Java? O Java só surge em 1991, e em seu lançamento em 1995, e acaba herdando muitas características do Smalltalk, tanto que muitas pessoas da comunidade Java vieram do mundo Smalltalk. E uma das coisas que Java herda é ser primariamente orientada a objetos.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas porque essa preocupação em ser Orientada a Objetos?!</em></p>
+</div>
+<div class="paragraph">
+<p>Porque na verdade a computação não começou com essas linguagens e nem com esses paradigmas, mas como Programação Funcional (ver <em><a href="https://dl.acm.org/doi/abs/10.1145/72551.72554">Conception, evolution, and application of functional programming languages</a></em>). Linguagens funcionais são excelentes para modelarem problemas matemáticos e alguns problemas computacionais, pois elas são declarativas. Podemos transpor a definição de um problema para a linguagem de programação facilmente, podendo até mesmo aplicar uma lógica equacional, pois, se as funções são puras, o valor de <code>f(x)</code> só precisa ser calculado uma vez. Logica equacional é o mesmo que tratar uma função como uma equação matemática, isso implica que símbolos iguais terão valores iguais.</p>
+</div>
+<div class="paragraph">
+<p>MAS linguagens funcionais apresentam uma certa dificuldade de modelar alguns tipos de sistemas e, com a popularização da computação, foi necessário outros paradigmas para os novos sistemas que foram sendo desenvolvidos. O primeiro desses paradigmas foi a Programação Procedural, popularizado pela linguagens como C. Nesse tipo de linguagem a lógica de programação pode ser estruturada dentro de procedimentos que podem ser tanto funções quanto procedimentos, a diferença entre os dois é que uma função não altera o valor dos parâmetros e sempre retorna um valor, já os procedimentos alteram o valor dos parâmetros e não retornam nenhum valor. Em C, podemos escrever tanto funções quanto procedimentos.</p>
+</div>
+<div class="paragraph">
+<p>Linguagens procedurais apresentam bastante dificuldade para encapsular complexidade porque é difícil criar abstrações com ela. Em C, os dados são sempre modelados usando tipos primitivos ou estruturas, que nada mais são que agrupamentos de tipos primitivos. Mesmo quem desenvolve C hoje em dia, não consegue compreender o que era desenvolver nos anos 70, pois a linguagem continuou avançando. Eu tenho uma leve ideia porque, na universidade, desenvolvi programas para um microcontrolador com o compilador bem limitado. O exemplo abaixo eu retirei de um <a href="https://github.com/vepo/csvi">visualizador de CSV</a> que eu desenvolvi por necessidade.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="c"><span></span>matrix_config_t <span style="color: #666666">*</span><span style="color: #0000FF">matrix_config_initialize</span>(<span style="color: #B00040">size_t</span> width, <span style="color: #B00040">size_t</span> height)
+{
+    matrix_config_t <span style="color: #666666">*</span>config <span style="color: #666666">=</span> (matrix_config_t <span style="color: #666666">*</span>)malloc(<span style="color: #008000; font-weight: bold">sizeof</span>(matrix_config_t));
+    config<span style="color: #666666">-&gt;</span>columns <span style="color: #666666">=</span> width;
+    config<span style="color: #666666">-&gt;</span>heights <span style="color: #666666">=</span> height;
+    config<span style="color: #666666">-&gt;</span>column_width <span style="color: #666666">=</span> (<span style="color: #B00040">size_t</span> <span style="color: #666666">*</span>)calloc(width, <span style="color: #008000; font-weight: bold">sizeof</span>(<span style="color: #B00040">size_t</span>));
+    config<span style="color: #666666">-&gt;</span>line_height <span style="color: #666666">=</span> (<span style="color: #B00040">size_t</span> <span style="color: #666666">*</span>)calloc(height, <span style="color: #008000; font-weight: bold">sizeof</span>(<span style="color: #B00040">size_t</span>));
+    <span style="color: #008000; font-weight: bold">return</span> config;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe que no código há a preocupação de se alocar a posição de memória necessária para uma determinada estrutura chamada <code>matriz_config_t</code> e que essa alocação é feita através de duas funções diferentes <code>calloc</code> e <code>malloc</code>. Esse código pode parecer simples, mas tem diversidades camadas de complexidades, como simplesmente diferenciar essas duas funções.</p>
+</div>
+<div class="paragraph">
+<p><em>— Aonde você quer chegar?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Ora! Qual é o objetivo de um desenvolvedor?</p>
+</div>
+<div class="paragraph">
+<p><em>— Escrever código!</em></p>
+</div>
+<div class="paragraph">
+<p>Errado! O objetivo de um desenvolvedor é resolver problemas através da escrita de código. Por isso, desenvolvedores não podem e não devem ficar preocupado com complexidades desnecessária. É para remover essa complexidade que surgem linguagens Orientadas a Objetos. As linguagens procedurais são simples e com poucas funcionalidades, por isso toda a informação é armazenada de forma simplória em estruturas. Isso gera complexidade e o objetivo principal de uma linguagem de programação é encapsular complexidade.</p>
+</div>
+<div class="paragraph">
+<p>Vamos tentar explicar de outra forma&#8230;&#8203;</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-04-o-que-e-poo">O que é Programação Orientada a Objetos</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Vamos estabelecer algumas hipóteses&#8230;&#8203;.</p>
+</div>
+<div class="sect2">
+<h3 id="_e-se-eu-puder-lidar-com-tipos-complexos">E se eu puder lidar com tipos complexos</h3>
+<div class="paragraph">
+<p>Uma linguagem OO irá sempre lidar com tipos de dados cada vez mais complexos pois não estamos apenas falando de programação, mas de encapsulamento de complexidades.</p>
+</div>
+<div class="paragraph">
+<p>Vamos supor que eu desejo desenvolver uma API para navegação robótica e eu sei que meu robô tem 4 rodas e que posso definir a velocidade de cada roda. Será que eu preciso saber qual é a velocidade de cada roda? Ou eu posso apenas mandar comandos para o meu robô? Um exemplo de comandos são: "Vá para frente", "Faça uma curva de 30º", "Pare".</p>
+</div>
+<div class="paragraph">
+<p>Quando falamos de Orientação a Objetos, devemos pensar em design de código. Não estamos falando de programação pura, mas de uma modelagem de dados e conceitos. Os detalhes internos devem ser escondidos para quem só sejam visíveis para os próprios times de manutenção.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_e-se-eu-puder-associar-comportamento-aos-meus-tipos-complexos">E se eu puder associar comportamento aos meus tipos complexos</h3>
+<div class="paragraph">
+<p>Todo código tem um contexto para ser executado. Quando eu tenho um robô e eu desejo que ele vá para uma posição, se essa ordem é diferente para cada robô e produz diferentes resultados, mas ela sempre está associada a um robô, ou seja, não faz sentido um outro objeto que não seja um robô se mover (<em>ainda falarei de herança</em>).</p>
+</div>
+<div class="paragraph">
+<p>Mas podem existir outros objetos que se movem, certo? E como fica se a função mover é somente associada a robôs?</p>
+</div>
+<div class="paragraph">
+<p>Em uma linguagem orientada a objetos, não temos funções e nem procedimentos, mas métodos. A diferença é que uma função transforma dados, procedimentos executa uma série de alterações nos parâmetros, mas um método envia uma mensagem (<em>essas definições não tem caráter acadêmico, se alguém tiver alguma referência me manda no Twitter</em>). Logo um método vai pertencer a um objeto, assim se formos modelar um Avião, podemos criar um outro método mover que existirá somente para um Avião e que será diferente do método mover de um robô.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_e-se-puder-compartilhar-o-comportamento-entre-tipos-diferentes">E se puder compartilhar o comportamento entre tipos diferentes</h3>
+<div class="paragraph">
+<p>Objetos tem um tipo especifico, por exemplo nós estamos falando de um robô. Mas eu posso assumir que um robô é um tipo de objeto móvel? Posso eu criar métodos nesse objeto móvel? O que essa implementação desse método faz para um robô é a mesma coisa que se faz para um avião?</p>
+</div>
+<div class="paragraph">
+<p>Para cada pergunta acima, existe uma resposta no mundo da Programação Orientada a Objetos e é o que vamos ver na próxima sessão.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-04-orientacao-a-objetos">Orientação a Objetos</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nós falamos um pouco sobre Programação Funcional e Programação Procedural, então vamos definir o que é Programação Orientada a Objetos (POO) antes de ver como Java faz POO.</p>
+</div>
+<div class="paragraph">
+<p>Programação Orientada a Objetos é um modelo de design, analise e desenvolvimento de software que organiza todo o software ao redor dos dados e suas abstrações. Para que isso seja possível, é criado o conceito de Objeto. Um objeto é um componente de software composto de atributos e comportamento.</p>
+</div>
+<div class="paragraph">
+<p>Quando falamos de orientação a objeto, focamos na definição do que é um objeto e das operações que esse objeto pode realizar, ao contrário da lógica necessária para realizar a operação. Os principais benefícios da POO é a reutilização de código, escalabilidade e eficiência no desenvolvimento. Então podemos definir que POO vai ter alguns elementos.</p>
+</div>
+<div class="sect2">
+<h3 id="_elementos">Elementos</h3>
+<div class="paragraph">
+<p>Abaixo vemos as descrições de cada elemento da POO, elas não se referem a linguagem Java, mas ao paradigma em si.</p>
+</div>
+<div class="sect3">
+<h4 id="_classes">Classes</h4>
+<div class="paragraph">
+<p><strong>Classes</strong> são tipos de dados definidos pelo usuário que atuam como modelo para objetos, atributos e métodos.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_objetos">Objetos</h4>
+<div class="paragraph">
+<p><strong>Objetos</strong> são instâncias de uma classe criada com dados específicos.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cap-04-elementos-metodos">Métodos</h4>
+<div class="paragraph">
+<p><strong>Métodos</strong> são funções definidas dentro de uma classe que descrevem o comportamento de um objeto. Cada método contido nas definições de classe começa com uma referência a um objeto de instância. Além disso, as sub-rotinas contidas em um objeto são chamadas de métodos de instância. Os programadores usam métodos para reutilização ou para manter a funcionalidade encapsulada dentro de um objeto por vez.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_atributos">Atributos</h4>
+<div class="paragraph">
+<p><strong>Atributos</strong> são definidos no modelo de classe e representam o estado de um objeto. Os objetos terão dados armazenados no campo de atributos. Os atributos de classe pertencem à própria classe.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cap-04-principios">Princípios</h3>
+<div class="paragraph">
+<p>Quando falamos em Orientação a Objetos, temos em mente alguns princípios.</p>
+</div>
+<div class="sect3">
+<h4 id="_encapsulamento">Encapsulamento</h4>
+<div class="paragraph">
+<p>Encapsulamento significa que um objeto não é obrigado a expor a sua implementação e nem os seus atributos. Cabe ao design do objeto escolher como será feita essa exposição. Essa característica de ocultação de dados fornece maior segurança ao programa e evita corrupção de dados não intencional.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_abstração">Abstração</h4>
+<div class="paragraph">
+<p>Objetos criam abstrações que tornam possível controlar a complexidade. Ao se criar uma classe, o restante do sistema deverá interagir através da interface que ela propõe não tendo acesso a sua lógica interna.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="cap-04-principios-heranca">Herança</h4>
+<div class="paragraph">
+<p>As classes podem reutilizar o código de outras classes. Relacionamentos e subclasses entre objetos podem ser atribuídos, permitindo que os desenvolvedores reutilizem a lógica comum enquanto ainda mantêm uma hierarquia única. Essa propriedade da OOP força uma análise de dados mais completa, reduz o tempo de desenvolvimento e garante um maior nível de precisão.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_polimorfismo">Polimorfismo</h4>
+<div class="paragraph">
+<p>Os objetos são projetados para compartilhar comportamentos e podem assumir mais de uma forma. O sistema poderá definir como vê um objeto e como interage por ele baseado na sua própria classe ou em alguma classe pai, reduzindo a complexidade ou a necessidade de duplicar código. Quando uma classe filha é criada, que estende a funcionalidade da classe pai, ambas podem ser tratada pelo mesmo código usando a classe pai como interface. O polimorfismo permite que diferentes tipos de objetos usem a mesma interface.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-java-faz-programação-orientada-a-objetos">Como Java faz Programação Orientada a Objetos</h3>
+<div class="paragraph">
+<p>Java é uma linguagem primariamente orientada a objetos, logo você deve primeiro entender o que é uma classe. Classe é o arquétipo de um objeto. Arquétipo, resumidamente, é o tipo comum de algo. Por exemplo, se eu falar que existe o tipo Gato, você vai imaginar o formato desse animal e algumas outras características, mas se eu falar que existe o Garfield você vai imaginar que ele é um Gato laranja, gordo e preguiçoso. O Garfield é um indivíduo do arquétipo Gato.</p>
+</div>
+<div id="significado-arquetipo" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-04/arquetipo.png" alt="arquetipo">
+</div>
+<div class="title">Figura 1. Significado de Arquétipo da Wikipedia</div>
+</div>
+<div class="paragraph">
+<p>Vamos transpor isso pra Java? Podemos ter uma classe Gato, mas o objeto será um Garfield. Assim, podemos ter&#8230;&#8203;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">package</span> <span style="color: #0000FF; font-weight: bold">org.animais.mamiferos</span>;
+
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">org.fisica.luz.Cor</span>;
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">org.animais.psique.Temperamento</span>;
+
+<span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Gato</span> {
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #B00040">float</span> pesoEmKg;
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #008000; font-weight: bold">final</span> Cor cor;
+    <span style="color: #008000; font-weight: bold">private</span> Temperamento temperamento;
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #0000FF">Gato</span>(<span style="color: #B00040">float</span> pesoEmKg, Cor cor, Temperamento temperamento) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">pesoEmKg</span> <span style="color: #666666">=</span> pesoEmKg;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">cor</span> <span style="color: #666666">=</span> cor;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">temperamento</span> <span style="color: #666666">=</span> temperamento;
+    }
+
+    <span style="color: #408080; font-style: italic">// MÉTODOS</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Isso significa que podemos modelar qualquer Gato por esse modelo, assim se quisermos ter um Garfield&#8230;&#8203;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>Gato garfield <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Gato(<span style="color: #666666">15.0</span>, Cor.<span style="color: #7D9029">LARANJA</span>, Temperamento.<span style="color: #7D9029">PREGUICOSO</span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No primeiro trecho de código tempo a declaração da classe <code>Gato</code> no pacote <code>org.animais.mamiferos</code>. Isso significa que só pode existir um tipo de <code>Gato</code> nesse pacote, mas isso não implica que eu possa criar o tipo <code>Gato</code> para descrever, por exemplo, <em>instalações elétricas não-oficiais</em>, que obviamente não fazem parte do pacote <code>org.animais.mamiferos</code>, mas <code>org.humanos.civilizacoes.brasil.infraestrutura</code>. Classe é usada para definir o tipo do objeto, mas o pacote é o contexto na qual ele existe. Classe e Pacote tem uma relação umbilical, uma Classe sempre deve estar ligada a um Pacote.</p>
+</div>
+<div class="paragraph">
+<p>A segunda coisa que vamos detalhar nesse trecho de código são os modificadores de acesso. Como disse uma linguagem orientada a objetos é usada para se encapsular detalhes, logo os modificadores de acesso servem para definir quem pode acessar o quê. Eles podem ser aplicados para Classes, Métodos e Campos e existem os seguintes modificadores de acesso.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Tipo</th>
+<th class="tableblock halign-center valign-top">Token</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Package Private</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define que o elemento será acessível dentro do pacote. Esse é o modificador padrão, isso significa que nesse caso pode ser omitido.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Privado</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>private</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define que o elemento só pode ser acessado dentro da própria classe.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Protegido</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>protected</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define que o elemento é acessível dentro do mesmo pacote ou através de herança.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Público</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>public</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Define que o elemento é acessível em qualquer contexto.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Final</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>final</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Se aplicada a classe, ela não poderá ser estendida. Se aplicada a um campo ele não poderá ter seu valor alterado. Se aplicado a um método, ele não poderá ser reimplementado em uma classe que herda ele.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Estático</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>static</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pode ser usado tanto em campos como em classes internas. Se usado no campo, ele vai ter apenas um valor e está associado a classe. Campos não estáticos são associados a objetos. Se aplicado a classes internas, ela não dependerá de um objeto.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Ainda existem dois mais dois modificadores (<code>volatile</code> e <code>transiente</code>), mas eles não são importantes quando falamos de OO. <code>transiente</code> será importante quando falarmos de serialização e <code>volatile</code> quando falarmos de threads. Dos outros, podemos agrupar o <code>private</code>, <code>protected</code>, <code>public</code> e a ausência de um desses, pois eles são mutualmente excludentes.</p>
+</div>
+<div class="paragraph">
+<p>O próximo ponto que podemos falar é sobre métodos. Em Java não é comum termos funções puras, nem linguagem está preparada para isso. Temos basicamente dois tipos de métodos. Os métodos de instância são aqueles que são associados a um objeto. E os métodos estáticos são aqueles associados a uma classe, sem depender de uma instância. Conseguimos criar métodos estáticos usando o modificador de acesso <code>static</code>. Quando um método não é estático, podemos usar <code>this</code> para se referir a instância com a qual o método é associado.</p>
+</div>
+<div class="paragraph">
+<p>Métodos sempre tem parâmetros e valor de retorno (pode ser <code>void</code> que significa um vazio existencial, diferente do vazio de posição que é a palavra <em>empty</em>). Métodos de instância sempre vão te acesso a um objeto específico (usando o <code>this</code>), enquanto métodos estáticos não o são.</p>
+</div>
+<div class="paragraph">
+<p>Vamos ver melhor como os métodos funcionam? E se nós criássemos 3 métodos na nossa classe gato. O primeiro seria um método para mesclar características de 2 gatos, o segundo seria o método <code>meow</code> e o terceiro o método de reprodução (<code>cruza</code>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Gato</span> {
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Gato <span style="color: #0000FF">mistura</span>(Gato gatoA, Gato gatoB) {
+        <span style="color: #408080; font-style: italic">// Mágica acontece</span>
+        <span style="color: #008000; font-weight: bold">return</span> gatoC;
+    }
+
+    <span style="color: #408080; font-style: italic">// Campos, construtores, getters e setters</span>
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">meow</span>() {
+        System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">println</span>(<span style="color: #BA2121">&quot;Miau!&quot;</span>);
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> Gato <span style="color: #0000FF">cruza</span>(Felino outro) {
+        <span style="color: #008000; font-weight: bold">if</span> ((<span style="color: #666666">!</span>(outro <span style="color: #008000; font-weight: bold">instanceof</span> Gato)) <span style="color: #666666">||</span> sexo <span style="color: #666666">==</span> outro.<span style="color: #7D9029">sexo</span>) {
+            <span style="color: #008000; font-weight: bold">throw</span> <span style="color: #008000; font-weight: bold">new</span> CruzamentoException(<span style="color: #BA2121">&quot;Não é possível gerar filhote!&quot;</span>);
+        }
+        <span style="color: #008000; font-weight: bold">return</span> mistura(<span style="color: #008000; font-weight: bold">this</span>, outro);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O método <code>meow</code> é o exemplo clássico que veremos em herança, ele não retorna nada, só executa uma ação. Aqui vamos focar nos métodos <code>cruza</code> e <code>mistura</code> (ok, focar na parte reprodutiva foi péssimo&#8230;&#8203; mas estou falando de gatos!). <code>mistura</code> é um método que aleatoriamente vai gerar um novo gato baseado nas características de dois gatos. Nele podemos ver que o método recebe dois parâmetros e retorna um valor. No caso desse método, estamos retornando um novo objeto, mas nada impede de o retorno ser um dos parâmetros. Outra característica é que os parâmetros são uma passagem por referência e não por valor como vamos ver um pouco mais a frente. Sobre o método <code>cruza</code>, nele podemos acessar os campos do objeto local e campos da referência. Quero ressaltar o uso do <code>this</code> que é a forma de acessar a referência ao objeto pela qual o método é referenciado, o <code>this</code> não pode ser usado para métodos estáticos.</p>
+</div>
+<div class="sect3">
+<h4 id="cap-04-principios-heranca-implemenacao">Como Java implementa Herança</h4>
+<div class="paragraph">
+<p>Falamos sobre classes e alguns detalhes, mas agora precisamos falar de herança.</p>
+</div>
+<div class="paragraph">
+<p>Temos 3 tipos de classe: a Classe, a Interface e a Classe Abstrata.</p>
+</div>
+<div class="paragraph">
+<p><em>— Peraê! Mas como uma classe pode ser também Interface e Classe Abstrata?!?!? Tem algum erro lógico nessa afirmação!</em></p>
+</div>
+<div class="paragraph">
+<p>Não! Segura essa informação que quando formos falar sobre Reflexão trataremos do conceito interno de Classe. Por enquanto aceite que existem três tipos de classe e um deles é classe. 🤷‍♂️</p>
+</div>
+<div class="paragraph">
+<p>A Interface é quando tempos um contrato de como uma classe deve ser implementada. Ela vai definir a assinatura de alguns métodos. Por assinatura entenda que é a forma como a JVM usa para identificar um método, ela é composta pelo nome do método e a lista de parâmetros. O tipo de retorno não faz parte de uma assinatura e isso vai ser importante mais a frente. Uma interface também pode definir métodos <code>default</code> e métodos <code>static</code>. Uma interface normalmente é usada para definir um tipo, ou comportamento, comum dentro de um sistema.</p>
+</div>
+<div class="paragraph">
+<p>Uma classe abstrata é uma classe que não pode ser instanciada. Normalmente usamos quase abstrata quando desejamos compartilhar comportamento entre vários tipos. Em uma classe abstrata podemos definir variáveis e métodos, mas também podemos definir métodos abstratos (usando o modificador <code>abstract</code>). Ao se declara um método abstrato, estamos declarando apenas a assinatura, a implementação ficará a cargo de alguma classe que estende nossa classe abstrata.</p>
+</div>
+<div class="paragraph">
+<p>E por fim uma classe é uma implementação pela qual podemos instanciar objetos. Classes podem ser estendidas também quando queremos modificar um comportamento específico. Por exemplo, e se quisermos modificar a forma como o Garfield mia?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>Gato garfield <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Gato(<span style="color: #666666">15.0</span>, Cor.<span style="color: #7D9029">LARANJA</span>, Temperamento.<span style="color: #7D9029">PREGUICOSO</span>) {
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">meow</span>() {
+        System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">println</span>(<span style="color: #BA2121">&quot;Miaaaaaaau!&quot;</span>);
+    }
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quando adicionamos um bloco de código lodo após a instanciação da classe, estamos criando uma classe anônima. Esse comportamento será especifico dessa instância. Nós poderíamos evitar isso usando o modificador <code>final</code> no método ou na classe. Se usarmos no método, nenhuma subclasse poderá estender esse método, mas se usarmos na classe, ela não poderá ser estendida.</p>
+</div>
+<div class="paragraph">
+<p>Quando falamos de herança normalmente usamos as palavras estende e implementa. Estende é quando temos uma classe abstrata sendo estendida, e isso é feito usando a palavra reservada <code>extends</code>. Já implementa é quando temos uma interface sendo implementada pela classe, a palavra reservada <code>implements</code>.</p>
+</div>
+<div class="paragraph">
+<p>O Java tem algumas limitações em heranças. Uma classe SÓ pode estender uma classe, mas pode implementar quantas interfaces forem necessárias. MAS interfaces com mesma assinatura e tipo de retorno diferentes não são possíveis de serem implementas por uma mesma classe. No caso abaixo, temos que um <code>Gato</code> estende um <code>Felino</code> e implementa as interfaces <code>Miador</code> e <code>Ronronador</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Gato</span> <span style="color: #008000; font-weight: bold">extends</span> Felino <span style="color: #008000; font-weight: bold">implements</span> Miador, Ronronador {
+    <span style="color: #408080; font-style: italic">// Implementação</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cap-04-conceitos-oo">Conceitos da Orientação a Objetos</h3>
+<div class="paragraph">
+<p>Agora vamos discutir alguns conceitos comuns da orientação a objetos que podem nos auxiliar no dia a dia.</p>
+</div>
+<div class="sect3">
+<h4 id="_herança">Herança</h4>
+<div class="paragraph">
+<p>Para entender herança, podemos pensar em herança genética. Todo objeto ele tem um arquétipo e ele vai possuir uma hierarquia de tipos. Um <code>Gato</code> é um <code>Felino</code> que é um <code>Animal</code>. Cada uma dessas classes podem ter comportamentos associados ou apenas assinaturas de métodos. Se voltarmos no post anterior, sobre a biblioteca <code>Collections</code>, vamos ver o mais comum tipo de herança.</p>
+</div>
+<div id="jdk-lib-collections" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-03/Collections.png" alt="Collections">
+</div>
+<div class="title">Figura 2. Pacote Java Collections</div>
+</div>
+<div class="paragraph">
+<p>Vamos ver o caso da <code>LinkedList</code> que estende uma <code>AbstractSequentialList</code> e implementa as interface <code>List</code>, <code>Deque</code>, <code>Cloneable</code> e <code>Serializable</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>LinkedList</code> é uma classe, <code>AbstractSequentialList</code> é uma classe abstrata e <code>List</code> uma interface. <code>AbstractSequentialList</code> contém uma implementação de lista que por sua vêz estende uma <code>AbstractList</code>. Podemos dizer que <code>LinkedList</code> herda implementações de <code>AbstractSequentialList</code> e <code>AbstractList</code>. Assim como podemos dizer que <code>LinkedList</code> e <code>ArrayList</code> herdam implementações de <code>AbstractList</code> mesmo tendo comportamentos completamente diferentes.</p>
+</div>
+<div class="paragraph">
+<p>Da mesma forma <code>LinkedList</code> e <code>ArrayList</code> são tipos de <code>List</code>, enquanto apenas <code>LinkedList</code> é um tipo de <code>Deque</code>.</p>
+</div>
+<div class="paragraph">
+<p>Quando temos uma classe que herda tipos de outras classe, podemos definir nossos objetos com o tipo que desejarmos. Eu recomendo sempre usar a interface que você deseja usar e não a implementação final. Quer um exemplo? Vamos imaginar que eu quero definir um método que fará uma busca especifica pelo Gato mais gordo. Ao invés de declarar que desejo receber uma <code>LinkedList</code>, posso declarar que desejo receber apenas uma <code>List</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Gatos</span> {
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Gato <span style="color: #0000FF">maisGordo</span>(List<span style="color: #666666">&lt;</span>Gato<span style="color: #666666">&gt;</span> gatos) {
+        <span style="color: #408080; font-style: italic">// encontra o Garfield aqui que não tem erro.</span>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Uma dúvida clássica é se perguntar porque não devo usar o tipo mais específico. Nunca devemos usar as classes porque isso limita o uso do nosso código. Ao usar um <code>List</code>, eu posso aceitar qualquer implementação de <code>List</code>, mesmo implementações que eu não conheço. Essa preocupação será muito mais real quando estivermos falando de frameworks em que a geração de código ou classes do tipo proxy são comuns.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_override">Override</h4>
+<div class="paragraph">
+<p>Chamamos de <em>Override</em> a prática de sobrescrever implementações de métodos em classes filhos. Vamos voltar ao nosso exemplo de Gatos, e se existe uma raça especifica de gatos que não mia, são gatos mudos. Como esse característica é muito especifica mas ele definitivamente são gatos, podemos criar essa nova classe de gatos e sobrescrever o método.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">GatoMudo</span> <span style="color: #008000; font-weight: bold">extends</span> Gato {
+
+    <span style="color: #AA22FF">@Override</span>
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">meow</span>() {
+        System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">println</span>(<span style="color: #BA2121">&quot;.&quot;</span>); <span style="color: #408080; font-style: italic">// . significa silêncio</span>
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Se tivermos um objeto da classe <code>GatoMudo</code>, mesmo que ele esteja definido como <code>Gato</code>, será chamado o método da classe <code>GatoMudo</code>.</p>
+</div>
+<div class="paragraph">
+<p>O uso da anotação <code>@Override</code> não é obrigatório, mas é altamente recomendável.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_overload">Overload</h4>
+<div class="paragraph">
+<p>Chamamos de <em>Overload</em> quando criamos um novo método para um tipo diferente de parâmetros. Essa técnica é excelente quando queremos criar métodos semelhantes para tipos diferentes. Vamos supor que nosso método de <code>mistura</code> vai ser migrado para a classe abstrata de animais e que queremos criar esse método para alguns tipos de animais, não para todos, mas ele será diferente para alguns grupos (tem animal que se divide e não reproduz). Assim podemos criar um método mistura para os tipos <code>Mamifero</code>, <code>Ave</code>, <code>Reptil</code> e <code>Peixe</code>, cada método terá uma implementação completamente diferente.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Gato</span> {
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Mamifero <span style="color: #0000FF">mistura</span>(Mamifero mamiferoA, Mamifero mamiferoB) {
+        <span style="color: #408080; font-style: italic">// Mágica acontece</span>
+        <span style="color: #008000; font-weight: bold">return</span> mamiferoC;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Ave <span style="color: #0000FF">mistura</span>(Ave aveA, Ave aveB) {
+        <span style="color: #408080; font-style: italic">// Mágica acontece</span>
+        <span style="color: #008000; font-weight: bold">return</span> aveC;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Reptil <span style="color: #0000FF">mistura</span>(Reptil reptilA, Reptil reptilB) {
+        <span style="color: #408080; font-style: italic">// Mágica acontece</span>
+        <span style="color: #008000; font-weight: bold">return</span> reptilC;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">static</span> Peixe <span style="color: #0000FF">mistura</span>(Peixe peixeA, Peixe peixeB) {
+        <span style="color: #408080; font-style: italic">// Mágica acontece</span>
+        <span style="color: #008000; font-weight: bold">return</span> peixeC;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nós fizemos <em>overload</em> de um método estático, mas poderíamos ter feito de um método de instância.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_hashcode-equals-e-tostring">HashCode, Equals e ToString</h4>
+<div class="paragraph">
+<p>Uma outra reclamação constante de quem não gosta de Java é a necessidade de se implementar esses três métodos que as vezes parecem inúteis.</p>
+</div>
+<div class="paragraph">
+<p>Primeiro devemos esclarecer que <code>hashCode</code>, <code>equals</code> e <code>toString</code> são métodos extremamente úteis e usados constantemente pela JVM. É sempre recomendável a leitura da documentação da classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Object.html">Object</a> sobre esses três métodos.</p>
+</div>
+<div class="paragraph">
+<p><code>hashCode</code> é um método usado para o calculo do <em>Hash</em> do objeto. O hash é um valor inteiro que será usado para identificar cada objeto. Dois objetos iguais devem ter o mesmo hash, mas dois objetos com o mesmo hash não são iguais. Toda e qualquer classe usando o nome Hash usar esse método, assim se você tem um <code>HashMap</code> ou um <code>HashSet</code>, você tem o uso do método.</p>
+</div>
+<div class="paragraph">
+<p><code>equals</code> é um método usado para se verificar um objeto é igual a outro. Ele é usado por várias algoritmos da JVM, as vezes associado com o hash ou sem associação. Quando temos um <code>HashMap</code> os dois métodos são usados. O <code>equals</code> é usando quando temos o que chamamos de <strong>Colisão de Hash</strong>, dois objetos diferentes que tem o mesmo hash.</p>
+</div>
+<div class="paragraph">
+<p><code>toString</code> é usado para se criar um valor String para a classe. Sempre implemente o toString para melhorar o rastreamento de erros em logs de execução.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cap-04-passagem-por-valor-e-referencia">Passagem por valor e Passagem por referência</h3>
+<div class="paragraph">
+<p>Quando estudamos linguagem como C, estudar o tipo de passagem como argumento de uma função é muito importante, porque é possível controlar o que queremos fazer ao se escolher o tipo de parâmetro. Já em Java não nos preocupamos muito, mas em ambas a linguagem temos a possibilidade de se passar um argumento como valor ou como referência. Vamos primeiro definir para depois mostrar como pode ser feito?</p>
+</div>
+<div class="paragraph">
+<p>Falamos de <strong>Passagem por valor</strong> de um argumento para uma função quando ao se alterar o valor desse argumento dentro de um função, essa alteração não é refletida fora da função. Já quando falamos de <strong>Passagem por referência</strong> de um argumento, ao se alterar o valor desse argumento dentro da função ele é refletido fora da função. Fácil de entender? Não?!?!</p>
+</div>
+<div class="paragraph">
+<p>Em C, isso é meio óbvio porque podemos passar o valor ou a referência. Vou tentar mostrar aqui:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="c"><span></span><span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;stdio.h&gt;</span><span style="color: #BC7A00"></span>
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">incrementaValor</span>(<span style="color: #B00040">int</span> valor) {
+    <span style="color: #008000; font-weight: bold">return</span> valor <span style="color: #666666">+</span> <span style="color: #666666">1</span>;
+}
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">incrementaReferencia</span>(<span style="color: #B00040">int</span> <span style="color: #666666">*</span> valor) {
+    (<span style="color: #666666">*</span>valor)<span style="color: #666666">++</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">*</span>valor;
+}
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>() {
+    <span style="color: #B00040">int</span> contador <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    printf(<span style="color: #BA2121">&quot;Valor: %d</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>, incrementaValor(contador));  <span style="color: #408080; font-style: italic">// Imprime &quot;Valor: 1&quot;</span>
+    printf(<span style="color: #BA2121">&quot;Valor: %d</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>, incrementaValor(contador));  <span style="color: #408080; font-style: italic">// Imprime &quot;Valor: 1&quot;</span>
+
+    printf(<span style="color: #BA2121">&quot;Valor: %d</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>, incrementaReferencia(<span style="color: #666666">&amp;</span>contador));  <span style="color: #408080; font-style: italic">// Imprime &quot;Valor: 1&quot;</span>
+    printf(<span style="color: #BA2121">&quot;Valor: %d</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>, incrementaReferencia(<span style="color: #666666">&amp;</span>contador));  <span style="color: #408080; font-style: italic">// Imprime &quot;Valor: 2&quot;</span>
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O que acontece quando eu chamo a função <code>incrementaValor</code> é que uma cópia do contador é enviado para a função, mas quando chamo <code>incrementaReferencia</code> o próprio contador é enviado para a função.</p>
+</div>
+<div class="paragraph">
+<p>Em Java só temos passagem por valor quando usamos tipos primitivos (<code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code> ou <code>char</code>). Quando definimos um objeto, sempre estamos passando a referência do mesmo para funções. Por isso é muito importante entender o que é e como garantir imutabilidade. Quando formos falar de memória, vou explicar o que é o conceito de memória e como isso funciona na prática, mas, resumidamente, tipos primitivos são armazenados na stack do programa enquanto todas as classes são armazenados na memoria heap do programa. Ao se criar um objeto, um ponteiro na stack é criado para um novo espaço de memoria alocado na Heap. <em>Calma, você não tem obrigação de entender isso facilmente</em>!!!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_imutabilidade-e-mutabilidade">Imutabilidade e Mutabilidade</h3>
+<div class="paragraph">
+<p>Chamamos de mutabilidade a capacidade de um objeto ter seu estado interno alterado. Em orientação a objetos mutabilidade é um requisito desejado para quase todas as classes, por isso que só recentemente o Java incorporou o conceito de imutabilidade a linguagem através dos Records. Antes dos Records era comum se usar POJOs em que existia para cada campo um respectivo <code>get</code> e um <code>set</code>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">POJO</div>
+POJO é um acrônimo para <em>Plain Old Java Object</em>, que significa velho e simples objeto Java. É um termo usado para referenciar um padrão de classes Java que não dependem da herança de interfaces ou classes de frameworks externos.
+</div>
+</div>
+<div class="paragraph">
+<p>Records é o tipo que adiciona o conceito de imutabilidade ao código Java. Abaixo vou definir a classe <strong>Usuario</strong> três vezes. Na primeira vez ela é mutável, na segunda imutável usando POJO e na terceira usando record.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Usuario</span> {
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #B00040">int</span> id;
+    <span style="color: #008000; font-weight: bold">private</span> String username;
+    <span style="color: #008000; font-weight: bold">private</span> String email;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #0000FF">Usuario</span>(<span style="color: #B00040">int</span> id, String username, String email) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">id</span> <span style="color: #666666">=</span> id;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">username</span> <span style="color: #666666">=</span> username;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">email</span> <span style="color: #666666">=</span> email;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">int</span> <span style="color: #0000FF">getId</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> id;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">setId</span>(<span style="color: #B00040">int</span> id) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">id</span> <span style="color: #666666">=</span> id;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> String <span style="color: #0000FF">getUsername</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> username;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">setUsername</span>(String username) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">username</span> <span style="color: #666666">=</span> username;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> String <span style="color: #0000FF">getEmail</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> email;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">void</span> <span style="color: #0000FF">setEmail</span>(String email) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">email</span> <span style="color: #666666">=</span> email;
+    }
+
+    <span style="color: #408080; font-style: italic">// Implementa hashCode, equals e toString</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para implementar um campo imutável, devemos usar o modificador de acesso <code>final</code>. Um campo final terá seu valor definido no construtor e não poderá ser alterado em todo ciclo de vida do objeto.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> <span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">Usuario</span> {
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #008000; font-weight: bold">final</span> <span style="color: #B00040">int</span> id;
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #008000; font-weight: bold">final</span> String username;
+    <span style="color: #008000; font-weight: bold">private</span> <span style="color: #008000; font-weight: bold">final</span> String email;
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #0000FF">Usuario</span>(<span style="color: #B00040">int</span> id, String username, String email) {
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">id</span> <span style="color: #666666">=</span> id;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">username</span> <span style="color: #666666">=</span> username;
+        <span style="color: #008000; font-weight: bold">this</span>.<span style="color: #7D9029">email</span> <span style="color: #666666">=</span> email;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> <span style="color: #B00040">int</span> <span style="color: #0000FF">getId</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> id;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> String <span style="color: #0000FF">getUsername</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> username;
+    }
+
+    <span style="color: #008000; font-weight: bold">public</span> String <span style="color: #0000FF">getEmail</span>() {
+        <span style="color: #008000; font-weight: bold">return</span> email;
+    }
+
+    <span style="color: #408080; font-style: italic">// Implementa hashCode, equals e toString</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ao usar records, é como se todos os campos já fossem definidos como final, mas a grande vantagem se dá que não precisamos implementar os métodos <code>hashCode</code>, <code>equals</code> e <code>toString</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">public</span> record <span style="color: #0000FF">Usuario</span>(<span style="color: #B00040">int</span> id, String username, String email) {}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-04-conclusao">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Orientação a Objeto é uma ótima técnica para fazer design de código. Ela é melhor utilizada quando tempos que modelar problemas do mundo real, mas haverá dificuldade se o modelo for mais próximo de um modelo matemático.</p>
+</div>
+<div class="paragraph">
+<p>O principal ganho com a modelagem a Orientação a Objetos é a capacidade de se encapsular complexidades.</p>
+</div>
+</div>
+</div>
+        </article>
+        
+
+
+
+
+
+<div class="series">
+    <div class="serie-contents">
+        
+        <h2>
+            Java 101<br/>
+            <span class="description">(série de 7 partes)</span>
+        </h2>
+        
+            
+            <a href="/posts/java-101">
+                <div class="serie-article">Como começar a aprender Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-sintaxe">
+                <div class="serie-article">A sintaxe do Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-collections">
+                <div class="serie-article">Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!</div>
+            </a>
+            
+        
+            
+            <div class="serie-article selected">OO: Eu vejo objetos por todos os cantos!</div>
+            
+        
+            
+            <a href="/posts/java-101-io">
+                <div class="serie-article">Java I/O</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-threads">
+                <div class="serie-article">Concorrência e Paralelismo</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-memoria">
+                <div class="serie-article">Memória</div>
+            </a>
+            
+        
+    </div>
+</div>
+
+        
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                <img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+        <div class="article-footer">
+            
+            <div class="published">
+                <div>Escrito em 30/maio/2022</div>
+            </div>
+            
+
+            
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                    
+                    
+                     
+            
+            
+                
+            <div class="related-posts">
+                <h2>Posts relacionados</h2>
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/entendendo-o-kafka">
+                            
+                                Entendendo o Kafka
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/jakarta-ee-e-microprofile-io">
+                            
+                                Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+                            
+                                Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                        
+                <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+                            
+                                Como criar uma linguagem usando ANTLR4 e Java
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/trabalhando-com-dinheiro">
+                            
+                                Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/deixando-rastros-ou-como-usar-log">
+                            
+                                Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/anatomia-de-um-topico">
+                            
+                                Entendendo o Kafka: Anatomia de um Tópico
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                        
+                <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+                            
+                                Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/devops-como-comecar">
+                            
+                                Coisas que todo Sênior deve saber: DevOps! Como começar?
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/testes-101-testando-aplicacoes-java">
+                            
+                                Level Up: Testes 101 - Testando aplicações Java
+                            
+                </a>
+                            
+                             
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                         
+                     
+                 
+                    
+                     
+                         
+                     
+                         
+                     
+                        
+                <a href="/posts/context-and-dependency-injection-cdi-2-0">
+                            
+                                Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+                            
+                </a>
+                            
+                             
+                 
+                    
+                        
+            
+        </div>
+        
+        </div>
+    </div>
+
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<div class="buymeacoffee">
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://twitter.com/vepo">
+				<i class="fab fa-twitter fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YXWDKRN6ZR"></script>
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+ </body>
+</html>

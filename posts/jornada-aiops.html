@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@vepo">
+  <meta name="twitter:creator" content="@vepo">
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+  
+  <!-- SEO stuff -->
+  
+  <title>Jornada AIOps</title>
+  <meta property="og:title" content="Jornada AIOps" />
+  <meta name="twitter:title" content="Jornada AIOps">
+  
+
+
+  
+  <meta name="description" content="Um breve relato sobre a proposição de uma solução que decidimos não apresentar uma solução, mas um modelo de maturidade. Era um desafio, o que apresentamos não cobria o que era deseja, mas mesmo assim ganhamos." />
+  <meta property="og:description" content="Um breve relato sobre a proposição de uma solução que decidimos não apresentar uma solução, mas um modelo de maturidade. Era um desafio, o que apresentamos não cobria o que era deseja, mas mesmo assim ganhamos." />
+  <meta name="twitter:description" content="Um breve relato sobre a proposição de uma solução que decidimos não apresentar uma solução, mas um modelo de maturidade. Era um desafio, o que apresentamos não cobria o que era deseja, mas mesmo assim ganhamos.">
+  
+
+  
+  <meta name="keywords" content="AIOps, AI, O homem que sabia javanês">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/posts/jornada-aiops" />
+  <meta property="og:url" content="https://blog.vepo.dev/posts/jornada-aiops" />
+  <meta name="twitter:url" content="https://blog.vepo.dev/posts/jornada-aiops">
+
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/pexels-negative-space-169573.jpg" />
+  <meta name="twitter:image" content="https://blog.vepo.dev/assets/images/pexels-negative-space-169573.jpg">
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2021-08-30T07:45:00+00:00" />
+  <meta property="article:modified_time" content="2021-08-30T07:45:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="AIOps" property="article:tag">
+  
+  <meta content="AI" property="article:tag">
+  
+  <meta content="O homem que sabia javanês" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Jornada AIOps",
+      "datePublished": "2021-08-30T07:45:00+00:00",
+      
+      "description": "Um breve relato sobre a proposição de uma solução que decidimos não apresentar uma solução, mas um modelo de maturidade. Era um desafio, o que apresentamos não cobria o que era deseja, mas mesmo assim ganhamos.",
+      
+      
+      "url": "https://blog.vepo.dev/posts/jornada-aiops"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header class="site-header">
+            <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+            <nav class="menu-list">
+	
+	<a href="/computacao-critica" class="menu-link">Computação Crítica</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutorais</a>
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+        </header>
+        <div class="title">
+    
+    <h1 class="serie-title">
+        Jornada AIOps
+    </h1>
+    
+</div>
+<div class="article cover-image">
+    
+    <img alt="Jornada AIOps" src="/assets/images/pexels-negative-space-169573.jpg" width="0" height="0" />
+    
+</div>
+        
+        
+        <div class="publish_date">
+            <strong>
+                <time datetime="2021-08-30T07:45:00+00:00">
+                    30/agosto/2021
+                </time>
+            </strong> 
+        </div>
+        
+        <div class="tag-container">
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default aiops" href="/tags/#aiops">AIOps</a> 
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default ai" href="/tags/#ai">AI</a> 
+            
+            <i class="fas fa-tags"></i>
+            <a class="label label-default o-homem-que-sabia-javanês" href="/tags/#o-homem-que-sabia-javanês">O homem que sabia javanês</a> 
+            
+        </div>
+            
+            
+        <hr> 
+        
+        
+        <article>
+            <p>No último sábado terminamos (eu e meu grupo) o MBA da FIAP de Arquitetura de Software como campeões do desafio principal. Preciso confessar que estávamos completamente céticos em relação a qualquer prêmio por dois motivos. O primeiro é que não entregamos o que foi pedido e o segundo é que a nossa proposição de arquitetura era o mais simples possível. Mas vou descrever essa jornada.</p>
+
+<h1 id="o-desafio">O Desafio</h1>
+
+<p>Na verdade era um <em>Chalenge</em>, mas como eu me recuso a usar termos estrangeiros se temos bons termos em pt-BR, mas vou chamar de desafio mesmo! 😀</p>
+
+<p>Um banco que existe antes das FinTechs, mas que cresceu na era das FinTechs, apresentou uma proposta de melhoria da sua gestão de infraestrutura: <strong><em>“queremos AIOps”</em></strong>. A proposta parecia genérica, e realmente era. Tudo que eles pediam era uma apresentação da arquitetura proposta com um demonstração. Eles focaram que era algo HandsOn! Queriam ver funcionando no dia da entrega. Não havia nada mais especificado.</p>
+
+<p>Durante as mentorias, conseguimos levantar alguns pontos da infraestrutura do banco. Eles usavam um provedor de Cloud que já tinham escolhidos como principal fornecedor. E usavam duas ferramentas, uma para APM e outra para monitoramento de rede. Não conhecíamos e nunca tínhamos usado nenhuma dessas ferramentas, para ser sincero, durante minha carreira eu tive pouco contato com software em produção, então monitoramento é uma fraqueza. Só usei o NewRelic e fiz alguns deploys usando a plataforma ELK. Mas isso não me dá a visão de uma infraestrutura completa para um banco.</p>
+
+<h1 id="decisões-iniciais-e-definições">Decisões iniciais e Definições</h1>
+
+<p>Na conversa com o grupo chegamos a primeira conclusão: <em>o desafio é vago</em>. Se entregarmos algo HandsOn, é bem provável que cubra todos os requisitos e podemos até ganhar, mas ao encarar o primeiro trade-off, pode ser completamente descartado. Então fizemos a primeira pergunta: <em>como entregar algo que com certeza não vai ser jogado fora?</em> Era hora de pesquisar.</p>
+
+<p>A primeira definição que encontramos foi do <a href="https://www.gartner.com/en/information-technology/glossary/aiops-artificial-intelligence-operations">Gartner</a>, na verdade foi a única que fomos atrás. Não fomos atrás de outras definição por um motivo bem simples: <strong>fugir do papo de vendedor</strong>. Normalmente quem escreve sobre um assunto é quem vende um produto relacionado, e muitos desses “white-papers” estão na verdade não apaixonados pelo problema, mas vendendo uma solução.</p>
+
+<blockquote>
+  <p><em>AIOps combines big data and machine learning to automate IT operations processes, including event correlation, anomaly detection and causality determination.</em></p>
+</blockquote>
+
+<p>Segundo o Gartner, AIOps envolve eventos. AIOps começa quando eventos podem ser colocados dentro um algoritmos de Machine Learning. Nesse ponto informamos claramente para a equipe do banco: <em>pode tirar o cavalinho da chuva que não vai ser fácil</em>. Pois é, ao invés de vendermos nossa solução, falamos a verdade. Para criar um solução robusta de AIOps era preciso catalogar dados, criar eventos e treinar uma rede neural.</p>
+
+<h1 id="conhece-te-a-ti-mesmo"><em>“Conhece-te a ti mesmo”</em></h1>
+
+<p>O segundo passo foi criar um meio de auto avaliação. Não faz sentido apresentarmos uma solução para uma empresa e ela mesmo não conseguir avaliar se a solução permitia AIOps ou não. Logo procuramos se existe algum modelo de maturidade para AIOps.</p>
+
+<p>Se você nunca parou para olhar o que é um modelo de maturidade, recomendo fortemente que procure algum. Você pode encontrar facilmente para Metodologias Ágil e DevOps. Na maioria dos casos começar a fazer algo não significa apenas usar ferramentas, mas entender o problema e saber como a ferramenta pode de ajudar a implementar uma politica.</p>
+
+<p>Ao procurar um bom modelo de maturidade tivemos o mesmo problema com a definição: <em>papo de vendedor</em>. Normalmente quem produz um modelo de maturidade quer validar a própria ferramenta e não avaliar a adequação do problema com a solução. O problema é que a solução proposta vai sempre levar ao nível mais alto, pois todas as deficiências da solução serão propositadamente omitidas. Então passamos a segunda, terceira, quarta, etc… página do google para encontrar um modelo que fosse realmente abrangente.</p>
+
+<p>Assim pudemos propor o seguinte modelo:</p>
+
+<ul>
+  <li>Nível 0 - Caos
+    <ul>
+      <li>Sem dados</li>
+      <li>Sem análises</li>
+      <li>Sem automação</li>
+    </ul>
+  </li>
+  <li>Nível 1 - Coleta
+    <ul>
+      <li>Serviços com suporte a coleta de informações de operação</li>
+    </ul>
+  </li>
+  <li>Nível 2 - Consolidação
+    <ul>
+      <li>Dados da operação centralizados</li>
+      <li>Identificação manual de erros</li>
+      <li>Construção manual de dashboards</li>
+    </ul>
+  </li>
+  <li>Nível 3 - Contextualização
+    <ul>
+      <li>Extração de informações dos dados</li>
+      <li>Identificação automática de erros</li>
+      <li>Estatísticas não supervisionadas</li>
+      <li>Automação bi-direcional (ITSM)</li>
+    </ul>
+  </li>
+  <li>Nível 4 - Conselho
+    <ul>
+      <li>Recomendação de fontes de dados</li>
+      <li>Recomendações de análises e correlações</li>
+      <li>Automação de múltiplos passos</li>
+    </ul>
+  </li>
+  <li>Nível 5 - Autômato
+    <ul>
+      <li>Otimização proativa</li>
+      <li>Tuning de performance</li>
+      <li>Solução automática de problemas</li>
+      <li>Automação Closed-Loop</li>
+    </ul>
+  </li>
+</ul>
+
+<p>É muito importante que o modelo de maturidade seja devidamente apresentado a empresa, porque muitos entendem que podem chegar ao nível máximo apenas usando algumas ferramentas. ISSO É UM MITO! Todo maturidade chega através de muito esforço e mudanças graduais. É bem provável que a maioria das empresas esteja no nível 0, mas se simplesmente falarmos que elas vivem o Caos já perdemos o cliente. Porque na verdade nenhuma empresa séria vive o Caos, eles podem até estar nessa fase, mas já criaram uma série de processos para garantir que o caos seja controlado. O que acontece é que a empresa caminha para o lado no modelo de maturidade, ao invés de andar para o nível 1, ela vai criar processos que engessem o caos tornando ele extremamente burocrático.</p>
+
+<p>Quer um exemplo dessa burocracia? Uns 5 anos atrás eu vi uma palestra de um IT Leader (termo genérico, não!?) contando como foi a migração de todos os serviços da empresa para nuvem. A apresentação de cerca de 50 minutos não contou com nenhuma definição, padrão estabelecido ou mesmo conceito. Não falaram de Cloud Native, Microservices, etc… Como a empresa fez? Replicou tudo na nuvem e foi verificando se o serviço replicado na nuvem era igual ao executado on-premise. Ora, qual foi o custo disso?!!? Depois eles migraram pra nuvem e mantiveram o on-premise ainda em atividade para garantir um fallback. Eu não quero saber quantas noites esses infelizes perderam por não estudar o conceito de Cloud Native que já tem uns 10 anos, ou por não ter estabelecido um padrão para toda a aplicação.</p>
+
+<p>Com o modelo de maturidade acima, a empresa poderia criar um planejamento para andar entre as fases.</p>
+
+<h1 id="escolhas-de-ferramentas">Escolhas de ferramentas</h1>
+
+<p>O próximo passo era escolher ferramentas que pudessem possibilitar a implantação de cada nível do AIOps. Para isso fizemos um grande levantamento. Quem pode ajudar em cada linha do nosso modelo de maturidade? Fizemos a lista de todos os nomes e começamos a jogar em um diagrama. Mas para fazer uma integração não é só criar uma seta num diagrama <a href="https://www.opengroup.org/archimate-forum/archimate-overview">ArchiMate</a>, é muito fácil criar diagramas mas é bastante complexo colocar eles em funcionamento.</p>
+
+<p>Logo começamos uma busca intensiva por toda a documentação de todas as ferramentas com a seguinte pergunta: <em>como eu integro a ferramenta A na ferramenta B?</em> Com essa análise simples, já pudemos dividir as ferramentas em conjuntos de possíveis soluções. Mas já no começo sabíamos de algumas limitações, pois o banco já usava duas ferramentas e escolhido o provedor Cloud. Assim todas as soluções deveriam incluir essas duas ferramentas e esse provedor cloud.</p>
+
+<h1 id="a-decisão-difícil">A decisão difícil</h1>
+
+<p>Entre as várias opções arquiteturais, tínhamos algumas plataformas Open Source e várias empresas oferecendo serviços.</p>
+
+<p>Escolher uma solução open source seria minha escolha de coração, mas isso requer bastante trabalho para implantar. Muitas vezes acreditamos que é fácil montar uma equipe com bons desenvolvedores que entendem de plataformas open source e são hábeis em pesquisar soluções na internet. Mas na verdade o mercado é bem diferente da nossa bolha. A grande maioria dos desenvolvedores não tem essa habilidade, não conseguem entender os protocolos e muitos não entendem nada em inglês. Logo a solução precisava ser provida por uma empresa que daria um bom suporte.</p>
+
+<p>E sobre ter várias empresas, isso é realmente bom… MAS… O que observamos no passo anterior foi que as próprias empresas que proveem serviços de observabilidade estão se fechando em silos propositadamente. A empresa sabe que se ela os produtos A e B, se ela prover integração do produto A com o B da concorrência, ela vai perder mercador. Logo as empresas que tem produtos lideres de mercado estão removendo possibilidades de integração. Nós verificamos isso fazendo uma correlação de datas de lançamento de produtos, posts de blogs e documentação. Quando a empresa lança um produto, ela retira a possibilidade de integração da documentação e os posts de blogs anteriores a data de lançamento do produto vão possuir links inválidos. O que isso significa?</p>
+
+<p>Se escolhêssemos as melhores ferramentas para cada passo, teríamos uma grande dificuldade de evoluir pois cada integração seria custosa. Então era mais fácil aceitar o Vendor Lock-In para podermos propor uma arquitetura fácil e rápida de se implantar. Depois de implantada a empresa poderia avaliar uma troca de serviço. Assim decidimos que todas os serviços deveriam ser do próprio provedor de Cloud, que nesse caso era a AWS.</p>
+
+<p>Usando o mesmo provedor de serviços evitamos silos de dados. Se a ferramenta de AIOps só precisar olhar para um local é muito mais fácil de manter e evoluir a solução.</p>
+
+<h1 id="criação-de-um-plano">Criação de um plano</h1>
+
+<p>Eu sempre digo que se temos um plano, temos tudo. Ter um plano é como viajar para um lugar desconhecido com um mapa, mesmo se pegarmos o caminho errado, é possível reavaliar e propor uma nova rota. Todo plano pode ser reavaliado.</p>
+
+<p>Dados os níveis de maturidade começamos a escolher ponto a ponto de como integrar. Primeiro era preciso ter dados! Por isso propusemos um escolha que todos os microsserviços deveriam expor seus dados em formato <a href="https://prometheus.io/docs/introduction/overview/">Prometheus</a>. Não vamos usar o Prometheus, mesmo sendo uma das possibilidades, mas percebemos que todos os serviços estão abertos a se integrar com soluções open source. Todo serviço deve ser Cloud Native, seguir os 12 Fatores e usar um framework moderno. Como exemplo criei um serviço de registro de pagamento bem simples usando <a href="http://quarkus.io/">Quarkus.io</a>, <a href="https://www.postgresql.org/">PostgreSQL</a> com JPA Panache, <a href="https://blog.vepo.dev/posts/using-bean-Validation-on-quarkus">Jakarta Bean Validation</a>, <a href="https://quarkus.io/guides/smallrye-metrics">MicroProfile Metrics</a>, <a href="https://quarkus.io/guides/smallrye-health">MicroProfile Health</a> e <a href="https://www.openapis.org/">OpenAPI</a>. Usando o esqueleto de microsserviço já atingimos o nível 1, habilitando a coleta de informações.</p>
+
+<p>O próximo passo é consolidar todos esses dados em um só local. É muito importante que seja um só local, pois isso facilitará a implementação. Para isso escolhemos o AWS CloudWatch, porque ele é o serviço que faz isso nativamente para Amazon. Se precisamos coletar dados de servidores on-premise, podemos usar o AWS CloudWatch Agente para coletar todos os dados e salvar no mesmo <em>“lake”</em>.</p>
+
+<p>Lembra que a empresa já possuía alguns serviços de monitoramento? Esses serviços não poderiam ser facilmente integrados, não há suporte. Por isso propusemos exportar os dados em formato Prometheus, que podem ser coletado pelo AWS CloudWatch Agente e, além disso, criar eventos e alarmes que podem ser enviados via API para o AWS CloudWatch. Esses serviços podem ser usados, mas a integração não vai ser nativa.</p>
+
+<p>Usando apenas o AWS CloudWatch já é possível criar um dashboard com as informações principais do ecossistema. É possível também identificar erros e criar eventos e alertas baseado em padrões de logs, correlação de eventos, etc… A escolha do AWS CloudWatch por se só já leva ao nível 2, mas será preciso uma fase de criação de dashboards, eventos e alertas para chegar a plenitude do nível 2 e depois chegar ao nível 3, contextualizando dados e logs.</p>
+
+<p>Um ponto interessante que eu não tinha nem ideia, é que o sistema bancário é super regulamentado. Agradeça a essa regulamentação por não termos tido crise nos anos 2008/09. Essa regulamentação vem lá dos anos 90, quando vários bancos quebraram por pura picaretagem dos seus diretores. Quem tem mais de 35 vai se <a href="https://pt.wikipedia.org/wiki/Salvatore_Cacciola">lembrar</a> de vários homens branco classe AAA+++++ sendo presos, mansões sendo leiloadas, etc… Bom, dessa regulamentação vem um rígido processo de ITSM, isso significa que nenhuma operação na produção deve ser feita sem um rastreamento. Por isso precisamos escolher uma ferramenta de ITSM externa a AWS, mas que pode ser integrada vai API usando Lambda. Com alertas e funções lambdas é possível automatizar várias operações tanto na nuvem quanto em on premise.</p>
+
+<p>Para finalizar, propomos o uso do AWS DevOps Guru, um produto da própria AWS que promete magicamente habilitar o AIOps. Mas fomos bem cético nesse uso. Ao propor já avisamos que nenhuma solução de Machine Learning vem de graça, tem que ter uma base tageada e treinamento de modelos. Não fizemos nenhuma PoC usando o DevOps Guru, apenas propomos e ainda dissemos para só habilitar quando todo o dever de casa estiver feito.</p>
+
+<p><img src="/assets/images/aws-devops-guru.png" alt="AWS DevOps Guru" /></p>
+
+<p>Essa solução é propositadamente simples.</p>
+
+<h1 id="outras-soluções">Outras soluções</h1>
+
+<p>Não tínhamos nenhuma esperança de ganhar e quando começaram as apresentações percebemos claramente que não iriamos ganhar. Todas as soluções eram extremamente complexas, usavam ao menos 10 produtos diferentes. Teve um grupo que chegou a propor uma integração plugando um Apache Kafka no AWS CloudWatch, nessa hora eu peguei minha garrafa de água pra ver se alguém tinha colocado drogas ou se o grupo realmente não tinha parado para avaliar o nível de dificuldade da solução proposta.</p>
+
+<p>Muitos quando era questionados das escolhas gaguejavam ou dava desculpas esfarrapadas. Nossa solução não era a cereja do bolo, no documento que entregamos ela ocupava poucos parágrafos (algo como uns dois a mais que a sessão anterior) com alguns links de documentação. O ponto principal era o modelo de maturidade.</p>
+
+<h1 id="outras-aplicações-reais">Outras aplicações reais</h1>
+
+<p>Você pode achar que isso só funciona para infraestrutura de aplicações, mas é bem provável que seu acesso ao mundo será controlado por uma solução AIOps. As especificações 5G já preveem algo chamado como SDMN (Software-defined mobile networking) onde a estrutura da rede é definida por software. Isso possibilita que seja também alterada por software, assim há alguns casos de AIOps já estudados, que nesse caso se chama Closed Loop. Para maiores informações leia <a href="https://dl.acm.org/doi/10.1145/3472735.3474458">AI-driven Closed-loop Automation in 5G and beyond Mobile Networks</a> ou <a href="https://ieeexplore.ieee.org/abstract/document/8802040">Towards Closed Loop 5G Service Assurance Architecture for Network Slices as a Service</a>.</p>
+
+<p>Mas vou descrever como isso pode acontecer no futuro. Imagina que alguma empresa lance um jogo que sobrecarrega toda a rede de telefonia. É preciso de muito tráfego pra isso, mas vamos supor que esse jogo seja mesmo um grande desperdício. Se a rede não se reorganizar, a latência e velocidade de todos os usuário da rede será afetada. Usando Closed Loop, a própria rede pode perceber que apenas um serviço está causando um impacto enorme (normalmente 20% dos usuários usam 80% da rede), então a rede é dividida (network slicing) e esses usuários são direcionados para uma rede exclusiva. Deste modo, se o uso está abusivo, apenas eles vão sentir o impacto, evitando que outros usuários sejam impactados. Isso é muito importante em 5G pois nessa rede não estarão somente usuários, mas equipamentos importantes de fábricas, hospitais e locomoção.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Complexidade e papo de vendedor vende. Mas verdade e simplicidade convencem muito melhor. Muitos arquitetos gostam de complexidade porque eles acreditam que ela vai dar elegância a solução. Mas o conceito de elegância vem da simplicidade, fazer o básico bem feito.</p>
+
+<p>Ao propor uma arquitetura leia toda a documentação, evite passar vergonha de propor a solução errada. Pode ser que quando você for apresentar ninguém realmente saiba do que você está falando, mas pode ser que exista um especialista no assunto. Existe até um conto centenário chamado <a href="https://www.amazon.com.br/Homem-Sabia-Javan%C3%AAs-Outros-Contos/dp/8534235929">O homem que sabia javanês</a> que mostra como uma pessoa pode parecer inteligente apenas sendo cara de pau. Não seja essa pessoa, isso é leviano e injusto. Creio que nós só ganhamos esse prêmio porque ao vender as dificuldades de implementação e fazer uma pesquisa séria no tema implodimos todas as soluções impossíveis e colocamos uma bomba relógio na complexidade desnecessária.</p>
+
+        </article>
+        
+        
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                <img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+        <div class="article-footer">
+            
+            <div class="published">
+                <div>Escrito em 30/agosto/2021</div>
+            </div>
+            
+
+            
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+             
+                 
+                     
+                 
+                     
+                 
+                     
+                 
+            
+            
+        </div>
+        
+        </div>
+    </div>
+
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<div class="buymeacoffee">
+				<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+					data-name="bmc-button" data-slug="vepo" data-color="#5F7FFF" data-emoji="" data-font="Cookie"
+					data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff"
+					data-coffee-color="#FFDD00"></script>
+			</div>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://twitter.com/vepo">
+				<i class="fab fa-twitter fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-3x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YXWDKRN6ZR"></script>
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+ </body>
+</html>

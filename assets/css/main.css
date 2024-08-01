@@ -1,0 +1,459 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+body {
+    font-family: 'Playfair Display', 'Times New Roman', serif;
+    background-color: #EEECE6;
+    color: #444444;
+}
+
+img {
+    max-width: 100%;
+}
+
+a:link, a:visited, a:hover, a:active { 
+    text-decoration: none; 
+    color: #444444;
+}
+
+article a:link,
+article a:visited,
+article a:hover,
+article a:active { 
+    text-decoration: none; 
+    color: #4444BB;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.site-header {
+    border-bottom: solid 1px #444444;
+}
+
+.site-header h3, .site-header nav {
+    display: inline-block;
+}
+
+.site-header a {
+    text-transform: uppercase;
+    margin: 0 1vw;
+}
+
+.site-header .site-title a {
+    margin: 0;
+}
+
+.pagination {
+    text-align: center;
+    display: block;
+    margin: 0.7em 0;
+}
+
+.list-group {
+    text-align: center;
+}
+
+.list-group p {
+    text-align: justify;
+    margin: 16px auto;
+    width: max(50%, 540px);
+    max-width: 100%;
+}
+
+.list-group .cover-image img {
+    max-width: 100%;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+}
+
+.tag-container {
+    margin: 16px auto;
+    width: max(50%, 540px);
+    text-align: center;
+    max-width: 100%;
+}
+
+.tag-container .label {
+    text-transform: uppercase;
+    margin: 0 1em;
+    white-space: nowrap;
+}
+
+.title, .publish_date {
+    text-align: center;
+}
+
+.article.cover-image {
+    text-align: center;
+}
+
+.article.cover-image img {
+    width: auto;
+    height: auto;
+    max-height: 400px;
+    max-width: 100%;
+}
+
+article > p {
+    text-align: justify;
+}
+
+.series {
+    text-align: center;
+    margin-bottom: 25px;
+    counter-reset: post;
+    border-radius: 10px;
+    max-width: 70vw;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px 0;
+    background: #FFF;
+}
+
+.series h2 {
+   font-size: 1.2em;
+}
+
+.series .serie-contents .serie-article::before {
+    counter-increment: post;
+    content: "\00a0\00a0\00a0" counter(post) ": ";
+    position: absolute;
+    left: 1vw;
+}
+
+.series .description {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+.series a {
+    color: #000000;
+}
+
+.series .serie-article {
+    position: relative;
+    padding: 4px 4px 4px 45px;
+    text-align: left;
+}
+
+.series .serie-article.selected {
+    font-weight: bolder;
+    background: #888;
+    color: #FFF;
+}
+
+.series .serie-article.selected:before {
+    content: ">\00a0" counter(post) ": ";
+    position: absolute;
+    left: 1vw;
+}
+
+.series .serie-contents .serie-article:not(.selected):hover {
+    background-color: #888888;
+    color: #FFFFFF;
+}
+
+.img-block {
+    text-align: center;
+}
+
+.img-block img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* desktop */
+@media (min-width: 768px) {
+    body:not([browser='Googlebot']) .container.post {
+        font-size: 0.8em;
+        max-width: min(100vw, 936px);
+    }
+
+    body:not([browser='Googlebot']) .series {
+        max-width: 70%;
+        font-size: 0.8em
+    }
+}
+
+/* mobile */
+@media (max-width: 767px) {
+    body {
+        font-size: 1.3em;
+    }
+    body:not([browser='Googlebot']) .container.post {
+        font-size: 1em;
+    }
+}
+
+
+.article-footer .published {
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.article-footer .related-posts {
+    border-top: solid 1px #444444;
+    text-align: center;
+}
+
+.article-footer .related-posts a {
+    display: block;
+}
+
+.github-repo {
+    background: #FFF;
+    border: solid 1px #4444;
+    padding: 5px 20px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.github-repo .user, .github-repo .logo {
+    max-height: 40px;
+    border-radius: 5px;
+    width: auto;
+}
+
+.github-repo, .github-repo .url, .github-repo a, .github-repo a:visited, .github-repo a:hover {
+    color: #444444;
+}
+
+.github-repo .url {
+    margin-left: 20px;
+}
+
+
+.github-repo .url * {
+    vertical-align: baseline;
+}
+
+.github-repo h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.github-repo h2 * {
+    vertical-align: middle;
+}
+
+
+pre.highlight {
+    padding: 11px;
+    margin: 0 0 11.5px;
+}
+
+
+.highlighter-rouge {
+    max-width: 90vw;
+}
+
+
+.table-container {
+    width: calc(100vw - 20px);
+    overflow: auto;
+    max-width: 100%;
+    min-width: 100%;
+    background-color: #FFFFFF;
+}
+
+.table-container table {
+    max-width: 100%;
+    min-width: 100%;
+}
+
+.table-container table td, 
+.table-container table th {
+    padding: 2px 5px;
+    border: solid 1px #444444;
+}
+
+.dev-article {
+    background: #000000;
+    display: table;
+    width: 100%;
+}
+
+.dev-article .dev-user-picture {
+    display: table-cell;
+    max-width: 50px;
+    padding: 0 10px 0 0;
+    width: 80px;
+    height: 70px;
+    min-width: 80px;
+    max-width: 80px;
+}
+
+.dev-article .dev-user-picture img {
+    width: auto;
+    height: 72px;
+}
+
+.dev-article .dev-article-title {
+    display: table-cell;
+    color: #FFFFFF;
+    vertical-align: middle;
+    font-size: 22px;
+}
+
+.dev-article .dev-article-title > a {
+    font-weight: bold;
+}
+
+.dev-article .dev-article-title a {
+    color: #FFFFFF;
+}
+
+.dev-article .dev-logo {
+    display: table-cell;
+    width: 70px;
+    height: 70px;
+}
+
+.dev-article .dev-logo img {
+    width: 100%;
+}
+
+.dev-article .dev-tag {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.dev-article .dev-tag a {
+    color: #FFFFFF;
+    font-style: italic;
+}
+
+footer {
+    background: #333;
+    margin-top: 30px;
+    padding: 20px 0;
+}
+
+.footer-links {
+    margin: 0 0 0 0em;
+    padding: 0;
+    text-align: right;
+}
+
+.footer-links>li {
+    padding-right: 1em;
+    display: inline-block;
+    text-align: left;
+}
+.footer-links>li>a {
+    vertical-align: bottom;
+}
+
+.buymeacoffee a {
+    color: #FFFFFF;
+}
+
+
+.bio s {
+    opacity: 0.6;
+}
+
+.education>div {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.education>div>div:not(.logo) {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+}
+
+.education .logo {
+    padding: 5px 20px 5px 0;
+}
+
+.education .logo img {
+    height: 80px;
+    width: auto;
+}
+
+.education .time {
+    color: #1B4353;
+    font-size: 0.9em;
+    line-height: 1em;
+}
+
+.education .institution {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.education .course {
+    font-size: 0.9em;
+    line-height: 0.9em;
+}
+
+.bio-social-media img,
+.bio-social-media svg {
+    max-height: 30px;
+    font-size: 30px;
+    vertical-align: top;
+    margin-right: 20px;
+    width: 1em;
+}
+
+.quoteblock,
+blockquote {
+    padding: 0.3em 1rem 0.3em 1rem;
+    border-left: solid 1px #444;
+    margin: 0 0 0.5em 0;
+    background: #DDDDDD;
+}
+
+.quoteblock > blockquote {
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.quoteblock .attribution {
+    margin-top: 1em;
+    color: #666;
+    font-size: 0.9em;
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+
+.sidebarblock {
+    border: solid 1px #444;
+    margin: 3em 0 1em 0;
+    border-radius: 3px;
+    background: #444;
+    color: #FFF;
+}
+.sidebarblock .content {
+    padding: 2em 1em 1em;
+    position: relative;
+}
+
+.sidebarblock .title {
+    position: absolute;
+    top: -1.5em;
+    background: #888;
+    padding: 0.4vw 1vw;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.sidebarblock a,
+.sidebarblock a:visited{
+    color: #bed1ec;
+}
+
+.sidebarblock a:hover {
+    color: #dfecff;
+}
+
+.imageblock {
+    margin: 1em 0;
+}
