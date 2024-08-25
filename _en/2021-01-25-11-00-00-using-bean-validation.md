@@ -1,12 +1,14 @@
 ---
 title: Using Bean Validation on Quarkus.io
-permalink: /posts/using-bean-Validation-on-quarkus
 published: true
 description: A minimal how-to of how to use Bean Validation on Quarkus.io
 tags: [Quarkus, Java, Bean Validation, Hibernate]
 cover_image: /assets/images/data-center.jpg
 series: Quarkus Tutorial
 publish_date: 2021-01-25 11:00:00 +0300
+permalink: /en/using-bean-validation-on-quarkus
+redirect_from:
+  - /posts/using-bean-Validation-on-quarkus
 ---
 
 [Jakarta Bean Validation](https://beanvalidation.org/latest-draft/spec/) is a very useful specification. I can't find any reason to do not use it. If you know, please share with me.

@@ -10,8 +10,7 @@ paginate: 15
 paginate_path: /pag-:num
 
 defaults:
-  -
-    values:
+  - values:
       layout: "default"
 
 # Build settings
@@ -27,7 +26,19 @@ asciidoctor:
     pygments-css: style
     figure-caption: Figura
     imagesdir: /assets/images
-
+collections:
+  en:
+    output: true
+    permanlink: /en/:title
+    layout: en
+  tutorial:
+    output: true
+    permanlink: /tutorial/:title
+    layout: tutorial
+  youtube:
+    output: true
+    permanlink: /computacao-critica/:title
+    layout: youtube
 #theme: minima
 plugins:
   - jekyll-asciidoc
@@ -59,6 +70,10 @@ feed:
   path: atom.xml
   tags: true
   encoding: UTF-8
+  collections:
+    - en
+    - youtube
+    - tutorial
 whitelist:
   - jekyll-redirect-from
 host: 0.0.0.0

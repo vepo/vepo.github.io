@@ -7,8 +7,15 @@
             <h3 class="site-title"><a href="/">Victor Osório</a></h3>
             {% include menu.html %}
         </header>
-        {% include page-header.html %}
-        {% if page.id %}
+        <div class="title">
+            <h1 class="serie-title">
+                {{ page.title }}
+            </h1>
+            <p> {{ page.description }}</p>
+        </div>
+        <div class="article cover-image">
+            <img alt="{{ page.title }}" src="{{ page.cover_image }}" width="{% imagesize post.cover_image:width %}" height="{% imagesize post.cover_image:height %}" />
+        </div>
         {% if page.publish_date %}
         <div class="publish_date">
             <strong>
@@ -24,25 +31,10 @@
             <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">{{ tag }}</a> 
             {% endfor %}
         </div>
-            {%if page.github %}
-        <p>
-            <a href="{{ page.github }}" class="btn btn-default">
-                <i class="fa fa-github fa-2x"></i> {{ page.github }}
-            </a>
-        </p>
-            {% endif %}
-            {% if page.original %}
-        <div>
-            Post originalmente publicado em <a href="{{ page.original }}">{{ page.original | domain }}</a>.
-        </div>
-            {% endif %}
         <hr> 
-        {% endif %}
-        {% include serie.html %}
         <article>
             {{ content }}
         </article>
-        {% include serie.html %}
         {% if page.id %}
         <div style="text-align: center;margin: 10px auto;max-width: 50%;">
             <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">

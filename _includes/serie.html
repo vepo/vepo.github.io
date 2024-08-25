@@ -1,7 +1,20 @@
 {% if page.series %}
+
+{{ page.position }}
+
+{% if page.collection == 'posts' %}
+{% assign current_collection = site.posts %}
+{% elsif page.collection == 'en' %}
+{% assign current_collection = site.en %}
+{% elsif page.collection == 'youtube' %}
+{% assign current_collection = site.youtube %}
+{% else %}
+{% assign current_collection = site.posts %}
+{% endif %}
+
 <div class="series">
     <div class="serie-contents">
-        {% assign serie_articles = site.posts | where: "series", page.series | sort: "publish_date" %}
+        {% assign serie_articles = current_collection | where: "series", page.series | sort: "publish_date" %}
         <h2>
             {{ page.series }}<br/>
             <span class="description">(série de {{ serie_articles | size }} partes)</span>
