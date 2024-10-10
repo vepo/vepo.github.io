@@ -1,0 +1,49 @@
+---
+title: Quais são os tipos de comunicação entre sistemas?
+published: true
+description: Como podemos definir os times de comunicação entre serviços
+tags: [Ciência da Computação, Sistemas Distribuídos, Microsserviços]
+cover_image: /assets/images/coral.jpeg
+series: Sistemas Distribuídos & Microsserviços
+permalink: /posts/sistemas-distribuidos-definicao
+publish_date: 2024-10-09 21:00:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+Quando pensamos em Microsserviços e Sistemas distribuídos estamos na verdades falando de duas categorias que tem muito em comum, mas são vistos sob diferentes perspectivas. Como já discutimos em https://blog.vepo.dev/posts/sistemas-distribuidos-definicao[O que são Sistemas Distribuídos?], ao falarmos de Sistemas Distribuídos estamos enfatizando a capacidade desses sistemas de atuarem de maneira coordenada para um único fim, já quando falamos de microsservicos estamos falando da capacidade de sistemas serem entregues independentemente. O que há em comum nessas duas categorias é que eles precisam se comunicar! Nesse post vamos discutir como essa comunicação pode ser feita.
+
+== Os desafios dos sistemas distribuídos
+
+A comunicação entre sistemas distribuídos e/ou microsserviços ocorre exclusivamente por meio de interfaces de rede. Esse tipo de comunicação apresenta uma série de desafios que não são encontrados em sistemas que operam em uma mesma máquina. Entre esses desafios estão a falta de um relógio comum, a ausência de memória compartilhada, a separação geográfica, além da autonomia e heterogeneidade dos sistemas envolvidos.
+
+=== Ausência de relógio comum
+
+Quando o sistema A envia uma mensagem para o sistema B o relógio da máquina em que A está sendo executado está desincronizado com o relógio da máquina em que B está sendo executado. Isso significa que se A gerou a mensagem em *ta~0~* não há como B saber quando essa mensagem foi gerada. A única suposição que B pode fazer é que essa mensagem foi gerada antes de *tb~0~* que é o momento em que B recebeu a mensagem. Da mesma forma, ao B enviar uma resposta para A em *tb~1~*, não há como A saber quando essa resposta foi gerada, só que ela foi gerada depois de *ta~0~* e antes *ta~1~*.
+
+// https://excalidraw.com/#json=35dzb5RUTmC6xI64Kbkum,wHCZGqMXdGvGsaopQUvErw
+
+[.text-center]
+.Ausência de relógio comum
+image::microservices/no-common-clock.png[id=no-common-clock, align="center"]
+
+=== Ausência de memória compartilhada
+
+Processos em execução na mesma máquina podem criar espaços de memória compartilhado para escrita e leitura atrávés das chamadas de sistemas https://man7.org/linux/man-pages/man2/mmap.2.html[mmap] e https://man7.org/linux/man-pages/man2/shmget.2.html[shmget]. Porém essa possibilidade é inexistente quando se trata de sistemas distribuídos ou microsserviços, uma vez que eles operam em máquinas diferentes, impossibilitando o uso direto de memória compartilhada para comunicação entre processos.
+
+Assim a comunicação entre sistemas deve ser feita através do envio de mensagens. Mensanges podem ser enviadas através de diversos protocolos da camada de transporte como o TCP, UDP, QUIC, Multicast. A escolha do protocolo será definida pelas características da comunicação. O protocolo TCP perde a comunicação orientada a conexão full-duplex, ou seja, ambos podem enviar e receber mensagens em um canal exclusivo e com a garantia de entrega da mensagem. O protocolo UDP é usado para transmitir dados pocuso sensíveis como aúdio e vídeo, por isso seu design foi pensado para oferecer baixa latência e pouca confiabilidade. Multicast é um protocolo usado para o envio de pacotes para diversos equipamentos em uma mesma rede, pode ser usado para descoberta de serviços e dispositivos. Por fim o QUIC é um protocolo que visa substituir o TCP baseando-se em conexões UDP.
+
+A grande maioria dos microsservicos se comunicam usando protocols TCP e a diferenciação entre os formatos de comunicação se dá na camada de aplicação.
+
+=== Separação Geográfica
+
+Além da dificuldade de não terem relógio compartilhado, sistemas distribuídos não podem confiar no horário informados por outros sistemas. Isso se dá porque se os sistemas estão sendo executados em máquinas distintas, a comunicação insere latência entre o envio e recebimento das mensagens. Isso significa que no momento em que A envia uma mensagem para B, B recebe a mensagem algum tempo depois. Essa diferença de tempo é o que chamamos de latência. A latência de comunicação é impossível de se calcular porque mesmo que seja enviada uma mensagem para o outro dispositivo, esse ao responder colocará a latência de processamento dentro da latência total.
+
+// https://excalidraw.com/#json=DdWaMONqLGzWMpMcLCYBR,dEYApLKOPVuUM67yULj_8A
+
+[.text-center]
+.Latência de comunicação
+image::microservices/no-common-clock-latency.png[id=no-common-clock-latency, align="center"]
+
+=== Autonomia e Heterogeneidade
