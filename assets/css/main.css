@@ -1,28 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@font-face {
+    font-family: "Irvin-Heading";
+    src: url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.eot");
+    src: url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.eot?#iefix")format("embedded-opentype"),
+        url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.woff2")format("woff2"),
+        url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.woff")format("woff"),
+        url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.ttf")format("truetype"),
+        url("https://db.onlinewebfonts.com/t/1e44faec07b8b81f60a3215d76bd0086.svg#Irvin-Heading")format("svg");
+}
+
+@font-face {
+    font-family: "TNYAdobeCaslonPro";
+    src: url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.eot");
+    src: url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/68e94a17c3e618dbe0936fcbf25b26c6.svg#TNY Adobe Caslon Pro Regular")format("svg");
+}
 
 body {
-    font-family: 'Playfair Display', 'Times New Roman', serif;
-    background-color: #EEECE6;
-    color: #444444;
+    background: #FFFFFF;
+    font-family: TNYAdobeCaslonPro, Times New Roman, Times, serif;
 }
 
 img {
     max-width: 100%;
 }
 
-a:link, a:visited, a:hover, a:active { 
-    text-decoration: none; 
-    color: #444444;
+h1, h2, h3, h4, h5, h6 {
+    font-family: Irvin-Heading, Helvetica Neue, Helvetica, Arial, sans-serif; 
 }
 
-article a:link,
-article a:visited,
-article a:hover,
-article a:active { 
+p {
+    font-family: TNYAdobeCaslonPro, Times New Roman, Times, serif;
+}
+
+a:link, a:visited, a:hover, a:active { 
     text-decoration: none; 
-    color: #4444BB;
-    font-weight: bold;
-    font-style: italic;
+    color: #000000;
 }
 
 .site-header {
@@ -35,7 +50,8 @@ article a:active {
 
 .site-header a {
     text-transform: uppercase;
-    margin: 0 1vw;
+    margin: 0.5vw 0;
+    display: block;
 }
 
 .site-header .site-title a {
@@ -48,29 +64,12 @@ article a:active {
     margin: 0.7em 0;
 }
 
-.list-group {
-    text-align: center;
-}
-
-.list-group p {
-    text-align: justify;
-    margin: 16px auto;
-    width: max(50%, 540px);
-    max-width: 100%;
-}
-
-.list-group .cover-image img {
-    max-width: 100%;
-    max-height: 400px;
-    width: auto;
-    height: auto;
-}
-
 .tag-container {
     margin: 16px auto;
     width: max(50%, 540px);
     text-align: center;
     max-width: 100%;
+    font-size: 0.8rem;
 }
 
 .tag-container .label {
@@ -79,23 +78,32 @@ article a:active {
     white-space: nowrap;
 }
 
-.title, .publish_date {
-    text-align: center;
+.row > .card {
+    padding-left: 0;
+    padding-right: 0;
+    width: calc(33.3333% - 0.7rem);
+}
+
+.row > .card:not(:nth-child(3n)) {
+    margin-right: 1rem;
 }
 
 .article.cover-image {
-    text-align: center;
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
 }
-
 .article.cover-image img {
-    width: auto;
-    height: auto;
-    max-height: 400px;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
-article > p {
-    text-align: justify;
+.title, .publish_date {
+    text-align: center;
 }
 
 .series {
@@ -107,7 +115,7 @@ article > p {
     margin-left: auto;
     margin-right: auto;
     padding: 14px 0;
-    background: #FFF;
+    border: solid 1px #AAAAAA;
 }
 
 .series h2 {
@@ -161,193 +169,6 @@ article > p {
     max-width: 100%;
     height: auto;
 }
-
-/* desktop */
-@media (min-width: 768px) {
-    body:not([browser='Googlebot']) .container.post {
-        font-size: 0.8em;
-        max-width: min(100vw, 936px);
-    }
-
-    body:not([browser='Googlebot']) .series {
-        max-width: 70%;
-        font-size: 0.8em
-    }
-}
-
-/* mobile */
-@media (max-width: 767px) {
-    body {
-        font-size: 1.3em;
-    }
-    body:not([browser='Googlebot']) .container.post {
-        font-size: 1em;
-    }
-}
-
-
-.article-footer .published {
-    font-size: 0.9em;
-    font-style: italic;
-}
-
-.article-footer .related-posts {
-    border-top: solid 1px #444444;
-    text-align: center;
-}
-
-.article-footer .related-posts a {
-    display: block;
-}
-
-.github-repo {
-    background: #FFF;
-    border: solid 1px #4444;
-    padding: 5px 20px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-}
-
-.github-repo .user, .github-repo .logo {
-    max-height: 40px;
-    border-radius: 5px;
-    width: auto;
-}
-
-.github-repo, .github-repo .url, .github-repo a, .github-repo a:visited, .github-repo a:hover {
-    color: #444444;
-}
-
-.github-repo .url {
-    margin-left: 20px;
-}
-
-
-.github-repo .url * {
-    vertical-align: baseline;
-}
-
-.github-repo h2 {
-    font-size: 20px;
-    margin: 0;
-}
-
-.github-repo h2 * {
-    vertical-align: middle;
-}
-
-
-pre.highlight {
-    padding: 11px;
-    margin: 0 0 11.5px;
-}
-
-
-.highlighter-rouge {
-    max-width: 90vw;
-}
-
-
-.table-container {
-    width: calc(100vw - 20px);
-    overflow: auto;
-    max-width: 100%;
-    min-width: 100%;
-    background-color: #FFFFFF;
-}
-
-.table-container table {
-    max-width: 100%;
-    min-width: 100%;
-}
-
-.table-container table td, 
-.table-container table th {
-    padding: 2px 5px;
-    border: solid 1px #444444;
-}
-
-.dev-article {
-    background: #000000;
-    display: table;
-    width: 100%;
-}
-
-.dev-article .dev-user-picture {
-    display: table-cell;
-    max-width: 50px;
-    padding: 0 10px 0 0;
-    width: 80px;
-    height: 70px;
-    min-width: 80px;
-    max-width: 80px;
-}
-
-.dev-article .dev-user-picture img {
-    width: auto;
-    height: 72px;
-}
-
-.dev-article .dev-article-title {
-    display: table-cell;
-    color: #FFFFFF;
-    vertical-align: middle;
-    font-size: 22px;
-}
-
-.dev-article .dev-article-title > a {
-    font-weight: bold;
-}
-
-.dev-article .dev-article-title a {
-    color: #FFFFFF;
-}
-
-.dev-article .dev-logo {
-    display: table-cell;
-    width: 70px;
-    height: 70px;
-}
-
-.dev-article .dev-logo img {
-    width: 100%;
-}
-
-.dev-article .dev-tag {
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.dev-article .dev-tag a {
-    color: #FFFFFF;
-    font-style: italic;
-}
-
-footer {
-    background: #333;
-    margin-top: 30px;
-    padding: 20px 0;
-}
-
-.footer-links {
-    margin: 0 0 0 0em;
-    padding: 0;
-    text-align: right;
-}
-
-.footer-links>li {
-    padding-right: 1em;
-    display: inline-block;
-    text-align: left;
-}
-.footer-links>li>a {
-    vertical-align: bottom;
-}
-
-.buymeacoffee a {
-    color: #FFFFFF;
-}
-
 
 .bio s {
     opacity: 0.6;
@@ -422,45 +243,81 @@ blockquote p:last-child {
     margin-bottom: 0;
 }
 
-
-.sidebarblock {
-    border: solid 1px #444;
-    margin: 3em 0 1em 0;
-    border-radius: 3px;
-    background: #444;
-    color: #FFF;
-}
-.sidebarblock .content {
-    padding: 2em 1em 1em;
-    position: relative;
+pre.highlight {
+    padding: 1rem 2rem;
+    margin: 0 0 2rem;
 }
 
-.sidebarblock .title {
-    position: absolute;
-    top: -1.5em;
-    background: #888;
-    padding: 0.4vw 1vw;
-    border-radius: 3px;
-    font-weight: bold;
-    font-size: 1.2em;
+
+.highlighter-rouge, .highlight {
+    max-width: 90vw;
+    border-radius: 0.5rem;
 }
 
-.sidebarblock a,
-.sidebarblock a:visited{
-    color: #bed1ec;
+
+@media (min-width: 768px) {
+    body:not([browser='Googlebot']) .container.post {
+        font-size: 0.8em;
+        max-width: min(100vw, 936px);
+    }
+
+    body:not([browser='Googlebot']) .series {
+        max-width: 70%;
+        font-size: 0.8em
+    }
 }
 
-.sidebarblock a:hover {
-    color: #dfecff;
+@media (max-width: 767px) {
+    .site-title,
+    .menu-list {
+        text-align: center;
+        margin: auto;
+        width: 100%;
+    }
+    .row > .card {
+        width: 90%;
+        margin: auto;
+    }
 }
 
-.imageblock {
-    margin: 1em 0;
+.article-footer .published {
+    font-size: 0.9em;
+    font-style: italic;
+    text-align: center;
 }
 
-.btn-pj-clt a:link,
-.btn-pj-clt a:visited,
-.btn-pj-clt a:hover, 
-.btn-pj-clt a:active {
+.article-footer .related-posts {
+    border-top: solid 1px #444444;
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.article-footer .related-posts a {
+    display: block;
+}
+
+footer {
+    background: #000;
+    margin-top: 30px;
+    padding: 20px 0;
+}
+
+.footer-links {
+    margin: 0 0 0 0em;
+    padding: 0;
+    text-align: right;
+}
+
+.footer-links>li {
+    padding-right: 1em;
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+}
+.footer-links>li>a {
+    vertical-align: bottom;
+}
+
+.buymeacoffee a {
     color: #FFFFFF;
 }

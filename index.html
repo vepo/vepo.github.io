@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: clean
 title: Notas do dia a dia de um engenheiro de software
 description: "Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e
 reflexões sobre filosofia"
@@ -30,39 +30,41 @@ reflexões sobre filosofia"
 	{% endif %}
 </div>
 
-<div class="list-group">
+<div class="row">
 	{% for post in paginator.posts %}
 	{% if post.published %}
-	<div class="list-group-item">
+	<div class="card col-md-4 mb-3">
 		<a href="{{ post.url }}">
-			{% if post.series %}
-			<h4 class="list-group-item-heading">{{ post.series }}: {{ post.title }}</h4>
+			{% if post.noimage %}
 			{% else %}
-			<h4 class="list-group-item-heading">{{ post.title }}</h4>
+			<img class="card-img-top" alt="{{ post.title }}" src="{{ post.cover_image }}" />
 			{% endif %}
-			<h6 class="list-group-item-heading">
-				<time datetime="{{ post.publish_date | date_to_xmlschema }}">
-					{{ post.publish_date | localize: '%d/%B/%Y' }}
-				</time>
-			</h6>
+			<div class="card-body">
+				{% if post.series %}
+				<h5 class="card-title">{{ post.series }}: {{ post.title }}</h5>
+				{% else %}
+				<h5 class="card-title">{{ post.title }}</h5>
+				{% endif %}
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="{{ post.publish_date | date_to_xmlschema }}">
+							{{ post.publish_date | localize: '%d/%B/%Y' }}
+						</time>
+					</h6>
+					<div class="tag-container">
+						{% for tag in post.tags %}
+						<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">
+							<i class="fas fa-tags"></i>
+							{{ tag }}
+						</a>
+						{% endfor %}
+					</div>
+					{% if post.description != "" %}
+					<p>{{ post.description }}</p>
+					{% endif %}
+				</div>
+			</div>
 		</a>
-		{% if post.noimage %}
-		{% else %}
-		<div class="cover-image">
-			<img alt="{{ post.title }}" src="{{ post.cover_image }}" width="{% imagesize post.cover_image:width %}" height="{% imagesize post.cover_image:height %}">
-		</div>
-		{% endif %}
-		<div class="tag-container">
-			{% for tag in post.tags %}
-			<a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">
-				<i class="fas fa-tags"></i>
-				{{ tag }}
-			</a>
-			{% endfor %}
-		</div>
-		{% if post.description != "" %}
-		<p>{{ post.description }}</p>
-		{% endif %}
 	</div>
 	{% endif %}
 	{% endfor %}
