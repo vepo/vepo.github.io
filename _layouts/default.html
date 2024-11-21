@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 {% include head.html %}
+
 <body>
     <main class="container">
         <div class="row g-5">
@@ -17,9 +18,9 @@
                     {% if page.noimage %}
                     <img alt="{{ page.title }}" src="/assets/images/top.avif" class="img-fluid" />
                     {% elsif page.cover_image %}
-                    <img alt="{{ page.title }}" src="{{ page.cover_image }}"  class="img-fluid" />
+                    <img alt="{{ page.title }}" src="{{ page.cover_image }}" class="img-fluid" />
                     {% else %}
-                    <img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.avif"  class="img-fluid" />
+                    <img alt="{{ page.title }}" src="/assets/images/{{page.id}}/top.avif" class="img-fluid" />
                     {% endif %}
                 </div>
                 <div class="title">
@@ -37,36 +38,36 @@
                     {% endif %}
                 </div>
                 {% if page.id %}
-                    {% if page.publish_date %}
-                    <div class="publish_date">
-                        <strong>
-                            <time datetime="{{ page.publish_date | date_to_xmlschema }}">
-                                {{ page.publish_date | localize: '%d/%B/%Y' }}
-                            </time>
-                        </strong> 
-                    </div>
-                    {% endif %}
-                    <div class="tag-container">
-                        {% for tag in page.tags %}
-                        <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">
-                            <i class="fas fa-tags"></i>
-                            {{ tag }}
-                        </a> 
-                        {% endfor %}
-                    </div>
-                    {%if page.github %}
-                    <p>
-                        <a href="{{ page.github }}" class="btn btn-default">
-                            <i class="fa fa-github fa-2x"></i> {{ page.github }}
-                        </a>
-                    </p>
-                    {% endif %}
-                    {% if page.original %}
-                    <div>
-                        Post originalmente publicado em <a href="{{ page.original }}">{{ page.original | domain }}</a>.
-                    </div>
-                    {% endif %}
-                    <hr> 
+                {% if page.publish_date %}
+                <div class="publish_date">
+                    <strong>
+                        <time datetime="{{ page.publish_date | date_to_xmlschema }}">
+                            {{ page.publish_date | localize: '%d/%B/%Y' }}
+                        </time>
+                    </strong>
+                </div>
+                {% endif %}
+                <div class="tag-container">
+                    {% for tag in page.tags %}
+                    <a class="label label-default {{ tag | slugify }}" href="/tags/#{{ tag | slugify }}">
+                        <i class="fas fa-tags"></i>
+                        {{ tag }}
+                    </a>
+                    {% endfor %}
+                </div>
+                {%if page.github %}
+                <p>
+                    <a href="{{ page.github }}" class="btn btn-default">
+                        <i class="fa fa-github fa-2x"></i> {{ page.github }}
+                    </a>
+                </p>
+                {% endif %}
+                {% if page.original %}
+                <div>
+                    Post originalmente publicado em <a href="{{ page.original }}">{{ page.original | domain }}</a>.
+                </div>
+                {% endif %}
+                <hr>
                 {% endif %}
                 {% include serie.html %}
                 <article>
@@ -75,10 +76,11 @@
                 {% if page.id %}
                 <div style="text-align: center;margin: 10px auto;max-width: 50%;">
                     <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
-                        <img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
                     </a>
                     <br />
-                    Este obra está licenciado com uma Licença 
+                    Este obra está licenciado com uma Licença
                     <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
                         Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
                     </a>.
@@ -90,11 +92,11 @@
                         <div>Escrito em {{ page.publish_date| localize: '%d/%B/%Y' }}</div>
                     </div>
                     {% endif %}
-                {% include related-posts.html %}
-                {% endif %}
+                    {% include related-posts.html %}
+                    {% endif %}
                 </div>
             </div>
-            </div>
+        </div>
         </div>
     </main>
     {% include footer.html %}
