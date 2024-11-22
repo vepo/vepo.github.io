@@ -3,6 +3,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" type="image/png" href="/icon.png" />
   <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  {% if page.series %}
+  <title>{{ page.series }}: {{page.title}}</title>
+  <meta property="og:title" content="{{ page.series }}: {{page.title}}" />
+  {% else %}
+  <title>{{page.title}}</title>
+  <meta property="og:title" content="{{page.title}}" />
+  {% endif %}
+
+  {% if page.description %}
+  <meta name="description" content="{{page.description}}" />
+  <meta property="og:description" content="{{page.description}}" />
+  {% else %}
+  <meta name="description" content="{{page.excerpt | strip_html | strip}}" />
+  <meta property="og:description" content="{{page.excerpt | strip_html| strip}}" />
+  {% endif %}
+
+  {% if page.tags %}
+  <meta name="keywords" content="{{ page.tags | join:', ' }}">
+  {% else %} 
+  <meta name="keywords" content="Software Development, Java, Apache Kafka, Desenvolvimento de Software, Jakarta EE, TDD, Microsserviçoes">
+  {% endif %}
+
+  <link rel="canonical" href="{{site.url}}{{page.url}}" />
+  <meta property="og:url" content="{{site.url}}{{page.url}}" />
+  <meta property="og:site_name" content="{{site.name}}" />
+
+  {% if page.noimage %}
+  <meta property="og:image" content="{{site.url}}/assets/images/top.avif" />
+  {% elsif page.cover_image %}
+  <meta property="og:image" content="{{site.url}}{{ page.cover_image }}" />
+  {% else %}
+  <meta property="og:image" content="{{site.url}}/assets/images/{{page.id}}/top.avif" />
+  {% endif %}
+
+  {% if page.id %}
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  {% if page.publish_date %}
+  <meta property="article:published_time" content="{{ page.publish_date | date_to_xmlschema }}" />
+  <meta property="article:modified_time" content="{{ page.publish_date | date_to_xmlschema }}" />
+  {% endif %}
+
+  <meta content="{{site.author.linkedin}}" property="article:author">
+
+  {% if page.categories %}
+  {% for category in page.categories limit:1 %}
+  <meta content="{{ category }}" property="article:section">
+  {% endfor %}
+  {% endif %}
+
+  {% if page.tags %}
+  {% for tag in page.tags %}
+  <meta content="{{ tag }}" property="article:tag">
+  {% endfor %}
+  {% endif %}
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ page.title | xml_escape }}",
+      "datePublished": "{{ page.publish_date | date_to_xmlschema }}",
+      {% if page.description %}
+      "description": "{{ page.description | xml_escape }}",
+      {% else %}
+      "description": "{{ page.excerpt | strip_html}}",
+      {% endif %}
+      {% if page.original %}
+      "sameAs" : [
+        "{{ page.original }}"
+      ],
+      {% endif %}
+      "url": "{{site.url}}{{page.url}}"
+    }
+  </script>
+
+  {% else %}
+  <!-- its not an article -->
+  <meta property="og:type" content="website" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "headline": "{{ page.title  | xml_escape }}",
+    {% if page.description %}
+    "description": "{{ page.description | xml_escape }}",
+    {% else %}
+    "description": "{{ page.excerpt | strip_html | xml_escape }}",
+    {% endif %}
+    "url": "{{site.url}}{{page.url}}",
+    "sameAs" : [
+      "https://twitter.com/vepo",
+      "https://www.linkedin.com/in/victorosorio/",
+      "https://medium.com/@vepo",
+      "https://dev.to/vepo/",
+      "https://www.youtube.com/@victor.osorio"
+    ]
+  }
+</script>
+  {% endif %}
+
+  <link rel="author" href="{{site.author.linkedin}}" />
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
   <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
