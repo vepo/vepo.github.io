@@ -5,7 +5,7 @@ published: true
 publish_date: 2021-03-26 08:51:06 +0300
 description: Antes de iniciar a desenvolver, descreva o que você vai fazer
 tags: [Documentação de Software, README, Documentação, Engenharia de Software]
-cover_image: /assets/images/docs.avif
+cover_image: /assets/images/docs-100-42.webp
 ---
 
 Quando comecei a trabalhar oficialmente como Arquiteto de Software, identifiquei uma grande deficiência: _documentar_. Documentar não é uma atividade fácil, e você pode sentir essa dor ao usar qualquer software, biblioteca ou framework proprietário ou open source. Investi parte do meu tempo para [ler sobre](https://www.amazon.com.br/Documenting-Software-Architectures-Views-Beyond/dp/0321552687?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2LKF8X7AVG95S&dchild=1&keywords=documenting+software+architectures&qid=1616765005&sprefix=documenting+so%2Caps%2C299&sr=8-1&linkCode=ll1&tag=vepo0f-20&linkId=526aaf0393ca484d229ae901a6ab7cfb&language=pt_BR&ref_=as_li_ss_tl) o assunto e praticar tanto nos meus projetos pessoais quanto da empresa que trabalhava.
