@@ -4,7 +4,7 @@ permalink: /posts/o-mundo-dos-narcisos
 published: true
 description: Por que pessoas boas são segregadas por suas opiniões? Uma breve reflexão sobre a leitura do livro “A Mente Moralista”
 tags: [Redes Sociais, Narcisismo, Tecnologia, Sociedade]
-cover_image: /assets/images/narciso.jpg
+cover_image: /assets/images/narciso-100-42.webp
 series: O que tá acontecendo na internet?
 publish_date: 2020-11-18 14:00:00 +0300
 original: "https://vepo.medium.com/o-mundo-dos-narcisos-4156e95a9e32?source=friends_link&sk=e36f9fa9497ffe469bc7f785aa838841"
