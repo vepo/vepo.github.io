@@ -5,7 +5,7 @@ permalink: /posts/existe-vies-algoritmico
 description: 
 tags: [Algoritmos, Tecnologia, Jacques Ellul, Sociedade]
 series: A Sociedade Tecnológica no Século XXI
-cover_image: /assets/images/narciso.jpg
+cover_image: /assets/images/narciso-100-42.webp
 publish_date: 2023-02-22 21:21:00 +0300
 ---
 
