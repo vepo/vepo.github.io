@@ -5,7 +5,7 @@ published: true
 series: Pensamento Crítico
 description: Aproveitei uma folga nas funcionalidades para fazer um curso no LinkedIn Learning. Minha escolha? Pensamento Crítico!
 tags: [Filosofia, Pensamento Crítico]
-cover_image: /assets/images/filosofia.avif
+cover_image: /assets/images/filosofia-100-42.webp
 publish_date: 2021-11-09 09:40:00 +0300
 ---
 
