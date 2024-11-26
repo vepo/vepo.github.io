@@ -6,7 +6,7 @@ description:
 tags: [Java]
 publish_date: 2024-07-04 15:00:00 +0300
 permalink: /tutorial/como-criar-um-projeto-java-usando-maven
-cover_image: /assets/images/chaplin-modern-times.jpg
+cover_image: /assets/images/chaplin-modern-times-100-42.webp
 ---
 
 
