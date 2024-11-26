@@ -6,7 +6,7 @@ description:
 tags: [Java, Sonar]
 publish_date: 2024-07-29 10:00:00 +0300
 permalink: /tutorial/configurando-sonar-em-projetos-java
-cover_image: /assets/images/chaplin-modern-times.jpg
+cover_image: /assets/images/chaplin-modern-times-100-42.webp
 ---
 
 ## Análise Estática de Código e Sonar
