@@ -2,7 +2,7 @@
 title: Existe "Viés Algorítmico"?
 published: true
 permalink: /posts/existe-vies-algoritmico
-description: 
+description: Existe viés algoritmico na Inteligência Articial? Nesse post eu vou descrever como funcionam as modernas inteligências artficiais e responder que não há como fugir do viés algorítimico!
 tags: [Algoritmos, Tecnologia, Jacques Ellul, Sociedade]
 series: A Sociedade Tecnológica no Século XXI
 cover_image: /assets/images/narciso-100-42.webp

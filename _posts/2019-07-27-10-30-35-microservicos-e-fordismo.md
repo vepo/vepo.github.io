@@ -2,7 +2,7 @@
 title: Microsserviços e Fordismo
 permalink: /posts/microsservicos-e-fordismo
 published: true
-description: 
+description: Qual é a relação entre a Lei de Conway e Microsserviços?
 tags: [Citações, Microsserviços, Desenvolvimento]
 publish_date: 2019-07-27 10:30:35 +0300
 original: "https://dev.to/vepo/microservicos-e-fordismo-1fhp"

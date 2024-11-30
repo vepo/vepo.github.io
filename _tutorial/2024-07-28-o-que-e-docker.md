@@ -2,7 +2,7 @@
 layout: "tutorial"
 title: O que é Docker
 published: true
-description: 
+description: Nesse tutorial vou ensinar o que é o docker e como usar Docker para distribuir aplicações.
 tags: [Docker]
 publish_date: 2024-07-28 22:00:00 +0300
 permalink: /tutorial/o-que-e-docker

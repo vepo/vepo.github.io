@@ -2,7 +2,7 @@
 layout: "tutorial"
 title: Como criar um projeto Java usando Maven
 published: true
-description: 
+description: Nesse tutorial eu vou ensinar como criar um projeto Java usando o Maven
 tags: [Java]
 publish_date: 2024-07-04 15:00:00 +0300
 permalink: /tutorial/como-criar-um-projeto-java-usando-maven

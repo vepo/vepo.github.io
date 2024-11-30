@@ -2,7 +2,7 @@
 layout: "tutorial"
 title: Configurando Sonar em projetos Java
 published: true
-description: 
+description: Nesse tutorial eu vou ensinar como configurar o Sonar em projetos Java.
 tags: [Java, Sonar]
 publish_date: 2024-07-29 10:00:00 +0300
 permalink: /tutorial/configurando-sonar-em-projetos-java
