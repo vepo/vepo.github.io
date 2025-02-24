@@ -1,12 +1,15 @@
 ---
 title: Como gerar flamegraph em aplicações Java
-published: true
+published: false
 description: Como podemos definir os tipos de recupareção de estado
 tags: [Java, Observabilidade, Profiling, Tuning, JVM, Flamegraph]
 cover_image: /assets/images/java/duke-paper-100-42.webp
 permalink: /posts/como-gerar-flamegraph-na-jvm
 publish_date: 2025-02-24 07:59:00 +0300
 ---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
 
 Profiling tem sido uma das minhas principais atividades nos últimos meses. Como a aplicação que eu trabalho chegou a um bom grau de 
 maturidade onde há poucas funcionalidades a sere feitas e os bugs de produção são raros, hoje o principal esforço é melhorar o desempenho
@@ -16,7 +19,7 @@ estudar com se dá o uso da CPU em produção e como funciona internamente o Kaf
 É nesse contexto que resolvi finalmente investir um tempo para tentar gerar um diagrama muito interessante chamado Flamegraph. Caso você 
 ainda não o conheça, vamos primeiro falar sobre ele e depois mostrar como você pode gerar ele na sua aplicação Java facilmente!
 
-## O Flamegraph
+== O Flamegraph
 
 O Flamegraph é um diagrama de monitoramento do uso da CPU [criado por Brendan Gregg](https://www.brendangregg.com/flamegraphs.html) enquanto trabalhava 
 investigando problemas de performance no MySQL. Caso você queira ler a descrição do próprio criador, recomendo um post no site pessoal dele
@@ -45,13 +48,13 @@ _StreamThread_, enquanto ao olharmos para o flamegraph, vemos todas as _StreamTh
 Isso acontece porque ao se colocar todo o tempo de CPU em um único eixo, facilita-se a visualização. O flamegraph reduz o número de variáveis a se considerar para
 se extrair um dado simples: tempo de CPU!
 
-## Como extrair o Flamegraph?!
+== Como extrair o Flamegraph?!
 
 Se você fizer essa pesquisa no Google, já aviso que se deparará com diversos posts com muita informação antiga e pouca comparação. Verá posts onde só se usou 
 as ferramentas de performance do Linux, outros posts usando somente o Java Flight Recorder e outros posts usando agentes nativos que integram código Java com 
 as ferramentas nativas do Linux. Nesse post eu vou mostrar como exatrair de duas formas e depois comparar os resultados obtidos por ambas as formas.
 
-### Extraindo usando apenas o Java Flight Recorder!
+=== Extraindo usando apenas o Java Flight Recorder!
 
 A primeira forma de se extrair o flamegraph é pegar as informações necessárias usando apenas ferramentas providas pela JVM e depois processar essa informações 
 criando o framegraph. A JVM já provê uma série de ferramentas de profiling que estão dentro do JDK. Se você não conhece o comando `jcmd` recomendo parar tudo que 
@@ -124,7 +127,7 @@ artefato dos testes de carga da aplicação.
 java -cp converter.jar jfr2flame --dot --total --alloc --classify --title "My CPU Profile" /tmp/recording.jfr /tmp/flamegraph.html
 ```
 
-### Extraindo usando agente nativo
+=== Extraindo usando agente nativo
 
 A grande desvantagem de usar somente o Java Flight Recorder é que algumas informações sobre a execução nativa é perdida. Ao migrar para 
 a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam **exceptions para controle de fluxo
@@ -142,7 +145,7 @@ PID=$(ps -a | grep java | awk '{print $1}')                                     
 A desvantagem desse método é que você alterou o ambiente em que o seu software está rodando. Isso não tem problemas na grande maioria dos casos,
 mas não é muito bem visto para ambientes de produção.
 
-## Recomendações
+== Recomendações
 
 Eu recomendo que você use constantemente ferramentas de profiling para visualizar o que está acontecendo no seu software. Existe uma máxima na área
 de adminstração que pode ser aplicada em qualquer lugar das nossa vidas "o que não pode ser medido, não pode ser gerenciado", logo é importante para 
