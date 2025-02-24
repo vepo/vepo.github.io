@@ -1,6 +1,6 @@
 ---
 title: Como gerar flamegraph em aplicações Java
-published: false
+published: true
 description: Como podemos definir os tipos de recupareção de estado
 tags: [Java, Observabilidade, Profiling, Tuning, JVM, Flamegraph]
 cover_image: /assets/images/java/duke-paper-100-42.webp
