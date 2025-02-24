@@ -26,7 +26,9 @@ investigando problemas de performance no MySQL. Caso você queira ler a descriç
 [Flame Graphs](https://www.brendangregg.com/flamegraphs.html) e um artigo na Communications da ACM chamado 
 [The Flame Graph](https://cacm.acm.org/practice/the-flame-graph/).
 
-![Flamegraph do uso de CPU do MySQL. Diversas barras amarelas parecendo uma chama. Cada camada da barra é o tempo de uso de CPU da aplicação distribuído pelo proceimentp/metodo do código.](./assets/images/cpu-mysql-updated.svg)
+[.text-center]
+.Flamegraph do uso de CPU do MySQL
+image::cpu-mysql-updated.svg[id=cpu-mysql-updated, align="center"]
 
 A informação provida pelo flamegraph pode não parecer nova, ela já era provida por diversas ferramentas de profiling, mas a forma de interação
 com o dado é mais interessante e dos dá mais informações sobre o que realmente acontece em tempo de execução. O VisualVM já provê informação semelhante,
@@ -34,7 +36,9 @@ mas a forma que ela é exibida, apesar de mais acurada, torna difícil visualiza
 _threads_, como é visto na imagem abaixo. Conseguimos ver o uso de cada thread, o que de certa forma está parcialmente certo, mas dificulta a visualização 
 pois não vemos o dado real por CPU.
 
-![Profiling da CPU pelo VisualVM. Uma árvore de chamadas de métodos com uma barra vermelha a direita e o tempo de execução.](./assets/images/java/visualvm-cpu-profiling.png)
+[.text-center]
+.Profiling da CPU pelo VisualVM.
+image::java/visualvm-cpu-profiling.png[id=visualvm-cpu-profiling, align="center"]
 
 Pode parecer estranho o que vou afirmar aqui, mas _threads_ não existem! _Threads_ são uma abstração do Sistema Operacional que facilitam o desenvolvimento de 
 software ao tratar o paralelismo como uma necessidade básica. Para entender melhor essa afirmação temos que entender que CPU é um recurso do nosso sistema que é
@@ -61,7 +65,8 @@ criando o framegraph. A JVM já provê uma série de ferramentas de profiling qu
 está fazendo e dar uma olhada nele. [Na documentação do `jcmd`](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html) você consegue encontrar a 
 descrição de todo comandos que você pode executar só passando o PID da JVM que você quer olhar.
 
-```bash
+[source,bash]
+----
 > jcmd MyProgram help (or "jcmd 2125 help")
 2125:
 The following commands are available:
@@ -87,7 +92,7 @@ VM.system_properties
 VM.command_line
 VM.version
 help
-```
+----
 
 Para gerar o flamegraph independentemente do método, você precisará do [**async-profiler**](https://github.com/async-profiler/async-profiler). É uma excelente 
 ferramenta que gera o flamegraph a partir da gravação do Java Flight Recorder e também gera usando o agente nativo. 
@@ -96,7 +101,8 @@ Nesse primeiro método vamos usar o Java Flight Recorder para gravar as informa�
 pode usar os dois métodos abaixos, ambos foram extraídos de scripts de profile que eu uso. No primeiro eu inicio a gravação, depois gero trafego (o qual foi
 substituído pelo `sleep`) e por fim finalizo a gravação. A vantagem desse método é que você grava somente o periodo em que o trafego foi gerado.
 
-```bash
+[source,bash]
+----
 DURATION=1200 ## 2 minutos
 rm -f /tmp/recording.jfr                                            ## Apaga gravações antigas que podem ter sido feitas
 NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 15 | head -n 1) ## Gera um nome aleatório para evitar conflitos
@@ -104,19 +110,20 @@ PID=$(ps -a | grep java | awk '{print $1}')                         ## Acessa n�
 jcmd $PID JFR.start name=$NAME settings=profile                     ## Inicia gravação
 sleep $DURATION
 jcmd $PID JFR.stop name=$NAME filename=/tmp/recording.jfr
-```
+----
 
 No segundo método, o `jcmd` é executado de forma asincrona usando os parâmetros `duration` e `delay`. Esse método é bom para capturar informações
 do ambiente de produção sem precisar reiniciar o servidor.
 
-```bash
+[source,bash]
+----
 DELAY=10m
 DURATION=20m
 rm -f /tmp/recording.jfr                                                        ## Apaga gravações antigas que podem ter sido feitas
 NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 15 | head -n 1)             ## Gera um nome aleatório para evitar conflitos
 PID=$(ps -a | grep java | awk '{print $1}')                                     ## Acessa número do processo em execução se rodando em docker/k8s
 jcmd $PID JFR.start name=$NAME settings=profile delay=$DELAY duration=$DURATION ## Inicia gravação
-```
+----
 
 Depois de capturado o arquivo `recording.jfr`, você precisa gerar o flamegraph usando o 
 [converter](https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar) do async-profile. 
