@@ -1,6 +1,6 @@
 ---
 title: Como gerar flamegraph em aplicações Java
-published: false
+published: true
 description: Como podemos definir os tipos de recupareção de estado
 tags: [Java, Observabilidade, Profiling, Tuning, JVM, Flamegraph]
 cover_image: /assets/images/java/duke-paper-100-42.webp
@@ -21,10 +21,10 @@ ainda não o conheça, vamos primeiro falar sobre ele e depois mostrar como voc�
 
 == O Flamegraph
 
-O Flamegraph é um diagrama de monitoramento do uso da CPU [criado por Brendan Gregg](https://www.brendangregg.com/flamegraphs.html) enquanto trabalhava 
+O Flamegraph é um diagrama de monitoramento do uso da CPU https://www.brendangregg.com/flamegraphs.html[criado por Brendan Gregg] enquanto trabalhava 
 investigando problemas de performance no MySQL. Caso você queira ler a descrição do próprio criador, recomendo um post no site pessoal dele
-[Flame Graphs](https://www.brendangregg.com/flamegraphs.html) e um artigo na Communications da ACM chamado 
-[The Flame Graph](https://cacm.acm.org/practice/the-flame-graph/).
+https://www.brendangregg.com/flamegraphs.html[Flame Graphs] e um artigo na Communications da ACM chamado 
+https://cacm.acm.org/practice/the-flame-graph/[The Flame Graph].
 
 [.text-center]
 .Flamegraph do uso de CPU do MySQL
@@ -62,7 +62,7 @@ as ferramentas nativas do Linux. Nesse post eu vou mostrar como exatrair de duas
 
 A primeira forma de se extrair o flamegraph é pegar as informações necessárias usando apenas ferramentas providas pela JVM e depois processar essa informações 
 criando o framegraph. A JVM já provê uma série de ferramentas de profiling que estão dentro do JDK. Se você não conhece o comando `jcmd` recomendo parar tudo que 
-está fazendo e dar uma olhada nele. [Na documentação do `jcmd`](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html) você consegue encontrar a 
+está fazendo e dar uma olhada nele. https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html[Na documentação do `jcmd`] você consegue encontrar a 
 descrição de todo comandos que você pode executar só passando o PID da JVM que você quer olhar.
 
 [source,bash]
@@ -94,7 +94,7 @@ VM.version
 help
 ----
 
-Para gerar o flamegraph independentemente do método, você precisará do [**async-profiler**](https://github.com/async-profiler/async-profiler). É uma excelente 
+Para gerar o flamegraph independentemente do método, você precisará do https://github.com/async-profiler/async-profiler[*async-profiler*]. É uma excelente 
 ferramenta que gera o flamegraph a partir da gravação do Java Flight Recorder e também gera usando o agente nativo. 
 
 Nesse primeiro método vamos usar o Java Flight Recorder para gravar as informações de execução e depois gerar o flamegraph, para gravar as informações você 
@@ -126,7 +126,7 @@ jcmd $PID JFR.start name=$NAME settings=profile delay=$DELAY duration=$DURATION 
 ----
 
 Depois de capturado o arquivo `recording.jfr`, você precisa gerar o flamegraph usando o 
-[converter](https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar) do async-profile. 
+https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar[converter] do async-profile. 
 Para isso execute o comando abaixo e _voilà_!!! Você tem uma pagina HTML pura para colocar onde quiser. Eu coloquei ela como 
 artefato dos testes de carga da aplicação.
 
@@ -137,10 +137,10 @@ java -cp converter.jar jfr2flame --dot --total --alloc --classify --title "My CP
 === Extraindo usando agente nativo
 
 A grande desvantagem de usar somente o Java Flight Recorder é que algumas informações sobre a execução nativa é perdida. Ao migrar para 
-a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam **exceptions para controle de fluxo
-o que pode ser um grande problema de desempenho**.
+a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam *exceptions para controle de fluxo
+o que pode ser um grande problema de desempenho*.
 
-Para executar usando agente natvo com o [**async-profiler**](https://github.com/async-profiler/async-profiler), basta fazer o download da buil,
+Para executar usando agente natvo com o https://github.com/async-profiler/async-profiler[*async-profiler*], basta fazer o download da buil,
 copiar para o ambiente de execução e depois executar o comando `asprof` como mostrado abaixo.
 
 ```bash
