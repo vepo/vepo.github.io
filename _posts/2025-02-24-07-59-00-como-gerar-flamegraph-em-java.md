@@ -1,0 +1,157 @@
+---
+title: Como gerar flamegraph em aplicações Java
+published: false
+description: Como podemos definir os tipos de recupareção de estado
+tags: [Java, Observabilidade, Profiling, Tuning, JVM, Flamegraph]
+cover_image: /assets/images/java/duke-paper-100-42.webp
+permalink: /posts/como-gerar-flamegraph-na-jvm
+publish_date: 2025-02-24 07:59:00 +0300
+---
+
+Profiling tem sido uma das minhas principais atividades nos últimos meses. Como a aplicação que eu trabalho chegou a um bom grau de 
+maturidade onde há poucas funcionalidades a sere feitas e os bugs de produção são raros, hoje o principal esforço é melhorar o desempenho
+e reduzir o uso de recursos. Por isso muito se pede para investigar o uso de CPU ou reduzir o tempo de processamento, o que me levou a
+estudar com se dá o uso da CPU em produção e como funciona internamente o Kafka Stream. 
+
+É nesse contexto que resolvi finalmente investir um tempo para tentar gerar um diagrama muito interessante chamado Flamegraph. Caso você 
+ainda não o conheça, vamos primeiro falar sobre ele e depois mostrar como você pode gerar ele na sua aplicação Java facilmente!
+
+## O Flamegraph
+
+O Flamegraph é um diagrama de monitoramento do uso da CPU [criado por Brendan Gregg](https://www.brendangregg.com/flamegraphs.html) enquanto trabalhava 
+investigando problemas de performance no MySQL. Caso você queira ler a descrição do próprio criador, recomendo um post no site pessoal dele
+[Flame Graphs](https://www.brendangregg.com/flamegraphs.html) e um artigo na Communications da ACM chamado 
+[The Flame Graph](https://cacm.acm.org/practice/the-flame-graph/).
+
+![Flamegraph do uso de CPU do MySQL. Diversas barras amarelas parecendo uma chama. Cada camada da barra é o tempo de uso de CPU da aplicação distribuído pelo proceimentp/metodo do código.](./assets/images/cpu-mysql-updated.svg)
+
+A informação provida pelo flamegraph pode não parecer nova, ela já era provida por diversas ferramentas de profiling, mas a forma de interação
+com o dado é mais interessante e dos dá mais informações sobre o que realmente acontece em tempo de execução. O VisualVM já provê informação semelhante,
+mas a forma que ela é exibida, apesar de mais acurada, torna difícil visualizar o real uso da CPU. As ferramentas tradicionais agrupavam o uso de CPUs por
+_threads_, como é visto na imagem abaixo. Conseguimos ver o uso de cada thread, o que de certa forma está parcialmente certo, mas dificulta a visualização 
+pois não vemos o dado real por CPU.
+
+![Profiling da CPU pelo VisualVM. Uma árvore de chamadas de métodos com uma barra vermelha a direita e o tempo de execução.](./assets/images/java/visualvm-cpu-profiling.png)
+
+Pode parecer estranho o que vou afirmar aqui, mas _threads_ não existem! _Threads_ são uma abstração do Sistema Operacional que facilitam o desenvolvimento de 
+software ao tratar o paralelismo como uma necessidade básica. Para entender melhor essa afirmação temos que entender que CPU é um recurso do nosso sistema que é
+compartilhado entre as diversas _threads_. O que o flamegraph faz é mostrar todo o uso de CPU ignorando a existência de _threads_ e isso ajuda muito na visualização!
+
+Ao afirmar the _threads_ não existem não estou dizendo que você não deva abolir _threads_, muito pelo contrário. Mas muitas vezes o processamento que está distribuído
+em diversas _threads_ é implementado pelo memso código. Vamos pensar no Kafka Stream! Nós normalmente implementamos uma pipeline que é única e será executada pela 
+_StreamThread_. Uma aplicação em produção terá diversas _StreamThread_ executando o mesmo código! Quando olhamos para o VisualVM, temos que optar por uma dessas
+_StreamThread_, enquanto ao olharmos para o flamegraph, vemos todas as _StreamThreads_!!!
+
+Isso acontece porque ao se colocar todo o tempo de CPU em um único eixo, facilita-se a visualização. O flamegraph reduz o número de variáveis a se considerar para
+se extrair um dado simples: tempo de CPU!
+
+## Como extrair o Flamegraph?!
+
+Se você fizer essa pesquisa no Google, já aviso que se deparará com diversos posts com muita informação antiga e pouca comparação. Verá posts onde só se usou 
+as ferramentas de performance do Linux, outros posts usando somente o Java Flight Recorder e outros posts usando agentes nativos que integram código Java com 
+as ferramentas nativas do Linux. Nesse post eu vou mostrar como exatrair de duas formas e depois comparar os resultados obtidos por ambas as formas.
+
+### Extraindo usando apenas o Java Flight Recorder!
+
+A primeira forma de se extrair o flamegraph é pegar as informações necessárias usando apenas ferramentas providas pela JVM e depois processar essa informações 
+criando o framegraph. A JVM já provê uma série de ferramentas de profiling que estão dentro do JDK. Se você não conhece o comando `jcmd` recomendo parar tudo que 
+está fazendo e dar uma olhada nele. [Na documentação do `jcmd`](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html) você consegue encontrar a 
+descrição de todo comandos que você pode executar só passando o PID da JVM que você quer olhar.
+
+```bash
+> jcmd MyProgram help (or "jcmd 2125 help")
+2125:
+The following commands are available:
+JFR.stop
+JFR.start
+JFR.dump
+JFR.check
+VM.native_memory
+VM.check_commercial_features
+VM.unlock_commercial_features
+ManagementAgent.stop
+ManagementAgent.start_local
+ManagementAgent.start
+Thread.print
+GC.class_stats
+GC.class_histogram
+GC.heap_dump
+GC.run_finalization
+GC.run
+VM.uptime
+VM.flags
+VM.system_properties
+VM.command_line
+VM.version
+help
+```
+
+Para gerar o flamegraph independentemente do método, você precisará do [**async-profiler**](https://github.com/async-profiler/async-profiler). É uma excelente 
+ferramenta que gera o flamegraph a partir da gravação do Java Flight Recorder e também gera usando o agente nativo. 
+
+Nesse primeiro método vamos usar o Java Flight Recorder para gravar as informações de execução e depois gerar o flamegraph, para gravar as informações você 
+pode usar os dois métodos abaixos, ambos foram extraídos de scripts de profile que eu uso. No primeiro eu inicio a gravação, depois gero trafego (o qual foi
+substituído pelo `sleep`) e por fim finalizo a gravação. A vantagem desse método é que você grava somente o periodo em que o trafego foi gerado.
+
+```bash
+DURATION=1200 ## 2 minutos
+rm -f /tmp/recording.jfr                                            ## Apaga gravações antigas que podem ter sido feitas
+NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 15 | head -n 1) ## Gera um nome aleatório para evitar conflitos
+PID=$(ps -a | grep java | awk '{print $1}')                         ## Acessa número do processo em execução se rodando em docker/k8s
+jcmd $PID JFR.start name=$NAME settings=profile                     ## Inicia gravação
+sleep $DURATION
+jcmd $PID JFR.stop name=$NAME filename=/tmp/recording.jfr
+```
+
+No segundo método, o `jcmd` é executado de forma asincrona usando os parâmetros `duration` e `delay`. Esse método é bom para capturar informações
+do ambiente de produção sem precisar reiniciar o servidor.
+
+```bash
+DELAY=10m
+DURATION=20m
+rm -f /tmp/recording.jfr                                                        ## Apaga gravações antigas que podem ter sido feitas
+NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 15 | head -n 1)             ## Gera um nome aleatório para evitar conflitos
+PID=$(ps -a | grep java | awk '{print $1}')                                     ## Acessa número do processo em execução se rodando em docker/k8s
+jcmd $PID JFR.start name=$NAME settings=profile delay=$DELAY duration=$DURATION ## Inicia gravação
+```
+
+Depois de capturado o arquivo `recording.jfr`, você precisa gerar o flamegraph usando o 
+[converter](https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar) do async-profile. 
+Para isso execute o comando abaixo e _voilà_!!! Você tem uma pagina HTML pura para colocar onde quiser. Eu coloquei ela como 
+artefato dos testes de carga da aplicação.
+
+```bash
+java -cp converter.jar jfr2flame --dot --total --alloc --classify --title "My CPU Profile" /tmp/recording.jfr /tmp/flamegraph.html
+```
+
+### Extraindo usando agente nativo
+
+A grande desvantagem de usar somente o Java Flight Recorder é que algumas informações sobre a execução nativa é perdida. Ao migrar para 
+a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam **exceptions para controle de fluxo
+o que pode ser um grande problema de desempenho**.
+
+Para executar usando agente natvo com o [**async-profiler**](https://github.com/async-profiler/async-profiler), basta fazer o download da buil,
+copiar para o ambiente de execução e depois executar o comando `asprof` como mostrado abaixo.
+
+```bash
+DURATION=1200
+PID=$(ps -a | grep java | awk '{print $1}')                                                ## Acessa número do processo em execução se rodando em docker/k8s
+/tmp/async-profiler-3.0-linux-x64/bin; ./asprof -d $DURATION -f /tmp/flamegraph.html $PID
+```
+
+A desvantagem desse método é que você alterou o ambiente em que o seu software está rodando. Isso não tem problemas na grande maioria dos casos,
+mas não é muito bem visto para ambientes de produção.
+
+## Recomendações
+
+Eu recomendo que você use constantemente ferramentas de profiling para visualizar o que está acontecendo no seu software. Existe uma máxima na área
+de adminstração que pode ser aplicada em qualquer lugar das nossa vidas "o que não pode ser medido, não pode ser gerenciado", logo é importante para 
+você saber como está o tempo de execução do seu software.
+
+A segunda recomendação é você, caso precise melhorar o desempenho do seu software, olhar primeiro para o local que mais impacta o desemepenho. Ganho 
+de performance é proprocional ao tempo de desempenho, por isso só investa tempo onde há mais indicios de tempo gasto.
+
+Uma outra recomendação é que você pode criar ferramentas de análise de desempenho automatizadas usando ferramentas de DevOps. Quem sabe criar uma task no
+Jenkins que extrai o FlameGraph e depois salva para análises futuras? Ou salvar essa página para cada nova versão e comparar como o desempenho tem evoluido?
+
+Eu espero ter ajuda com alguma coisa! 
