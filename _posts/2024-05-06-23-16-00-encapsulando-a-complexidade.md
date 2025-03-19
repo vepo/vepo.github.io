@@ -275,4 +275,5 @@ Outra questão é que não somos acostumados a adjetivar. Mas creio que se você
 MAS... voltando ao meu tweet. Responde aí, você compreendeu que o exatamente? 
 
 _Provavelmente vou publicar um vídeo amanhã em sequência a esse._
-{% youtube https://youtu.be/3SvVY6eceP4 %}
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3SvVY6eceP4?si=KJeVdPakMskjfuW0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
