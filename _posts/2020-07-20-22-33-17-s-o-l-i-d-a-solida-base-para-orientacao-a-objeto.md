@@ -22,7 +22,9 @@ Simplesmente porque não devemos saber as coisas só pra mostrar para os outros.
 
 # Porque SOLID?
 
-SOLID foi proposto pelo Uncle Bob, vulgo Robert C. Martin, em [2000](https://web.archive.org/web/20150906155800/http://www.objectmentor.com/resources/articles/Principles_and_Patterns.pdf). Sua ideia ao propor alguns padrões era evitar podridão no código. Essa ideia de podridão não era novo, Joseph Yoder já tinha usado o termo Big Ball of Mud alguns anos antes. Mas a ideia era, quando um software vai evoluindo, algumas vezes o design/arquitetura não evolui, logo é preciso ter algumas parametros para analise antes de fazer uma alteração. 
+SOLID foi proposto pelo ~Uncle Bob~ Seo Roberto, vulgo Robert C. Martin, em [2000](https://web.archive.org/web/20150906155800/http://www.objectmentor.com/resources/articles/Principles_and_Patterns.pdf). Sua ideia ao propor alguns padrões era evitar podridão no código. Essa ideia de podridão não era novo, Joseph Yoder já tinha usado o termo Big Ball of Mud alguns anos antes. Mas a ideia era, quando um software vai evoluindo, algumas vezes o design/arquitetura não evolui, logo é preciso ter algumas parametros para analise antes de fazer uma alteração. 
+
+> Atualização: Acerca do **Seo Roberto**, eu não sou fã das ideias dele. Na época que escrevi esse texto eu tinha um pé atrás, hoje tenho 2 pés atrás. [O livro dele sobre Design De Código é um desserviço](https://youtu.be/_5023ZrV2ek) e a pessoa dele é ligada a movimentos politicos radicais. Mas isso é o de menos, o pior é a opinião dele sobre comentários de código. (É ironia, a posição politica dele é repugnante)
 
 Mas vamos conhecer antes quais problemas ele identificou?
 
