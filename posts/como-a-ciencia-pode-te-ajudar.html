@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>Como a ciência pode te ajudar a resolver bugs</title>
+  <meta property="og:title" content="Como a ciência pode te ajudar a resolver bugs" />
+  
+
+  
+  <meta name="description" content="Qual é o método que você usa para resolver bugs? Você tem método?" />
+  <meta property="og:description" content="Qual é o método que você usa para resolver bugs? Você tem método?" />
+  
+
+  
+  <meta name="keywords" content="Ciência, Método Científico, Troubleshooting">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/posts/como-a-ciencia-pode-te-ajudar" />
+  <meta property="og:url" content="https://blog.vepo.dev/posts/como-a-ciencia-pode-te-ajudar" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/pexels-pixabay-207529.jpg" />
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2021-07-02T09:00:02+00:00" />
+  <meta property="article:modified_time" content="2021-07-02T09:00:02+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Ciência" property="article:tag">
+  
+  <meta content="Método Científico" property="article:tag">
+  
+  <meta content="Troubleshooting" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Como a ciência pode te ajudar a resolver bugs",
+      "datePublished": "2021-07-02T09:00:02+00:00",
+      
+      "description": "Qual é o método que você usa para resolver bugs? Você tem método?",
+      
+      
+      "url": "https://blog.vepo.dev/posts/como-a-ciencia-pode-te-ajudar"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YXWDKRN6ZR"></script>
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+                    <header class="site-header">
+                        <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+                        <nav class="menu-list">
+	
+	<a href="/computacao-critica" class="menu-link">Computação Crítica</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+                    </header>
+                </div>
+            </div>
+            <div class="col-md-10 main-content">
+                <div class="article cover-image">
+                    
+                    <img alt="Como a ciência pode te ajudar a resolver bugs" src="/assets/images/pexels-pixabay-207529.jpg" class="img-fluid" />
+                    
+                </div>
+                <div class="title">
+                    
+                    <h1 class="serie-title">
+                        Como a ciência pode te ajudar a resolver bugs
+                    </h1>
+                    
+                </div>
+                
+                
+                <div class="publish_date">
+                    <strong>
+                        <time datetime="2021-07-02T09:00:02+00:00">
+                            02/julho/2021
+                        </time>
+                    </strong>
+                </div>
+                
+                <div class="tag-container">
+                    
+                    <a class="label label-default ciência" href="/tags/#ciência">
+                        <i class="fas fa-tags"></i>
+                        Ciência
+                    </a>
+                    
+                    <a class="label label-default método-científico" href="/tags/#método-científico">
+                        <i class="fas fa-tags"></i>
+                        Método Científico
+                    </a>
+                    
+                    <a class="label label-default troubleshooting" href="/tags/#troubleshooting">
+                        <i class="fas fa-tags"></i>
+                        Troubleshooting
+                    </a>
+                    
+                </div>
+                
+                
+                <hr>
+                
+                
+                <article>
+                    <p>Está na moda falar sobre ciência. Em meio a uma pandemia algumas pessoas estão louvando-a (<em>estou nesse grupo talkey!</em>) e outras odiando. Mas creio que muitos nem conhecem como a ciência funciona. Entender como ela funciona pode te ajudar em muitas coisas na sua vida, muitas decisões práticas podem ser tomadas de forma melhor se conhecermos o método da ciência. <strong><em>Método??!?!</em></strong> Sim meu caro, ciência é um método e não um ser mágico que detêm o conhecimento do além de como as coisas funcionam.</p>
+
+<p>Mas antes de começarmos vou fazer uma pergunta: <em>Qual é o seu método?</em> Talvez você não saiba responder a essa pergunta, mas você tem sim um método. Esse método pode ser até descrito. Tenta refletir aí baseado nas perguntas abaixo:</p>
+
+<ul>
+  <li>O que você faz quando recebe um ticket para implementar?</li>
+  <li>O que você faz pensa quando sabe que tem um bug?</li>
+  <li>Como você aprende?</li>
+</ul>
+
+<p>Tudo tem um método, as vezes ele é completamente subconsciente e emocional. Mas você pode refletir sobre ele e mudar ele.</p>
+
+<h2 id="como-funciona-o-método-científico">Como funciona o Método Científico?</h2>
+
+<p><em><strong>Aviso</strong>: Eu não sou filosofo e nem cientista e minha faculdade não tinha nenhuma matéria sobre método científico, logo não leve minhas afirmações como últimas, elas podem estar imprecisas. Aprendi sobre método científico na prática em laboratório de física.</em></p>
+
+<p>A base do método científico é a formulação e validação de hipóteses. Mas como isso funciona? Vamos dividir em passos e explicar cada passo pensando na solução de bugs.</p>
+
+<ol>
+  <li>Observação</li>
+  <li>Formulação de hipóteses</li>
+  <li>Elaboração de experimentos</li>
+  <li>Validação das hipóteses</li>
+  <li>Análise de dados</li>
+  <li>Conclusão</li>
+</ol>
+
+<h3 id="1-observação">1. Observação</h3>
+
+<p>A primeira coisa que devemos fazer quando nos deparamos com um bug é observar o que está acontecendo. Nesse caso precisamos levantar dados como em que ambiente o bug acontece, qual o contexto, saber se o sistema está sob estresse, há outros processos rodando na mesma máquina, quais foram as alterações recentes e quem fez, etc… Quanto mais perguntas você fizer nessa fase, mais informações vai ter.</p>
+
+<p>É muito importante saber todo o contexto, porque em muitos casos bugs são criados por efeitos colaterais de outras alterações e algumas soluções podem desfazer alterações prévias que são requisitos necessários.</p>
+
+<p>No final, a observação deve resultar em coleta de logs do sistema. Se o erro acontece sem nenhuma mensagem de erro ou alerta, isso por si já faz parte do bug.</p>
+
+<h3 id="2-formulação-de-hipóteses">2. Formulação de hipóteses</h3>
+
+<p>O segundo passo é formular hipóteses. Desenvolvimento de software também é baseado em hipóteses, algumas delas são requisitos e outras são padrões arquiteturais.</p>
+
+<p>A hipótese é nada mais do que uma afirmação sobre o contexto. Por que é importante formular hipóteses? Porque não podemos simplesmente sair alterando código sem saber o que ele faz. Precisamos ser cirúrgicos nas nossas alterações para evitar efeitos colaterais. Se formos cirúrgicos em nossas alterações, o código vai ficar cada vez mais estável, caso contrário teremos cada vez mais bugs em um processo que custará cada vez mais caro para o desenvolvimento. Nada é pior do que código instável.</p>
+
+<p>Quer exemplos de hipóteses?</p>
+<ul>
+  <li>O arquivo de configuração não está sendo lido</li>
+  <li>O processo não tem permissão de leitura</li>
+  <li>O HD está cheio</li>
+  <li>Há um memory leaky e o processo está sendo finalizado pelo sistema operacional</li>
+</ul>
+
+<h3 id="3-elaboração-de-experimentos">3. Elaboração de experimentos</h3>
+
+<p>Agora que temos uma hipótese, precisamos validar ela, mas para isso temos que fazer experimentos. Como eu posso criar um experimento a partir de uma hipótese? Nosso camarada Karl Popper pode nos ajudar (<em>acho que era outro Karl?</em> 🙃), precisamos falsear essa hipótese.</p>
+
+<p>Falsear é um termo que pode parecer estranho, mas é como se pegássemos nossa hipótese e tentássemos ver como ela pode ser refutada. Esse é o princípio básico para se criar testes. Se eu tenho uma hipotese que o erro acontece por um motivo, será que eu consigo criar um teste que reproduz aquele erro?</p>
+
+<p>Vamos tentar fazer isso com nossa primeira hipótese? Se o arquivo de configuração não está sendo lido, quais são as possibilidades que podem fazer isso acontecer? Será que ele existe? Se ele não existir há uma mensagem de erro? Será que o caminho dele está certo? Será que há alguma variável de ambiente que sobrescreve ele? Será que há algum erro no arquivo, algum parâmetro escrito de forma incorreta? Quais mensagens de logs demonstram isso?</p>
+
+<p>Falsear é refletir sobre a hipótese e em como construir testes que validem a hipótese. É simplesmente tentar destruir ela a todo custo.</p>
+
+<h3 id="4-validação-das-hipóteses">4. Validação das hipóteses</h3>
+
+<p>Agora com minhas suposições, precisamos criar testes para validar se é realmente isso que está acontecendo. Esses testes podem não ser testes automatizados, pode ser apenas <em>“pede pra pessoa de operação executar <code class="language-plaintext highlighter-rouge">df -h</code> e me mandar a resposta”</em>.</p>
+
+<p>Ou pode ser criar testes mesmo, no nosso exemplo, o que acontece se existe um arquivo de configuração especificado, mas ele não existe? Deve aparecer algum erro? O processo deve ser finalizado? Criar os testes automatizados podem ser importantes para que alterações futuras não tragam o erro de volta.</p>
+
+<p>Nessa fase da validação de hipóteses é necessário em muitos casos voltar a fase de observação. Na grande maioria dos bugs de produção não há dados para prever ele porque ninguém imaginava que ele poderia acontecer.</p>
+
+<h3 id="5-análise-de-dados">5. Análise de dados</h3>
+
+<p>Ao executar os testes, temos mais dados. Mas será que os testes realmente reproduzem o problema? É nessa hora vamos comprovar nossa hipótese. Se a mensagem de erro é a mesma ou o comportamento é similar podemos assumir que nossa hipótese é válida, caso contrário precisamos de uma nova hipótese e assim voltamos ao passo <strong>2</strong>. É muito importante que o erro seja reproduzido, pois só assim sabemos quais condições o levaram a acontecer.</p>
+
+<h3 id="6-conclusão">6. Conclusão</h3>
+
+<p>Ora, na ciência temos uma hipótese validada, mas e em desenvolvimento de software? Também temos uma hipótese validada! E isso pode levar a várias ações. Observe que nesse processo eu não falo de ações ou correções, pois esse é o processo de encontrar o problema.</p>
+
+<p>Mas dada a nossa hipótese, quais ações devem ser tomadas? O processo deve ser executado com permissão de administrador? O processo deve ser finalizado se houver um erro no arquivo de configuração? O software deve sempre colocar no log as configurações lidas? O software deve validar se tem permissão de leitura/escrita de certos arquivos?</p>
+
+<p>É muito importante que a conclusão leve a possíveis requisitos de automatização. Isso pode ser feito com a criação de testes ou com dashboards para validar a operação. O conceito de observabilidade é muito importante, devemos ter dados sobre a operação que possam validar e guiar o desenvolvimento.</p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Método é importante, sem ele atuamos cegamente sem sabermos o que realmente estamos fazendo. Há vários métodos no desenvolvimento de software e as vezes não pensamos sobre eles, como desenvolvimento tempos o Test Driven Development que é um método bem comum. Ter método é bastante útil porque nos ajuda a não procrastinar, sabemos como iniciar a fazer e quais são os passos. Em muitos casos a procrastinação é o medo de executar por não saber.</p>
+
+<p>Agora que você conhece como eu aplico o Método Científico no meu trabalho do dia a dia, me manda um oi para ver se eu te ajudei!</p>
+
+<p>Se quiser conhecer mais sobre Karl Popper, eu achei esse texto simples no blog Nau dos Loucos: <a href="https://naudosloucos.com.br/falseabilidade-descomplicada-karl-popper-e-o-falsificacionismo/">Falseabilidade Descomplicada: Karl Popper e o Falsificacionismo</a></p>
+
+                </article>
+                
+                <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+                    </a>
+                    <br />
+                    Este obra está licenciado com uma Licença
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+                    </a>.
+                </div>
+                
+                <div class="article-footer">
+                    
+                    <div class="published">
+                        <div>Escrito em 02/julho/2021</div>
+                    </div>
+                    
+                    
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+
+
+    
+<div class="related-posts">
+    <h2>Posts relacionados</h2>
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+            
+    <a href="/posts/debugando-ou-troubleshooting">
+                
+                    Coisas que todo Sênior deve saber: Debugando ou Troubleshooting
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+    
+
+</div>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+</body>
