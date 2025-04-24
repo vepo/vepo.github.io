@@ -26,4 +26,11 @@ não lembra das aulas de literatura, não tenha ideia do que significa a palavra
 e viveu uma vida cheia de excessos. Mas não estamos aqui para falar de romântismo, idealismo, ou mesmo da vida sexual de poetas europeus que não tinham coisa melhor pra fazer. Ada mudou 
 a história ao se encontrar com Charles Babbage!
 
-Babbage era um engenheiro, e também aristocrata, inglês que estudava formas de criar uma máquina de calculos.
+Babbage era um engenheiro, e também aristocrata, inglês que estudava formas de criar uma máquina para calculos, a Máquina Analítica. Então, Ada traduziu um artigo de Luigi Menabrea acerca
+da máquina e adicionou diversas notas, entre elas a implementação de um programa para o calculo nos Números de Bernoulli, fazendo dela a primeira programadora da história. A máquina de 
+Babbage nunca chegou a ser finalizada, mas o seu projeto serviu de referência para outras maquinas eletrônicas no futuro.
+
+Outro nome influente é o de Alonzo Church que talvez você nunca tenha ouvido falar, mas todo dia você deve pronunciar uma palavra usada por ele: lambda. Church estudava uma forma de descrever
+o comportamento dos termos em uma função e por isso propos uma sintaxe de termos chamada Lambda Calculus. Sua intenção era caputurar os aspectos computacionais de uma função. Caso você ainda 
+não tenha reparado, as palavras computador ou computação derivam do termpo computar, que, por sua vez, vem da matemática. Computação surge assim como uma forma de se resolver problemas 
+matemáticos complexos. O primeiro computador eletrônico programável, o ENIAC, era usado para cálculos balísticos que anteriormente era feitos manualmente.
