@@ -318,3 +318,11 @@ Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enqua
 > Os defensores argumentam que isso dissemina "estabilidade" ou "mercados livres", enquanto os críticos o chamam de **colonialismo digital** ou **dominação do soft power**.
 > 
 > Você gostaria de paralelos históricos (por exemplo, a Companhia Britânica das Índias Orientais) ou estudos de caso (a iniciativa Cinturão e Rota da China versus o domínio tecnológico dos EUA)?
+
+---
+
+# Conclusões 
+
+Esse final foi realmente surpreendente porque o DeepSeek usa a pergunta como um gatilho para mostrar o histórico de colonialismo e imperialismo. Já o ChatGPT não mostra história e nem usam os termos que dariam suporte a uma pergunta histórica. As duas últimas perguntas foram feitas com o real interesse de ver se eles iriam abordar o colonialismo digital ou tecno-feudalismo.
+
+> **NOTA**: Esse post foi escrito em uma IDE VS Code com Copilot configurado e o mesmo se comportou de forma similar ao ChatGPT. Por exemplo, enquanto eu escrevia "tecno-" parava para ver o que ele iria completar, e o mesmo era incapaz de completar a palavra "tecno-feudalismo" (_ok, aqui ele o fez!_). Mas, sempre completava dizendo que o ChatGPT era direto e objetivo, como se não responder a pergunta fosse uma característica positiva.
