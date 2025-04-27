@@ -275,7 +275,7 @@ Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enqua
 > 
 > - **Ascensão da "GovTech"**: Algumas startups agora fazem parcerias com governos em vez de lutar contra eles (por exemplo, a Citymapper para o transporte público).
 > 
-> --
+> ---
 > 
 > ### **Conclusão: Disrupção vs. Democracia**
 > As tentativas do Vale do Silício de "destruir a governança" não foram puramente maliciosas — muitos acreditavam genuinamente que estavam melhorando os sistemas. Mas os danos colaterais (desigualdade, confiança corroída, caos regulatório) revelaram uma falha no modelo: **inovação sem responsabilização prejudica a sociedade**.
