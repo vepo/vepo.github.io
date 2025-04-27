@@ -243,7 +243,7 @@ Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enqua
 > - **Arbitragem Regulatória**: Explorando áreas jurídicas cinzentas (por exemplo, a Uber classificando motoristas como "contratados independentes" para contornar as leis trabalhistas).
 > - **Efeitos de Rede**: A vantagem de ser o primeiro significa vencer rapidamente, mesmo que isso signifique esmagar concorrentes (táxis) ou cooptar reguladores.
 > 
-> --
+> ---
 > 
 > ### **3. Minando a Governança: Táticas e Exemplos**
 > #### **Uber vs. Cidades**
@@ -267,7 +267,7 @@ Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enqua
 > - **Conveniência do Consumidor**: As pessoas priorizavam viagens baratas (Uber) ou estadias baratas (Airbnb) em detrimento de custos a longo prazo (perda de salários, crise imobiliária).
 > - **Fiscalização Fraca**: Muitas cidades não tinham reguladores com conhecimento em tecnologia ou recursos para combater equipes jurídicas bem financiadas.
 > 
-> --
+> ---
 > 
 > ### **5. A Reação e o Acerto de Contas**
 > - **Derrotas Legais**: A Uber perdeu na UE (deve tratar motoristas como funcionários), a Airbnb enfrentou proibições em cidades com escassez de moradias.
