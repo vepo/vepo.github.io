@@ -9,6 +9,10 @@ permalink: /posts/como-gerar-flamegraph-na-jvm
 publish_date: 2025-02-24 07:59:00 +0300
 ---
 
+Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura. Abaixo estão as respostas que obtive de cada IA, sem edição ou modificação. O objetivo é comparar as respostas e ver como cada IA aborda o mesmo assunto.
+
+Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enquanto o DeepSeek é mais crítico e analítico. O ChatGPT parece ter uma visão mais otimista e idealista, enquanto o DeepSeek tem uma visão mais realista e crítica.
+
 # ChatGPT
 
 — **_Como você define o Vale do Silício?_**
