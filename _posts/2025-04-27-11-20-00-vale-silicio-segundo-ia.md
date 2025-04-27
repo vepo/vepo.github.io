@@ -2,9 +2,7 @@
 title: O Vale do Sílicio segundo as IA Generativas
 published: true
 description: | 
-    Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício, se existe uma cultura religiosa no Vale do Silício, se as pessoas do Vale do Silício acreditam que são superiores às outras pessoas no mundo, se o mundo deveria ser dominado pelo Vale do Silício e por que algumas empresas do Vale do Silício tentaram destruir a maior parte da governança mundial.
-
-    O resultado foi interessante, o ChatGPT respondeu de forma mais direta, desviando de criticas e o DeepSeek trouxe uma visão mais crítica e reflexiva, COMO DEVERIA SER!
+    Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura.
 tags: [Vale do Silício, Cultura, Tecnologia, IA Generativa, Tecno-Feudalismo]
 cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
 permalink: /posts/como-gerar-flamegraph-na-jvm
