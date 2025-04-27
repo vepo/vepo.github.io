@@ -64,6 +64,7 @@ Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enqua
 
 ![ChatGPT responde que o limite de perguntas foi excedido e oferece remover limites com assinatura premium.](/assets/images/chat-gpt-on-silicon-valley.png)
 
+---
 
 ## DeepSeek
 
