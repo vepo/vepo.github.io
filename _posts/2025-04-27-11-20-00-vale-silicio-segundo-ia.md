@@ -147,8 +147,11 @@ publish_date: 2025-02-24 07:59:00 +0300
 > 
 > ### **Conclusão: Superioridade ou apenas confiança?**
 > A crença do Vale do Silício em seu próprio excepcionalismo é uma mistura de:
+>
 > ✅ **Ambição genuína** – Muitos querem resolver grandes problemas.
+>
 > ⚠️ **Pontos cegos** – Subestimar a ética, a desigualdade e as consequências não intencionais.
+>
 > ❌ **Elitismo ocasional** – Descartar perspectivas não tecnológicas como "retrógradas".
 > 
 > Gostaria de exemplos de como isso se aplica a contratações, expansão global ou debates como a ética da IA?
