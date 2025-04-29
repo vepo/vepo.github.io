@@ -38,7 +38,7 @@ Apesar do artigo ter 64 anos, o trecho em destaque descreve o que hoje chamamos 
 
 ## A diferença qualitativa entre _Machine Learning_ e Inteligência Artificial Clássica
 
-— _Aqui, me dê a liberdade argumentativa de diferenciar o que chamamos de Machine Learnig de Inteligência Artifical. Essa diferenciação é essencial para entender porque esses algoritmos não são uma forma de inteligência coletiva._
+— _Aqui, me dê a liberdade argumentativa de diferenciar o que chamamos de Machine Learnig de Inteligência Artifical. Essa diferenciação é essencial para entender porque esses algoritmos são uma forma de inteligência coletiva._
 
 Esse pequeno resumo histórico é necessário para se pontuar dois elementos essências no entendimento dos algoritmos. O primeiro se referem a natureza desses algoritmos e o segundo a história deles.
 
