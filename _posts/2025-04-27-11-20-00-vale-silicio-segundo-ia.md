@@ -4,7 +4,7 @@ published: true
 description: | 
     Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura.
 tags: [Vale do Silício, Cultura, Tecnologia, IA Generativa, Tecno-Feudalismo]
-cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
+cover_image: /assets/images/capas/maquina-escrever-mesa.jpg
 permalink: /posts/o-vale-silicio-segundo-ia
 series: Inteligência Coletiva
 publish_date: 2025-04-27 11:20:00 +0300
