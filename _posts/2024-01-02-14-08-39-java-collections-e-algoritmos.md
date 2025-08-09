@@ -2,7 +2,7 @@
 title: "Java Collections e Algoritmos: Entendendo LinkedList vs. ArrayList"
 published: true
 description: | 
-    Neste post, vamos explorar o pacote **Java Collections**, suas principais classes e interfaces, e focar em um comparativo detalhado entre **LinkedList** e **ArrayList**. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.
+    Neste post, vamos explorar o pacote Java Collections, suas principais classes e interfaces, e focar em um comparativo detalhado entre LinkedList e ArrayList. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.
 tags: [Collections, LinkedList, ArrayList, Algoritmos]
 cover_image: /assets/images/java/duke-paper-100-42.webp
 permalink: /posts/java-collections-e-algoritmos

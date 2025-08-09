@@ -2,7 +2,7 @@
 title: "Arquitetura de Software e Sistemas Baseados em Eventos: Conceitos e Aplicações"
 published: true
 description: | 
-    A arquitetura de software é um tema fundamental para desenvolvedores e arquitetos que buscam criar sistemas escaláveis, eficientes e adaptáveis. Neste post, exploraremos os conceitos essenciais da arquitetura de software, com foco especial em **sistemas orientados a eventos**, e como eles se comunicam.
+    A arquitetura de software é um tema fundamental para desenvolvedores e arquitetos que buscam criar sistemas escaláveis, eficientes e adaptáveis. Neste post, exploraremos os conceitos essenciais da arquitetura de software, com foco especial em sistemas orientados a eventos, e como eles se comunicam.
 tags: [Arquitetura baseada em Eventos, Data Stream Processing, Message-Oriented Middleare]
 cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
 permalink: /posts/arquitetura-baseada-em-eventos
