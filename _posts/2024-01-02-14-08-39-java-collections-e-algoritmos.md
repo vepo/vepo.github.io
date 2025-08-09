@@ -4,7 +4,7 @@ published: true
 description: | 
     Neste post, vamos explorar o pacote Java Collections, suas principais classes e interfaces, e focar em um comparativo detalhado entre LinkedList e ArrayList. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.
 tags: [Collections, LinkedList, ArrayList, Algoritmos]
-cover_image: /assets/images/java/duke-paper-100-42.webp
+cover_image: /assets/images/java/duke-thinking-100-42.webp
 permalink: /posts/java-collections-e-algoritmos
 publish_date: 2024-01-02 14:08:39 +0300
 ---
