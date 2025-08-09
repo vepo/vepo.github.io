@@ -3,9 +3,9 @@ title: "Entendendo equals(), hashCode() e Collections em Java"
 published: true
 description: | 
     Neste post, vamos explorar os conceitos fundamentais de `equals()`, `hashCode()` e como eles são utilizados em estruturas de dados como `HashSet` e `HashMap` no Java. Além disso, discutiremos a importância da imutabilidade e como implementar esses métodos corretamente.
-tags: [Arquitetura baseada em Eventos, Data Stream Processing, Message-Oriented Middleare]
+tags: [Java, Collections, Algoritmos]
 cover_image: /assets/images/java/duke-paper-100-42.webp
-permalink: /posts/java-collections-e-algoritmos
+permalink: /posts/java-collections-equals-hashcode
 publish_date: 2024-01-09 14:13:46 +0300
 ---
 
