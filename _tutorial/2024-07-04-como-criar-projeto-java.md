@@ -6,7 +6,7 @@ description: Nesse tutorial eu vou ensinar como criar um projeto Java usando o M
 tags: [Java]
 publish_date: 2024-07-04 15:00:00 +0300
 permalink: /tutorial/como-criar-um-projeto-java-usando-maven
-cover_image: /assets/images/chaplin-modern-times-100-42.webp
+cover_image: /assets/images/capas/chaplin-modern-times.webp
 ---
 
 

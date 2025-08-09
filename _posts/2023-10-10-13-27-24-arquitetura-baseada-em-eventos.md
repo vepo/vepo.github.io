@@ -4,7 +4,7 @@ published: true
 description: | 
     A arquitetura de software é um tema fundamental para desenvolvedores e arquitetos que buscam criar sistemas escaláveis, eficientes e adaptáveis. Neste post, exploraremos os conceitos essenciais da arquitetura de software, com foco especial em sistemas orientados a eventos, e como eles se comunicam.
 tags: [Arquitetura baseada em Eventos, Data Stream Processing, Message-Oriented Middleare]
-cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
+cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/arquitetura-baseada-em-eventos
 publish_date: 2023-10-10 13:27:24 +0300
 ---

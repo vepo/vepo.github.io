@@ -4,7 +4,7 @@ published: true
 permalink: /posts/mock-schema-registry
 description: Qual é a maneira mais fácil de se testar um consumer/producer/stream Kafka usando Schema Registry?
 tags: [Apache Kafka, Unit Test, Java]
-cover_image: /assets/images/chaplin-modern-times-100-42.webp
+cover_image: /assets/images/capas/chaplin-modern-times.webp
 publish_date: 2023-01-27 10:21:00 +0300
 ---
 

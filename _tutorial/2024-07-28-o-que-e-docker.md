@@ -6,7 +6,7 @@ description: Nesse tutorial vou ensinar o que é o docker e como usar Docker par
 tags: [Docker]
 publish_date: 2024-07-28 22:00:00 +0300
 permalink: /tutorial/o-que-e-docker
-cover_image: /assets/images/chaplin-modern-times-100-42.webp
+cover_image: /assets/images/capas/chaplin-modern-times.webp
 ---
 
 Esse tutorial está armazenado em 
