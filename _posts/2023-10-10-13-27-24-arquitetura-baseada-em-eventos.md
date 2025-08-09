@@ -71,7 +71,7 @@ Os eventos são a **fonte única da verdade** e devem ser **ordenados globalment
 ### 3. **Data Stream Processing**  
 Eventos são processados em **janelas de tempo** e podem ser correlacionados.  
 - Exemplo: Agregação de métricas de telemetria em tempo real.  
-- Ferramentas: Apache Flink, Spark Streaming.  
+- Ferramentas: Apache Flink, Spark Streaming, Kafka Streams.  
 
 ### 4. **Time Series Data**  
 Eventos temporais (ex.: temperatura, velocidade) que podem ser **agregados ou descartados**.  
