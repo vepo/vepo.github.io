@@ -4,7 +4,7 @@ permalink: /posts/linux-tudo-e-um-arquivo
 published: true
 description: No Linux, tudo é um arquivo. Esse é o primeiro ensinamento para você entender o funcionamento do Linux
 tags: [Linux]
-cover_image: /assets/images/pexels-dick-hoskins-6969512.jpg
+cover_image: /assets/images/penguins-100-42.jpg
 series: Aprendendo Linux
 publish_date: 2021-03-03 18:00:00 +0300
 ---

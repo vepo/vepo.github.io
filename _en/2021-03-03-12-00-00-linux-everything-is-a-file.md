@@ -3,7 +3,7 @@ title: Everything is a file
 published: true
 description: On Linux everything is a file. This is the starting point to learn Linux
 tags: [Linux]
-cover_image: /assets/images/pexels-dick-hoskins-6969512.jpg
+cover_image: /assets/images/penguins-100-42.jpg
 series: Learning Linux
 publish_date: 2021-03-03 18:00:00 +0300
 permalink: /en/linux-everything-is-a-file
