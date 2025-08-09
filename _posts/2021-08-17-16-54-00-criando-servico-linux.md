@@ -4,7 +4,7 @@ permalink: /posts/criando-um-servico-linux
 published: true
 description: Linux tem um excelente suporte a serviço. Vamos tentar demonstrar rapidamente como criar um serviço.
 tags: [Linux, Java, Serviços]
-cover_image: /assets/images/pexels-dick-hoskins-6969512.jpg
+cover_image: /assets/images/penguins-100-42.jpg
 series: Aprendendo Linux
 publish_date: 2021-08-17 16:55:00 +0300
 ---
