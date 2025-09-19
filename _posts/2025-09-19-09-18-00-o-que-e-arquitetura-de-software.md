@@ -4,7 +4,7 @@ published: true
 description: | 
     Esse é o primeiro post do conversas sobre arquitetura. Ele ainda não está completo.
 tags: [Arquitetura de Software]
-cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
+cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/o-que-e-arquitetura-de-software
 series: Conversas sobre Arquitetura
 publish_date: 2025-09-19 09:1*:00 +0300
