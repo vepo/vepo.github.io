@@ -10,6 +10,8 @@ series: Conversas sobre Arquitetura
 publish_date: 2025-09-19 09:1*:00 +0300
 ---
 
+{% youtube OviOkjmOFEA %}
+
 Para entender melhor o que é arquitetura de software, fiz um exercício de buscar definições nas redes sociais. Criei uma pesquisa e coletei respostas no Blue Sky, Mastodon e LinkedIn. Apesar de parecer amador, essa técnica é conhecida como "Teoria Embasada" (Grounded Theory), onde você coleta dados e a partir deles constrói uma teoria. Mas eu não quero fazer um artigo científico sobre como os desenvolvedores brasileiros entendem arquitetura de software, quero apenas entender o que eles pensam sobre o assunto.
 
 Entre as respostas, encontrei definições interessantes, como:
@@ -85,8 +87,31 @@ Outra implicação importante da definição de Arquitetura é que todo software
 
 Esses aspectos existem e podem ser identificados com clareza por arquitetos experientes. Se pegarmos um mesmo sistema e apresentarmos a dois arquitetos diferentes, é bem provável que ambos cheguem a conclusões parecidas sobre qual arquitetura o sistema possui. Eles podem discordar em pequenos detalhes, mas isso não seria um problema.
 
-# Aviso
+## Arquitetura inclui comportamento
 
-Esse post ainda não está finalizado. Ele foi publicado pois se trata do roteiro para o vídeo abaixo
+Como já foi discutido anteriormente, arquitetura é uma forma de se informar sobre o software que temos, ou desejamos ter, em execução e o comportamento desse software não pode ser ignorado. Em muitos casos criar um diagrama só com componentes e conectores pode ser suficiente, mas há situações em que o comportamento precisa ser melhor detalhado.
 
-{% youtube OviOkjmOFEA %}
+Vamos imaginar que temos dois sistemas que possuem um algoritmo para garantir a consistência dos dados em longas transações. Como eu posso representar esse algoritmo com linhas ligando sistemas? É impossível. Para isso é preciso explorar as notações existentes.
+
+Nessa introdução posso citar duas notações que podem ser úteis. **BPMN** e **UML**.
+
+**BPMN** é o acronimo de _Business Process Notation Model_. É uma notação usada, como o nome já diz, para descrever processos de negócios e pode ser usada para se descrever longas transações ou mesmo longos processos. Por exemplo, você pode modelar uma Saga [[1]](https://microservices.io/patterns/data/saga.html) [[2]](https://dl.acm.org/doi/10.1145/38713.38742) como usando **BPMN**. 
+
+Outra notação importante é o diagrama de sequência do **UML**. **UML**, _Unified Modeling Language_, é uma linguagem de modelagem de sistemas de software que possui um grande conjunto de diagramas. Apesar do UML não ser tão popular quanto antigamente, ele ainda segue sendo bastante útil. Construir e apresentar um diagrama de sequência pode ser o diferencial em uma apresentação técnica ou mesmo na comunicação de um processo em desenvolvimento.
+
+## Nem toda Arquitetura é uma boa arquitetura
+
+Por fim, precisamos dizer que nem toda arquitetura é boa. Arquitetura de Software também serve para avaliar se um sistema atinge os requisitos de negócio para que ele foi desenvolvido.
+
+A escolha de uma arquitetura é um processo importante no desenvolvimento de sistemas críticos. Você não pode subir um sistema qualquer se ele for essêncial ou se a demanada de uso for elevada. Sistemas essênciais ou sistemas críticos devem ter alta disponibilidade, o que implica em certos requisitos de qualidades que devem ser endereçados na arquitura. Já sistema de alta demanda também precisam ter alta disponilidade, mas precisam escalar que também é um requisito de qualidade.
+
+Existem várias metodologias para definição de uma arquitetura. Podemos falar da [Metodologia de Analise de Trade Off](https://www.sei.cmu.edu/documents/1186/1998_005_001_16646.pdf), de [Arquitetura Evolucionaria](https://evolutionaryarchitecture.com/precis.html) e muitos outros métodos. Mas o que precisamos ter em mente é que alguns requisitos de qualidades são incompatíveis. 
+
+Vamos analisar por exemplo o Teorema CAP. CAP é um acrônimo que significa Consistência, Disponibilidade e Particionamento. Segundo o Teorema, para se ter alta disponibilidade é preciso abdicar da consistência e parater disponibilidade e consistência é preciso abdicar do particionamento. Já há bastante [crítica a esse teorema](https://arxiv.org/abs/1509.05393), que não vamos tratar agora, mas ele revela como se dá a análise de requisitos não funcionais. Se você precisar de uma aplicação com alta disponibilidade e consistência forte, você vai ter que abdicar de particionamento, o que significa que sua aplicação poderá ter dificuldades no escalonamento.
+
+# Conclusão
+
+Podemos concluir que Arquitetura de Software não é uma disciplina exata, nem uma formula pronta para construção de sistemas. Arquitetura é um papel que pode ser desempenhada por arquitetos de softwares e desenvolvedores que tem como objetivo compreender, comunicar e racionalizar um sistema de software. 
+
+Pensar a arquitetura de um sistema é fundamental para projetos críticos e para a evolução de sistemas. Um sistema pode até evoluir sem ninguém olhar para a sua arquitetura, mas ele com certeza não terá sucesso de satisfazer os requisitos de negócios.
+
