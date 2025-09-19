@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>Java 101: Java I/O</title>
+  <meta property="og:title" content="Java 101: Java I/O" />
+  
+
+  
+  <meta name="description" content="Quais são as bibliotecas para leitura de arquivos em Java? O que significa ler e escrever em um programa? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema." />
+  <meta property="og:description" content="Quais são as bibliotecas para leitura de arquivos em Java? O que significa ler e escrever em um programa? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema." />
+  
+
+  
+  <meta name="keywords" content="Java, Tutorial, I/O">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/posts/java-101-io" />
+  <meta property="og:url" content="https://blog.vepo.dev/posts/java-101-io" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/java/duke-chez-100-42.webp" />
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2022-07-04T20:53:00+00:00" />
+  <meta property="article:modified_time" content="2022-07-04T20:53:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Java" property="article:tag">
+  
+  <meta content="Tutorial" property="article:tag">
+  
+  <meta content="I/O" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Java I/O",
+      "datePublished": "2022-07-04T20:53:00+00:00",
+      
+      "description": "Quais são as bibliotecas para leitura de arquivos em Java? O que significa ler e escrever em um programa? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.",
+      
+      
+      "url": "https://blog.vepo.dev/posts/java-101-io"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YXWDKRN6ZR"></script>
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+                    <header class="site-header">
+                        <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+                        <nav class="menu-list">
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+                    </header>
+                </div>
+            </div>
+            <div class="col-md-10 main-content">
+                <div class="article cover-image">
+                    
+                    <img alt="Java I/O" src="/assets/images/java/duke-chez-100-42.webp" class="img-fluid" />
+                    
+                </div>
+                <div class="title">
+                    
+                    <h1 class="serie-title">
+                        Java 101
+                    </h1>
+                    <h2>
+                        Java I/O
+                    </h2>
+                    
+                </div>
+                
+                
+                <div class="publish_date">
+                    <strong>
+                        <time datetime="2022-07-04T20:53:00+00:00">
+                            04/julho/2022
+                        </time>
+                    </strong>
+                </div>
+                
+                <div class="tag-container">
+                    
+                    <a class="label label-default java" href="/tags/#java">
+                        <i class="fas fa-tags"></i>
+                        Java
+                    </a>
+                    
+                    <a class="label label-default tutorial" href="/tags/#tutorial">
+                        <i class="fas fa-tags"></i>
+                        Tutorial
+                    </a>
+                    
+                    <a class="label label-default i-o" href="/tags/#i-o">
+                        <i class="fas fa-tags"></i>
+                        I/O
+                    </a>
+                    
+                </div>
+                
+                
+                <hr>
+                
+                
+
+
+
+
+
+<div class="series">
+    <div class="serie-contents">
+        
+        <h2>
+            Java 101<br/>
+            <span class="description">(série de 7 partes)</span>
+        </h2>
+        
+            
+            <a href="/posts/java-101">
+                <div class="serie-article">Como começar a aprender Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-sintaxe">
+                <div class="serie-article">A sintaxe do Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-collections">
+                <div class="serie-article">Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-objetos">
+                <div class="serie-article">OO: Eu vejo objetos por todos os cantos!</div>
+            </a>
+            
+        
+            
+            <div class="serie-article selected">Java I/O</div>
+            
+        
+            
+            <a href="/posts/java-101-threads">
+                <div class="serie-article">Concorrência e Paralelismo</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-memoria">
+                <div class="serie-article">Memória</div>
+            </a>
+            
+        
+    </div>
+</div>
+
+                <article>
+                    <div class="paragraph">
+<p>Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections e como Java faz Orientação a Objetos, esses tópicos são necessários para o que vamos falar agora: <strong>I/O</strong>.</p>
+</div>
+<div class="sect1">
+<h2 id="cap-05-o-que-e-io">O que é I/O?!?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando pensamos em um computador a primeira coisa que pensamos é no que fazemos online: enviar um tweet, responder email, ver um vídeo ou mesmo ler esse post. Mas um computador não entende essas atividades, para ele tudo são bits, ou seja, todas essa são atividades podem ser traduzidas em outras atividades de baixo nível. Quando eu uso o termo "baixo nível" entenda como algo de menor abstração, por exemplo, para você ler esse post, o seu navegador teve que renderizar uma página HTML, que foi requisitada de um servidor HTTP usando uma conexão Socket, que na verdade é apenas uma troca de bits entre vários computadores. Essas atividades sempre envolvem trocas de informações que só são possível através de algo chamado <strong>serialização</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Serialização</strong> seria a transformação de uma informação em um formato intermediário para que ela possa transitar entre dois processos. Ou seja, a informação que você está lendo agora é composta de alguns arquivos HTML, Javascript, CSS, PNG e JPEG que são enviadas através da web usando o protocolo HTTP sobre TLS.</p>
+</div>
+<div class="paragraph">
+<p><em>—  Você não ia falar de I/O? Que papo é esse de <strong>serialização</strong> e internet?!?</em></p>
+</div>
+<div class="paragraph">
+<p>Sim, I/O é outra forma de falar sobre serialização. Toda informação para ser enviada ela passa pelos passos de (1) serialização, (2) escrita, (3) transmissão, (4) leitura e (5) desserialização. O processo de transmissão pode ser o envio dessa informação através de uma API, ou o armazenamento dela em um banco de dados ou mesmo a escrita no disco para que possa ser lida no futuro. Os formatos de serialização de dados são bem interessantes de se analisar, mas não é o foco desse post, aqui focaremos em conhecer as bibliotecas que a JVM nos oferece para que possamos ler e escrever objetos onde bem desejarmos.</p>
+</div>
+<div class="paragraph">
+<p>Na JVM existem dois pacotes que lidam com serialização em Java. O mais conhecido deles é o <a href="https://docs.oracle.com/javase/8/docs/api/java/io/package-summary.html"><code>java.io</code></a> onde estão definidas as classes para leitura síncrona. Já no <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/package-summary.html"><code>java.nio</code></a> estão definidas as classes para leitura assíncrona (Non-blocking I/O).</p>
+</div>
+<div class="paragraph">
+<p>Seria hipocrisia da minha parte dizer que você deve conhecer esses pacotes por completo, eu não os conheço. Só quem trabalha especificamente com I/O deve conhecer bem essas classes. Não se surpreenda se um desenvolvedor com anos de experiência em Java procurar no Google <em>"how to read a text file in Java"</em>. Isso acontece porque esses pacotes são complexos e por isso difíceis de serem internalizados. Mas você deve saber algumas informações importantes e nós vamos trabalhar elas aqui.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Porque a interface <code>Serializable</code>? Devo usar?</p>
+</li>
+<li>
+<p>O que é um <code>InputStream</code> e um <code>OutputStream</code>?</p>
+</li>
+<li>
+<p>Qual Stream devo usar?</p>
+</li>
+<li>
+<p>Qual a diferença entre um Stream e os Readers/Writers?</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Nós não vamos falar de NIO, esse será o assunto de um post mais a frente. Não estranhe se você perceber que um Sênior não sabe como usar as classes desse pacote, em muitos casos elas são usadas apenas pelos frameworks o que implica que muitos desenvolvedores nunca tiveram contato com ela.</p>
+</div>
+<div class="sect2">
+<h3 id="_a-diferença-entre-io-e-nio">A diferença entre IO e NIO</h3>
+<div class="paragraph">
+<p>Talvez você tenha ficado curioso do motivo de existirem dois pacotes para I/O. Não ficou? Bom, existem dois pacotes diferentes porque NIO é um conceito muito mais novo do que IO. IO existe desde que os computadores existem e sempre foi um problema para qualquer software. Se você não fez faculdade de Ciência da Computação, saiba que existe até uma matéria só pensando em como se criar estrutura de dados para arquivos, isso porque ao se ler um arquivos nos deparamos com alguns problemas que deveriam ser óbvios: (1) o tempo de leitura é muito inferior ao tempo de acesso a memória, (2) os dados são armazenados em blocos que não são facilmente rearranjáveis e (3) a leitura de blocos próximos é mais rápida que a leitura de blocos distantes. Os discos mais novos não possuem o problema (3), mas mesmo assim ler e escrever de arquivo não pode ser feito da mesma forma que ler e escrever na memória.</p>
+</div>
+<div class="paragraph">
+<p><em>—  Escrever na memória?!?! Eu nunca escrevi na memória!!!</em></p>
+</div>
+<div class="paragraph">
+<p>Todo programa, ao ser executado, está armazenado na memória. Essa é uma operação tão comum que é transparente para linguagens alto nível. Se estivéssemos escrevendo em C seria preciso alocar e desalocar memória. Mas em Java a alocação é feita com um <code>new</code> e a memória é desalocada automaticamente. Mas não é possível alocar espaça em disco.</p>
+</div>
+<div class="paragraph">
+<p>Se compararmos a escrita e memória com a escrita em disco, ou interface de redes, vemos que a primeira é tão rápida que pode ser considerada imediata. Já os outros tipos de escrita não podem ser consideradas imediatas, por isso surgiram uma série de interfaces capazes de avisar ao software quando o dado está pronto para ser lido. É nesse ponto que diferenciamos IO de NIO! O pacote <code>java.io</code> são classes usadas para leitura/escrita bloqueante, enquanto o pacote <code>java.nio</code> são classes de leitura/escrita não bloqueante. E como NIO é mais recente que o IO tradicional, seu pacote foi inserido em uma versão do Java bem mais recente (JDK 1.4).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-05-arquivos-sockets-linux">Arquivos, Sockets e Linux 🐧</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Uma das grandes vantagens do Sistema Operacional Linux é que tudo são arquivos. Quase todas as funcionalidades do sistema operacional são expostas através de arquivos mapeados no sistema de arquivos. Assim ao invés de fazer uma chamada de sistema complexa para, por exemplo, obter o tempo que a máquina está em operação, basta ler o arquivo <code>/proc/uptime</code>. Ou ler o arquivo <code>/proc/cpuinfo</code> para obter uma série de informações sobre a CPU.</p>
+</div>
+<div class="paragraph">
+<p>Essa foi uma escolha arquitetural do sistema que se tornou bastante eficaz porque cria uma interface comum entre diversas operações. Por exemplo, se você for procurar no Windows a maneira de se ver todos os processo em execução, verá que tem uma <a href="https://docs.microsoft.com/pt-br/windows/win32/psapi/enumerating-all-processes">API (<em>lembre-se que API não se refere só a API REST</em>) complexa</a>, mas em um Linux basta executar <code>ls /proc</code> e todos os diretórios com números são processos. Para saber mais informações dos processos, basta acessar alguns arquivos dentro dessas pastas.</p>
+</div>
+<div class="paragraph">
+<p>Essa informação pode parecer perdida, mas ela tem uma relação profunda com o que veremos a seguir. Quando o Linux escolhe mapear tudo como arquivo, a escolha feita é por se tratar diversas formas de dados por uma mesma interface. Arquivos são fáceis de serem lidos, então ao expor tudo como arquivo é fácil conseguir acessar essas informações. A JVM também traz a mesma abordagem! Tudo em serialização vai se resumir a poucas classes. A operação de leitura de um arquivo ou leitura de um socket são tão semelhantes que podem ser executadas pelo mesmo código.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-05-apresentacao-pacote">Apresentação do pacote <code>java.io</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para entendermos o pacote <code>java.io</code> primeiro precisamos entender o que é um Stream (ou fluxo em tradução livre). Não confunda Stream de I/O com Stream de Collections, eles tem um conceito parecido, mas são aplicados em locais diferentes. Stream significa fluxo e quando falamos de Stream estamos falando de uma informação que flui em sentido único.</p>
+</div>
+<div class="paragraph">
+<p>Para entender melhor é preciso pensar em como era feito antes&#8230;&#8203; As bibliotecas do C para leitura de arquivo/socket não fazem diferenciação entre as interfaces de leitura e escrita, ao se criar um canal de comunicação temos um inteiro que identifica o canal e esse inteiro pode ser usado tanto para leitura como para escrita. Observe a documentação das funções <a href="https://man7.org/linux/man-pages/man2/read.2.html"><code>read</code></a> e <a href="https://man7.org/linux/man-pages/man2/write.2.html"><code>write</code></a> e veja que elas recebem os mesmo argumentos.</p>
+</div>
+<div id="cap-05-c-read" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://man7.org/linux/man-pages/man2/read.2.html"><img src="/assets/images/java-101/cap-05/read.PNG" alt="read"></a>
+</div>
+<div class="title">Figura 1. Documentação da função read</div>
+</div>
+<div id="cap-05-c-write" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://man7.org/linux/man-pages/man2/write.2.html"><img src="/assets/images/java-101/cap-05/write.PNG" alt="write"></a>
+</div>
+<div class="title">Figura 2. Documentação da função write</div>
+</div>
+<div class="paragraph">
+<p>Em Java foi decidido que haveria uma diferenciação lógica entre leitura e escrita. Ao se ler um arquivo poderíamos ter o fluxo de leitura (InputStream ou Reader) e o fluxo de escrita (<code>OutputStream</code> ou <code>Writer</code>). Cada um desses fluxos teria uma orientação única, isso significa que um InputStream apenas lê e o <code>OutputStream</code> apenas escreve. É por isso que se usa o nome Stream.</p>
+</div>
+<div class="paragraph">
+<p>Essa é a primeira informação importante do pacote <code>java.io</code>: <strong>As interfaces de leitura são separadas das interfaces de escrita!</strong> Para apresentar o pacote em um diagrama de classes foi até preciso criar essa separação para possibilitar que melhor visualização.</p>
+</div>
+<div class="paragraph">
+<p>Outro ponto da biblioteca C que explica o funcionamento do pacote <code>java.io</code> são as funções <a href="https://man7.org/linux/man-pages/man2/open.2.html"><code>open</code></a> e <a href="https://man7.org/linux/man-pages/man2/close.2.html"><code>close</code></a>. Em qualquer sistema operacional para se realizar a leitura em arquivo, ou em um socket, só é possível com a alocação de recurso. Isso é feito para evitar que processos diferentes criem estados inconsistentes. Quando um processo chama a função <code>open</code> para um determinado arquivo, ele não poderá ser aberto por outro processo enquanto não for liberado através da função <code>close</code>. Se a função <code>close</code> não for chamada, o arquivo só será liberado quando o processo morrer o que pode também gerar um estado inconsistente. Por isso era importante garantir na escrita do código que a função close sempre fosse chamada e que o arquivo sempre estivesse em um estado consistente. Lembre-se que leitura e escrita não são processos imediatos, se o programa finalizar ou o arquivo for fechado antes da escrita terminar, o arquivo fica em um estado inconsistente.</p>
+</div>
+<div id="cap-05-c-open" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://man7.org/linux/man-pages/man2/open.2.html"><img src="/assets/images/java-101/cap-05/open.PNG" alt="open"></a>
+</div>
+<div class="title">Figura 3. Documentação da função open</div>
+</div>
+<div id="cap-05-c-close" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://man7.org/linux/man-pages/man2/close.2.html"><img src="/assets/images/java-101/cap-05/close.PNG" alt="close"></a>
+</div>
+<div class="title">Figura 4. Documentação da função close</div>
+</div>
+<div class="paragraph">
+<p>Agora volta ao Java&#8230;&#8203; Em C era preciso criar mecanismos de garantir que o arquivo estava fechado antes que o programa finalizasse. Em Java isso foi internalizado na linguagem através de alguns mecanismos. Por isso temos as interfaces <code>Closeable</code> e <code>AutoCloseable</code>. Se um objeto precisa liberar recursos depois de usado, ele deve implementar a interface <code>Closeable</code> e o método <code>close</code> deve ser chamado. Até a versão 6 do Java era comum ver o <code>close</code> sendo chamado dentro do bloco <code>finally</code> de um <code>try {} catch {} finally {}</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>Reader reader <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">null</span>;
+<span style="color: #008000; font-weight: bold">try</span> {
+    reader <span style="color: #666666">=</span> <span style="color: #408080; font-style: italic">// inicia reader</span>
+    <span style="color: #408080; font-style: italic">// lê dados</span>
+} <span style="color: #008000; font-weight: bold">catch</span> (IOException ioe) {
+    <span style="color: #408080; font-style: italic">// trata exceção</span>
+} <span style="color: #008000; font-weight: bold">finally</span> {
+    <span style="color: #008000; font-weight: bold">if</span> (reader <span style="color: #666666">!=</span> <span style="color: #008000; font-weight: bold">null</span>) {
+        <span style="color: #008000; font-weight: bold">try</span> {
+            reader.<span style="color: #7D9029">close</span>();
+        } <span style="color: #008000; font-weight: bold">catch</span> (IOException ioe) {
+            <span style="color: #408080; font-style: italic">// trata exceção</span>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Como esse código tem muito <em>boilerplate</em> (código sem significado único, repetido), o Java 7 trouxe um recurso na sintaxe chamado <em>try-with-resources</em>. Agora todo inicio de um <em>try-catch</em> é possível declarar um ou mais objetos que devem implementar a nova interface chamada <code>AutoCloseable</code>. Como esse é um recurso da linguagem, a interface <code>AutoCloseable</code> não faz parte do pacote <code>java.io</code>, ao contrário da interface <code>Closeable</code>, mas do package <code>java.lang</code>. Assim o bloco finally poderia ser removido sem prejuízo nenhum a lógica do programa.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">try</span> (Reader reader <span style="color: #666666">=</span> <span style="color: #408080; font-style: italic">/* inicia reader */</span>) {
+    <span style="color: #408080; font-style: italic">// lê dados</span>
+} <span style="color: #008000; font-weight: bold">catch</span> (IOException ioe) {
+    <span style="color: #408080; font-style: italic">// trata exceção</span>
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Agora que sabemos que (1) objetos de I/O devem liberar recursos e que as classes de I/O são do tipo <code>Closeable</code>, observe as principais classes do pacote. Vamos explorar um pouco delas.</p>
+</div>
+<div id="cap-05-io-read" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-05/IO-Read.png" alt="IO Read">
+</div>
+<div class="title">Figura 5. Java I/O classes de leitura</div>
+</div>
+<div id="cap-05-io-write" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-05/IO-Write.png" alt="IO Write">
+</div>
+<div class="title">Figura 6. Java I/O classes de escrita</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_casos-de-uso">Casos de Uso</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para explorar melhor essas classes, vamos dividir o pacote em 5 casos de usos bem comuns para biblioteca I/O.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Como ler um arquivo?</p>
+</li>
+<li>
+<p>Como escrever um arquivo?</p>
+</li>
+<li>
+<p>Como ler dados do console?</p>
+</li>
+<li>
+<p>Como ler/escrever em Socket?</p>
+</li>
+<li>
+<p>Lidando objetos complexos</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_1-como-ler-um-arquivo">1. Como ler um arquivo?</h3>
+<div class="paragraph">
+<p>Falamos anteriormente que a diferença entre um InputStream e um Reader é que o InputStream trabalha com bytes enquanto o Reader com caracteres. Agora vamos mostrar um exemplo prático? Imagina que você tem um arquivo texto em formato JSON, como fazer pra o ler? Se pensou em ler usando um Reader&#8230;&#8203; vá com calma! A primeira coisa a fazer é decidir qual biblioteca vai ser usada para ler o JSON. A escolha deve começar pelo elemento mais complexo.</p>
+</div>
+<div class="paragraph">
+<p>Para se ler um JSON, temos uma biblioteca praticamente onipresente: <a href="https://github.com/FasterXML/jackson-databind/">Jackson Databind</a>! O coração dessa biblioteca é a classe <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.13/com/fasterxml/jackson/databind/ObjectMapper.html">ObjectMapper</a> e ela define várias formas de se escrever em arquivo, a forma mais fácil nem chega a usar Stream ou Readers. O código abaixo foi retirado a própria documentação do ObjectMapper, observe que não se usa nem InputStream/OutputStream ou Readers/Writers.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">final</span> ObjectMapper mapper <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> ObjectMapper(); <span style="color: #408080; font-style: italic">// can use static singleton, inject: just make sure to reuse!</span>
+MyValue value <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> MyValue();
+<span style="color: #408080; font-style: italic">// ... and configure</span>
+File newState <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> File(<span style="color: #BA2121">&quot;my-stuff.json&quot;</span>);
+mapper.<span style="color: #7D9029">writeValue</span>(newState, value); <span style="color: #408080; font-style: italic">// writes JSON serialization of MyValue instance</span>
+<span style="color: #408080; font-style: italic">// or, read</span>
+MyValue older <span style="color: #666666">=</span> mapper.<span style="color: #7D9029">readValue</span>(<span style="color: #008000; font-weight: bold">new</span> File(<span style="color: #BA2121">&quot;my-older-stuff.json&quot;</span>), MyValue.<span style="color: #7D9029">class</span>);
+
+<span style="color: #408080; font-style: italic">// Or if you prefer JSON Tree representation:</span>
+JsonNode root <span style="color: #666666">=</span> mapper.<span style="color: #7D9029">readTree</span>(newState);
+<span style="color: #408080; font-style: italic">// and find values by, for example, using a JsonPointer expression:</span>
+<span style="color: #B00040">int</span> age <span style="color: #666666">=</span> root.<span style="color: #7D9029">at</span>(<span style="color: #BA2121">&quot;/personal/age&quot;</span>).<span style="color: #7D9029">getValueAsInt</span>();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Mas isso não impede que se use eles para ler dados de um arquivo. A primeira missão que temos é mapear o objeto que devemos ler como um POJO. Em um projeto pessoal eu criei uma interface para inspecionar Cluster Kafka, o <a href="https://blog.vepo.dev/projects/kafka-tool">Kafka Tool</a>. Nesse projeto, todas as configurações são salvas em arquivos JSON no diretório <code>~/.kafka-tool</code> (arquivos começados com <code>.</code> são considerados ocultos no Linux), assim para armazenar as informações de Brokers é preciso primeiro mapear um broker. Depois de mapeador o broker é preciso carregar a lista de brokers do arquivo, para isso basta usar o código abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>Path kafkaToolConfigPath <span style="color: #666666">=</span> PAths.<span style="color: #7D9029">get</span>(System.<span style="color: #7D9029">getProperty</span>(<span style="color: #BA2121">&quot;user.home&quot;</span>), <span style="color: #BA2121">&quot;.kafka-tool&quot;</span>);
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span>kafkaToolConfigPath.<span style="color: #7D9029">toFile</span>().<span style="color: #7D9029">exists</span>()) {
+
+    Path propertiesPath <span style="color: #666666">=</span> kafkaToolConfigPath.<span style="color: #7D9029">resolve</span>(<span style="color: #BA2121">&quot;kafka-properties.json&quot;</span>);
+    <span style="color: #008000; font-weight: bold">if</span> (propertiesPath.<span style="color: #7D9029">toFile</span>().<span style="color: #7D9029">exists</span>()) {
+        <span style="color: #008000; font-weight: bold">try</span> (BufferedReader reader <span style="color: #666666">=</span> Files.<span style="color: #7D9029">newBufferedReader</span>(propertiesPath)) {
+            <span style="color: #008000; font-weight: bold">return</span> Optional.<span style="color: #7D9029">of</span>(reader.<span style="color: #7D9029">lines</span>()
+                                     .<span style="color: #7D9029">collect</span>(Collectors.<span style="color: #7D9029">joining</span>()))
+                           .<span style="color: #7D9029">filter</span>(Predicate.<span style="color: #7D9029">not</span>(String::isBlank))
+                           .<span style="color: #7D9029">flatMap</span>(value <span style="color: #666666">-&gt;</span> handleIoException(() <span style="color: #666666">-&gt;</span> mapper.<span style="color: #7D9029">readValue</span>(value, KafkaBroker<span style="color: #666666">[]</span>.<span style="color: #7D9029">class</span>)));
+        } <span style="color: #008000; font-weight: bold">catch</span> (IOException e) {
+            logger.<span style="color: #7D9029">error</span>(<span style="color: #BA2121">&quot;Error reading file!&quot;</span>, e);
+        }
+    }
+}
+<span style="color: #008000; font-weight: bold">return</span> Optional.<span style="color: #7D9029">empty</span>();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para ler usamos um <a href="https://docs.oracle.com/javase/8/docs/api/java/io/BufferedReader.html"><code>BufferedReader</code></a> porque ele permite ler todo o arquivo em texto facilmente, para isso usamos a o método <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#newBufferedReader-java.nio.file.Path-"><code>Files.newBufferedReader</code></a>, que pode ser lido através do método <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.13/com/fasterxml/jackson/databind/ObjectMapper.html#readValue-java.lang.String-java.lang.Class-"><code>ObjectMapper.readValue</code></a> que aceita <code>String</code>. Mas também podíamos abrir um <code>InputStream</code> usando <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#newInputStream-java.nio.file.Path-java.nio.file.OpenOption&#8230;&#8203;-"><code>Files.newInputStream</code></a> e usar ele diretamente como parâmetro <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.13/com/fasterxml/jackson/databind/ObjectMapper.html#readValue-java.io.InputStream-java.lang.Class-"><code>ObjectMapper.readValue</code></a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_2-como-escrever-um-arquivo">2. Como escrever um arquivo?</h3>
+<div class="paragraph">
+<p>De forma bem similar podemos escreve em arquivos usando as mesmas APIs.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>Path kafkaToolConfigPath <span style="color: #666666">=</span> PAths.<span style="color: #7D9029">get</span>(System.<span style="color: #7D9029">getProperty</span>(<span style="color: #BA2121">&quot;user.home&quot;</span>), <span style="color: #BA2121">&quot;.kafka-tool&quot;</span>);
+<span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">!</span>kafkaToolConfigPath.<span style="color: #7D9029">toFile</span>().<span style="color: #7D9029">exists</span>()) {
+    kafkaToolConfigPath.<span style="color: #7D9029">toFile</span>().<span style="color: #7D9029">mkdir</span>();
+}
+
+Path propertiesPath <span style="color: #666666">=</span> kafkaToolConfigPath.<span style="color: #7D9029">resolve</span>(<span style="color: #BA2121">&quot;kafka-properties.json&quot;</span>);
+ObjectMapper mapper <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> ObjectMapper().<span style="color: #7D9029">enable</span>(SerializationFeature.<span style="color: #7D9029">INDENT_OUTPUT</span>)
+<span style="color: #008000; font-weight: bold">try</span> (BufferedWriter writer <span style="color: #666666">=</span> Files.<span style="color: #7D9029">newBufferedWriter</span>(propertiesPath, StandardOpenOption.<span style="color: #7D9029">CREATE</span>, StandardOpenOption.<span style="color: #7D9029">TRUNCATE_EXISTING</span>)) {
+    writer.<span style="color: #7D9029">write</span>(mapper.<span style="color: #7D9029">writeValueAsString</span>(brokers));
+} <span style="color: #008000; font-weight: bold">catch</span> (IOException e) {
+    logger.<span style="color: #7D9029">error</span>(<span style="color: #BA2121">&quot;Error saving file!&quot;</span>, e);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para escrever usamos um <a href="https://docs.oracle.com/javase/8/docs/api/java/io/BufferedWriter.html"><code>BufferedWriter</code></a>, através do <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#newBufferedWriter-java.nio.file.Path-java.nio.file.OpenOption&#8230;&#8203;-"><code>Files.newBufferedWriter</code></a>, porque é uma opção viável para se usar com <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.13/com/fasterxml/jackson/databind/ObjectMapper.html#writeValueAsString-java.lang.Object-"><code>ObjectMapper.writeValueAsString</code></a>. Mas da mesma forma podíamos usar <a href="https://docs.oracle.com/javase/8/docs/api/java/io/OutputStream.html"><code>OutputStream</code></a>, através do <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#newOutputStream-java.nio.file.Path-java.nio.file.OpenOption&#8230;&#8203;-"><code>Files.newOutputStream</code></a>, porque também é uma opção viável para se usar com <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.13/com/fasterxml/jackson/databind/ObjectMapper.html#writeValueAsBytes-java.lang.Object-"><code>ObjectMapper.writeValueAsBytes</code></a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_3-como-ler-dados-do-console">3. Como ler dados do console?</h3>
+<div class="paragraph">
+<p>Toda aplicação pode rodar em modo de linha de comando. Linha de comando é bastante útil porque possibilita que as aplicações sejam integradas a scripts de execução seguindo a Filosofia Unix: <strong><em>Escreva programas para lidar com fluxos de texto, porque essa é uma interface universal</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>A primeira informação importante é saber que os streams de entrada, saída e erro estão expostos como variáveis globais na classe <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/System.html"><code>System</code></a>. Assim podemos facilmente escrever um programa que lê da linha de comando com algumas linhas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">try</span>(BufferedReader reader <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> BufferedReader(<span style="color: #008000; font-weight: bold">new</span> InputStreamReader(System.<span style="color: #7D9029">in</span>))) {
+    String name <span style="color: #666666">=</span> reader.<span style="color: #7D9029">readLine</span>();
+    System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">println</span>(name);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse código é certo e funciona, mas existe uma outra classe que facilita em muito o tratamento de dados que vem do console, é a classe <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Scanner.html"><code>Scanner</code></a>. Com ela é possível tratar os dados de entrada de forma mais fácil. Por exemplo se eu quiser fazer um programa para lê números do console, é possível fazer com poucas linhas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">try</span>(Scanner in <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Scanner(System.<span style="color: #7D9029">in</span>)) {
+    System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">print</span>(<span style="color: #BA2121">&quot;Qual o seu nome? &quot;</span>);
+    String nome <span style="color: #666666">=</span> in.<span style="color: #7D9029">nextLine</span>();
+    System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">print</span>(<span style="color: #BA2121">&quot;Quantos anos você tem? &quot;</span>);
+    <span style="color: #B00040">int</span> idade <span style="color: #666666">=</span> in.<span style="color: #7D9029">nextInt</span>();
+    System.<span style="color: #7D9029">out</span>.<span style="color: #7D9029">println</span>(<span style="color: #BA2121">&quot;Oi &quot;</span> <span style="color: #666666">+</span> nome <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;! Você tem &quot;</span> <span style="color: #666666">+</span> idade <span style="color: #666666">+</span> <span style="color: #BA2121">&quot; anos!&quot;</span>);
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_4-como-lerescrever-em-socket">4. Como ler/escrever em Socket?</h3>
+<div class="paragraph">
+<p>Sockets devem ser usados com parcimônia! Sockets permitem que dois processos se comuniquem entre si através de uma conexão TCP direta. O problema em usar Sockets é que em muitos casos você pode estar reimplementando um protocolo já conhecido. Mas as vantagens de se usar socket é que seu programa vai ter liberdade de se comunicar. Quando temos dois programas se comunicando por socket um deles será o cliente e o outro será o servidor, é o que chamamos de Socket Server.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Caso de Uso</div>
+Eu já implementei um caso de uso bastante complexo usando Socket, mas era porque tínhamos um servidor de geração de voz. Os clientes enviavam texto e outros parâmetros e recebiam de volta Stream de dados de acordo com o formato requerido (MP3, WAV, etc&#8230;&#8203;).
+</div>
+</div>
+<div class="paragraph">
+<p>Não vamos entrar aqui em detalhes sobre como a classe Socket funciona, mas ao abrir um socket, ela vai dispor de dois Stream para leitura e escrita de dados. Assim podemos ter o servidor abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span>AtomicBoolean running <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> AtomicBoolean(<span style="color: #008000; font-weight: bold">true</span>);
+ExecutorService threadPool <span style="color: #666666">=</span> Executors.<span style="color: #7D9029">newFixedThreadPool</span>(<span style="color: #666666">10</span>); <span style="color: #408080; font-style: italic">// thread para processar socket</span>
+<span style="color: #008000; font-weight: bold">try</span>(ServerSocket server <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> ServerSocket(<span style="color: #666666">5555</span>)) {            <span style="color: #408080; font-style: italic">// abre socket na porta 5555</span>
+    <span style="color: #008000; font-weight: bold">while</span> (running.<span style="color: #7D9029">get</span>()) {
+        Socket socket <span style="color: #666666">=</span> server.<span style="color: #7D9029">accept</span>();                       <span style="color: #408080; font-style: italic">// conexão aberta com cliente</span>
+        threadPool.<span style="color: #7D9029">submit</span>(() <span style="color: #666666">-&gt;</span> {                              <span style="color: #408080; font-style: italic">// Se não tratar dentro de uma thread não é possível abrir outras conexões</span>
+            <span style="color: #008000; font-weight: bold">try</span> {
+                process(socket.<span style="color: #7D9029">getInputStream</span>(),               <span style="color: #408080; font-style: italic">// encapsula toda comunicação</span>
+                        socket.<span style="color: #7D9029">getOutputStream</span>());
+            } <span style="color: #008000; font-weight: bold">finally</span> {
+                socket.<span style="color: #7D9029">close</span>();                               <span style="color: #408080; font-style: italic">// Só fecha o socket depois de finalizada a comunicação</span>
+            }
+        });
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Já o cliente é um pouco mais simples porque não se espera que ele se conecte com mais de um servidor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="java"><span></span><span style="color: #008000; font-weight: bold">try</span> (Socket socket <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> Socket(<span style="color: #BA2121">&quot;localhost&quot;</span>, <span style="color: #666666">5555</span>)) {
+    process(socket.<span style="color: #7D9029">getInputStream</span>(), socket.<span style="color: #7D9029">getOutputStream</span>());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Eu não recomendo a você escrever um servidor socket em nenhuma hipótese. Caso você tenha um protocolo complexo que deve ser feito através de um servidor socket, eu recomendo usar o projeto <a href="https://netty.io/">Netty</a> para que você consiga focar nas regras de negócios deixando funcionalidades como serialização, controle de threads e segurança como responsabilidade da biblioteca.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_5-lidando-objetos-complexos">5. Lidando objetos complexos</h3>
+<div class="paragraph">
+<p>Se você foi atento deve ter reparado que no diagrama de classe tem duas classes que parecem bastante úteis: <a href="https://docs.oracle.com/javase/8/docs/api/java/io/ObjectInputStream.html"><code>ObjectInputStream</code></a> e <a href="https://docs.oracle.com/javase/8/docs/api/java/io/ObjectOutputStream.html"><code>ObjectOutputStream</code></a>. Essas duas classes permitem serializar qualquer objeto da JVM e enviar para outra JVM, é por causa dessas classes que existe a interface <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html"><code>Serializable</code></a> a qual eu citei na minha primeira pergunta e até agora não respondi. Pois vamos entender o motivo de deixar essa resposta por último?</p>
+</div>
+<div class="paragraph">
+<p>Para serializar um objeto eu devo usar a interface <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Serializable.html"><code>Serializable</code></a>? Não! Você pode usar qualquer biblioteca com formatos de serialização que são compreendidos por várias linguagens. A interface <code>Serializable</code> é usada para serializar objetos que só podem ser carregados na JVM através das classes <code>ObjectInputStream</code> e <code>ObjectOutputStream</code>. MAS essas classes não deve ser usadas porque elas tem várias falhas de segurança que podem ser exploradas. Então resposta curta: <strong>Não use essas classes!</strong></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-05-proximos-passos">Próximos passos</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Eu espero que você tenha compreendido que como ler dados de várias fontes como arquivos ou sockets. Agora é hora de você aprender a usar bibliotecas de leituras de arquivos. Recomendo que você explore a biblioteca Jackson, assim como outras bibliotecas para se escrever JSON. Um bom exercício é comparar a performance de escrita entre várias bibliotecas e escolher a que você vai usar sempre.</p>
+</div>
+<div class="paragraph">
+<p>Outros exercícios são tentar conhecer a biblioteca de leitura e XML, <a href="https://yaml.org/">YAML</a>, <a href="https://toml.io/en/">TOML</a> ou qualquer outro formato que lhe interessar.</p>
+</div>
+</div>
+</div>
+                </article>
+                
+                <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+                    </a>
+                    <br />
+                    Este obra está licenciado com uma Licença
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+                    </a>.
+                </div>
+                
+
+
+
+
+
+<div class="series">
+    <div class="serie-contents">
+        
+        <h2>
+            Java 101<br/>
+            <span class="description">(série de 7 partes)</span>
+        </h2>
+        
+            
+            <a href="/posts/java-101">
+                <div class="serie-article">Como começar a aprender Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-sintaxe">
+                <div class="serie-article">A sintaxe do Java</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-collections">
+                <div class="serie-article">Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-objetos">
+                <div class="serie-article">OO: Eu vejo objetos por todos os cantos!</div>
+            </a>
+            
+        
+            
+            <div class="serie-article selected">Java I/O</div>
+            
+        
+            
+            <a href="/posts/java-101-threads">
+                <div class="serie-article">Concorrência e Paralelismo</div>
+            </a>
+            
+        
+            
+            <a href="/posts/java-101-memoria">
+                <div class="serie-article">Memória</div>
+            </a>
+            
+        
+    </div>
+</div>
+
+                <div class="article-footer">
+                    
+                    <div class="published">
+                        <div>Escrito em 04/julho/2022</div>
+                    </div>
+                    
+                    
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+
+
+    
+<div class="related-posts">
+    <h2>Posts relacionados</h2>
+     
+        
+         
+            
+    <a href="/posts/entendendo-o-kafka">
+                
+                    Entendendo o Kafka
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+                
+                    Como criar uma linguagem usando ANTLR4 e Java
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/trabalhando-com-dinheiro">
+                
+                    Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/deixando-rastros-ou-como-usar-log">
+                
+                    Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/anatomia-de-um-topico">
+                
+                    Entendendo o Kafka: Anatomia de um Tópico
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+                
+                    Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/devops-como-comecar">
+                
+                    Coisas que todo Sênior deve saber: DevOps! Como começar?
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/testes-101-testando-aplicacoes-java">
+                
+                    Level Up: Testes 101 - Testando aplicações Java
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/context-and-dependency-injection-cdi-2-0">
+                
+                    Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+                
+    </a>
+                
+                 
+     
+        
+            
+
+</div>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+</body>

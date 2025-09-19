@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>Notas do dia a dia de um engenheiro de software</title>
+  <meta property="og:title" content="Notas do dia a dia de um engenheiro de software" />
+  
+
+  
+  <meta name="description" content="Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia" />
+  <meta property="og:description" content="Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia" />
+  
+
+   
+  <meta name="keywords" content="Software Development, Java, Apache Kafka, Desenvolvimento de Software, Jakarta EE, TDD, Microsserviçoes">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/pag-2/" />
+  <meta property="og:url" content="https://blog.vepo.dev/pag-2/" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images//top.avif" />
+  
+
+  
+  <!-- its not an article -->
+  <meta property="og:type" content="website" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "WebSite",
+    "headline": "Notas do dia a dia de um engenheiro de software",
+    
+    "description": "Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia",
+    
+    "url": "https://blog.vepo.dev/pag-2/",
+    "sameAs" : [
+      "https://twitter.com/vepo",
+      "https://www.linkedin.com/in/victorosorio/",
+      "https://medium.com/@vepo",
+      "https://dev.to/vepo/",
+      "https://www.youtube.com/@victor.osorio"
+    ]
+  }
+</script>
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YXWDKRN6ZR"></script>
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+                    <header class="site-header">
+                        <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+                        <nav class="menu-list">
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+                    </header>
+                </div>
+            </div>
+            <div class="col-md-10 main-content">
+                <div class="article cover-image">
+                    
+                    <img alt="Notas do dia a dia de um engenheiro de software" src="/assets/images//top.avif" class="img-fluid" />
+                    
+                </div>
+                <div class="title">
+                    
+                    <h1 class="serie-title">
+                        Notas do dia a dia de um engenheiro de software
+                    </h1>
+                    
+                </div>
+                
+                
+                <article>
+                    <!-- Pagination links -->
+<div class="pagination">
+	
+	<a href="/">
+		Anterior
+	</a>
+	
+	&nbsp;
+	|
+	&nbsp;
+	<span class="page_number ">
+		Página: 2 de 6
+	</span>
+	&nbsp;
+	|
+	&nbsp;
+	
+	<a href="/pag-3">Próximo</a>
+	
+</div>
+
+<div class="row">
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/existe-vies-algoritmico">
+			
+			<img class="card-img-top" alt="Existe "Viés Algorítmico"?" src="/assets/images/narciso-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">A Sociedade Tecnológica no Século XXI: Existe "Viés Algorítmico"?</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2023-02-22T18:21:00+00:00">
+							22/fevereiro/2023
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default algoritmos" href="/tags/#algoritmos">
+							<i class="fas fa-tags"></i>
+							Algoritmos
+						</a>
+						
+						<a class="label label-default tecnologia" href="/tags/#tecnologia">
+							<i class="fas fa-tags"></i>
+							Tecnologia
+						</a>
+						
+						<a class="label label-default jacques-ellul" href="/tags/#jacques-ellul">
+							<i class="fas fa-tags"></i>
+							Jacques Ellul
+						</a>
+						
+						<a class="label label-default sociedade" href="/tags/#sociedade">
+							<i class="fas fa-tags"></i>
+							Sociedade
+						</a>
+						
+					</div>
+					
+					<p>Existe viés algoritmico na Inteligência Articial? Nesse post eu vou descrever como funcionam as modernas inteligências artficiais e responder que não há como fugir do viés algorítimico!</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/mock-schema-registry">
+			
+			<img class="card-img-top" alt="Testes de Kafka Stream e Schema Registry" src="/assets/images/capas/chaplin-modern-times.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Testes de Kafka Stream e Schema Registry</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2023-01-27T07:21:00+00:00">
+							27/janeiro/2023
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default apache-kafka" href="/tags/#apache-kafka">
+							<i class="fas fa-tags"></i>
+							Apache Kafka
+						</a>
+						
+						<a class="label label-default unit-test" href="/tags/#unit-test">
+							<i class="fas fa-tags"></i>
+							Unit Test
+						</a>
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+					</div>
+					
+					<p>Qual é a maneira mais fácil de se testar um consumer/producer/stream Kafka usando Schema Registry?</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/leituras-2022">
+			
+			<img class="card-img-top" alt="Leituras de 2022" src="/assets/images/capas/books.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Leituras de 2022</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2023-01-21T17:00:00+00:00">
+							21/janeiro/2023
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default livros" href="/tags/#livros">
+							<i class="fas fa-tags"></i>
+							Livros
+						</a>
+						
+					</div>
+					
+					<p>Levantamento dos livros que li em 2022. Faço uma breve descrição do livro e minhas impressões. São 10 livros sendo 4 de computação, 4 de ficção e 2 de ciências sociais.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/sistemas-distribuidos-definicao">
+			
+			<img class="card-img-top" alt="O que são Sistemas Distribuídos?" src="/assets/images/microservices/cover-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Sistemas Distribuídos & Microsserviços: O que são Sistemas Distribuídos?</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2023-01-02T15:00:00+00:00">
+							02/janeiro/2023
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default ciência-da-computação" href="/tags/#ciência-da-computação">
+							<i class="fas fa-tags"></i>
+							Ciência da Computação
+						</a>
+						
+						<a class="label label-default sistemas-distribuídos" href="/tags/#sistemas-distribuídos">
+							<i class="fas fa-tags"></i>
+							Sistemas Distribuídos
+						</a>
+						
+						<a class="label label-default microsserviços" href="/tags/#microsserviços">
+							<i class="fas fa-tags"></i>
+							Microsserviços
+						</a>
+						
+					</div>
+					
+					<p>Como podemos definir Sistemas Distribuídos?</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-memoria">
+			
+			<img class="card-img-top" alt="Memória" src="/assets/images/java/duke-paper-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: Memória</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-11-11T12:55:00+00:00">
+							11/novembro/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+						<a class="label label-default gerenciamento-de-memória" href="/tags/#gerenciamento-de-memória">
+							<i class="fas fa-tags"></i>
+							Gerenciamento de Memória
+						</a>
+						
+						<a class="label label-default tuning" href="/tags/#tuning">
+							<i class="fas fa-tags"></i>
+							Tuning
+						</a>
+						
+					</div>
+					
+					<p>Como funciona o gerenciamento de memória com Java? Nesse post vou descrever como funciona a memória de um programa Java e comparar ele com de outros programas. Depois vou mostrar quais os principais desafios do gerenciamento de memória em programas Java. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/ddd-02-elementos-do-design-de-software">
+			
+			<img class="card-img-top" alt="Elementos do Design de Software" src="/assets/images/docs-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Um pouco de DDD: Elementos do Design de Software</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-11-08T10:30:00+00:00">
+							08/novembro/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default ddd" href="/tags/#ddd">
+							<i class="fas fa-tags"></i>
+							DDD
+						</a>
+						
+						<a class="label label-default documentação" href="/tags/#documentação">
+							<i class="fas fa-tags"></i>
+							Documentação
+						</a>
+						
+						<a class="label label-default modelagem-de-software" href="/tags/#modelagem-de-software">
+							<i class="fas fa-tags"></i>
+							Modelagem de Software
+						</a>
+						
+					</div>
+					
+					<p>Quais são os elementos básicos de um modelo de software? Existem tipos de elementos que podemos usar para construir qualquer modelo?</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/ddd-01-modelos-e-dominio">
+			
+			<img class="card-img-top" alt="Modelos e Domínio em Software" src="/assets/images/docs-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Um pouco de DDD: Modelos e Domínio em Software</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-09-27T10:45:00+00:00">
+							27/setembro/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default ddd" href="/tags/#ddd">
+							<i class="fas fa-tags"></i>
+							DDD
+						</a>
+						
+						<a class="label label-default documentação" href="/tags/#documentação">
+							<i class="fas fa-tags"></i>
+							Documentação
+						</a>
+						
+						<a class="label label-default modelagem-de-software" href="/tags/#modelagem-de-software">
+							<i class="fas fa-tags"></i>
+							Modelagem de Software
+						</a>
+						
+					</div>
+					
+					<p>Todo software existe para resolver um problema real. E para resolver esse problema precisa ser bem modelado. Nesse post vou navegar um pouco pela introdução do livro Domain-Driven Design para explicar o que é modelo e o que é domínio e como podemos modelar nosso software.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-threads">
+			
+			<img class="card-img-top" alt="Concorrência e Paralelismo" src="/assets/images/java/duke-tumble-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: Concorrência e Paralelismo</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-09-03T15:00:00+00:00">
+							03/setembro/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+						<a class="label label-default tutorial" href="/tags/#tutorial">
+							<i class="fas fa-tags"></i>
+							Tutorial
+						</a>
+						
+						<a class="label label-default threads" href="/tags/#threads">
+							<i class="fas fa-tags"></i>
+							Threads
+						</a>
+						
+						<a class="label label-default concorrência" href="/tags/#concorrência">
+							<i class="fas fa-tags"></i>
+							Concorrência
+						</a>
+						
+						<a class="label label-default paralelismo" href="/tags/#paralelismo">
+							<i class="fas fa-tags"></i>
+							Paralelismo
+						</a>
+						
+					</div>
+					
+					<p>O que eu preciso saber de concorrência e paralelismo para desenvolver usando Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/avaliando-a-validade-do-seu-caso">
+			
+			<img class="card-img-top" alt="Avaliando a validade do seu caso" src="/assets/images/filosofia-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Pensamento Crítico: Avaliando a validade do seu caso</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-07-05T11:16:00+00:00">
+							05/julho/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default filosofia" href="/tags/#filosofia">
+							<i class="fas fa-tags"></i>
+							Filosofia
+						</a>
+						
+						<a class="label label-default pensamento-crítico" href="/tags/#pensamento-crítico">
+							<i class="fas fa-tags"></i>
+							Pensamento Crítico
+						</a>
+						
+						<a class="label label-default evidências" href="/tags/#evidências">
+							<i class="fas fa-tags"></i>
+							Evidências
+						</a>
+						
+					</div>
+					
+					<p>As informações que você tem são válidas para uma tomada de decisão?</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-io">
+			
+			<img class="card-img-top" alt="Java I/O" src="/assets/images/java/duke-chez-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: Java I/O</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-07-04T20:53:00+00:00">
+							04/julho/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+						<a class="label label-default tutorial" href="/tags/#tutorial">
+							<i class="fas fa-tags"></i>
+							Tutorial
+						</a>
+						
+						<a class="label label-default i-o" href="/tags/#i-o">
+							<i class="fas fa-tags"></i>
+							I/O
+						</a>
+						
+					</div>
+					
+					<p>Quais são as bibliotecas para leitura de arquivos em Java? O que significa ler e escrever em um programa? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/algoritmos-uma-introducao">
+			
+			<img class="card-img-top" alt="Algoritmos - Uma introdução" src="/assets/images/pexels-artem-beliaikin-5456314.avif" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Algoritmos: Algoritmos - Uma introdução</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-06-10T09:47:30+00:00">
+							10/junho/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default algoritmo" href="/tags/#algoritmo">
+							<i class="fas fa-tags"></i>
+							Algoritmo
+						</a>
+						
+						<a class="label label-default ciência-da-computação" href="/tags/#ciência-da-computação">
+							<i class="fas fa-tags"></i>
+							Ciência da Computação
+						</a>
+						
+					</div>
+					
+					<p>O que é um algoritmo? O que define um algoritmo?</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-objetos">
+			
+			<img class="card-img-top" alt="OO: Eu vejo objetos por todos os cantos!" src="/assets/images/java/duke-plug-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: OO: Eu vejo objetos por todos os cantos!</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-05-30T08:15:00+00:00">
+							30/maio/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default orientação-a-objeto" href="/tags/#orientação-a-objeto">
+							<i class="fas fa-tags"></i>
+							Orientação a Objeto
+						</a>
+						
+						<a class="label label-default tutorial" href="/tags/#tutorial">
+							<i class="fas fa-tags"></i>
+							Tutorial
+						</a>
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+					</div>
+					
+					<p>Você sabe o que é Orientação a Objetos? E você sabe porque OO é o principal foco da linguagem Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-collections">
+			
+			<img class="card-img-top" alt="Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!" src="/assets/images/java/duchess-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: Collections!?!? Listas, conjuntos e mapas... as classes mais usadas do Java!</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-05-06T14:38:00+00:00">
+							06/maio/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+						<a class="label label-default tutorial" href="/tags/#tutorial">
+							<i class="fas fa-tags"></i>
+							Tutorial
+						</a>
+						
+						<a class="label label-default collections" href="/tags/#collections">
+							<i class="fas fa-tags"></i>
+							Collections
+						</a>
+						
+						<a class="label label-default bibliotecas" href="/tags/#bibliotecas">
+							<i class="fas fa-tags"></i>
+							Bibliotecas
+						</a>
+						
+					</div>
+					
+					<p>Continuando a série sobre Java, vamos apresentar o que é o Java Collections. Vou apresentar um panorama sobre a biblioteca contendo as principais classes. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/schemas-no-apache-kafka">
+			
+			<img class="card-img-top" alt="Schemas no Apache Kafka" src="/assets/images/mesa-trabalho-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Schemas no Apache Kafka</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-05-04T18:59:00+00:00">
+							04/maio/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default event-driven-architecture" href="/tags/#event-driven-architecture">
+							<i class="fas fa-tags"></i>
+							Event-Driven Architecture
+						</a>
+						
+						<a class="label label-default apache-kafka" href="/tags/#apache-kafka">
+							<i class="fas fa-tags"></i>
+							Apache Kafka
+						</a>
+						
+					</div>
+					
+					<p>Um dos grandes problemas com Apache Kafka é lidar com schema das mensagens. Nesse post vou levantar alguns problemas e algumas soluções.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+	
+	<div class="card col-md-4 mb-3">
+		<a href="/posts/java-101-sintaxe">
+			
+			<img class="card-img-top" alt="A sintaxe do Java" src="/assets/images/java/duke-thinking-100-42.webp" />
+			
+			<div class="card-body">
+				
+				<h5 class="card-title">Java 101: A sintaxe do Java</h5>
+				
+				<div class="card-text">
+					<h6 class="list-group-item-heading">
+						<time datetime="2022-04-29T12:26:00+00:00">
+							29/abril/2022
+						</time>
+					</h6>
+					<div class="tag-container">
+						
+						<a class="label label-default java" href="/tags/#java">
+							<i class="fas fa-tags"></i>
+							Java
+						</a>
+						
+						<a class="label label-default tutorial" href="/tags/#tutorial">
+							<i class="fas fa-tags"></i>
+							Tutorial
+						</a>
+						
+					</div>
+					
+					<p>Você sabe o que é o mínimo que você precisa saber pra desenvolver Java? Aqui eu vou apresentar um pouco da sintaxe do Java. Quero passar por todas as estruturas que vão fazer você criar o melhor código possível. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.</p>
+					
+				</div>
+			</div>
+		</a>
+	</div>
+	
+	
+</div>
+
+<!-- Pagination links -->
+<div class="pagination">
+	
+	<a href="/">
+		Anterior
+	</a>
+	
+	&nbsp;
+	|
+	&nbsp;
+	<span class="page_number ">
+		Página: 2 de 6
+	</span>
+	&nbsp;
+	|
+	&nbsp;
+	
+	<a href="/pag-3">Próximo</a>
+	
+</div>
+                </article>
+                
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+</body>
