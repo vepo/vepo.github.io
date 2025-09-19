@@ -89,4 +89,4 @@ Esses aspectos existem e podem ser identificados com clareza por arquitetos expe
 
 Esse post ainda não está finalizado. Ele foi publicado pois se trata do roteiro para o vídeo abaixo
 
-{% youtube https://youtu.be/OviOkjmOFEA %}
+{% youtube OviOkjmOFEA %}
