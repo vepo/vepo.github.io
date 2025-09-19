@@ -12,7 +12,7 @@ publish_date: 2025-09-19 09:1*:00 +0300
 
 {% youtube OviOkjmOFEA %}
 
-Para entender melhor o que é arquitetura de software, fiz um exercício de buscar definições nas redes sociais. Criei uma pesquisa e coletei respostas no Blue Sky, Mastodon e LinkedIn. Apesar de parecer amador, essa técnica é conhecida como "Teoria Embasada" (Grounded Theory), onde você coleta dados e a partir deles constrói uma teoria. Mas eu não quero fazer um artigo científico sobre como os desenvolvedores brasileiros entendem arquitetura de software, quero apenas entender o que eles pensam sobre o assunto.
+Para entender melhor o que é arquitetura de software, fiz um exercício de buscar definições nas redes sociais. Criei uma pesquisa e coletei respostas no Blue Sky, Mastodon e LinkedIn. Apesar de parecer amador, essa técnica é conhecida como ["Teoria Embasada" (Grounded Theory)](https://dl.acm.org/doi/10.1109/ICSE-Companion52605.2021.00139), onde você coleta dados e a partir deles constrói uma teoria. Mas eu não quero fazer um artigo científico sobre como os desenvolvedores brasileiros entendem arquitetura de software, quero apenas entender o que eles pensam sobre o assunto.
 
 Entre as respostas, encontrei definições interessantes, como:
 
