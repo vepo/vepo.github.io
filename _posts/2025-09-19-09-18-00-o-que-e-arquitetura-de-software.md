@@ -7,7 +7,7 @@ tags: [Arquitetura de Software]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/o-que-e-arquitetura-de-software
 series: Conversas sobre Arquitetura
-publish_date: 2025-09-19 09:1*:00 +0300
+publish_date: 2025-09-19 09:18:00 +0300
 ---
 
 {% youtube OviOkjmOFEA %}
