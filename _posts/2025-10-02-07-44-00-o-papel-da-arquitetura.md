@@ -59,7 +59,7 @@ Eu sempre recomendo que o arquiteto deve acompanhar conferências, ler livros bo
 
 ### 3. Trade-offs e Decisões Arquiteturais
 
-Arquitetura de software é sobre tomar decisões. Essas decisões são tomadas para garantir os atributos de qualidade do sistema e para isso o arquiteto deve estar ciente das consequências dessas decisões. Essas consequências são chamadas de _trade-offs_. O **Architecture Tradeoff Analysis Method** (ATAM) surge como uma abordagem sistemática para avaliar essas compensações, ajudando arquitetos a tomar decisões conscientes e fundamentadas.
+Arquitetura de software é sobre tomar decisões. Essas decisões são tomadas para garantir os atributos de qualidade do sistema e para isso o arquiteto deve estar ciente das consequências dessas decisões. Essas consequências são chamadas de _trade-offs_. O [**Architecture Tradeoff Analysis Method** (ATAM)](https://www.sei.cmu.edu/documents/629/2000_005_001_13706.pdf) surge como uma abordagem sistemática para avaliar essas compensações, ajudando arquitetos a tomar decisões conscientes e fundamentadas.
 
 Desenvolvido pela **Software Engineering Institute** (SEI), o ATAM baseia-se na premissa de que não existem soluções arquiteturais perfeitas, apenas soluções adequadas para contextos específicos. O método fornece um framework para:
 
