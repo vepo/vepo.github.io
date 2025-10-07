@@ -1,10 +1,25 @@
 ---
-title: Entendendo o Kafka
+title: Entendendo o Kafka — Uma Introdução à Plataforma de Eventos
 permalink: /posts/entendendo-o-kafka
 published: true
-description: Uma breve introdução ao Apache Kafka
+description: |
+    Resumo para SEO: Entendendo o Apache Kafka — Uma Introdução à Plataforma de Eventos
+    
+    Descubra como o Apache Kafka vai além de um simples message broker e se torna a base ideal para arquiteturas orientadas a eventos e microsserviços. Neste guia introdutório, você vai aprender:
+    
+        O que é o Kafka e quando usá-lo (ou não) em comparação com RabbitMQ, ActiveMQ e Amazon SQS;
+    
+        Como ele atua como uma plataforma de streaming completa, permitindo reprocessamento, baixo acoplamento e alta tolerância a falhas;
+    
+        Passo a passo para criar um cluster Kafka com Docker;
+    
+        Exemplos práticos de produção e consumo de mensagens;
+    
+        Como garantir a ordenação das mensagens e usar tópicos como fontes da verdade.
+    
+    Ideal para desenvolvedores e arquitetos que buscam escalabilidade, resiliência e flexibilidade em sistemas distribuídos. 🚀
 tags: [Apache Kafka, Java, Microservices]
-cover_image: /assets/images/rio-fluindo.webp
+cover_image: /assets/images/rio-fluindo-100-42.webp
 publish_date: 2018-04-30 12:00:00 +0300
 last_modified_at: 2023-09-25 23:00:00 +0300
 original: "https://medium.com/@vepo/entendendo-o-kafka-bf64169e421f"
