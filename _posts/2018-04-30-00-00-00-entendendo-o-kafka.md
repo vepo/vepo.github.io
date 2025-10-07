@@ -3,8 +3,6 @@ title: Entendendo o Kafka — Uma Introdução à Plataforma de Eventos
 permalink: /posts/entendendo-o-kafka
 published: true
 description: |
-    Resumo para SEO: Entendendo o Apache Kafka — Uma Introdução à Plataforma de Eventos
-    
     Descubra como o Apache Kafka vai além de um simples message broker e se torna a base ideal para arquiteturas orientadas a eventos e microsserviços. Neste guia introdutório, você vai aprender:
     
         O que é o Kafka e quando usá-lo (ou não) em comparação com RabbitMQ, ActiveMQ e Amazon SQS;
