@@ -2,7 +2,7 @@
 title: O Papel da Arquitetura de Software
 published: true
 description: | 
-    Esse é o terceiro post do conversas sobre arquitetura. A arquitetura de software vai muito além da tecnologia. Descubra como ela conecta aspectos técnicos, estratégicos, humanos e culturais para criar sistemas que realmente entregam valor de negócio.
+    Esse é o terceiro post da série Conversas sobre Arquitetura. A arquitetura de software vai muito além da tecnologia. Descubra como ela conecta aspectos técnicos, estratégicos, humanos e culturais para criar sistemas que realmente entregam valor de negócio, equilibrando decisões que vão desde a garantia de atributos de qualidade até a administração de expectativas de stakeholders em um ambiente em constante mudança.
 tags: [Arquitetura de Software]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/o-papel-da-arquitetura

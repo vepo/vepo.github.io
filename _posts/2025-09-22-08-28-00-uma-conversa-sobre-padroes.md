@@ -2,7 +2,7 @@
 title: Uma conversa sobre Padrões de Projeto
 published: true
 description: | 
-    Esse é o segundo post do conversas sobre arquitetura. Nele vamos discutir o que são Padrões de Projetos e como eles vão muito além do livro inicial do Gang of Four.
+    Esse é o segundo post da série Conversas sobre Arquitetura. Nele vamos discutir o que são Padrões de Projetos e como eles vão muito além do livro inicial do Gang of Four. Descubra como os padrões aumentam nosso vocabulário técnico, permitem comunicação mais eficiente entre desenvolvedores e formam linguagens que nos ajudam a compor soluções arquiteturais mais robustas e adequadas aos problemas que precisamos resolver.
 tags: [Arquitetura de Software, Padrões de Projetos]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/uma-conversa-sobre-padroes
