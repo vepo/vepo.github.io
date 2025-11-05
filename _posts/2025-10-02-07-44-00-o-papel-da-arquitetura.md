@@ -10,6 +10,8 @@ series: Conversas sobre Arquitetura
 publish_date: 2025-10-02 07:44:00 +0300
 ---
 
+{% youtube uVIMee-yIaI %}
+
 A Arquitetura de Software é uma disciplina que se relaciona com diversos contexto. Podemos afirmar que uma pessoa atuando como arquiteto de software atua em pelo menos quatro contextos diferentes:
 1. Técnico: _como o sistema é construído?_
 2. Estratégico: _qual o impacto do sistema no negócio?_

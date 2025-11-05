@@ -10,6 +10,8 @@ series: Conversas sobre Arquitetura
 publish_date: 2025-09-22 08:28:00 +0300
 ---
 
+{% youtube 6snGJFaj0ig %}
+
 Quando tentamos definir arquitetura de software não podemos fugir de discutir o conceito de padrões de projeto. No fundo, o papel de um arquiteto é encontrar dentro de um conjunto de padrões, a solução que melhor se adequa aos requisitos de negócio que o sistema que está sendo arquitetado precisa atender.
 
 Padrões de Projetos não surgiram com o livro de 1995 de Erich Gamma, Richard Helm, Ralph Johnson e John Vlissides, mais conhecidos como a Gang of Four (GoF). O conceito de padrões de projeto foi inicialmente discutido por Christopher Alexander no livro **A Pattern Language: Towns, Buildings, Construction** em 1977. Alexander foi um arquiteto e urbanista que propôs que existem soluções recorrentes para problemas recorrentes na arquitetura e no design urbano. Ele sugeriu que essas soluções poderiam ser documentadas como "padrões" que poderiam ser reutilizados em diferentes contextos.
