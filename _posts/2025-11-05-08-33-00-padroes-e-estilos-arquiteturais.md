@@ -20,7 +20,7 @@ Roy Fielding em sua tese de doutorado definie estilos arquiteturais como **um co
 
 Da mesma forma do padrão, o estilo também é um referencial para a construção de sistemas, mas ele não foca em resolver problemas mas em alcançar atributos de qualidade. Eles são qualitativamente diferentes dos padrões e não são mutuamente exclusivos. Mas eu costumo simplificar a discussão dizendo que um padrão arquitetural define como o seu componente será organizado internamente, enquanto o estilo define como o seu componente irá interagir com os outros componentes do sistema. Ou seja, quando eu falo de padrão estou pensando nas classes enquanto quando falo de estilo estou pensando em protocolos de comunicação, formatos de mensagens, etc. Mas a diferença primordia é que enquanto o padrão está tentando resolver um problema, o estilo arquitetural está procurando habilitar formas de interação entre os componentes.
 
-Nas próximas seções vou aprensentar os diversos padrões e estilos que serão discutidos posteriormente. Mas por enquanto vamos discutir os elementos que compõe um estilo arquitetural e como podemos usar os estilos para compor arquiteturas.
+Nas próximas seções vou apresentar os diversos padrões e estilos que serão discutidos posteriormente. Mas por enquanto vamos discutir os elementos que compõe um estilo arquitetural e como podemos usar os estilos para compor arquiteturas.
 
 ## Abstrações de Tempo de Execução
 
