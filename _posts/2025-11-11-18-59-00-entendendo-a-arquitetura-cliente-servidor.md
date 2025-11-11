@@ -61,3 +61,8 @@ Isso levanta algumas discussões interessantes, pois podemos implementar nossos 
 No primeiro caso, é necessário que o cliente seja assíncrono, isso significa que ao invés de bloquear a thread da aplicação enquanto a resposta não chega, o cliente envia a requisição com um callback associado, liberando a thread para que outra operação seja realizada. 
 
 No segundo caso, o servidor não processa a requisição, mas adiciona ela a uma fila de execução respondendo com um identificador para verificar o estado da execução,
+
+
+## Conclusão
+
+Entender a arquitetura Cliente-Servidor é um dos pilares fundamentais para se compreender o desafio de construir sistemas distribuídos. Sua simplicidade conceitual — baseada em requisições e respostas — facilita a implementação e o entendimento de sistemas complexos, porém adiciona desafios quando se trata de escalabilidade e disponibilidade.
