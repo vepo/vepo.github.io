@@ -2,7 +2,7 @@
 title: Entendendo a arquitetura Cliente-Servidor
 published: true
 description: | 
-    Esse é o quinto post da série **Conversas sobre Arquitetura**. Nele, mergulhamos nos fundamentos que sustentam a web e grande parte dos sistemas distribuídos atuais: a **arquitetura Cliente-Servidor**. Você vai entender o que define os papéis de cliente e servidor, como a comunicação entre eles funciona na prática e quais são as implicações dessa relação — desde protocolos de rede até o impacto na disponibilidade do sistema. Se você já se perguntou como estilos como REST, RPC e GraphQL se relacionam com esse modelo, ou como a latência e as falhas de comunicação afetam sua aplicação, este post é um ponto de partida essencial. Vamos descomplicar os conceitos e mostrar por que essa arquitetura continua sendo a base de tantas soluções modernas.
+    Esse é o quinto post da série **Conversas sobre Arquitetura**. Nele, mergulhamos no estilo arquitetural fundamental para a web: a **arquitetura Cliente-Servidor**. Você vai entender como se define os papéis de cliente e servidor, como a comunicação entre eles funciona na prática e quais são as implicações dessa relação — desde protocolos de rede até o impacto na disponibilidade do sistema.
 tags: [Arquitetura de Software]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/entendendo-a-arquitetura-cliente-servidor
