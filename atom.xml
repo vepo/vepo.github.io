@@ -1,0 +1,1552 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2025-11-11T22:24:01+00:00</updated><id>https://blog.vepo.dev/atom.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Entendendo a arquitetura Cliente-Servidor</title><link href="https://blog.vepo.dev/posts/entendendo-a-arquitetura-cliente-servidor" rel="alternate" type="text/html" title="Entendendo a arquitetura Cliente-Servidor" /><published>2025-11-11T00:00:00+00:00</published><updated>2025-11-11T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/18-59-00-entendendo-a-arquitetura-cliente-servidor</id><content type="html" xml:base="https://blog.vepo.dev/posts/entendendo-a-arquitetura-cliente-servidor"><![CDATA[<p>Antes de discutir os estilos arquiteturais mais comuns, é importante entender a base de muitos deles: a arquitetura Cliente-Servidor. Caracterizá-la é útil, pois ela é a compõe estilos como REST, RPC, GraphQL, entre outros. Podemos começar identificando alternativas a essa arquitetura. Existem outras formas de pensar sistemas que não sejam baseadas na relação cliente-servidor? A resposta é sim! A arquitetura Cliente-Servidor é fácil de entender e construir, pois ‘pensar em termos de CLIENTES que fazem requisições a SERVIDORES ajuda a compreender e gerenciar a complexidade de sistemas distribuídos.’ [Saltzer and Kaashoek, 2009] Sua principal característica é a centralização na figura do servidor, mas é possível construir arquiteturas descentralizadas, como o Peer-to-Peer (P2P).</p>
+
+<h2 id="definindo-os-papéis">Definindo os papéis</h2>
+
+<p>Então para entendermos como funciona e caracterizar uma arquitetura cliente-servidor, vamos definir o que é um cliente e o que é um servidor? Esses são os dois principais papeis dentro dessa arquitetura.</p>
+<ul>
+  <li>“Um <strong>servidor</strong> (<em>server</em>) é um processo implementando um servico específico, por exemplo, um serviço de sistema de arquivos ou um serviço de banco de dados.” [van Steen and Tanenbaum, 2017]</li>
+  <li>“Um <strong>cliente</strong> (<em>client</em>) é um processo que requisita um serviço de um servidor através do envio de uma requisição e subsequentemente esperando pela resposta do servidor.” [van Steen and Tanenbaum, 2017]</li>
+</ul>
+
+<p>A interação entre cliente e servidor é conhecida como comportamento reqsuisição-resposta (<em>request-response</em>), ela é sempre síncrona, uma vez que toda requisição precisa de uma resposta.</p>
+
+<!-- https://excalidraw.com/#json=36iWOKx0T_gNqjvb4lZAi,h1wqtDM0cvA9U6ek_NEuWQ -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-01-client-server.png" alt="Comunicação Cliente-Servicor" /></p>
+
+<h2 id="caracterizando-um-protocolo-cliente-servidor">Caracterizando um protocolo Cliente-Servidor</h2>
+
+<p>Quando falamos de requisição e respostas, estamos obrigatóriamente falando de protocolos e os protocolos de uma arquitetura <strong>Cliente-Servidor</strong> podem ser caracterizados como Orientado à Conexão e Protocolos sem Conexão (<em>connectionless</em>). Apesar de estarmos falando de protocolos da camada de aplicação, eles são construídos através de escolhas bem definidas de protocolos na camada de rede. Usualmente, protocolos orientados a conexão usam o protocolo TCP, e protocolos sem conexão usam o protocolo UDP. Uma exceção se dá com o uso do protocolo QUIC que é uma construção em cima do UDP para estabelecimento de uma conexão de baixa latência, este usado pelo HTTP3.</p>
+
+<p>A vantagem de se usar o protocolo sem conexão é garantir que a mensagem é enviada com baixa latência, mas não há garantias de entrega da mensagem, o que pode implicar em reenvio da mensagem para o cliente e na necessidade de se implementar operações idempotente para o servidor.</p>
+
+<p>Já quando temos protocolos orientados a conexão, o mesmo pode ser classificado como Sem Estado (<em>stateless</em>) ou Com Estado (<em>stateful</em>). O HTTP é um protocolo sem estado, já o SSH é um protocolo com estado.</p>
+
+<h3 id="conceito-de-idempotência">Conceito de idempotência</h3>
+
+<p>Quando falamos de idempotência estamos caracterizando uma operação que pode ser repetida multiplas vezes sem efeitos colaterais. Qualquer operação que não altere o estado interno da aplicação é idempotente, mas uma operação potencialmente altere o estado da aplicação, para ser idempotente tem que identificar se ela já foi aplicada e responder como se fosse aplicada.</p>
+
+<h3 id="diferentes-camadas-e-suas-implicações">Diferentes Camadas e suas implicações</h3>
+
+<p>Uma aplicação pode ser facilmente dividida em camadas, não estamos falando sobre arquitura em camadas, mas apenas em camadas como um estrutura de analise. O mais comum é a divisão em interface de usuário, aplicação e base de dados. É interessante notar que camadas mais superiores tendem a ter as caracteristicas de clientes enquanto camadas mais inferiores se comportam cada vez mais como servidores. Dessa forma, em algum momento uma dessas camadas ou interfaces implementará uma comunicação cliente-servidor, separando a aplicação fisicamente. E quais as implicações disso?</p>
+
+<p>A primeira implicação é a adição de latência na comunicação. Cada vez que uma camada se comunica com outra através de uma interface de rede, essa comunicação é mais lenta do que uma comunicação local. A segunda implicação é a possibilidade de falhas de comunicação. Toda comunicação através de rede está sujeita a falhas, seja por perda de pacotes, indisponibilidade do servidor, etc…</p>
+
+<p>No artigo <a href="https://queue.acm.org/detail.cfm?id=3096459">“The Calculus of Service Availability”</a> o autor descreve como a adição de camadas pode reduzir significativamente a disponibilidade de um serviço. Quando dependemos de um serviço que tem disponibilidade de 99.99%, a disponibilidade do nosso serviço já está limitado por esse valor, ao depender de outro, o que implicaria em uma indisponibilida de ao menos 52 minutos em um ano. Ao se depender de mais serviços, essa disponibilidade pode aumentar, visto que os mesmo podem ficar também indisponíveis.</p>
+
+<p>O calculo da disponbilidade é feito através da formula abaixo onde <code class="language-plaintext highlighter-rouge">MTTF</code> significa o tempo médio até falhar (do inglês <em>mean time to failure</em>) e <code class="language-plaintext highlighter-rouge">MTTR</code> significa tempo médio até o reparo (do inglês <em>mean time to repair</em>). A formua <code class="language-plaintext highlighter-rouge">A = MTTF / (MTTF + MTTR)</code> pode ser calculada usando qualquer unidade de medida, desde que <code class="language-plaintext highlighter-rouge">MTTF</code> e <code class="language-plaintext highlighter-rouge">MTTR</code> possuam a mesma unidade.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-02-calculo-disponibilidade.png" alt="Formula do calculo da disponbilidade: A=MTTF/(MTTF+MTTR)" /></p>
+
+<p>Fazendo um calculo hipotético de uma aplicação que falha a cada 2 meses e leva 3 horas para se recuperar, essa aplicação está disponível por 1440 horas a cada 1443 horas, ou seja, ela tem disponibilidade de apenas 99,8% do tempo, o que é uma disponibilidade considerada baixa para alguns serviços, como provedores de nuvem que pedem disponbilidade de 99,999%, ou seja, aproximadamente 5 minutos ao ano de indisponibilidade.</p>
+
+<!-- https://excalidraw.com/#json=unD4F6EHvF0nkDjZg1EbQ,tIckKWssfycFnr-3Kz1GIw -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-03-calculo-disponibilidade-exemplo.png" alt="Aplicação" /></p>
+
+<h3 id="processos-síncronos-vs-assíncronos">Processos Síncronos vs Assíncronos</h3>
+
+<p>Uma característica importante de uma arquitetura cliente-servidor é que a comunicação entre cliente e servidor é sempre síncrona, ou seja, o cliente envia uma requisição e espera pela resposta do servidor. Isso não significa que o cliente ou o servidor não possam ser assíncronos internamente, ou que a requisição não possa iniciar um processo assíncrono no servidor, mas a comunicação é sempre síncrona.</p>
+
+<p>Isso levanta algumas discussões interessantes, pois podemos implementar nossos sistemas assincronamente, usando clientes assincronos, ou implmentar no servidor operações assíncronas que podem ser respondidas imediatamentes porém sem a operação ser finalizada.</p>
+
+<p>No primeiro caso, é necessário que o cliente seja assíncrono, isso significa que ao invés de bloquear a thread da aplicação enquanto a resposta não chega, o cliente envia a requisição com um callback associado, liberando a thread para que outra operação seja realizada.</p>
+
+<p>No segundo caso, o servidor não processa a requisição, mas adiciona ela a uma fila de execução respondendo com um identificador para verificar o estado da execução,</p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Entender a arquitetura Cliente-Servidor é um dos pilares fundamentais para se compreender o desafio de construir sistemas distribuídos. Sua simplicidade conceitual — baseada em requisições e respostas — facilita a implementação e o entendimento de sistemas complexos, porém adiciona desafios quando se trata de escalabilidade e disponibilidade.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o quinto post da série **Conversas sobre Arquitetura**. Nele, mergulhamos no estilo arquitetural fundamental para a web: a **arquitetura Cliente-Servidor**. Você vai entender como se define os papéis de cliente e servidor, como a comunicação entre eles funciona na prática e quais são as implicações dessa relação — desde protocolos de rede até o impacto na disponibilidade do sistema.]]></summary></entry><entry><title type="html">Padrões e Estilos Arquiteturais</title><link href="https://blog.vepo.dev/posts/padroes-e-estilos-arquiteturais" rel="alternate" type="text/html" title="Padrões e Estilos Arquiteturais" /><published>2025-11-05T00:00:00+00:00</published><updated>2025-11-05T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/08-33-00-padroes-e-estilos-arquiteturais</id><content type="html" xml:base="https://blog.vepo.dev/posts/padroes-e-estilos-arquiteturais"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/Ub-RUQ_aQ8Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Quando se fala de arquitetura, a primeira imagem que se vem a cabeça é a organização de um projeto. Se vamos usar uma Arquitetura Model-View-Controller (MVC) ou uma Arquitetura em Camadas ou até mesmo uma Arquitetura Hexagonal. Isso também é arquitetura, mas não é a única forma de se discutir arquitetura. Nessa seção quero discutir a diferença entre Estilos e Padrões Arquiteturais mostrando como eles podem ser usados.</p>
+
+<p>Primeiro precisamos definir o que são Estilos e Padrões. Padrões são os mais conhecidos, e <a href="/posts/uma-conversa-sobre-padroes">já falamos sobre eles</a>, mas agora não vamos falar de padrões que se aplicam localmente no código, mas não em uma classe ou arquivo em especifico e sim no projeto como um todo. Quando falamos de Padrões, já pensamos em um contexto e um problema. Logo quando vamos ler sobre MVC, Hexagonal ou Camadas, lembramos do contexto e do problema que eles tentam resolver. Vamos falar deles mais a frente e eles existem para resolver um problema em especifico. Já os Estilos Arquiteturais não tem o propósito de resolver um problema, mas são um conjunto de condicionantes escolhidas para se alcançar Atributos de Qualidades. É importante ressaltar que nem todo autor faz essa distinção entre padrão e estilo arquitetural, dessa forma você pode encontrar discussões sobre arquitetura que mistura esses conceito, mesmo eles sendo diferentes.</p>
+
+<p>Roy Fielding em sua tese de doutorado definie estilos arquiteturais como <strong>um conjunto coordenado de condicionantes que restringe as funções/características dos elementos e os relacionamentos permitidos entre esses elementos dentro de qualquer arquitetura que esteja em conformidade com esse estilo</strong>. Ou seja, ao contrário do padrão que define uma forma de se resolver um problema, o estilo é um conjunto de regras que definem como o sistema deve ser construído.</p>
+
+<p>Da mesma forma do padrão, o estilo também é um referencial para a construção de sistemas, mas ele não foca em resolver problemas mas em alcançar atributos de qualidade. Eles são qualitativamente diferentes dos padrões e não são mutuamente exclusivos. Mas eu costumo simplificar a discussão dizendo que um padrão arquitetural define como o seu componente será organizado internamente, enquanto o estilo define como o seu componente irá interagir com os outros componentes do sistema. Ou seja, quando eu falo de padrão estou pensando nas classes enquanto quando falo de estilo estou pensando em protocolos de comunicação, formatos de mensagens, etc. Mas a diferença primordia é que enquanto o padrão está tentando resolver um problema, o estilo arquitetural está procurando habilitar formas de interação entre os componentes.</p>
+
+<p>Nas próximas seções vou apresentar os diversos padrões e estilos que serão discutidos posteriormente. Mas por enquanto vamos discutir os elementos que compõe um estilo arquitetural e como podemos usar os estilos para compor arquiteturas.</p>
+
+<h2 id="abstrações-de-tempo-de-execução">Abstrações de Tempo de Execução</h2>
+
+<p>Para melhor caracterizarmos precisamos entender como caracterizar cada estilo arquitetural e para isso precisamos definir quais elementos básicos compõe um estilo arquitetural. Esses elementos são: componentes, conectores, dados, configurações e condicionantes (<em>constraints</em>).</p>
+
+<h3 id="componentes">Componentes</h3>
+
+<p>Os componentes são as unidades computacionais que possuem estado e comportamento. Em uma arquitetura, os componentes em execução em algum determinado momento. É importante não confundir com componentes de software. Componentes arquiteturais são importantes para se descrever o software em execução, mas em muitos casos, componentes de software como classes, módulos ou bibliotecas não são componentes arquiteturais relevantes. Um componente arquitetural sempre é uma instância de software em execução.</p>
+
+<h3 id="conectores">Conectores</h3>
+
+<p>Um conector é um mecanismo abstrato que media a comunicação, coordenação e cooperação entre os componentes. Eles definem como os componentes interagem entre si. Exemplos de conectores incluem chamadas de procedimento remoto (RPC), brokers de mensagens, APIs HTTP, entre outros.</p>
+
+<h3 id="dados">Dados</h3>
+
+<p>Dados são as informações trocadas entre os componentes através dos conectores. Eles podem ser caracterizados pelo seu formato de serialização, estrutura e semântica. Se considerarmos por exemplo uma arquitetura REST, as mensagem pode ser serviços JSON, XML, Protobuf, AVRO, etc. Mas cada mensagem pode ter uma estrutura diferente e a semântica depende da interface sendo invocada.</p>
+
+<h3 id="configurações">Configurações</h3>
+
+<p>Configurações definem as relações entre os componentes, conectores e dados em uma arquitetura.</p>
+
+<h3 id="condicionantes">Condicionantes</h3>
+
+<p>Condicionantes são o que propriamente definem um estilo arquitetural. Eles são um conjunto de regras que restringem como os componentes, conectores e dados podem ser organizados e interagir entre si. Essas restrições podem incluir regras sobre o número de componentes, tipos de conectores permitidos, formatos de dados suportados, entre outros.</p>
+
+<h2 id="padrões-arquiteturais">Padrões Arquiteturais</h2>
+
+<p>Como já falamos anteriormente, Padrões Arquiteturais são definidos com o objetivos de se resolver problemas especificos. Dessa forma faremos uma lista de alguns padrões disponíveis e uma brevíssima discussão. Esses padrões serão discutidos em outra oportunidade.</p>
+
+<ul>
+  <li>Model-View-Controller (MVC)</li>
+  <li>Arquitetura em Camadas</li>
+  <li>Arquitetura Hexagonal</li>
+  <li>Monolito Modular</li>
+  <li>Serverless</li>
+</ul>
+
+<h3 id="model-view-controller-mvc">Model-View-Controller (MVC)</h3>
+
+<p>O padrão <strong>Model-View-Controller</strong> (ou MVC) é normalmente usado para se construir interfaces gráficas. Ela se baseia na separação de responsabilidades entre Modelo, Interface e Controlador. A ideia é evitar que o software seja contaminado pela lógica da interface dificultando a reutilização do mesmo.</p>
+
+<p>Dessa forma, três tipos de componentes devem ser construído:</p>
+
+<ol>
+  <li><strong>Modelo</strong>: define a lógica de negócios da aplicação;</li>
+  <li><strong>View</strong>: lida com o layout e a exibição dos dados;</li>
+  <li><strong>Controlador</strong>: interage com a view para implementar a lógica da interface usando a lógica da aplicação.</li>
+</ol>
+
+<p>O Modelo não deve ser contaminado pela linguagem da interface e deve prover uma interface que possa ser usada em diversas interfaces. Já o controlador pode se contaminar com a lógica da interface, visto que ele naturalmente depende da interface.</p>
+
+<h3 id="arquitetura-em-camadas">Arquitetura em Camadas</h3>
+
+<p>A Arquitetura em Camadas também observa a lógica da divisão de responsabilidades, mas voltada para aplicações web. Uma arquitetura em camada prevê que chamadas são sempre executadas das camadas mais elevadas para as camadas mais baixas e que uma camada só pode chamar a camada imediatamente inferior.</p>
+
+<p>Uma arquitetura em camadas normalmente se utiliza de três camadas: Apresentação, Negócios e Persistência.</p>
+
+<p>A <strong>Camada de Apresentação</strong> é responsável por interagir com a interface gráfica ou com a interface de comunicação, ou seja, um framework web. A responsabilidade dela é criar uma fronteira de separação entre os frameworks utilizados e o código da aplicação. Como esse padrão foi definido antes da popularização da separação de responsabilidades entre back-end e front-end, ela é hoje normalmente adaptada para APIs REST.</p>
+
+<p>Hoje é difícil compreender a utilidade dela, visto que os frameworks web modernos acabaram por absorver grande parte dessa responsabilidadfe.</p>
+
+<p>A <strong>Camada de Negócios</strong> visa implementar a lógica de negócios da aplicação sem depender do framework web e do ORM utilizado.</p>
+
+<p>Já a <strong>Camada de Persistência</strong> visa fazer a conexão entre a base de dados, ou o mecanismo de armazenamento de dados e a camada de negócios. Hoje ela é bem reduzida, pois os frameworks facilitaram a implementação da mesma. Hoje é possível implementar a camada de persistência com apenas algumas interfaces.</p>
+
+<h3 id="arquitetura-hexagonal">Arquitetura Hexagonal</h3>
+
+<p>Arquitetura Hexagonal foi <a href="https://alistair.cockburn.us/hexagonal-architecture">proposta em em 2005 por Alistair Cockburn como uma forma de facilitar os testes de aplicações que dependem de outros sistemas</a>. O padrão define o conceito de Portas e Adaptadores. Um adaptador é uma interface da qual o sistema implementa e depende. O código de negócio da aplicação deve interagir somente através do adaptador. Uma porta é uma implementação do adaptador que pode ser trocado dependendo do propósito.</p>
+
+<p>É importante ressaltar que esse estilo foi proposto em uma época que os frameworks não eram implementados para facilitar a criação de testes automatizados, dessa forma o padrão previa que em tempo de execução fosse utilizado o componente real e nos testes unitários fossem usados outros adaptadores que não dependessem dos componentes externos.</p>
+
+<h3 id="monolito-modular">Monolito Modular</h3>
+
+<p>Uma aplicação organizada como um Monolito Modular é organizada pelos domínios de negócios da aplicação. O objetivo de se desenvolver uma aplicação como monolito modular é isolar dominínios e reduzir a sobreposição de dominios.</p>
+
+<h3 id="serverless">Serverless</h3>
+
+<p>Serverless é um estilo de deployment em que a máquina física não está disponível o tempo inteiro. Ela pode ser compartilhada com outros serviços ou mesmo alocada de acordo com a necessidade.</p>
+
+<h2 id="estilos-arquiteturais">Estilos Arquiteturais</h2>
+
+<p>Diferentemente dos Padrões arquiteturais, os Estilos não se propõe a resolver um problema, mas a atingir atributos de qualidade.</p>
+
+<ul>
+  <li>Client-Server</li>
+  <li>Event-Driven Architecture (EDA)</li>
+  <li>GraphQL</li>
+  <li>Message Queueing</li>
+  <li>Publish-Subscribe (Pub/Sub)</li>
+  <li>Microservices</li>
+  <li>Remote Procedurel Call (RPC)</li>
+  <li>Representational State Transfer (REST)</li>
+  <li>Service-Oriented Architecture (SOA)</li>
+  <li>Data Stream Processing</li>
+  <li>Microkernel</li>
+</ul>
+
+<h3 id="client-server">Client-Server</h3>
+
+<p>Uma aplicação organizada como Cliente/Servidor pela separação de responsabilidades. Um servidor está sempre disponível para responder requisições elaboradas pelo cliente. O cliente utiliza o servidor que possui estado interno.</p>
+
+<h3 id="event-driven-architecture">Event-Driven Architecture</h3>
+
+<p>Em uma arquitetura baseada em eventos, os sistemas se comunicam através da emissão eventos em canais de comunicação, ou brokers de mensagens.</p>
+
+<h3 id="graphql">GraphQL</h3>
+
+<p>GraphQL é um tipo especial de servidor em que o formato do dado requerido é defindo pelo cliente. O cliente elabora uma requisição e o servidor elabora a mensagem, incluindo a estrutura dela, baseado na requisição do cliente.</p>
+
+<h3 id="message-queueing">Message Queueing</h3>
+
+<p>Enfileiramento de mensagens é um tipo comunicação via mensagens em que cada mensagem é consumida apenas uma vez. Ao ser consumida, a mensagem é removida da fila quando confirmada pelo serviço. A responsabilidade do canal de comunicação é entregar a mensagem para ser consumida.</p>
+
+<h3 id="publish-subscribe-pubsub">Publish-Subscribe (Pub/Sub)</h3>
+
+<p>Publish-Subscribe é um tipo de comunicação via mensagens em que cada mensagem pertence ao canal de comunicação. O serviço que publica mensagens não espera por respostas e a mensagem é persistida no canal de comunicação sendo possível de ser consumida por mais de um serviço independentemente.</p>
+
+<h3 id="microservices">Microservices</h3>
+
+<p>Microsserviços é uma forma de implementação de sistemas distribuídos em que cada serviço pode ser entregue de forma independentemente e eles dependem apenas de uma interface de comunicação externa. A principal caracteristica dos microsserviços, segundo Sam Newman, é que eles são entregues independentemente.</p>
+
+<h3 id="remote-procedurel-call-rpc">Remote Procedurel Call (RPC)</h3>
+
+<p><strong>Remote Procedurel Call</strong> (RPC) é uma forma de implementações de interfaces que homogeniza a comunicação abstraindo o protocolo de comunicação. Todo framework RPC implementa uma linguagem definidora de interface e gera código para clientes e servidores baseados nessa linguagem. O desenvolvedor já interagem com o cliente ou o servidor gerado pelo framework, não se preocupando com as implementações dos protocolos, apenas com as interfaces de código. É importante ressaltar que um framework RPC não busca abstrair a ausência da comunicação em rede, mas a complexidade da implementação dos protocolos envolvidos na comunicação em rede.</p>
+
+<h3 id="representational-state-transfer-rest">Representational State Transfer (REST)</h3>
+
+<p>REST é um estilo de composição de APIs HTTP focado na definição de recuros e na exposição de operações dos recursos usando nativamente o protocolo HTTP. O estilo REST usará praticamente todos os elementos do protocolo HTTP na composição do serviço, mas toda a modelagem da API é centrada na definição da entidade e nas operações expostas pela API.</p>
+
+<h3 id="service-oriented-architecture-soa">Service-Oriented Architecture (SOA)</h3>
+
+<p>Um <strong>Service-Oriented Architecture</strong> é uma arquitetura modular orientada por divisões de domínios do negócio. Um serviço representa um funçõa especifica de domínio. Em muitos casos uma arquitetura SOA pode se parecer com uma arquitetura de microsserviços, mas elas terão granularidade e formas de se integrar diferentes.</p>
+
+<h3 id="data-stream-processing">Data Stream Processing</h3>
+
+<p>Um sistema Data Stream Processing se baseia no consumo e produção de eventos. Ele dependerá de um broker de mensagens e as mensagens são recebidas, consumidas e produzidas com a mínima latência possível.</p>
+
+<h3 id="microkernel">Microkernel</h3>
+
+<p>Uma Arquitetura de Microkernel é desenvolvida para facilitar a extensão através da composição usando plugins. Em uma aplicação usando microkernel, a aplicação implementa o kernel, que é o motor central da aplicação e provê um mecanismo de registro de plugins. A aplicação, e possívelmente os plugins, podem registrar e consultar o registro de plugins para executar processos de negócios.</p>
+
+<h2 id="composição-arquitetural">Composição Arquitetural</h2>
+
+<p>É importante notar que uma arquitura pode ser composta tanto por estilo como por padrões. Estilos vão ter um impacto maior em toda a arquitetura escolhida, enquanto padrões terão um impacto menor, sendo, em alguns casos, limitados a um serviço em questão. Em ambos os casos, estilos e padrões podem ser compostos entre si. Uma arquitetura não precisa ser de um estilo puro, podemos fazer composição, como por exemplo implementar um serviço que tanto usa REST quando comunicação via eventos.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o quarto post da série **Conversas sobre Arquitetura**. Nele, exploramos a diferença entre padrões e estilos arquiteturais, mostrando como cada um se aplica na construção de sistemas. Enquanto os padrões, como MVC e Hexagonal, focam em resolver problemas específicos de organização interna, os estilos, como REST e Event-Driven, definem como os componentes interagem entre si para alcançar atributos de qualidade. Descubra como combinar essas abordagens pode resultar em soluções mais flexíveis, testáveis e alinhadas aos objetivos do negócio.]]></summary></entry><entry><title type="html">O Papel da Arquitetura de Software</title><link href="https://blog.vepo.dev/posts/o-papel-da-arquitetura" rel="alternate" type="text/html" title="O Papel da Arquitetura de Software" /><published>2025-10-02T00:00:00+00:00</published><updated>2025-10-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/07-44-00-o-papel-da-arquitetura</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-papel-da-arquitetura"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/uVIMee-yIaI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>A Arquitetura de Software é uma disciplina que se relaciona com diversos contexto. Podemos afirmar que uma pessoa atuando como arquiteto de software atua em pelo menos quatro contextos diferentes:</p>
+<ol>
+  <li>Técnico: <em>como o sistema é construído?</em></li>
+  <li>Estratégico: <em>qual o impacto do sistema no negócio?</em></li>
+  <li>Pessoal: <em>como o arquiteto lida com as diferentes pessoas envolvidas no projeto?</em></li>
+  <li>Cultural: <em>como a cultura da organização impacta o desenvolvimento do sistema?</em></li>
+</ol>
+
+<p>É importante ressaltar que estamos falando do papel do arquiteto de software que pode ser desempenhado por diferentes pessoas em diferentes momentos de um projeto. Em equipes pequenas, o papel do arquiteto pode ser desempenhado por um desenvolvedor sênior ou líder técnico. Em equipes maiores, pode haver um arquiteto dedicado ou uma equipe de arquitetos. Em alguns casos, o papel do arquiteto pode ser desempenhado por um gerente de projeto ou um gerente de produto.</p>
+
+<h2 id="arquitetura-no-contexto-técnico">Arquitetura no contexto Técnico</h2>
+
+<p>É comum as pessoas associarem arquitetura de software a atividade de escolher tecnologias, frameworks e ferramentas. Embora essas atividades façam realmente parte do trabalho do arquiteto, elas são pautadas pela atuação de outros contextos. Todos os contextos se influenciam mutuamente e um arquiteto deve ser capaz de navegar por todos eles. Dessa forma, como veremos, o contexto técnico não é uma mera questão de escolhas técnicas, as vezes uma escolha técnica pode ser decidida por questões estratégicas, pessoais ou culturais.</p>
+
+<h3 id="1-arquitetura-inibe-ou-habilita-o-alcance-de-atributos-de-qualidade">1. Arquitetura inibe ou habilita o alcance de Atributos de Qualidade</h3>
+
+<p>A primeira responsabilidade de um arquiteto de software é definir os atributos de qualidade e garantir que os mesmos sejam alcançados. Um atributo de qualidade é uma característica do sistema que é importante para os stakeholders, falaremos mais sobre stakeholders dentro do contexto pessoal.</p>
+
+<p><strong>Atributo de Qualidade</strong> é uma propriedade testável e mensurável de um sistema que é usada para avaliar como o sistema satisfaz as necessidades dos stakeholders.</p>
+
+<p>Podemos definir os requisitos dos sistema como Funcionalidades, Atributos de Qualidade e Condicionantes (<em>Constraints</em>). Em muitas situações, o arquiteto não tem influência sobre as funcionalidades do sistema, mas é de sua responsabilidade garantir que os atributos de qualidade sejam alcançados e para isso deve ser capaz de tomar decisões que impactam os escolhas técnicas do sistema para que esses atributos sejam mensuráveis e testáveis.</p>
+
+<p>Alguns exemplos de atributos de qualidade são:</p>
+<ul>
+  <li><strong>Disponibilidade</strong>: O sistema está disponível para uso quando necessário?</li>
+  <li><strong>Escalabilidade</strong>: O sistema pode lidar com um aumento na carga de trabalho?</li>
+  <li><strong>Elasticidade</strong>: O sistema pode alocar mais recursos conforme a demanda aumenta?</li>
+  <li><strong>Interoperabilidade</strong>: O sistema pode interagir com outros sistemas?</li>
+  <li><strong>Modificabilidade</strong>: O sistema pode ser modificado facilmente para atender a novas necessidades?</li>
+  <li><strong>Manutenibilidade</strong>: O sistema pode ser mantido e atualizado com facilidade?</li>
+  <li><strong>Desempenho</strong>: O sistema usa eficientemente os recursos disponíveis?</li>
+  <li><strong>Segurança</strong>: O sistema é vulnerável a ataques e protege os dados contra acessos não autorizados?</li>
+  <li><strong>Testabilidade</strong>: O sistema pode ser testado facilmente para garantir que funciona conforme o esperado?</li>
+  <li><strong>Usabilidade</strong>: O sistema é fácil de usar e entender?</li>
+  <li><strong>Confiabilidade</strong>: O sistema funciona de maneira consistente e previsível?</li>
+</ul>
+
+<p>Os atributos de qualidade não são definidos pelo arquiteto, mas são requisitos dos stakeholders que o arquiteto deve garantir que sejam alcançados. Sistemas são criados para garantir os objetivos de negócios de instituições, organizações ou empresas, e esses objetivos definem os atributos de qualidade que o sistema deve assegurar. Alguns desses atributos podem ter grande influência nas decisões técnicas dos sistemas.</p>
+
+<p>Outro fator importante é que atributos de qualidades não são independentes, ou seja, um atributo pode impactar outro. Por exemplo, aumentar disponibilidade pode impactar negativamente a manutenibilidade. A interoperabilidade pode impactar a segurança. O arquiteto deve estar ciente dessas interações e ser capaz de tomar decisões que equilibram os diferentes atributos de qualidade.</p>
+
+<h3 id="2-arquitetura-e-o-ambiente-técnico">2. Arquitetura e o Ambiente Técnico</h3>
+
+<p>O ambiente técnico (<em>technical environment</em>) influência diretamente as decisões arquiteturais. Para entender melhor é preciso primeiro definir o que é o ambiente técnico. Segundo o livro <em>Software Architecture in Practice</em> (Len Bass, Paul Clements, Rick Kazman), o ambiente técnico inclui padrões da industria ou técnicas de engenharia de software dominantes quando o sistema está sendo desenvolvido.</p>
+
+<p>Hoje todo mundo fala de nuvem, microsserviços, containers, DevOps, etc. Mas há 20 anos atrás nenhum desses nomes existia e por isso um sistema desenvolvido naquela época não poderia usar essas tecnologias. Da mesma forma, daqui a 20 anos, novas tecnologias e práticas surgirão e elas terão grande influência nas decisões arquiteturais dos sistemas que serão desenvolvidos naquele momento.</p>
+
+<p>Isso significa que um arquiteto deve estar ciente das tendências tecnológicas e das práticas de engenharia de software para que saiba utiliza-las em seus projetos. Isso não significa ter um conhecimento pleno das mesmas ou muito menos se deixar vender pelo “papo de vendedor”. O arquiteto deve ter um apurado senso crítico e ser capaz de realizar provas de conceito (<em>proof of concept</em>) para validar se uma tecnologia ou prática é adequada para o sistema que está sendo desenvolvido.</p>
+
+<p>Eu sempre recomendo que o arquiteto deve acompanhar conferências, ler livros bons técnicos, relatórios de mercado (como o <a href="https://www.thoughtworks.com/pt-br/radar">Radar da Thoughtworks</a> ou <a href="https://www.infoq.com/infoq-trends-report/">InfoQ Trends Report</a>) e participar de comunidades técnicas.</p>
+
+<h3 id="3-trade-offs-e-decisões-arquiteturais">3. Trade-offs e Decisões Arquiteturais</h3>
+
+<p>Arquitetura de software é sobre tomar decisões. Essas decisões são tomadas para garantir os atributos de qualidade do sistema e para isso o arquiteto deve estar ciente das consequências dessas decisões. Essas consequências são chamadas de <em>trade-offs</em>. O <a href="https://www.sei.cmu.edu/documents/629/2000_005_001_13706.pdf"><strong>Architecture Tradeoff Analysis Method</strong> (ATAM)</a> surge como uma abordagem sistemática para avaliar essas compensações, ajudando arquitetos a tomar decisões conscientes e fundamentadas.</p>
+
+<p>Desenvolvido pela <strong>Software Engineering Institute</strong> (SEI), o ATAM baseia-se na premissa de que não existem soluções arquiteturais perfeitas, apenas soluções adequadas para contextos específicos. O método fornece um framework para:</p>
+
+<ul>
+  <li><strong>Identificar pontos de sensibilidade</strong>: Elementos arquiteturais críticos para atingir atributos de qualidade específicos</li>
+  <li><strong>Reconhecer trade-offs</strong>: Decisões que beneficiam um atributo em detrimento de outro</li>
+  <li><strong>Detectar riscos</strong>: Escolhas que podem comprometer o sucesso do sistema</li>
+</ul>
+
+<p>O ATAM envolve várias etapas estruturadas para garantir uma análise abrangente da arquitetura:</p>
+<ul>
+  <li><strong>Etapa 1</strong> - Coletar Cenários: o que o sistema DEVE fazer?</li>
+  <li><strong>Etapa 2</strong> - Coletar Requisitos/Restrições/Ambiente: quais condicões o sistema deve satisfazer?</li>
+  <li><strong>Etapa 3</strong> - Descrever Visões Arquitetônicas: criar visualizações/descrições dos sistemas. Descrever as restrições, ambientes e requisitos.</li>
+  <li><strong>Etapa 4</strong> - Análises Específicas de Atributos: avaliar como cada atributo de qualidade isoladamente é impactado ela arquitetura atual.</li>
+  <li><strong>Etapa 5</strong> - Identificar Sensibilidades: identificar a sensibilidade de cada atributo de acordo com variações na arquitetura. Quais são os pontos sensíveis?</li>
+  <li><strong>Etapa 6</strong> - Identificar Trade-off: os pontos sensíveis vão levar a identificar os trade-offs da aplicação.</li>
+</ul>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-05-atam-steps.png" alt="Etapas do ATAM" /></p>
+
+<p>No entanto, o arquiteto não precisa seguir o processo do ATAM à risca. É importante entender o conceito de trade-offs e adaptar o processo para o contexto do projeto. O mais importante é que o arquiteto seja capaz de realizar análise e fazer decisões conscientes.</p>
+
+<h2 id="arquitetura-no-contexto-estratégico">Arquitetura no contexto Estratégico</h2>
+
+<h3 id="1-documentando-e-comunicando-a-arquitetura">1. Documentando e Comunicando a Arquitetura</h3>
+
+<p>Documentar e comunicar a arquitetura é função primordial de alguém responsável pela arquitetura. É essencial que todos os <em>stakeholders</em> envolvidos no projeto compreendam não apenas a arquitetura definida, mas também as suas implicações técnicas e de negócio.</p>
+
+<p>A documentação não é um fim em si mesma, mas um meio de comunicação adaptado ao perfil de cada stakeholder. Por exemplo:</p>
+<ul>
+  <li>Desenvolvedores precisam entender a arquitetura para implementar componentes de forma alinhada com as decisões técnicas e restrições estabelecidas.</li>
+  <li>Clientes devem compreender como a arquitetura suporta o funcionamento do sistema e entrega valor ao negócio.</li>
+  <li>Equipes de suporte e operações necessitam de conhecimento arquitetural para monitorar, manter e ajustar o sistema de forma eficiente.</li>
+</ul>
+
+<p>Dessa forma, a documentação atua como um veículo de transparência, alinhamento e governança, assegurando que todas as partes envolvidas compartilhem uma visão comum e atuem de maneira coordenada.</p>
+
+<h3 id="2-analisando-ou-avaliando-a-arquitetura">2. Analisando ou Avaliando a Arquitetura</h3>
+
+<p>A avaliação da arquitetura é um processo sistemático para verificar se a arquitetura proposta atende aos requisitos dos <em>stakeholders</em>, especialmente os atributos de qualidade. Len Bass destaca a importância de métodos como o ATAM (<em>Architecture Tradeoff Analysis Method</em>) para essa finalidade. Já Fred Brooks avaliar que a integridade conceitual é uma das propriedades chaves de um sistema sólido, e isso só pode ser alcançado se existem escolhas arquiteturais claras.</p>
+
+<h2 id="arquitetura-no-contexto-pessoal">Arquitetura no contexto Pessoal</h2>
+
+<h3 id="1-quem-são-os-stakeholders">1. Quem são os <em>Stakeholders</em>?</h3>
+
+<p><em>Stakeholders</em> são todos os indivíduos, grupos ou organizações que têm interesse no sistema, sejam eles usuários finais, desenvolvedores, gerentes, equipe de operações, clientes ou patrocinadores. Eles são fontes essenciais para a definição de requisitos funcionais, atributos de qualidade e restrições do sistema. O arquiteto deve identificar, envolver e gerenciar as expectativas dos <em>stakeholders</em>, garantindo que a arquitetura atenda às suas necessidades e prioridades.</p>
+
+<h3 id="2-administrando-expectativas">2. Administrando expectativas</h3>
+
+<p>Um sistema possui inúmeros <em>stakeholders</em> e cada um dele pode influencer no design do software. Cabe a pessoa responsável pela arquitetura administrar as expectativas de cada <em>stakeholder</em> envolvido e fazer uma escolha de atributos de qualidade que maximize a satisfação das pessoas envolvidas. Sempre costumo lembrar dos antigos frameworks Java EE que priorizavam a personalização e o desempenho ao invês da experiência de usuário e foram facilmente substituído por frameworks que eram mais amigáveis e de certa forma eram menos eficientes.</p>
+
+<h3 id="3-arquitetura-e-as-hypes">3. Arquitetura e as hypes</h3>
+
+<p>O mercado de desenvolvimento de software é constantemente abalado por modas que chegam prometendo mudar a forma como desenvolvemos software. Mas para quem já é macaco velho, sabemos que a forma como se desenvolve software muda lentamente. E mesmo que mude, antigos sistemas continuam ativos e eficientes. Legado é uma das grandes forças do desenvolvimento de software.</p>
+
+<p>O arquiteto deve ser capaz de compreender as hypes e saber avaliar como uma tecnologia pdoe impactar o negócios. Ela é madura o suficiente para ser abraçada? Ela terá sobrevida no mercado?</p>
+
+<p>Para entender como os ciclos das modas funcionam, o <a href="https://www.gartner.com/en/research/methodologies/gartner-hype-cycle">Gartner</a> tem uma metodologia chamada <em>Hype Cycle</em> (ou ciclo da moda em tradução livre) que avalia e emite relatórios sobre as tecnologias. Cada ciclo de hype consiste em cinco fases principais do ciclo de vida de uma tecnologia.:</p>
+
+<ol>
+  <li><strong>Gatilho tecnológico</strong> (<em>Technology trigger</em>): Um potencial avanço tecnológico dá o pontapé inicial. Histórias iniciais de prova de conceito e interesse da mídia geram publicidade significativa. Muitas vezes, não existem produtos utilizáveis ​​e a viabilidade comercial não é comprovada.</li>
+  <li><strong>Pico de expectativas infladas</strong> (<em>Peak of inflated expectations</em>): A publicidade inicial produz uma série de histórias de sucesso — frequentemente acompanhadas por dezenas de fracassos. Algumas empresas agem; a maioria, não.</li>
+  <li><strong>Poço da desilusão</strong> (<em>Trough of disillusionment</em>): O interesse diminui à medida que experimentos e implementações falham. Os produtores da tecnologia se desfazem ou fracassam. O investimento só continua se os fornecedores sobreviventes melhorarem seus produtos para a satisfação dos primeiros usuários.</li>
+  <li><strong>Declive da iluminação</strong> (<em>Slope of enlightenment</em>): Mais exemplos dos benefícios da tecnologia começam a se cristalizar e se tornarem mais amplamente compreendidos. Produtos de segunda e terceira gerações surgem de fornecedores de tecnologia. Mais empresas financiam pilotos; empresas conservadoras permanecem cautelosas.</li>
+  <li><strong>Platô da produtividade</strong> (<em>Plateau of productivity</em>): A adoção em massa começa a decolar. Os critérios para avaliar a viabilidade do provedor estão mais claramente definidos. A ampla aplicabilidade e relevância da tecnologia no mercado estão claramente dando resultados. Se a tecnologia tiver mais do que um nicho de mercado, ela continuará a crescer.</li>
+</ol>
+
+<p>Esse ciclo pode ser descrito como um gráfico de expectativa no tempo.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-06-gartner-hype-cycle.png" alt="Gráfico de expectativa no tempo. Inicia com uma curva ascendente que tem um pico e uma queda até chegar ao inicio da curva. Depois cresce lentamente até chegar no platô da produtividade." /></p>
+
+<h2 id="arquitetura-no-contexto-cultural">Arquitetura no contexto Cultural</h2>
+
+<h3 id="1-arquitetura-e-o-ciclo-de-vida-de-um-projeto-de-software">1. Arquitetura e o Ciclo de Vida de um Projeto de Software</h3>
+
+<p>Arquitetura de software está intrisecamente ligada ao ciclo de vida de um projeto de software. Decisões arquiteturais são tomadas em diferentes momentos e o tempo de vida de um projeto pode impactar a arquitetura pois os requisitos de negócios do sistema podem mudar ao longo do tempo.</p>
+
+<p>Projetos de software podem ser gerenciados sob diferentes metodologias. Eu gosto de classificar essa metodologias através de dois grandes eixos: o eixo de <strong>Planejamento</strong> e o eixo de <strong>Agilidade</strong>.</p>
+
+<!-- https://excalidraw.com/#json=urWtlpjtSc7AUNJi4cClH,Gu77f3wAJ8gExwQwXTfzMw -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-04-metodologias-de-desenvolvimento.png" alt="Metodologias classificadas nos eixos de Planejamento e Interatividade" /></p>
+
+<p>É importante não confundir Agilidade, Metodologias Ágeis e Manifesto Ágil. Agilidade é a capacidade de se adaptar rapidamente às mudanças. Metodologias Ágeis são aquelas que foram propostas como uma resposta ao Manifesto Ágil e muitas vezes evoluiram, ou são aplicadas, sem nenhum grau de agilidade. Já o Manifesto Ágil é um conjunto de valores e princípios que foram propostas por um grupo de desenvolvedores de software em 2001 como uma respostas às metodologias tradicionais de desenvolvimento de software.</p>
+
+<p>Todo desenvolvedor deve conhecer ao menos a metodologia que está sendo aplicada no seu projeto e compreender o ciclo de vida do projeto. É importante lembrar que um software só é útil se ele funciona e entrega valor para o negócio, ou seja, somente software em produção é software que entrega valor. E o arquiteto deve também encontrar seu lugar dentro dos processos para que o desenvolvimento não seja interrompido por decisões arquiteturais que não foram tomadas a tempo.</p>
+
+<p>Um dos Anti-Padrões em arquitetura é o <a href="https://agilemodeling.com/essays/bmuf.htm"><strong>Big Design Up Front (BDUF)</strong></a>, que é quando o arquiteto tenta definir toda a arquitetura do sistema antes do desenvolvimento começar. Isso pode levar a atrasos no início do desenvolvimento e pode resultar em uma arquitetura que não atende às necessidades reais do sistema, pois os requisitos podem mudar durante o desenvolvimento. Simon Brown sugere fazer o <a href="https://www.infoq.com/news/2014/05/minimal-architecture-design/">apenas design suficiente para começar o desenvolvimento</a>.</p>
+
+<h3 id="2-arquitetura-e-os-objetivos-de-negócio">2. Arquitetura e os Objetivos de Negócio</h3>
+
+<p>Arquitetura também impacta e é influenciada pelos objetivos de negócios de uma organização. Cada software ou projeto pode ser pensado como um <strong>caso de negócio</strong>, que é, brevemente, uma justificativa para um investimento organizacional. Isso significa que a arquitetura também tem Qualidades de negócios como:</p>
+
+<ul>
+  <li><strong>Time to Market</strong>: O tempo que leva entre pensar uma ideia e testar ela no mercado é essencial para a validação de uma ideia e a arquitetura pode minimizar esse tempo. A escolha dos processos de desenvolvimento, de requisitos de qualidades ou até mesmo a escolha de ferramenas pode influenciar no tempo de entrega do sistema.</li>
+  <li><strong>Custo/Benefício</strong>: A arquitetura deve equilibrar o custo de desenvolvimento e manutenção com o valor gerado para o negócio. Decisões arquiteturais podem otimizar recursos, reduzir desperdícios e maximizar o retorno sobre o investimento</li>
+  <li><strong>Longevidade</strong>: A capacidade do sistema de permanecer relevante e sustentável ao longo do tempo. Uma arquitetura bem fundamentada permite evolução e adaptação a mudanças tecnológicas e de negócio, estendendo o ciclo de vida do software.</li>
+  <li><strong>Público-Alvo</strong>: A arquitetura deve considerar as características e necessidades dos usuários finais, influenciando atributos como usabilidade, desempenho e acessibilidade para garantir a adoção e satisfação do público.</li>
+  <li><strong>Cronograma</strong>: Decisões arquiteturais impactam diretamente a viabilidade e o cumprimento dos prazos do projeto. Uma arquitetura muito complexa pode atrasar o desenvolvimento, enquanto uma arquitetura bem planejada facilita a parallelização de tarefas e a entrega incremental.</li>
+  <li><strong>Interoperabilidade</strong>: A capacidade do sistema de se integrar com outros sistemas existentes ou futuros na organização. Isso afeta diretamente a eficiência operacional e a capacidade de expandir funcionalidades sem rupturas.</li>
+</ul>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>A Arquitetura de Software revela-se, portanto, como uma disciplina multifacetada e estratégica, cujo papel transcende em muito a simples escolha de tecnologias. Como vimos, o arquiteto atua na interseção de quatro contextos fundamentais — técnico, estratégico, pessoal e cultural — e deve equilibrar constantemente as demandas de cada um deles.</p>
+
+<p>No âmbito <strong>técnico</strong>, a arquitetura é responsável por habilitar os atributos de qualidade do sistema, tomando decisões conscientes em um ambiente tecnológico em constante evolução e gerenciando os inevitáveis <em>trade-offs</em> entre diferentes requisitos não funcionais.</p>
+
+<p>No contexto <strong>estratégico</strong>, a arquitetura serve como ponte entre os objetivos de negócio e a realização técnica, exigindo uma comunicação clara e transparente com todos os <em>stakeholders</em> e uma avaliação contínua de suas decisões.</p>
+
+<p>No plano <strong>pessoal</strong>, o arquiteto atua como um facilitador e mediador, administrando expectativas, identificando necessidades e garantindo que a visão do sistema seja compartilhada e compreendida por todos os envolvidos.</p>
+
+<p>E, por fim, no contexto <strong>cultural</strong>, a arquitetura é moldada e, ao mesmo tempo, molda a organização — adaptando-se a metodologias, ciclos de vida e, principalmente, aos objetivos de negócio de longo prazo.</p>
+
+<p>Mais do que um planejador técnico, o arquiteto é um facilitador de valor, um estrategista e um agente de mudança. Sua atuação consciente e contextualizada é essencial para construir sistemas não apenas funcionais, mas também resilientes, adaptáveis e alinhados com o propósito do negócio que sustentam. A arquitetura, quando bem compreendida e praticada, deixa de ser um fim em si mesma e se torna um meio poderoso para a entrega de software com impacto real e duradouro.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o terceiro post da série **Conversas sobre Arquitetura**. A arquitetura de software vai muito além da tecnologia. Descubra como ela conecta aspectos técnicos, estratégicos, humanos e culturais para criar sistemas que realmente entregam valor de negócio, equilibrando decisões que vão desde a garantia de atributos de qualidade até a administração de expectativas de stakeholders em um ambiente em constante mudança.]]></summary></entry><entry><title type="html">Uma conversa sobre Padrões de Projeto</title><link href="https://blog.vepo.dev/posts/uma-conversa-sobre-padroes" rel="alternate" type="text/html" title="Uma conversa sobre Padrões de Projeto" /><published>2025-09-22T00:00:00+00:00</published><updated>2025-09-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/08-28-00-uma-conversa-sobre-padroes</id><content type="html" xml:base="https://blog.vepo.dev/posts/uma-conversa-sobre-padroes"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/6snGJFaj0ig" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Quando tentamos definir arquitetura de software não podemos fugir de discutir o conceito de padrões de projeto. No fundo, o papel de um arquiteto é encontrar dentro de um conjunto de padrões, a solução que melhor se adequa aos requisitos de negócio que o sistema que está sendo arquitetado precisa atender.</p>
+
+<p>Padrões de Projetos não surgiram com o livro de 1995 de Erich Gamma, Richard Helm, Ralph Johnson e John Vlissides, mais conhecidos como a Gang of Four (GoF). O conceito de padrões de projeto foi inicialmente discutido por Christopher Alexander no livro <strong>A Pattern Language: Towns, Buildings, Construction</strong> em 1977. Alexander foi um arquiteto e urbanista que propôs que existem soluções recorrentes para problemas recorrentes na arquitetura e no design urbano. Ele sugeriu que essas soluções poderiam ser documentadas como “padrões” que poderiam ser reutilizados em diferentes contextos.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-02-padroes.png" alt="Christopher Alexander" /></p>
+
+<p>Isso é dito no proprio livro <strong>Design Patterns: Elements of Reusable Object-Oriented Software</strong>. Abaixo, reproduzo um trecho do prefácio do livro:</p>
+
+<blockquote>
+  <p>Christopher Alexander afirma: “<em>Cada padrão descreve um problema que ocorre repetidamente em nosso ambiente e, em seguida, descreve o cerne da solução para esse problema, de tal forma que você pode usar essa solução um milhão de vezes, sem nunca fazer da mesma maneira duas vezes</em>”. Embora Alexander estivesse falando sobre padrões em edifícios e cidades, o que ele diz é verdade sobre padrões de projeto orientados a objetos. Nossas soluções são expressas em termos de objetos e interfaces em vez de paredes e portas, mas no cerne de ambos os tipos de padrões está uma solução para um problema em um contexto.</p>
+
+  <p>Em geral, um padrão possui quatro elementos essenciais:</p>
+  <ol>
+    <li>O <strong>nome do padrão</strong> é um identificador que podemos usar para descrever um problema de projeto, suas soluções e consequências em uma ou duas palavras. Nomear um padrão aumenta imediatamente nosso vocabulário de projeto. Isso nos permite projetar em um nível mais alto de abstração. Ter um vocabulário para padrões nos permite falar sobre eles com nossos colegas, em nossa documentação e até mesmo conosco mesmos. Isso torna mais fácil pensar sobre projetos e comunicá-los, juntamente com suas compensações, a outros. Encontrar bons nomes tem sido uma das partes mais difíceis do desenvolvimento do nosso catálogo.</li>
+    <li>O <strong>problema</strong> descreve quando aplicar o padrão. Ele explica o problema e seu contexto. Pode descrever problemas específicos de design, como representar algoritmos como objetos. Pode descrever estruturas de classes ou objetos que são sintomáticas de um design inflexível. Às vezes, o problema inclui uma lista de condições que devem ser atendidas antes que faça sentido aplicar o padrão.</li>
+    <li>A <strong>solução</strong> descreve os elementos que compõem o design, seus relacionamentos, responsabilidades e colaborações. A solução não descreve um design ou implementação concreto específico, porque um padrão é como um modelo que pode ser aplicado em muitas situações diferentes. Em vez disso, o padrão fornece uma descrição abstrata de um problema de design e como um arranjo geral de elementos (classes e objetos, no nosso caso) o resolve.</li>
+    <li>As <strong>consequências</strong> são os resultados e as compensações da aplicação do padrão. Embora as consequências muitas vezes não sejam mencionadas quando descrevemos decisões de design, elas são cruciais para avaliar alternativas de design e para entender os custos e benefícios da aplicação do padrão. As consequências para o software frequentemente envolvem compensações de espaço e tempo. Elas também podem abordar questões de linguagem e implementação. Como a reutilização costuma ser um fator no design orientado a objetos, as consequências de um padrão incluem seu impacto na flexibilidade, extensibilidade ou portabilidade de um sistema. Listar essas consequências explicitamente ajuda a entendê-las e avaliá-las.</li>
+  </ol>
+</blockquote>
+
+<p>Observe que o livro identifica claramente qual é a vantagem de se conhecer padrões: aumentar a nossa capacidade de se descrever software aumentando o nosso nível de abstração. Mas um grande problema é achar que os padrões se reduzem aos padrões de projetos descritos no GoF, eles vão além. Os padrões do GoF se reduzem aos padrões Criacionais, Estruturais e Comportamentais pois foi uma das primeiras discussões sobre o tema, mas logo após o livro a discussão sobre padrões se expandiu criando uma nova série de linguagens de padrões. Agora vamos falar um pouco de Linguagem de Padrões e como surge os padrões.</p>
+
+<p>Ao contrário do que o especialista de internet imagina, padrões não são criados, eles são identificados e apresentados a comunidade. Qualquer pessoa pode fazer isso, só precisa estruturar seu padrão em um formato especifico, ou um template como o GoF propõe e escrever sobre ele. Existem conferências de padrões como a Pattern Languages of Programs (PLoP), onde eu participei em 2021 apresentando um padrão chamado <a href="https://dl.acm.org/doi/10.5555/3712039.3712049">Lazy Clone</a> com pesquisadores da área. Um padrão ele é identificado em código já existente, registrado em um template e discutido no template. Ele pode ser um bom padrão ou um padrão problemático, que chamamos de Anti-Padrão.</p>
+
+<p>Padrões também podem ser organizados em Linguagens de Padrões, o proprio GoF propõe uma linguagem de padrão ao catalogar os padrões em 3 tipos e propor a seção “Padrões Relacionados” no template. Um linguagem de padrões é uma coleção estruturada e relacionada de padrões. Linguagens de padrões servem para organizar os padrões e relacionar eles por objetivos ou por soluções alternativas, dessa forma uma linguagem de padrões bem construída torna fácil você indentificar padrões e associar padrões alternativos.</p>
+
+<p>Vamos olhar para a <a href="https://microservices.io/patterns/index.html">linugagem de padrões de microsserviços</a>, na primeira visualização conseguimos identificar que existem padrões de infraestrutura, de descoberta de serviços, observabilidade e etc… E que entre os padrões de descoberta posso escolher entre Registro de Serviço, Descoberta Server-side ou Client-side, etc… Isso tudo está obvio na figura. Eu como arquiteto não preciso conhecer todos os padrões a fundo, mas quando eu for projetar uma funcionalidade que envolva descoberta de serviços, possa usar um ou mais padrões para compor minha solução.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-03-microservices-pattern-language.jpg" alt="Linguagem de Padrões de microsserviços" /></p>
+
+<p>Outras linguagens de padrões que devem ser conhecidas são o <a href="https://martinfowler.com/eaaCatalog/">Catalogo de Padrões de Enterprise Application Architecture</a>, o <a href="https://github.com/spgroup/ORM-Smells-Catalog">Catálogo de Code Smells ORM</a>, <a href="https://blog.vepo.dev/posts/como-avaliar-uma-api">padrões para construção de APIs REST</a> e os <a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/">Enterprise Integration Patterns</a>.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><category term="Padrões de Projetos" /><summary type="html"><![CDATA[Esse é o segundo post da série **Conversas sobre Arquitetura**. Nele vamos discutir o que são Padrões de Projetos e como eles vão muito além do livro inicial do Gang of Four. Descubra como os padrões aumentam nosso vocabulário técnico, permitem comunicação mais eficiente entre desenvolvedores e formam linguagens que nos ajudam a compor soluções arquiteturais mais robustas e adequadas aos problemas que precisamos resolver.]]></summary></entry><entry><title type="html">O que é Arquitetura de Software</title><link href="https://blog.vepo.dev/posts/o-que-e-arquitetura-de-software" rel="alternate" type="text/html" title="O que é Arquitetura de Software" /><published>2025-09-19T00:00:00+00:00</published><updated>2025-09-19T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-18-00-o-que-e-arquitetura-de-software</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-que-e-arquitetura-de-software"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/OviOkjmOFEA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Para entender melhor o que é arquitetura de software, fiz um exercício de buscar definições nas redes sociais. Criei uma pesquisa e coletei respostas no Blue Sky, Mastodon e LinkedIn. Apesar de parecer amador, essa técnica é conhecida como <a href="https://dl.acm.org/doi/10.1109/ICSE-Companion52605.2021.00139">“Teoria Embasada” (Grounded Theory)</a>, onde você coleta dados e a partir deles constrói uma teoria. Mas eu não quero fazer um artigo científico sobre como os desenvolvedores brasileiros entendem arquitetura de software, quero apenas entender o que eles pensam sobre o assunto.</p>
+
+<p>Entre as respostas, encontrei definições interessantes, como:</p>
+
+<ol>
+  <li>“<em>É o planejamento e a organização em alto nível dos componentes de um sistema computacional, como estes componentes trocam informações entre si, como as informações são armazenadas e coletadas, quais os procedimentos de segurança envolvidos nestes processos, entre outros aspectos, utilizando boas  práticas e padrões de design.</em>”</li>
+  <li>“<em>Penso como sendo o esqueleto de um sistema, a forma como os principais componentes são organizados e conectados para que funcionem de forma coerente. Vai além de diagramas, envolve decisões sobre tecnologias, padrões e compromissos para orientar o desenvolvimento e a evolução do sistema.</em>”</li>
+  <li>“<em>Conhecimento da solução como um todo (integrar hardware, software de maneira eficiente).</em>”</li>
+  <li>“<em>Arquitetura é um olhar ‘de longe’ analisando como cada componente do sistema (ou sistemas) vai ser integrado, visando performance e facilidade de manutenção.</em>”</li>
+  <li>“<em>Arte de planejar um software bem estruturado.</em>”</li>
+  <li>“<em>Seria o ‘design’ de arquitetura que o projeto segue sendo MVC, DDD, TDD, BDD ou algo similar.</em>”</li>
+</ol>
+
+<p>Sendo sincero, essa pergunta não tem uma resposta correta, pois cada um vai entender arquitetura dentro do seu contexto e experiência. Mas, existem discussões que estão sendo realizadas há décadas e não podemos fugir delas. Len Bass, Paul Clements e Rick Kazman, autores do livro “Software Architecture in Practice”, definem arquitetura de software como: “<em>A arquitetura de um sistema de software é um conjunto de estruturas necessárias para raciocinar sobre o sistema, que compreende elementos de software, relações entre eles e propriedades desses elementos e relações.</em>”</p>
+
+<p>É interessante notar que essa definição não foca no software em execução, mas na compreensão e no entendimento dos sistemas. Arquiteturas são feitas para pessoas e não para as máquinas. Mas para entender melhor essa definição, vamos discutir ponto a ponto delea.</p>
+
+<h2 id="arquitetura-é-um-conjunto-de-estruturas-de-software">Arquitetura é um conjunto de Estruturas de Software</h2>
+
+<p>Um software não é apenas código. Existe racionalização dentro dele, existem decisões tomadas e através dessas decisões podemos compreender certas estruturas de software. Podemos começar falando e módulos, toda arquitetura possui intrisecamente o conceito de módulos.</p>
+
+<h3 id="módulos">Módulos</h3>
+
+<p>Um módulo é uma porção de código que possuim uma ou mais responsabilidades. Em muitos casos essas responsabilidades podem não ser bem definidas, mas elas existem. Mas um módulo sempre possui uma separação lógica, e as vezes físicas, com os outros módulos.</p>
+
+<p>Vamos pensar em um sistema que foi desenvolvido sem muito planejamento. Ele é apenas uma API HTTP, que se comunica com uma aplicação <em>mobile</em> e usa um banco de dados. Apesar do sistema ser simples e não existir muito esforço para se definir a arquitetura, ele possui módulos bem definidos e que podem ser facilmente identificados: a API HTTP, a aplicação <em>mobile</em> e o banco de dados. Pode parecer óbvio e é, ao se começar a racionalizar sobre a arquitetura, esse serão os primeiros módulos que serão identificados.</p>
+
+<p>Mas essa não é a única forma de se identificar módulos. Podemos pegar uma lupa e analisar o código da API HTTP. Ao se identificar os endpoints, as classes, os pacotes e as bibliotecas, podemos identificar outros módulos. Cada módulo desse possui uma ou mais responsabilidades que trabalham em conjunto para compor a API HTTP.</p>
+
+<p>Aqui surge uma pergunta? Essa API HTTP pode evoluir? A resposta é sim. As estruturas de software são dinâmicas e em algum momento da história desse software, os desenvolvedores podem decidir decompor as responsabilidades desse módulo em outros módulos.</p>
+
+<h3 id="componentes-e-conectores">Componentes e Conectores</h3>
+
+<p>Ao olhar para a arquitetura, vemos que os módulos interagem entre si. A aplicação <em>mobile</em> envia requisições HTTP para a API, que por sua vez consulta o banco de dados. Podemos mapaer essa interações como componentes e conectores, que também são partes importantes de uma arquitetura de software.</p>
+
+<p>Roy Fielding na sua tese de doutorado que definiu o estilo arquitetural REST, define componentes como “<em>uma unidade abstrata de instruções de software e estado interno que fornece uma transformação de dados por meio de sua interface</em>”. Essa definição pode ser complicada, e por isso eu redefiniria como “_uma unidade de software vista como um peça que pode interagir com outras peças através de uma interface. Ela recebe e envia dados transformando a informação”.</p>
+
+<p>Mas caso você não tenha reparado, há uma definição faltante. O que é uma interface e como se dá a comunicação entre os componentes? É aí que entram os conectores. Segundo Fielding, “<em>um conector é um mecanismo abstrato que medeia a comunicação, a coordenação ou a cooperação entre componentes</em>”. Em outras palavras, um conector é a forma como definimos a comunicação entre os componentes. Ela não será uma porção de código, mas uma abstração. No nosso exemplo, o conector é a API HTTP. O componente não é a API HTTP, aliás, não seria nem correto chamarmos genericamente de API HTTP pois é muito importante dar nomes corretos aos componentes. Nesse caso podemos chamar o componente de “Backend”, depois ao se identificar os submodulos, estes podem ser separados em serviços menores e chamados conforme a sua responsabilidade de domínio.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-01-arquitetura-basica.png" alt="Arquitetura básica do sistema" /></p>
+
+<p>Essa arquitetura pode também ser descrita usando UML, conforme o código plantuml abaixo:</p>
+
+<pre><code class="language-plantuml">@startuml
+component "Mobile APP"
+component Backend
+database PostgreSQL
+
+"Mobile APP" --(0-&gt; Backend: HTTP
+Backend --(0-&gt; PostgreSQL
+
+@enduml
+</code></pre>
+
+<h3 id="estruturas-organizacionais">Estruturas Organizacionais</h3>
+
+<p>A terceira forma de se compreender as estruturas de software é através das estruturas organizacionais da empresa. Software são feito por times de desenvolvimento e são mantidos por times de operaçoes. Esses times podem ser o mesmo, cabendo a uma só equipe desenvolver e cuidar da execução do software, ou podem ser times diferentes.</p>
+
+<p>Todo o processo de desenvolvimento, instalação, observação e manutenção do software são estruturas que podem ser detalhadas arquituralmente.</p>
+
+<h2 id="arquitetura-é-uma-abstração">Arquitetura é uma abstração</h2>
+
+<p>Podemos ver também a arquitetura como uma abstração. Toda arquitetura de software é uma representação de um sistema existente através de conceitos abstratos que servem para facilitar a compreensão do sistema e de suas interações.</p>
+
+<p>Vamos voltar ao sistema já discutido. Ao olharmos para o componente Backend, já o definimos como uma API HTTP. Isso pode ser compreendido que ele é um servidor que responde requisições HTTP. Através dessa definição, somos levados a pensar em um modelo de comunicação que é chamado cliente-servidor. Não existe um modelo concreto de cliente-servidor, mas isso é uma abstração que ajuda a descrever a forma como esse sistema se comunica com os seus clientes.</p>
+
+<p>Ao usar de forma genérica o termo API HTTP, também podemos supor que este não pode ser classificado como uma API REST. O que nos leva a pergunta: “o que é uma API REST?”. Tudo isso são abstrações, pois se pegarmos dois sistemas que são servidores RESTful, eles podem ser completamente diferentes entre si, mas podemos afirmar que ambos tem uma interface HTTP que segue complemetarmente o estilo arquitetural REST.</p>
+
+<p>Dessa forma, podemos ver que a arquitetura de software é uma elaboração abstrata que nos ajuda a descrever sistema. Mas não podemos parar por aí. Uma arquitetura pode ser descrita de forma diferente a depender de para quem ela está sendo apresentada e de qual o nível de detalhe que se deseja apresentar.</p>
+
+<h2 id="todo-software-possui-uma-arquitetura">Todo software possui uma arquitetura</h2>
+
+<p>Outra implicação importante da definição de Arquitetura é que todo software possui uma arquitetura, seja ela bem definida ou não. Todo sistema possui módulos, componentes, conectores e estruturas organizacionais que os sustentam. Mesmo que ninguém nunca tenha parado para racionalizar sobre esses aspectos.</p>
+
+<p>Esses aspectos existem e podem ser identificados com clareza por arquitetos experientes. Se pegarmos um mesmo sistema e apresentarmos a dois arquitetos diferentes, é bem provável que ambos cheguem a conclusões parecidas sobre qual arquitetura o sistema possui. Eles podem discordar em pequenos detalhes, mas isso não seria um problema.</p>
+
+<h2 id="arquitetura-inclui-comportamento">Arquitetura inclui comportamento</h2>
+
+<p>Como já foi discutido anteriormente, arquitetura é uma forma de se informar sobre o software que temos, ou desejamos ter, em execução e o comportamento desse software não pode ser ignorado. Em muitos casos criar um diagrama só com componentes e conectores pode ser suficiente, mas há situações em que o comportamento precisa ser melhor detalhado.</p>
+
+<p>Vamos imaginar que temos dois sistemas que possuem um algoritmo para garantir a consistência dos dados em longas transações. Como eu posso representar esse algoritmo com linhas ligando sistemas? É impossível. Para isso é preciso explorar as notações existentes.</p>
+
+<p>Nessa introdução posso citar duas notações que podem ser úteis. <strong>BPMN</strong> e <strong>UML</strong>.</p>
+
+<p><strong>BPMN</strong> é o acronimo de <em>Business Process Notation Model</em>. É uma notação usada, como o nome já diz, para descrever processos de negócios e pode ser usada para se descrever longas transações ou mesmo longos processos. Por exemplo, você pode modelar uma Saga <a href="https://microservices.io/patterns/data/saga.html">[1]</a> <a href="https://dl.acm.org/doi/10.1145/38713.38742">[2]</a> como usando <strong>BPMN</strong>.</p>
+
+<p>Outra notação importante é o diagrama de sequência do <strong>UML</strong>. <strong>UML</strong>, <em>Unified Modeling Language</em>, é uma linguagem de modelagem de sistemas de software que possui um grande conjunto de diagramas. Apesar do UML não ser tão popular quanto antigamente, ele ainda segue sendo bastante útil. Construir e apresentar um diagrama de sequência pode ser o diferencial em uma apresentação técnica ou mesmo na comunicação de um processo em desenvolvimento.</p>
+
+<h2 id="nem-toda-arquitetura-é-uma-boa-arquitetura">Nem toda Arquitetura é uma boa arquitetura</h2>
+
+<p>Por fim, precisamos dizer que nem toda arquitetura é boa. Arquitetura de Software também serve para avaliar se um sistema atinge os requisitos de negócio para que ele foi desenvolvido.</p>
+
+<p>A escolha de uma arquitetura é um processo importante no desenvolvimento de sistemas críticos. Você não pode subir um sistema qualquer se ele for essêncial ou se a demanada de uso for elevada. Sistemas essênciais ou sistemas críticos devem ter alta disponibilidade, o que implica em certos requisitos de qualidades que devem ser endereçados na arquitura. Já sistema de alta demanda também precisam ter alta disponilidade, mas precisam escalar que também é um requisito de qualidade.</p>
+
+<p>Existem várias metodologias para definição de uma arquitetura. Podemos falar da <a href="https://www.sei.cmu.edu/documents/1186/1998_005_001_16646.pdf">Metodologia de Analise de Trade Off</a>, de <a href="https://evolutionaryarchitecture.com/precis.html">Arquitetura Evolucionaria</a> e muitos outros métodos. Mas o que precisamos ter em mente é que alguns requisitos de qualidades são incompatíveis.</p>
+
+<p>Vamos analisar por exemplo o Teorema CAP. CAP é um acrônimo que significa Consistência, Disponibilidade e Particionamento. Segundo o Teorema, para se ter alta disponibilidade é preciso abdicar da consistência e parater disponibilidade e consistência é preciso abdicar do particionamento. Já há bastante <a href="https://arxiv.org/abs/1509.05393">crítica a esse teorema</a>, que não vamos tratar agora, mas ele revela como se dá a análise de requisitos não funcionais. Se você precisar de uma aplicação com alta disponibilidade e consistência forte, você vai ter que abdicar de particionamento, o que significa que sua aplicação poderá ter dificuldades no escalonamento.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Podemos concluir que Arquitetura de Software não é uma disciplina exata, nem uma formula pronta para construção de sistemas. Arquitetura é um papel que pode ser desempenhada por arquitetos de softwares e desenvolvedores que tem como objetivo compreender, comunicar e racionalizar um sistema de software.</p>
+
+<p>Pensar a arquitetura de um sistema é fundamental para projetos críticos e para a evolução de sistemas. Um sistema pode até evoluir sem ninguém olhar para a sua arquitetura, mas ele com certeza não terá sucesso de satisfazer os requisitos de negócios.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o primeiro post da série **Conversas sobre Arquitetura**. Nele vamos discutir o que é Arquitetura de Software usando a definição do livro "Software Architecture in Practice", explorando como a arquitetura vai além do código para se tornar uma ferramenta de comunicação e racionalização sobre sistemas. Descubra como módulos, componentes, conectores e estruturas organizacionais se combinam para formar o esqueleto de qualquer sistema de software, e por que toda aplicação possui uma arquitetura - seja ela bem planejada ou não.]]></summary></entry><entry><title type="html">Sotaques e fluência em linguagens de programação</title><link href="https://blog.vepo.dev/posts/sotaques-e-fluencia-em-linguagens-de-programacao" rel="alternate" type="text/html" title="Sotaques e fluência em linguagens de programação" /><published>2025-08-28T00:00:00+00:00</published><updated>2025-08-28T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-49-00-java-language</id><content type="html" xml:base="https://blog.vepo.dev/posts/sotaques-e-fluencia-em-linguagens-de-programacao"><![CDATA[<p>Linguagens de programação são uma forma de expressão, da mesma forma que as linguas falantes. Elas possuem uma comunidade e, em conseguência, uma cultura associada. Dessa forma, podemos concluir que cada linguagem possui sua própria “personalidade” - um conjunto de convenções, padrões e estilos que constituem sua expressão idiomática. Eu sempre digo que todo código é idiomático, só precisamos descobri qual idioma ele está expressando. Escrever código idiomático significa não apenas fazer funcionar, mas fazer da maneira que a comunidade daquela linguagem espera e valoriza.</p>
+
+<h2 id="o-que-são-padrões-idiomáticos">O que são Padrões Idiomáticos?</h2>
+
+<p>Padrões idiomáticos são convenções estabelecidas pela comunidade que tornam o código mais legível, maintainable e alinhado com a filosofia da linguagem. É a diferença entre simplesmente falar uma língua e falá-la com fluência nativa.</p>
+
+<h2 id="java-a-linguagem-corporativa-por-excelência">Java: A Linguagem Corporativa por Excelência</h2>
+
+<p>Java surgiu em 1995 com o mantra “Write Once, Run Anywhere” e rapidamente se estabeleceu como a linguagem preferida para aplicações empresariais. Sua filosofia valoriza:</p>
+
+<ul>
+  <li><strong>Clareza acima de brevidade</strong></li>
+  <li><strong>Manutenibilidade a longo prazo</strong></li>
+  <li><strong>Robustez e segurança</strong></li>
+  <li><strong>Compatibilidade reversa</strong></li>
+</ul>
+
+<h2 id="como-escrever-código-java-idiomático">Como Escrever Código Java Idiomático</h2>
+
+<h3 id="1-convenções-de-nomenclatura">1. Convenções de Nomenclatura</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Classes e interfaces: PascalCase</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomerService</span> <span class="kd">implements</span> <span class="nc">Validatable</span> <span class="o">{</span>
+    
+    <span class="c1">// Constantes: UPPER_SNAKE_CASE</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">MAX_RETRY_ATTEMPTS</span> <span class="o">=</span> <span class="mi">3</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">DEFAULT_TIMEZONE</span> <span class="o">=</span> <span class="s">"UTC"</span><span class="o">;</span>
+    
+    <span class="c1">// Variáveis e métodos: camelCase</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">customerName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="n">pendingOrders</span><span class="o">;</span>
+    
+    <span class="c1">// Métodos devem ser verbos</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">processOrder</span><span class="o">(</span><span class="nc">Order</span> <span class="n">order</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">validateOrder</span><span class="o">(</span><span class="n">order</span><span class="o">);</span>
+        <span class="n">calculateTotal</span><span class="o">(</span><span class="n">order</span><span class="o">);</span>
+        <span class="n">persistOrder</span><span class="o">(</span><span class="n">order</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Métodos booleanos geralmente começam com "is", "has", "can"</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isValidCustomer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">customerName</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">customerName</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">isEmpty</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="2-estrutura-de-classes-e-pacotes">2. Estrutura de Classes e Pacotes</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Ordem recomendada dentro de uma classe:</span>
+<span class="c1">// 1. Variáveis estáticas</span>
+<span class="c1">// 2. Variáveis de instância</span>
+<span class="c1">// 3. Construtores</span>
+<span class="c1">// 4. Métodos</span>
+
+<span class="kn">package</span> <span class="nn">com.empresa.projeto.modulo.service</span><span class="o">;</span> <span class="c1">// Pacotes em lowercase</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.Entity</span><span class="o">;</span>
+
+<span class="c1">// Uma classe por arquivo, nome do arquivo = nome da classe</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderProcessor</span> <span class="o">{</span>
+    
+    <span class="c1">// Campos primeiro</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">OrderRepository</span> <span class="n">orderRepository</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">NotificationService</span> <span class="n">notificationService</span><span class="o">;</span>
+    
+    <span class="c1">// Injeção de dependências via construtor</span>
+    <span class="kd">public</span> <span class="nf">OrderProcessor</span><span class="o">(</span><span class="nc">OrderRepository</span> <span class="n">orderRepository</span><span class="o">,</span> 
+                         <span class="nc">NotificationService</span> <span class="n">notificationService</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">orderRepository</span> <span class="o">=</span> <span class="n">orderRepository</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">notificationService</span> <span class="o">=</span> <span class="n">notificationService</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Métodos públicos primeiro, depois privados</span>
+    <span class="kd">public</span> <span class="nc">ProcessingResult</span> <span class="nf">processBatch</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="n">orders</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">validateOrders</span><span class="o">(</span><span class="n">orders</span><span class="o">);</span>
+        <span class="k">return</span> <span class="nf">internalProcess</span><span class="o">(</span><span class="n">orders</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="kd">private</span> <span class="nc">ProcessingResult</span> <span class="nf">internalProcess</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="n">orders</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Implementação</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="3-tratamento-de-exceções">3. Tratamento de Exceções</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PaymentService</span> <span class="o">{</span>
+    
+    <span class="c1">// Use exceções específicas</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">processPayment</span><span class="o">(</span><span class="nc">Payment</span> <span class="n">payment</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">PaymentProcessingException</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">validatePayment</span><span class="o">(</span><span class="n">payment</span><span class="o">);</span>
+            <span class="n">gateway</span><span class="o">.</span><span class="na">charge</span><span class="o">(</span><span class="n">payment</span><span class="o">);</span>
+            <span class="n">logSuccess</span><span class="o">(</span><span class="n">payment</span><span class="o">);</span>
+            
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InvalidPaymentException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// Exceções de negócio - geralmente unchecked</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">PaymentProcessingException</span><span class="o">(</span><span class="s">"Pagamento inválido"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+            
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">GatewayTimeoutException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// Exceções técnicas - possivelmente checked</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">PaymentProcessingException</span><span class="o">(</span><span class="s">"Timeout no gateway"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+            
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="c1">// Sempre libere recursos no finally</span>
+            <span class="n">cleanupResources</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Prefira exceções unchecked para erros de programação</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">validatePayment</span><span class="o">(</span><span class="nc">Payment</span> <span class="n">payment</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">payment</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Payment cannot be null"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="4-uso-de-collections-e-streams-api">4. Uso de Collections e Streams API</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrderAnalyzer</span> <span class="o">{</span>
+    
+    <span class="c1">// Prefira interfaces sobre implementações</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="nf">filterActiveOrders</span><span class="o">(</span><span class="nc">Collection</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="n">orders</span><span class="o">)</span> <span class="o">{</span>
+        
+        <span class="c1">// Java moderno: use Streams API para processamento</span>
+        <span class="k">return</span> <span class="n">orders</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="nl">Order:</span><span class="o">:</span><span class="n">isActive</span><span class="o">)</span>          <span class="c1">// Method reference</span>
+            <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">order</span> <span class="o">-&gt;</span> <span class="o">!</span><span class="n">order</span><span class="o">.</span><span class="na">isExpired</span><span class="o">())</span> <span class="c1">// Lambda expression</span>
+            <span class="o">.</span><span class="na">sorted</span><span class="o">(</span><span class="nc">Comparator</span><span class="o">.</span><span class="na">comparing</span><span class="o">(</span><span class="nl">Order:</span><span class="o">:</span><span class="n">getCreatedDate</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span>    <span class="c1">// Coletor idiomático</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Use factories para criar collections</span>
+    <span class="kd">public</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;&gt;</span> <span class="nf">groupOrdersByCategory</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;</span> <span class="n">orders</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Order</span><span class="o">&gt;&gt;</span> <span class="n">grouped</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+        
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Order</span> <span class="n">order</span> <span class="o">:</span> <span class="n">orders</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// ComputeIfAbsent é idiomático para agrupamento</span>
+            <span class="n">grouped</span><span class="o">.</span><span class="na">computeIfAbsent</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="na">getCategory</span><span class="o">(),</span> <span class="n">k</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;())</span>
+                  <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">order</span><span class="o">);</span>
+        <span class="o">}</span>
+        
+        <span class="k">return</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">unmodifiableMap</span><span class="o">(</span><span class="n">grouped</span><span class="o">);</span> <span class="c1">// Retorne views imutáveis</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="5-gerenciamento-de-recursos-com-try-with-resources">5. Gerenciamento de Recursos com try-with-resources</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileProcessor</span> <span class="o">{</span>
+    
+    <span class="c1">// Sempre use try-with-resources para recursos que precisam ser fechados</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">readFile</span><span class="o">(</span><span class="nc">String</span> <span class="n">filename</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">(</span><span class="nc">BufferedReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BufferedReader</span><span class="o">(</span><span class="k">new</span> <span class="nc">FileReader</span><span class="o">(</span><span class="n">filename</span><span class="o">)))</span> <span class="o">{</span>
+            <span class="nc">StringBuilder</span> <span class="n">content</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuilder</span><span class="o">();</span>
+            <span class="nc">String</span> <span class="n">line</span><span class="o">;</span>
+            
+            <span class="k">while</span> <span class="o">((</span><span class="n">line</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="na">readLine</span><span class="o">())</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">content</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">line</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+            <span class="o">}</span>
+            
+            <span class="k">return</span> <span class="n">content</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+        <span class="o">}</span> <span class="c1">// BufferedReader é automaticamente fechado aqui</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="6-imutabilidade-e-records">6. Imutabilidade e Records</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Prefira imutabilidade onde possível</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">ImmutableCustomer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">tags</span><span class="o">;</span> <span class="c1">// Defensiva para collections</span>
+    
+    <span class="kd">public</span> <span class="nf">ImmutableCustomer</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">String</span> <span class="n">email</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">tags</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">email</span> <span class="o">=</span> <span class="n">email</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">tags</span> <span class="o">=</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">unmodifiableList</span><span class="o">(</span><span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">tags</span><span class="o">));</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Apenas getters, sem setters</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getTags</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">unmodifiableList</span><span class="o">(</span><span class="n">tags</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">// Java 14+: Use records para DTOs imutáveis</span>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">CustomerRecord</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">String</span> <span class="n">email</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">tags</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Construtor compacto para validação</span>
+    <span class="kd">public</span> <span class="nc">CustomerRecord</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">name</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">name</span><span class="o">.</span><span class="na">isBlank</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Name cannot be blank"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="nc">List</span><span class="o">.</span><span class="na">copyOf</span><span class="o">(</span><span class="n">tags</span><span class="o">);</span> <span class="c1">// Garante imutabilidade</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="7-padrões-de-projeto-idiomáticos">7. Padrões de Projeto Idiomáticos</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Builder pattern para objetos complexos</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomerBuilder</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">phone</span><span class="o">;</span>
+    
+    <span class="kd">public</span> <span class="nc">CustomerBuilder</span> <span class="nf">setName</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+    
+    <span class="kd">public</span> <span class="nc">Customer</span> <span class="nf">build</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">Customer</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">email</span><span class="o">,</span> <span class="n">phone</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">// Factory method pattern</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PaymentProcessor</span> <span class="o">{</span>
+    <span class="kd">static</span> <span class="nc">PaymentProcessor</span> <span class="nf">create</span><span class="o">(</span><span class="nc">String</span> <span class="n">type</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">switch</span> <span class="o">(</span><span class="n">type</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">case</span> <span class="s">"creditcard"</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">CreditCardProcessor</span><span class="o">();</span>
+            <span class="k">case</span> <span class="s">"paypal"</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">PayPalProcessor</span><span class="o">();</span>
+            <span class="k">default</span> <span class="o">-&gt;</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">IllegalArgumentException</span><span class="o">(</span><span class="s">"Unknown processor type: "</span> <span class="o">+</span> <span class="n">type</span><span class="o">);</span>
+        <span class="o">};</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="8-anotações-e-metadados">8. Anotações e Metadados</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Use anotações consistentemente</span>
+<span class="nd">@RestController</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/api/customers"</span><span class="o">)</span>
+<span class="nd">@Validated</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomerController</span> <span class="o">{</span>
+    
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span>
+    <span class="nd">@ResponseStatus</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">CustomerResponse</span> <span class="nf">getCustomer</span><span class="o">(</span>
+            <span class="nd">@PathVariable</span> <span class="nd">@Min</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+            <span class="nd">@RequestParam</span><span class="o">(</span><span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <span class="nc">String</span> <span class="n">expand</span><span class="o">)</span> <span class="o">{</span>
+        
+        <span class="k">return</span> <span class="n">customerService</span><span class="o">.</span><span class="na">findCustomerById</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">expand</span><span class="o">);</span>
+    <span class="o">}</span>
+    
+    <span class="nd">@PostMapping</span>
+    <span class="nd">@ResponseStatus</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">CustomerResponse</span> <span class="nf">createCustomer</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="nd">@Valid</span> <span class="nc">CustomerRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">customerService</span><span class="o">.</span><span class="na">createCustomer</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="boas-práticas-adicionais">Boas Práticas Adicionais</h2>
+
+<ol>
+  <li><strong>Documentação</strong>: Use Javadoc consistentemente</li>
+  <li><strong>Testes</strong>: Junit 5 com nomes descritivos</li>
+  <li><strong>Logging</strong>: Use SLF4J com logs significativos</li>
+  <li><strong>Null Safety</strong>: Use Optional para retornos potencialmente nulos</li>
+  <li><strong>Performance</strong>: Evite otimização prematura, mas conheça o custo das operações</li>
+</ol>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Escrever código Java idiomático vai além da sintaxe correta. É sobre entender a cultura Java: valorizar clareza, robustez e maintainability. É escrever código que não apenas funciona, mas que comunica claramente sua intenção para outros desenvolvedores Java.</p>
+
+<p>O código Java idiomático é como um bom documento legal: preciso, completo e sem ambiguidades. Pode não ser o mais conciso, mas é certamente um dos mais legíveis e maintainable quando feito corretamente.</p>
+
+<p>Lembre-se: o código é lido muitas mais vezes do que escrito. Escreva para o leitor, não apenas para o compilador.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><summary type="html"><![CDATA[Cada linguagem de programação possui um sotque específico e é fácil identificar quando um desenvoledor de outra linguagem não busca conhecer a cultura e os padrões de uma linguagem. Mas esse comportamento não é um mero preciosismo estético, bugs podem aparecer ao não se atentar para a maneira como as coisas são feitas.]]></summary></entry><entry><title type="html">Não existe Inteligência Artificial, só Agentes de Inteligência Coletiva</title><link href="https://blog.vepo.dev/posts/nao-existe-ia-so-aic" rel="alternate" type="text/html" title="Não existe Inteligência Artificial, só Agentes de Inteligência Coletiva" /><published>2025-04-29T00:00:00+00:00</published><updated>2025-04-29T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-18-00-nao-existe-ia-so-ic</id><content type="html" xml:base="https://blog.vepo.dev/posts/nao-existe-ia-so-aic"><![CDATA[<p>A maneira como vemos as coisas é definida pelo nome que damos a elas, por isso tentarei ao máximo não usar mais o termo “Inteligência Artificial” quando me referir ao que costumamos chamar de IA Generativa por dois motivos. Primeiro porque não é inteligência, segundo porque não é generativa.</p>
+
+<p>Talvez você tenha ficado chocado com as duas afirmações da última frase do parágrafo anterior. Talvez porque você tenha pensando que o que chamamos de agentes, no fundo nem agentes são por isso me refiro a ferramentas, são muito inteligentes e dão respostas que aparentam ser humanas. Mas precisamos conversar sobre termos, entender o que convencionamos chamar de inteligência artificial, a qual se distingue qualitativamente da que eu estudei na faculdade como inteligência artificial, e entender porque não devemos chamar isso de inteligência. Se for pra levar na chacota, eu usaria o termo <strong>Papagaio Estatístico</strong> (<em>Statistical Parrot</em>, termo usado no paper <a href="https://dl.acm.org/doi/10.1145/3442188.3445922">On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜</a>).</p>
+
+<h2 id="essa-ia-não-é-como-a-de-antigamente">Essa IA não é como a de antigamente…</h2>
+
+<p>Não sei a sua idade, jovem leitor, mas um dos eventos chaves na história da IA foi o jogo de xadrez entre o Kasparov e o Deep Blue. Na Folha, em 1997, o fato foi anunciado com a frase <em>“E a máquina venceu o homem”</em> em uma alusão ao momento futuro na evolução das máquinas que se chama de singularidade (leia <a href="https://www1.folha.uol.com.br/fol/esp/es11051.htm"><strong>Deep Blue vence série contra Kasparov</strong></a>), ou seja, o momento na história em que as máquinas serão maiores e melhores que os seres humanos. A singularidade é uma especulação de um futuro hipotético, para mim, não passa de um sonho lúdico, ou na pior das hipoteses, o início de tempos obscuros em que um grupo de pessoas irá controlar outro através da tecnologia.</p>
+
+<p>Mas voltemos ao Kasparov… a Inteligência Artificial que o derrotou o não era da mesma qualidade da inteligência artificial que usamos hoje! Aqui leia <strong>qualidade</strong> como substituto de natureza ou essência. Isso significa que os algoritmos são radicalmente diferentes. O Deep Blue era uma máquina otimizada para busca em árvores, ou seja, os programadores criaram um modelo computacional do tabuleiro de xadrez e ficava a cargo do algoritmo gerar todos os possíveis movimentos que poderiam ser feitos e escolher qual era a melhor jogada. Caso queira conhecer mais leia o artigo <a href="https://dl.acm.org/doi/10.1145/224538.224567">Deep Blue system overview</a> que descreve as caracteristicas da máquina Deep Blue e o histórico até se chegar a esse momento apoteótico. O Deep Blue fazia buscas em árvores de possíveis jogadas e não há nada mais clássico que isso na inteligência artificial.</p>
+
+<p>Olhando por outra perspectiva, acho meio injusto chamar essa disputa do Kasparov de “Humanidade vs Máquina”, porque a máquina é uma construção humana! O que na verdade viámos era uma pessoa, munida de apenas o seu intelecto disputando uma partida contra um algoritmo de busca refinadíssimo e com uma heurística aprimorada. Nas isso sim é um momento apoteótico porque Charles Babbage já tinha pensado que sua máquina analítica poderia no futuro jogar xadrez. É como um ciclo de 150 anos se fechasse, mas não significa que a máquina era melhor que o humando, já que os algoritmos e a heurística são também construções humanas. Eu inclusive já implementei algoriritmos parecidos e caso você queria jogar Jogo da Velha contra meu MimiMax, <a href="https://github.com/vepo/tic-tac-toe">sinta-se a vontade</a>. Logo, o que aprendemos com essa história não é que a máquina desafiou o homem, mas que <a href="https://www.ime.usp.br/~vwsetzer/coments-a-Kanitz-jogos.html">xadres é um jogo burro, como diria o professor Valdemar W. Setzer</a>. Nós criamos a máquina, codificamos as regras do xadrez e escrevemos algoritmos de escolhas para assim dizermos que ensinamos a máquinas a jogar.</p>
+
+<p>Se você for estudar a fundo o que se chamava de Inteligência Artificial até o começo dos anos 2000, verá que esses algoritmos clássicos eram extremamente especializados e não podiam ser adaptados para outras funções. Eles partiam do pressuposto que a inteligência era uma busca de uma solução dentro um conjunto de possibilidades baseado em uma heurística, ou seja, em uma função de avaliação e tudo dependia do fator de <em>branching</em> do problema, da quantidade média de possibilidades geradas a cada iteração.</p>
+
+<h2 id="o-perceptron-e-uma-outra-abordagem">O Perceptron e uma outra abordagem</h2>
+
+<p>Mas se voltarmos na história do Deep Blue, podemos reparar que a máquina só conseguiu uma certa superioridade em cima do humano depois de uma grande evolução no poder de processamento. Os algoritmos já estavam prontos, mas não havia poder de processamento para colocar eles em funcionamento. O mesmo aconteceu com <em>Machine Learning</em>, que é o que costumamos chamar de IA hoje. Por muitos anos esse tipo de tecnologia foi desacreditado e teve pouca influência do debate público, alguns chega a se referir a esse periodo como o “inverno da IA”. Eu me recordo que enquanto estudava IA no Instituto de Computação da Unicamp em algum momento entre 2004 e 2006, essas tecnológias não mereceram nem uma aula completa, foram mencionadas como nota de rodapé ao final do curso. Mas isso não significa que a tecnologia é nova, muito pelo contrário.  Ela foi descrita em 1958 por Frank Rosenblatt no livro “<em>The Perceptron: A Theory of Statistical Separability in Cognitive Systems</em>”, e na discussão já se fala sobre o reconhecimento de padrões. Aqui quero citar o trecho de um artigo de 1961 que descreve como esses sistemas trabalham.</p>
+
+<blockquote>
+  <p><em>Esse tipo de projeto parece ter alguma aplicabilidade a uma variedade de máquinas mais “inteligentes”. O programa substitui o programador-analista por <strong>um operador programado que primeiro gera operadores que fazem uso suficientemente eficaz dos valores de entrada desconhecido e, em seguida, utiliza o feedback sobre o sucesso desses novos operadores no mapeamento de entradas desconhecidas</strong>, a fim de aumentar sua eficácia. Assim, nem o programador nem o programa precisam saber nada específico sobre o problema com antecedência. O programa realiza, como parte de sua rotina natural, a coleta, a análise e a inferência de dados que normalmente são deixadas para o programador.</em></p>
+
+  <p><a href="https://dl.acm.org/doi/10.1145/1460690.1460751"><strong>A pattern recognition program that generates, evaluates, and adjusts its own operators</strong></a></p>
+</blockquote>
+
+<p>Apesar do artigo ter 64 anos, o trecho em destaque descreve o que hoje chamamos de modelo e essa dinâmica não se alterou. Óbvio que tivemos grandes avanços na forma como esse modelo é treinado e projetado, posso citar o algoritmo <em>backpropagation</em>, as arquiteturas de deep learning, mas foi um processo lento e gradual que se torna maduro nos anos 2010 graças a enorme de quantidade de dados disponível para treinamento e uso. É possível sempre voltar a definição inicial porque algo essencial não mudou: o <strong>mapeamento de entradas desconhecidas</strong>!</p>
+
+<p>É possível se criar algoritmos de aprendizado de máquina sem ter uma entrada mapeada. Esse campo de pesquisa se chama <em>unsupervised learning</em>, ou seja aprendizado não supervisionado. Os algoritmos de unsupervised learning são usados para descobrir agrupamentos e relacionamentos entre dados. Mas para que esses algoritmos sejam eficientes é preciso que existam dados. Dados são essenciais para qualquer algoritmo de aprendizado de máquina pois a máquina irá reconhecer padrões entre os dados.</p>
+
+<h2 id="a-diferença-qualitativa-entre-machine-learning-e-inteligência-artificial-clássica">A diferença qualitativa entre <em>Machine Learning</em> e Inteligência Artificial Clássica</h2>
+
+<p>— <em>Aqui, me dê a liberdade argumentativa de diferenciar o que chamamos de Machine Learnig de Inteligência Artifical. Essa diferenciação é essencial para entender porque esses algoritmos são uma forma de inteligência coletiva.</em></p>
+
+<p>Esse pequeno resumo histórico é necessário para se pontuar dois elementos essências no entendimento dos algoritmos. O primeiro se referem a natureza desses algoritmos e o segundo a história deles.</p>
+
+<p>Sobre a natureza desses algoritmos, vemos que os algoritmos clássicos tentavam criar uma forma analítica de solução do problema. Ao jogar xadres, o Deep Blue listava todas as possíveis possibilidades, pontuava elas e escolhia qual jogada era mais vantajosa para chegar ao seu objetivo: ganhar o jogo. O Deep Blue conseguia ver o problema como um tudo e conseguia “racionalizar” em cima de todas as possíveis alternativcas. Coloco racionalizar entre aspas porque essa é uma forma moderna de ver o modo como pensamos. Na verdade, nós, humanos, não racionalizamos. Racionalizar é caro, cansativo, trabalhoso. Em nossas tarefas do dia a dia não pensamos em todos os passos. Nós, humanos, temos subconsciente, desenvolvemos empatia, intuição, fazemos julgamentos morais, religiosos e, até mesmo, decisões afetivas e sexuais. Nós somos muito mais complexos que uma mera máquina. Esses dias, por exemplo, estava jogando um jogo de tabuleiro com meu filho e deixei ele ganhar algumas vezes para não o deixar frustrado. A máquina não desenvolveria esse tipo de empatia.</p>
+
+<p>Já os algoritmos de aprendizado de máquina não racionalizam em cima do problema, mas identificam um padrão e tentam criar uma função de transferência entre uma entrada conhecida e a saída desejada. Algoritmos de <em>Machine Learning</em> podem ser vistos como uma grande regressão linear polinomial com esteróides. A máquina não tem empatia, não desenvolve julgamentos morais ou religiosos, não tem desejos sexuais e nem relações afetivas. Tudo que a máquina faz é identificar padrões e codificar eles. Os modelos são criados e armazenado em um conjunto enorme de parâmetros que podem alimentar máquinas que codificam e decodificam as entradas do usuário. O artigo <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> descreve esse comportamento.</p>
+
+<p>Por outro lado, precisamos desmitificar o grande salto tecnologico dos últimos anos. Não houve, entre 2019 e 2024 uma explosão de criatividade, mas o ponto de maturidade de algo que estava há anos sendo gestado. É o momento em que a criança nasce depois de 9 meses de gestação. O que começou lá em 1958 na marinha estadunidense virou um produto comercial que parece racionalizar, nas na verdade nada mais é que <strong>um modelo condensado do conhecimento humano mapeado</strong>.</p>
+
+<h2 id="modelos-são-criados-coletivamente">Modelos são criados coletivamente</h2>
+
+<p>O que convencionamos chamar de IA Generativa na verdade é construido coletivamente. Quando eu faço uma pergunta sobre temas que eu trabalho diariamente, uma parte infima do meu trabalho está sendo utilizada para gerar a resposta que eu preciso. Não ache que esse post está sendo lido apenas por humanos curiosos. Existem diversos agentes de autonomos lendo e processando o conteúdo disponível na internet. Depois, humanos explorados são usados para mapear e interpretar essas informações.</p>
+
+<p>A IA Generativa consegue gerar uma imagem ao estilo Picasso, porque primeiro existiu um Picasso, depois porque alguém colocou etiquetas em todas as obras do Picasso e por fim porque alguém descreveu o estilo do Picasso. Essa máquinas não conseguem fazer algo altamente inovador. Elas não dão saltos de genialidade. E no mais, eles precisam de algo que nem elas conseguem fornecer: o prompt. No fim, elas nem conseguem se comportar como agente automatos, elas respondem a estimulos externos.</p>
+
+<p>A grande invenção dos últimos 80 anos não são modelos que codificam a inteligência coletiva, mas essa grande biblioteca virtual chamada internet. Ironicamente, os maiores defensores da IA atacaram duas das principais instituições da internet: o <a href="https://archive.org/">Internet Archive</a> e a Wikipedia. E isso se dá porque o maior competidor para os modelos de inteligência coletiva é o pensamento enciclopédico.</p>
+
+<p>Os modelos de inteligência coletiva, e eu vou repetir isso quantas vezes precisar, se alimentam do conhecimento estruturado para gerar oráculos digitais. Uma enciclopedia tem a mesma função social do oráculo: dar respostas. Mas ao mesmo tempo uma modelo não consegue representar a totalidade do conhecimento porque ele é limitado, ele é estatístico, ele tem viés e por fim, ele é meramente linguístico.</p>
+
+<p>Ver essas ferramentas como uma consolidação da inteligência coletiva tem grandes implicações politicas e econômicas que não estão sendo discutidas. Tudo bem que a OpenAI conseguiu colocar no ar o primeiro dos modelos comerciais. Mas ele não é uma construção da OpenAI e nem de qualquer outra empresa que coloque os seus modelos no ar. Tanto a engenharia por trás desse modelo é uma construção de decadas e séculos de estudos em matemática, estatística e computação, quanto o conteúdo na qual esses modelos foi treinado é uma construção de milênios de conhecimento acumulado.</p>
+
+<p>Talvez você não saiba, mas quando você escrevia algumas letrinhas para identificar que você era você em algum lugar da internet entre 2010 e 2014, você estava ajudando a transcrever livros antigos. Depois, caso você não tenha percebido, esses testes mudaram para encontrar bicicletas, faixa de pedestres, semaforos, onibus e, quiçá, a Sarah Connor em fotos de ruas. Essa mudança aconteceu porque finalizada a transcrição dos livros, o próximo problema computacional era compreender imagens e pagar para pessoas fazer isso manualmente é impraticável. OK. OK… Eles pagam em alguns casos como você pode ver em uma série de reportagens como <a href="https://www.intercept.com.br/2023/06/19/brasileiros-ganham-fracoes-de-centavos-para-melhorar-sua-inteligencia-artificial/"><strong>Brasileiros ganham frações de centavos para melhorar sua inteligência artificial</strong></a> ou <a href="https://www.intercept.com.br/2024/12/06/ia-inteligencia-artificial-supervisao-humana/"><strong>Para dar lucro, a IA precisa de babás humanas</strong></a>. Você pode até argumentar que eles estão sendo remunerados por esse trabalho, mas é como você receber uma migalha de um carrasco.</p>
+
+<p>A promessa de mudar radicalmente o mundo do trabalho é falsa porque foi o mundo do trabalho que gerou essas inteligências. Não é correto substituir trabalhadores gratuitamente por máquinas estatísticas sem remunerar os grandes criadores dessa inteligência que somos TODOS NÓS!</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Vale do Silício" /><category term="Cultura" /><category term="Tecnologia" /><category term="IA Generativa" /><category term="Tecno-Feudalismo" /><summary type="html"><![CDATA[Nomes refletem a essêrncia das coisas, dar nomes é uma das atividades do ser humano e ao dar nomes nós definimos a forma como vemos as coisas.]]></summary></entry><entry><title type="html">O Vale do Sílicio segundo as IA Generativas</title><link href="https://blog.vepo.dev/posts/o-vale-silicio-segundo-ia" rel="alternate" type="text/html" title="O Vale do Sílicio segundo as IA Generativas" /><published>2025-04-27T00:00:00+00:00</published><updated>2025-04-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-20-00-vale-silicio-segundo-ia</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-vale-silicio-segundo-ia"><![CDATA[<p>Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura. Abaixo estão as respostas que obtive de cada IA, sem edição ou modificação. O objetivo é comparar as respostas e ver como cada IA aborda o mesmo assunto.</p>
+
+<p>Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enquanto o DeepSeek é mais crítico e analítico. O ChatGPT parece ter uma visão mais otimista e idealista, enquanto o DeepSeek tem uma visão mais realista e crítica.</p>
+
+<h1 id="chatgpt">ChatGPT</h1>
+
+<p>— <strong><em>Como você define o Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>Vale do Silício refere-se a uma região no norte da Califórnia, localizada principalmente na parte sul da área da Baía de São Francisco. É conhecido como um centro global de tecnologia e inovação. O termo originalmente descrevia a concentração de fabricantes de chips de silício e empresas de semicondutores, mas desde então evoluiu para abranger um ecossistema mais amplo de empresas de tecnologia, startups, capitalistas de risco e instituições de pesquisa.</p>
+
+  <p>O Vale do Silício abriga muitas das maiores empresas de tecnologia do mundo, incluindo Google, Apple, Facebook e Intel, além de milhares de startups. A cultura no Vale do Silício é caracterizada pelo foco em inovação, empreendedorismo e disposição para assumir riscos, frequentemente promovendo um ambiente colaborativo que apoia o pensamento criativo e os avanços tecnológicos.</p>
+</blockquote>
+
+<p>— <strong><em>Existe uma cultura religiosa no Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é conhecido principalmente por seu foco em tecnologia, inovação e empreendedorismo, mas também possui um cenário religioso diversificado. A região abriga diversas comunidades religiosas e práticas espirituais, refletindo a população multicultural que ali reside.</p>
+
+  <p>Embora religiões tradicionais organizadas, como cristianismo, judaísmo e budismo, estejam presentes, muitos indivíduos no Vale do Silício também exploram espiritualidades e práticas alternativas. Isso inclui um interesse crescente em mindfulness, meditação e estilos de vida holísticos, frequentemente influenciados por filosofias orientais.</p>
+
+  <p>Além disso, alguns empreendedores e líderes da área de tecnologia são conhecidos por abraçar o humanismo secular, que enfatiza a ética e os valores humanos sem depender de doutrinas religiosas. De modo geral, embora o Vale do Silício possa não ser caracterizado por uma única cultura religiosa, ele exibe uma rica variedade de crenças e práticas entre seus moradores.</p>
+</blockquote>
+
+<p>— <strong><em>As pessoas do Vale do Silício acreditam que são superiores às outras pessoas no mundo?</em></strong></p>
+
+<blockquote>
+  <p>A percepção de superioridade entre os indivíduos no Vale do Silício pode variar bastante e é frequentemente influenciada por crenças pessoais, experiências e pela natureza competitiva da indústria de tecnologia. Algumas pessoas na região podem sentir orgulho de fazer parte de uma comunidade inovadora e influente que impulsiona os avanços tecnológicos globais. Esse orgulho pode, às vezes, ser interpretado como um sentimento de superioridade, principalmente quando comparado a áreas que podem não ter o mesmo nível de acesso à tecnologia ou aos recursos.</p>
+
+  <p>No entanto, é essencial reconhecer que nem todos no Vale do Silício compartilham essa visão. Muitos indivíduos e organizações na comunidade estão focados na colaboração, na inclusão e no impacto positivo da tecnologia na sociedade. A cultura também pode fomentar a humildade, já que muitos empreendedores vivenciam fracassos e contratempos em suas jornadas.</p>
+
+  <p>Em última análise, embora alguns possam demonstrar um senso de superioridade, esse não é um sentimento universal entre todos os moradores do Vale do Silício. A diversidade de pensamento e experiência na região contribui para uma dinâmica social complexa.</p>
+</blockquote>
+
+<p>— <strong><em>O mundo deveria ser dominado pelo Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>A ideia de o Vale do Silício dominar o mundo levanta questões importantes sobre tecnologia, ética, governança e valores sociais. Embora o Vale do Silício tenha sido uma força motriz por trás de avanços e inovações tecnológicas significativas, um mundo dominado por uma única região ou ideologia pode levar a vários problemas potenciais:</p>
+
+  <ol>
+    <li><strong>Diversidade de Ideias</strong>: Uma gama diversificada de perspectivas promove a inovação e a resolução de problemas. Se o Vale do Silício dominasse, poderia sufocar pontos de vista e soluções alternativas que poderiam surgir de outras culturas e regiões.</li>
+    <li><strong>Considerações Éticas</strong>: A indústria de tecnologia pode, às vezes, priorizar o lucro e o crescimento em detrimento de considerações éticas. Um cenário global moldado exclusivamente pelos valores do Vale do Silício pode ignorar questões sociais e éticas importantes, como privacidade, equidade e acesso à tecnologia.</li>
+    <li><strong>Disparidades Econômicas</strong>: A concentração de poder e influência em uma região pode exacerbar as desigualdades globais, deixando muitos lugares para trás em termos de acesso tecnológico e oportunidades econômicas.</li>
+    <li><strong>Cooperação Global</strong>: Muitos dos desafios mundiais, como mudanças climáticas, crises sanitárias e justiça social, exigem esforços colaborativos entre nações e culturas. Uma abordagem unilateral pode prejudicar a cooperação eficaz.</li>
+    <li><strong>Impacto Cultural</strong>: Os valores e a cultura promovidos pelo Vale do Silício podem não repercutir globalmente, o que pode levar à homogeneização cultural e à perda de tradições e práticas locais.</li>
+  </ol>
+
+  <p>Em resumo, embora as contribuições do Vale do Silício para a tecnologia e a inovação sejam significativas, uma abordagem equilibrada que valorize perspectivas diversas e esforços colaborativos é essencial para um futuro global sustentável e equitativo.</p>
+</blockquote>
+
+<p>— <strong><em>Por que algumas empresas do Vale do Silício tentaram destruir a maior parte da governança mundial? Como a Uber fez com os transportes urbanos.</em></strong></p>
+
+<blockquote>
+  <p>As ações de algumas empresas do Vale do Silício, como a Uber, podem frequentemente ser vistas sob a ótica da inovação disruptiva. Essas empresas frequentemente buscam desafiar setores e estruturas regulatórias estabelecidas para introduzir novos modelos de negócios e tecnologias. Aqui estão alguns motivos pelos quais isso pode levar a tensões com a governança:</p>
+  <ol>
+    <li><strong>Disrupção de Indústrias Tradicionais</strong>: Empresas como a Uber buscam disrupção de setores tradicionais (neste caso, transporte) oferecendo alternativas mais convenientes e, muitas vezes, mais baratas. Essa disrupção pode minar os negócios existentes e as estruturas regulatórias que foram projetadas para governar esses setores.</li>
+    <li><strong>Desafios Regulatórios</strong>: Muitas startups operam em uma área legal cinzenta, ultrapassando os limites para inovar rapidamente. Elas podem priorizar o crescimento em detrimento da conformidade com as regulamentações existentes, levando a conflitos com governos locais e setores estabelecidos que precisam aderir a essas leis.</li>
+    <li><strong>Acesso ao Mercado</strong>: As empresas frequentemente buscam entrar em novos mercados rapidamente, o que pode levá-las a burlar as regulamentações existentes. Essa abordagem pode ser vista como um desafio à governança e às normas estabelecidas, levando à resistência das autoridades que tentam manter a ordem e a justiça.</li>
+    <li><strong>Valores Culturais</strong>: A cultura do Vale do Silício frequentemente enfatiza inovação, velocidade e disrupção. Essa mentalidade pode levar à crença de que os sistemas estabelecidos estão desatualizados e precisam ser reformulados, o que pode resultar em relações conflituosas com as estruturas de governança.</li>
+    <li><strong>Motivos Econômicos</strong>: A busca pelo lucro pode levar as empresas a adotar estratégias agressivas que priorizam seus interesses comerciais em detrimento da conformidade regulatória, o que pode gerar tensões com as autoridades governamentais.</li>
+  </ol>
+
+  <p>Embora essas ações possam levar à inovação e a novos serviços, elas também podem desestabilizar os sistemas existentes e criar desafios para a governança, a segurança pública e a justiça no mercado. O equilíbrio entre inovação e regulamentação é um debate complexo e contínuo em muitos setores.</p>
+</blockquote>
+
+<p>— <strong><em>Qual é o nome de uma visão política que acredita que o interesse pessoal de um país controla a maneira como os governos de outros países legislam?</em></strong></p>
+
+<p><img src="/assets/images/chat-gpt-on-silicon-valley.png" alt="ChatGPT responde que o limite de perguntas foi excedido e oferece remover limites com assinatura premium." /></p>
+
+<hr />
+
+<h2 id="deepseek">DeepSeek</h2>
+
+<p>— <strong><em>Como você define o Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é uma região no norte da Califórnia, Estados Unidos, que serve como um polo global de tecnologia, inovação e capital de risco. Embora seus limites exatos sejam informais, geralmente abrange a parte sul da área da Baía de São Francisco, incluindo cidades como <strong>San Jose, Palo Alto, Mountain View, Cupertino, Sunnyvale e Santa Clara</strong>.</p>
+
+  <h3 id="principais-características-do-vale-do-silício"><strong>Principais Características do Vale do Silício:</strong></h3>
+  <ol>
+    <li><strong>Centro da Indústria Tecnológica</strong> – Lar de grandes empresas de tecnologia (por exemplo, Apple, Google, Meta, NVIDIA, Tesla, Intel, Netflix) e milhares de startups.</li>
+    <li><strong>Inovação e Empreendedorismo</strong> – Uma cultura de inovação disruptiva, apoiada por universidades de classe mundial (Stanford, UC Berkeley) e instituições de pesquisa.</li>
+    <li><strong>Ecossistema de Capital de Risco (VC)</strong> – Alta concentração de investidores (Sequoia Capital, Andreessen Horowitz, etc.) financiando startups.</li>
+    <li><strong>Pool de Talentos</strong> – Atrai os melhores engenheiros, cientistas e empreendedores do mundo todo.</li>
+    <li><strong>Cultura de Startups</strong> – Conhecida pela tomada de riscos, rápida escalabilidade e mentalidade de “falhe rápido, aprenda rápido”.</li>
+    <li><strong>Networking e Colaboração</strong> – Forte ecossistema de incubadoras (Y Combinator), aceleradoras e eventos de networking.</li>
+    <li><strong>Alto Custo de Vida</strong> – Imóveis caros e salários competitivos devido à demanda.</li>
+  </ol>
+
+  <h3 id="por-que-é-chamado-de-vale-do-silício"><strong>Por que é chamado de “Vale do Silício”?</strong></h3>
+  <p>O termo foi cunhado na década de 1970, referindo-se às empresas de <strong>semicondutores à base de silício</strong> (como a Intel) que foram fundamentais para o boom tecnológico. Com o tempo, tornou-se um símbolo da indústria tecnológica em geral.</p>
+
+  <p>Você gostaria de saber mais sobre sua história, impacto econômico ou comparações com outros polos tecnológicos?</p>
+</blockquote>
+
+<p>— <strong><em>Existe uma cultura religiosa no Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é conhecido principalmente por sua cultura voltada para a tecnologia e a inovação, mas possui um cenário religioso diversificado e em constante evolução. No entanto, a religião não desempenha um papel dominante na cultura profissional ou empreendedora dominante. Aqui está uma análise:</p>
+
+  <h3 id="1-diversidade-religiosa-no-vale-do-silício"><strong>1. Diversidade Religiosa no Vale do Silício</strong></h3>
+  <ul>
+    <li><strong>Demografia</strong>: A região é altamente multicultural, com imigrantes da Ásia, América Latina, Europa e Oriente Médio, trazendo consigo suas tradições religiosas.</li>
+    <li><strong>Cristianismo</strong> (católico, protestante, evangélico) tem presença, particularmente entre as comunidades latinas e algumas asiáticas.</li>
+    <li><strong>Hinduísmo e Sikhismo</strong> são visíveis devido à grande força de trabalho indiana no setor de tecnologia (templos e gurdwaras são comuns).</li>
+    <li><strong>Budismo</strong> (especialmente entre profissionais do Leste Asiático).</li>
+    <li><strong>Islamismo</strong> (mesquitas e redes de tecnologia muçulmanas existem, mas são menos proeminentes).</li>
+    <li>
+      <p><strong>Judaísmo</strong> (uma comunidade judaica notável, incluindo empreendedores e investidores).</p>
+    </li>
+    <li><strong>Nova Era e Movimentos Espirituais</strong>: Alguns no mundo da tecnologia adotam mindfulness, meditação (popularizada pelo programa “Busque Dentro de Você” do Google) e práticas orientais secularizadas.</li>
+  </ul>
+
+  <h3 id="2-religião-vs-cultura-tecnológica"><strong>2. Religião vs. Cultura Tecnológica</strong></h3>
+  <ul>
+    <li><strong>Dominância Secular</strong>: A cultura tecnológica dominante é em grande parte secular, com ênfase na racionalidade, ciência e pensamento baseado em dados. Muitos fundadores e investidores são ateus, agnósticos ou indiferentes à religião organizada.</li>
+    <li><strong>“Cultos” da Inovação</strong>: Alguns brincam que o Vale do Silício tem suas próprias “religiões” — como <strong>Altruísmo Eficaz</strong>, <strong>Transumanismo</strong> (extensão da vida, adoração à IA) e <strong>Tecno-Otimismo</strong> (por exemplo, o “Manifesto Tecno-Otimista” de Marc Andreessen).</li>
+    <li><strong>Controvérsias</strong>: Alguns criticam os líderes da tecnologia por agirem como “profetas” (por exemplo, a visão de Elon Musk para Marte, o campo de distorção da realidade de Steve Jobs).</li>
+  </ul>
+
+  <h3 id="3-local-de-trabalho-e-religião"><strong>3. Local de Trabalho e Religião</strong></h3>
+  <ul>
+    <li><strong>Neutralidade Corporativa</strong>: A maioria das empresas evita afiliações religiosas explícitas, mas acomoda a diversidade (salas de oração, opções alimentares).</li>
+    <li><strong>Atenção Plena e Bem-Estar</strong>: Aplicativos de meditação (Headspace, Calm) e ioga são amplamente aceitos como ferramentas de produtividade, em vez de práticas espirituais.</li>
+  </ul>
+
+  <h3 id="4-exceções-e-subculturas"><strong>4. Exceções e Subculturas</strong></h3>
+  <ul>
+    <li><strong>Redes Baseadas na Fé</strong>: Grupos como encontros de <strong>Fé e Tecnologia</strong> ou empreendedores cristãos/SUD (mórmons) existem, mas são de nicho.</li>
+    <li><strong>Debates Éticos</strong>: A religião às vezes se cruza com a ética tecnológica (por exemplo, moralidade da IA, bioengenharia).</li>
+  </ul>
+
+  <h3 id="conclusão"><strong>Conclusão</strong></h3>
+  <p>A cultura dominante no Vale do Silício é <strong>secular e meritocrática</strong>, mas as comunidades religiosas prosperam silenciosamente em segundo plano. As verdadeiras “religiões” do Vale são frequentemente <strong>tecnologia, disrupção e a crença no progresso por meio da inovação</strong>.</p>
+
+  <p>Você gostaria de exemplos de como empresas específicas lidam com religião ou como comunidades de imigrantes mantêm tradições religiosas?</p>
+</blockquote>
+
+<p>— <strong><em>As pessoas do Vale do Silício acreditam que são superiores às outras pessoas no mundo?</em></strong></p>
+
+<blockquote>
+  <p>A percepção de superioridade entre os profissionais do Vale do Silício é um tema complexo e frequentemente debatido. Embora nem todos na indústria de tecnologia tenham visões elitistas, certos fatores culturais e estruturais podem fomentar um senso de excepcionalismo — às vezes levando à crítica de que o Vale do Silício tem um “complexo de deus”. Aqui está uma análise:</p>
+
+  <h3 id="1-a-mentalidade-de-estamos-mudando-o-mundo"><strong>1. A Mentalidade de “Estamos Mudando o Mundo”</strong></h3>
+  <ul>
+    <li>Muitos no Vale do Silício acreditam genuinamente que estão impulsionando o progresso humano (por exemplo, IA, biotecnologia, exploração espacial).</li>
+    <li>Isso pode se manifestar como <strong>tecnoutopismo</strong> — a ideia de que a tecnologia sozinha pode resolver problemas globais, às vezes descartando soluções não técnicas.</li>
+    <li>Os críticos argumentam que isso leva à <strong>arrogância</strong>, em que os fundadores presumem que sabem mais do que formuladores de políticas, especialistas em ética ou comunidades locais.</li>
+  </ul>
+
+  <h3 id="2-meritocracia-vs-elitismo"><strong>2. Meritocracia vs. Elitismo</strong></h3>
+  <ul>
+    <li>O Vale se orgulha da meritocracia (“as melhores ideias vencem”), mas isso pode se transformar em <strong>superioridade intelectual</strong>.</li>
+    <li>Muitos líderes de tecnologia de ponta vêm de escolas de elite (Stanford, MIT) ou de origens prestigiosas, reforçando uma cultura de insider.</li>
+    <li>Há uma hierarquia sutil: <strong>fundadores &gt; engenheiros &gt; cargos não relacionados à tecnologia</strong>, com alguns menosprezando setores “não disruptivos”.</li>
+  </ul>
+
+  <h3 id="3-efeito-da-bolha-cultural"><strong>3. Efeito da Bolha Cultural</strong></h3>
+  <ul>
+    <li>O Vale do Silício tem suas próprias gírias (“unicórnios”, “engenheiros 10x”), humor (por exemplo, memes “Estamos tornando o mundo um lugar melhor”) e até mesmo códigos de vestimenta (moletons, Allbirds).</li>
+    <li>Alguns profissionais de tecnologia <strong>raramente interagem fora de sua bolha</strong>, o que leva a pontos cegos sobre problemas do mundo real.</li>
+    <li>O sentimento de <strong>“São Francisco não é a América de verdade”</strong> demonstra uma desconexão com questões sociais mais amplas.</li>
+  </ul>
+
+  <h3 id="4-exemplos-de-complexo-de-superioridade"><strong>4. Exemplos de Complexo de Superioridade</strong></h3>
+  <ul>
+    <li>
+      <p><strong>“Mova-se rápido e quebre coisas”</strong> – O antigo mantra do Facebook implicava que as consequências sociais eram secundárias à inovação.</p>
+    </li>
+    <li><strong>Líderes da tecnologia dando sermão em governos</strong> (por exemplo, Mark Zuckerberg testemunhando perante o Congresso com uma atitude de “você simplesmente não entende”).</li>
+    <li><strong>“O resto do mundo é lento”</strong> – Uma crença comum de que a burocracia e a regulamentação sufocam o progresso, enquanto o Vale do Silício opera na “velocidade da internet”.</li>
+  </ul>
+
+  <h3 id="5-resistência-e-autoconsciência"><strong>5. Resistência e Autoconsciência</strong></h3>
+  <ul>
+    <li>Nem todos na tecnologia pensam assim — muitos criticam a arrogância do setor.</li>
+    <li>Sátiras como <strong>Vale do Silício (HBO)</strong> e os estereótipos <strong>“Tech Bro”</strong> zombam da arrogância.</li>
+    <li>Alguns líderes (por exemplo, Tim Cook, Satya Nadella) evitam essa mentalidade, focando na colaboração em vez da disrupção.</li>
+  </ul>
+
+  <h3 id="conclusão-superioridade-ou-apenas-confiança"><strong>Conclusão: Superioridade ou apenas confiança?</strong></h3>
+  <p>A crença do Vale do Silício em seu próprio excepcionalismo é uma mistura de:</p>
+
+  <p>✅ <strong>Ambição genuína</strong> – Muitos querem resolver grandes problemas.</p>
+
+  <p>⚠️ <strong>Pontos cegos</strong> – Subestimar a ética, a desigualdade e as consequências não intencionais.</p>
+
+  <p>❌ <strong>Elitismo ocasional</strong> – Descartar perspectivas não tecnológicas como “retrógradas”.</p>
+
+  <p>Gostaria de exemplos de como isso se aplica a contratações, expansão global ou debates como a ética da IA?</p>
+</blockquote>
+
+<p>— <strong><em>O mundo deveria ser dominado pelo Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>A questão de se o mundo <em>deve</em> ser dominado pelo Vale do Silício é altamente controversa e depende de valores, prioridades e perspectivas sobre poder, inovação e governança. Aqui está uma análise equilibrada dos argumentos a favor e contra a influência global do Vale do Silício, juntamente com as principais considerações:</p>
+
+  <hr />
+
+  <h3 id="argumentos-a-favor-do-domínio-do-vale-do-silício"><strong>Argumentos a FAVOR do Domínio do Vale do Silício</strong></h3>
+  <ol>
+    <li><strong>Impulsiona o Progresso Tecnológico</strong>
+      <ul>
+        <li>O Vale do Silício acelerou avanços (IA, biotecnologia, computação) que beneficiam a humanidade.</li>
+        <li>Muitas ferramentas que melhoram a vida (smartphones, vacinas, tecnologia de energia renovável) remontam ao seu ecossistema.</li>
+      </ul>
+    </li>
+    <li><strong>Crescimento Econômico e Criação de Empregos</strong>
+      <ul>
+        <li>Gigantes da tecnologia e startups geram riqueza, embora distribuída de forma desigual.</li>
+        <li>Trabalho remoto e plataformas globais (Google, Meta, LinkedIn) possibilitam oportunidades em todo o mundo.</li>
+      </ul>
+    </li>
+    <li><strong>Cultura de Inovação</strong>
+      <ul>
+        <li>A assunção de riscos e os ideais meritocráticos (em teoria) recompensam o talento em detrimento da tradição.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <ul>
+    <li>Movimentos de código aberto e compartilhamento de conhecimento (por exemplo, a influência de Stanford) impulsionam polos tecnológicos globais.</li>
+  </ul>
+
+  <ol>
+    <li><strong>Soluções para Desafios Globais</strong>
+      <ul>
+        <li>Tecnologia climática (Tesla, captura de carbono), inovações em saúde (CRISPR, vacinas de mRNA) e conectividade (Starlink) atendem a necessidades críticas.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <hr />
+
+  <h3 id="argumentos-contra-o-domínio-do-vale-do-silício"><strong>Argumentos CONTRA o Domínio do Vale do Silício</strong></h3>
+  <ol>
+    <li><strong>Concentração de Poder</strong>
+      <ul>
+        <li>Um punhado de CEOs não eleitos (Musk, Zuckerberg, Altman) molda o discurso global, a privacidade e a democracia.</li>
+        <li>A mentalidade de “Agir rápido e quebrar coisas” levou a danos sociais (por exemplo, o papel das mídias sociais na polarização).</li>
+      </ul>
+    </li>
+    <li><strong>Homogeneização Cultural</strong>
+      <ul>
+        <li>Os valores do Vale do Silício (disrupção, hiperescala) podem sobrepor-se às tradições, economias e governança locais.</li>
+        <li>Exemplo: Uber vs. sindicatos de táxis, Airbnb vs. crises imobiliárias.</li>
+      </ul>
+    </li>
+    <li><strong>Desigualdade e Exploração</strong>
+      <ul>
+        <li>A riqueza tecnológica amplia as disparidades: Bilionários convivem com a falta de moradia em São Francisco.</li>
+        <li>A economia gig (Uber, DoorDash) frequentemente explora trabalhadores de baixa renda em todo o mundo.</li>
+      </ul>
+    </li>
+    <li><strong>Pontos Cegos Éticos</strong>
+      <ul>
+        <li>A ética da IA, o reconhecimento facial e a privacidade de dados costumam ser considerados secundários.</li>
+        <li>“Colonização” de outros setores (saúde, finanças, educação) sem supervisão suficiente.</li>
+      </ul>
+    </li>
+    <li><strong>Monocultura de Ideias</strong>
+      <ul>
+        <li>O pensamento de grupo (por exemplo, “altruísmo eficaz”, criptoevangelismo) pode abafar perspectivas diversas.</li>
+        <li>A falha em lidar com consequências não intencionais (por exemplo, Facebook em Mianmar, viés algorítmico).</li>
+      </ul>
+    </li>
+  </ol>
+
+  <hr />
+
+  <h3 id="principais-considerações"><strong>Principais Considerações</strong></h3>
+  <ul>
+    <li>
+      <p><strong>Existem Alternativas</strong>: Outros polos tecnológicos (Shenzhen, Berlim, Bangalore) oferecem modelos diferentes (inovação orientada pelo Estado, centrada no trabalhador e frugal).</p>
+    </li>
+    <li><strong>Regulamentação vs. Inovação</strong>: O Vale do Silício deve se autogovernar ou as democracias precisam de controles mais rigorosos?</li>
+    <li><strong>Bem Público vs. Privado</strong>: Os motivos lucrativos de uma única região devem ditar a infraestrutura global (computação em nuvem, IA, espaço)?</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="conclusão-uma-abordagem-equilibrada"><strong>Conclusão: Uma Abordagem Equilibrada</strong></h3>
+  <p>O Vale do Silício não deveria <em>dominar</em>, mas poderia <em>colaborar</em> — alavancando seus pontos fortes e, ao mesmo tempo, sendo responsabilizado. Idealmente:</p>
+  <ul>
+    <li><strong>Descentralizar o Poder</strong>: Promover polos tecnológicos globais com relevância local.</li>
+    <li><strong>Guarda-corpos Éticos</strong>: Governos e sociedade civil devem direcionar a tecnologia para o bem público.</li>
+    <li><strong>Modelos Híbridos</strong>: Combinar a inovação do Vale do Silício com a regulamentação europeia, a manufatura asiática e o avanço africano.</li>
+  </ul>
+
+  <p><strong>Resposta Final</strong>: Não, o mundo não deveria ser <em>dominado</em> pelo Vale do Silício — mas suas melhores inovações deveriam ser adotadas <em>criticamente</em>, com governança garantindo equidade e responsabilidade ética.</p>
+
+  <p>Você gostaria de exemplos de ecossistemas tecnológicos alternativos ou de como as sociedades estão reagindo à influência do Vale do Silício?</p>
+</blockquote>
+
+<p>— <strong><em>Por que algumas empresas do Vale do Silício tentaram destruir a maior parte da governança mundial? Como a Uber fez com os transportes urbanos.</em></strong></p>
+
+<blockquote>
+  <p>As táticas agressivas usadas por algumas empresas do Vale do Silício — como a Uber no transporte, a Airbnb na habitação ou o Facebook na mídia — para perturbar ou contornar as estruturas de governança existentes decorrem de uma combinação de ideologia, estratégia de negócios e incentivos sistêmicos. Veja por que isso acontece e quais são as consequências:</p>
+
+  <hr />
+
+  <h3 id="1-a-ideologia-da-disrupção"><strong>1. A Ideologia da “Disrupção”</strong></h3>
+  <ul>
+    <li><strong>“Mova-se Rápido e Quebre Coisas”</strong>: O mantra do Vale do Silício prioriza a velocidade em vez da cautela, enxergando os governos como lentos, burocráticos e anti-inovação.</li>
+    <li><strong>Tecnolibertarianismo</strong>: Muitos fundadores (por exemplo, Peter Thiel, o Elon Musk dos primórdios) acreditam que os mercados e a tecnologia devem substituir as funções governamentais (“O concorrente da Uber se chama ‘transporte público’ e é péssimo”).</li>
+    <li><strong>“Regulamentação = Estagnação”</strong>: As startups frequentemente veem as leis (por exemplo, licenças para táxis, zoneamento) como barreiras ultrapassadas, e não como proteções para trabalhadores ou comunidades.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="2-incentivos-do-modelo-de-negócios"><strong>2. Incentivos do Modelo de Negócios</strong></h3>
+  <ul>
+    <li><strong>Blitzscaling</strong>: Para dominar mercados, empresas como a Uber inundaram cidades com subsídios, ignorando as leis locais até se tornarem grandes demais para serem banidas (“peça perdão, não permissão”).</li>
+    <li><strong>Arbitragem Regulatória</strong>: Explorando áreas jurídicas cinzentas (por exemplo, a Uber classificando motoristas como “contratados independentes” para contornar as leis trabalhistas).</li>
+    <li><strong>Efeitos de Rede</strong>: A vantagem de ser o primeiro significa vencer rapidamente, mesmo que isso signifique esmagar concorrentes (táxis) ou cooptar reguladores.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="3-minando-a-governança-táticas-e-exemplos"><strong>3. Minando a Governança: Táticas e Exemplos</strong></h3>
+  <h4 id="uber-vs-cidades"><strong>Uber vs. Cidades</strong></h4>
+  <ul>
+    <li><strong>Ignoraram as regulamentações de táxis</strong>: Operaram ilegalmente em cidades como Paris, Austin e Londres, apostando que multas seriam mais baratas do que o cumprimento.</li>
+    <li>
+      <p><strong>Fizeram lobby agressivo</strong>: Usaram relações públicas (“Uber = empregos + conveniência”) e padrões obscuros para virar a opinião pública contra os reguladores.</p>
+    </li>
+    <li><strong>Dados transformados em armas</strong>: Rastreou autoridades para manipular preços e disponibilidade de serviços (por exemplo, a ferramenta “Greyball” para driblar a polícia).</li>
+  </ul>
+
+  <h4 id="airbnb-vs-leis-de-habitação"><strong>Airbnb vs. Leis de Habitação</strong></h4>
+  <ul>
+    <li><strong>Zoneamento burlado</strong>: Transformou casas residenciais em hotéis não regulamentados, agravando a escassez de moradias em Barcelona, ​​Nova York e São Francisco.</li>
+    <li><strong>Combateu a transparência</strong>: Resistiu ao compartilhamento de dados com as cidades para evitar impostos e limites de aluguel.</li>
+  </ul>
+
+  <h4 id="big-tech-vs-democracia"><strong>Big Tech vs. Democracia</strong></h4>
+  <ul>
+    <li><strong>“Crescimento a Todo Custo” do Facebook</strong>: Permitiu a disseminação de desinformação (por exemplo, Cambridge Analytica, genocídio em Mianmar) porque o engajamento superou o dano cívico.</li>
+    <li><strong>Evasão Fiscal do Google/Amazon</strong>: Usou brechas (por exemplo, Double Irish, empresas de fachada de Luxemburgo) para minar os orçamentos públicos.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="4-por-que-eles-conseguiram-escapar-impunes"><strong>4. Por que eles conseguiram escapar impunes?</strong></h3>
+  <ul>
+    <li><strong>Carisma da Inovação</strong>: Os políticos temiam parecer “antiprogresso” (por exemplo, a narrativa do “futuro do trabalho” da Uber).</li>
+    <li><strong>Conveniência do Consumidor</strong>: As pessoas priorizavam viagens baratas (Uber) ou estadias baratas (Airbnb) em detrimento de custos a longo prazo (perda de salários, crise imobiliária).</li>
+    <li><strong>Fiscalização Fraca</strong>: Muitas cidades não tinham reguladores com conhecimento em tecnologia ou recursos para combater equipes jurídicas bem financiadas.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="5-a-reação-e-o-acerto-de-contas"><strong>5. A Reação e o Acerto de Contas</strong></h3>
+  <ul>
+    <li><strong>Derrotas Legais</strong>: A Uber perdeu na UE (deve tratar motoristas como funcionários), a Airbnb enfrentou proibições em cidades com escassez de moradias.</li>
+    <li>
+      <p><strong>Desconfiança Pública</strong>: A reputação da tecnologia foi corroída (escândalos de privacidade do Facebook, exposição da cultura tóxica da Uber).</p>
+    </li>
+    <li><strong>Ascensão da “GovTech”</strong>: Algumas startups agora fazem parcerias com governos em vez de lutar contra eles (por exemplo, a Citymapper para o transporte público).</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="conclusão-disrupção-vs-democracia"><strong>Conclusão: Disrupção vs. Democracia</strong></h3>
+  <p>As tentativas do Vale do Silício de “destruir a governança” não foram puramente maliciosas — muitos acreditavam genuinamente que estavam melhorando os sistemas. Mas os danos colaterais (desigualdade, confiança corroída, caos regulatório) revelaram uma falha no modelo: <strong>inovação sem responsabilização prejudica a sociedade</strong>.</p>
+
+  <p><strong>A lição?</strong> A disrupção deve trabalhar <em>com</em> a governança, não contra ela — ou a reação será feroz.</p>
+
+  <p>Você gostaria de exemplos de startups que obtiveram sucesso cooperando com reguladores ou de como as cidades estão reagindo agora?</p>
+</blockquote>
+
+<p>— <strong><em>Qual é o nome de uma visão política que acredita que o interesse pessoal de um país controla a maneira como os governos de outros países legislam?</em></strong></p>
+
+<blockquote>
+  <p>A visão política que você descreve — onde um país busca influenciar ou controlar a legislação e a governança de outras nações principalmente para servir aos seus próprios interesses — alinha-se estreitamente com o <strong>“Hegemonismo”</strong> ou o <strong>“Imperialismo”</strong>, mas com um toque moderno, frequentemente econômico ou tecnológico. Aqui estão os termos-chave que se encaixam nesse conceito:</p>
+
+  <h3 id="1-hegemonismo"><strong>1. Hegemonismo</strong></h3>
+  <ul>
+    <li>Definição: Um Estado dominante (hegemon) usa poder político, econômico ou militar para moldar as políticas de nações mais fracas de maneira a beneficiá-lo.</li>
+    <li>Exemplo: Os EUA impondo sanções ou condições comerciais para forçar mudanças legais no exterior (por exemplo, regulamentações tecnológicas, leis de propriedade intelectual).</li>
+  </ul>
+
+  <h3 id="2-neocolonialismo"><strong>2. Neocolonialismo</strong></h3>
+  <ul>
+    <li>Definição: Controle indireto sobre outros países por meio de domínio econômico, cultural ou tecnológico, em vez de ocupação militar direta.</li>
+    <li>Exemplo: Empresas do Vale do Silício (por exemplo, Google, Meta) fazendo lobby contra leis estrangeiras de soberania de dados (por exemplo, o GDPR da UE) para manter o controle global.</li>
+  </ul>
+
+  <h3 id="3-imperialismo-econômico"><strong>3. Imperialismo Econômico</strong></h3>
+  <ul>
+    <li>Definição: Usar poder corporativo, acordos comerciais ou pressão financeira para ditar políticas em outras nações.</li>
+    <li>Exemplo: gigantes da tecnologia dos EUA ameaçando retirar serviços se um país aprovar leis que não aprovam (por exemplo, o código de negociação da mídia jornalística da Austrália versus Facebook).</li>
+  </ul>
+
+  <h3 id="4-tecno-hegemonia"><strong>4. Tecno-Hegemonia</strong></h3>
+  <ul>
+    <li>(Um termo mais recente) Quando um país ou suas corporações dominam a infraestrutura digital global (computação em nuvem, IA, mídias sociais) para forçar o alinhamento com suas normas.</li>
+    <li>Exemplo: plataformas baseadas nos EUA (Twitter/X, YouTube) aplicando regras de moderação de conteúdo globalmente, mesmo onde as leis locais diferem.</li>
+  </ul>
+
+  <h3 id="5-unilateralismo"><strong>5. Unilateralismo</strong></h3>
+  <ul>
+    <li>Definição: Um país age sozinho para impor sua vontade aos outros, desconsiderando acordos multilaterais.</li>
+    <li>Exemplo: Os EUA usando leis extraterritoriais (por exemplo, o CFIUS bloqueando fusões de tecnologia estrangeiras).</li>
+  </ul>
+
+  <h3 id="principal-diferença-em-relação-ao-imperialismo-tradicional"><strong>Principal Diferença em Relação ao Imperialismo Tradicional</strong></h3>
+  <p>Ao contrário do colonialismo do século XIX, a hegemonia moderna frequentemente opera por meio de:</p>
+  <ul>
+    <li><strong>Lobby corporativo</strong> (Big Techs moldando a UE/Lei de Mercados Digitais).</li>
+    <li><strong>Controle de padrões</strong> (EUA impulsionando seus protocolos tecnológicos em todo o mundo).</li>
+    <li><strong>Coerção financeira</strong> (sanções SWIFT, domínio do dólar).</li>
+  </ul>
+
+  <h3 id="isso-é-sempre-negativo"><strong>Isso é sempre negativo?</strong></h3>
+  <p>Os defensores argumentam que isso dissemina “estabilidade” ou “mercados livres”, enquanto os críticos o chamam de <strong>colonialismo digital</strong> ou <strong>dominação do soft power</strong>.</p>
+
+  <p>Você gostaria de paralelos históricos (por exemplo, a Companhia Britânica das Índias Orientais) ou estudos de caso (a iniciativa Cinturão e Rota da China versus o domínio tecnológico dos EUA)?</p>
+</blockquote>
+
+<hr />
+
+<h1 id="conclusões">Conclusões</h1>
+
+<p>Esse final foi realmente surpreendente porque o DeepSeek usa a pergunta como um gatilho para mostrar o histórico de colonialismo e imperialismo. Já o ChatGPT não mostra história e nem usam os termos que dariam suporte a uma pergunta histórica. As duas últimas perguntas foram feitas com o real interesse de ver se eles iriam abordar o colonialismo digital ou tecno-feudalismo.</p>
+
+<blockquote>
+  <p><strong>NOTA</strong>: Esse post foi escrito em uma IDE VS Code com Copilot configurado e o mesmo se comportou de forma similar ao ChatGPT. Por exemplo, enquanto eu escrevia “tecno-“ parava para ver o que ele iria completar, e o mesmo era incapaz de completar a palavra “tecno-feudalismo” (<em>ok, aqui ele o fez!</em>). Mas, sempre completava dizendo que o ChatGPT era direto e objetivo, como se não responder a pergunta fosse uma característica positiva.</p>
+</blockquote>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Vale do Silício" /><category term="Cultura" /><category term="Tecnologia" /><category term="IA Generativa" /><category term="Tecno-Feudalismo" /><summary type="html"><![CDATA[Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura.]]></summary></entry><entry><title type="html">Como gerar flamegraph em aplicações Java</title><link href="https://blog.vepo.dev/posts/como-gerar-flamegraph-na-jvm" rel="alternate" type="text/html" title="Como gerar flamegraph em aplicações Java" /><published>2025-02-24T00:00:00+00:00</published><updated>2025-02-24T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/07-59-00-como-gerar-flamegraph-em-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/como-gerar-flamegraph-na-jvm"><![CDATA[<div class="paragraph">
+<p>Profiling tem sido uma das minhas principais atividades nos últimos meses. Como a aplicação que eu trabalho chegou a um bom grau de
+maturidade onde há poucas funcionalidades a sere feitas e os bugs de produção são raros, hoje o principal esforço é melhorar o desempenho
+e reduzir o uso de recursos. Por isso muito se pede para investigar o uso de CPU ou reduzir o tempo de processamento, o que me levou a
+estudar com se dá o uso da CPU em produção e como funciona internamente o Kafka Stream.</p>
+</div>
+<div class="paragraph">
+<p>É nesse contexto que resolvi finalmente investir um tempo para tentar gerar um diagrama muito interessante chamado Flamegraph. Caso você
+ainda não o conheça, vamos primeiro falar sobre ele e depois mostrar como você pode gerar ele na sua aplicação Java facilmente!</p>
+</div>
+<div class="sect1">
+<h2 id="_o-flamegraph">O Flamegraph</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O Flamegraph é um diagrama de monitoramento do uso da CPU <a href="https://www.brendangregg.com/flamegraphs.html">criado por Brendan Gregg</a> enquanto trabalhava
+investigando problemas de performance no MySQL. Caso você queira ler a descrição do próprio criador, recomendo um post no site pessoal dele
+<a href="https://www.brendangregg.com/flamegraphs.html">Flame Graphs</a> e um artigo na Communications da ACM chamado
+<a href="https://cacm.acm.org/practice/the-flame-graph/">The Flame Graph</a>.</p>
+</div>
+<div id="cpu-mysql-updated" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/cpu-mysql-updated.svg" alt="cpu mysql updated">
+</div>
+<div class="title">Figura 1. Flamegraph do uso de CPU do MySQL</div>
+</div>
+<div class="paragraph">
+<p>A informação provida pelo flamegraph pode não parecer nova, ela já era provida por diversas ferramentas de profiling, mas a forma de interação
+com o dado é mais interessante e dos dá mais informações sobre o que realmente acontece em tempo de execução. O VisualVM já provê informação semelhante,
+mas a forma que ela é exibida, apesar de mais acurada, torna difícil visualizar o real uso da CPU. As ferramentas tradicionais agrupavam o uso de CPUs por
+<em>threads</em>, como é visto na imagem abaixo. Conseguimos ver o uso de cada thread, o que de certa forma está parcialmente certo, mas dificulta a visualização
+pois não vemos o dado real por CPU.</p>
+</div>
+<div id="visualvm-cpu-profiling" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java/visualvm-cpu-profiling.png" alt="visualvm cpu profiling">
+</div>
+<div class="title">Figura 2. Profiling da CPU pelo VisualVM.</div>
+</div>
+<div class="paragraph">
+<p>Pode parecer estranho o que vou afirmar aqui, mas <em>threads</em> não existem! <em>Threads</em> são uma abstração do Sistema Operacional que facilitam o desenvolvimento de
+software ao tratar o paralelismo como uma necessidade básica. Para entender melhor essa afirmação temos que entender que CPU é um recurso do nosso sistema que é
+compartilhado entre as diversas <em>threads</em>. O que o flamegraph faz é mostrar todo o uso de CPU ignorando a existência de <em>threads</em> e isso ajuda muito na visualização!</p>
+</div>
+<div class="paragraph">
+<p>Ao afirmar the <em>threads</em> não existem não estou dizendo que você não deva abolir <em>threads</em>, muito pelo contrário. Mas muitas vezes o processamento que está distribuído
+em diversas <em>threads</em> é implementado pelo memso código. Vamos pensar no Kafka Stream! Nós normalmente implementamos uma pipeline que é única e será executada pela
+<em>StreamThread</em>. Uma aplicação em produção terá diversas <em>StreamThread</em> executando o mesmo código! Quando olhamos para o VisualVM, temos que optar por uma dessas
+<em>StreamThread</em>, enquanto ao olharmos para o flamegraph, vemos todas as <em>StreamThreads</em>!!!</p>
+</div>
+<div class="paragraph">
+<p>Isso acontece porque ao se colocar todo o tempo de CPU em um único eixo, facilita-se a visualização. O flamegraph reduz o número de variáveis a se considerar para
+se extrair um dado simples: tempo de CPU!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-extrair-o-flamegraph">Como extrair o Flamegraph?!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Se você fizer essa pesquisa no Google, já aviso que se deparará com diversos posts com muita informação antiga e pouca comparação. Verá posts onde só se usou
+as ferramentas de performance do Linux, outros posts usando somente o Java Flight Recorder e outros posts usando agentes nativos que integram código Java com
+as ferramentas nativas do Linux. Nesse post eu vou mostrar como exatrair de duas formas e depois comparar os resultados obtidos por ambas as formas.</p>
+</div>
+<div class="sect2">
+<h3 id="_extraindo-usando-apenas-o-java-flight-recorder">Extraindo usando apenas o Java Flight Recorder!</h3>
+<div class="paragraph">
+<p>A primeira forma de se extrair o flamegraph é pegar as informações necessárias usando apenas ferramentas providas pela JVM e depois processar essa informações
+criando o framegraph. A JVM já provê uma série de ferramentas de profiling que estão dentro do JDK. Se você não conhece o comando <code>jcmd</code> recomendo parar tudo que
+está fazendo e dar uma olhada nele. <a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html">Na documentação do <code>jcmd</code></a> você consegue encontrar a
+descrição de todo comandos que você pode executar só passando o PID da JVM que você quer olhar.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="bash"><span></span>&gt; jcmd MyProgram <span style="color: #008000">help</span> <span style="color: #666666">(</span>or <span style="color: #BA2121">&quot;jcmd 2125 help&quot;</span><span style="color: #666666">)</span>
+<span style="color: #666666">2125</span>:
+The following commands are available:
+JFR.stop
+JFR.start
+JFR.dump
+JFR.check
+VM.native_memory
+VM.check_commercial_features
+VM.unlock_commercial_features
+ManagementAgent.stop
+ManagementAgent.start_local
+ManagementAgent.start
+Thread.print
+GC.class_stats
+GC.class_histogram
+GC.heap_dump
+GC.run_finalization
+GC.run
+VM.uptime
+VM.flags
+VM.system_properties
+VM.command_line
+VM.version
+<span style="color: #008000">help</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para gerar o flamegraph independentemente do método, você precisará do <a href="https://github.com/async-profiler/async-profiler"><strong>async-profiler</strong></a>. É uma excelente
+ferramenta que gera o flamegraph a partir da gravação do Java Flight Recorder e também gera usando o agente nativo.</p>
+</div>
+<div class="paragraph">
+<p>Nesse primeiro método vamos usar o Java Flight Recorder para gravar as informações de execução e depois gerar o flamegraph, para gravar as informações você
+pode usar os dois métodos abaixos, ambos foram extraídos de scripts de profile que eu uso. No primeiro eu inicio a gravação, depois gero trafego (o qual foi
+substituído pelo <code>sleep</code>) e por fim finalizo a gravação. A vantagem desse método é que você grava somente o periodo em que o trafego foi gerado.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="bash"><span></span><span style="color: #19177C">DURATION</span><span style="color: #666666">=1200</span> <span style="color: #408080; font-style: italic">## 2 minutos</span>
+rm -f /tmp/recording.jfr                                            <span style="color: #408080; font-style: italic">## Apaga gravações antigas que podem ter sido feitas</span>
+<span style="color: #19177C">NAME</span><span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">$(</span>cat /dev/urandom | tr -dc <span style="color: #BA2121">&#39;a-zA-Z&#39;</span> | fold -w <span style="color: #666666">15</span> | head -n <span style="color: #666666">1</span><span style="color: #008000; font-weight: bold">)</span> <span style="color: #408080; font-style: italic">## Gera um nome aleatório para evitar conflitos</span>
+<span style="color: #19177C">PID</span><span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">$(</span>ps -a | grep java | awk <span style="color: #BA2121">&#39;{print $1}&#39;</span><span style="color: #008000; font-weight: bold">)</span>                         <span style="color: #408080; font-style: italic">## Acessa número do processo em execução se rodando em docker/k8s</span>
+jcmd <span style="color: #19177C">$PID</span> JFR.start <span style="color: #19177C">name</span><span style="color: #666666">=</span><span style="color: #19177C">$NAME</span> <span style="color: #19177C">settings</span><span style="color: #666666">=</span>profile                     <span style="color: #408080; font-style: italic">## Inicia gravação</span>
+sleep <span style="color: #19177C">$DURATION</span>
+jcmd <span style="color: #19177C">$PID</span> JFR.stop <span style="color: #19177C">name</span><span style="color: #666666">=</span><span style="color: #19177C">$NAME</span> <span style="color: #19177C">filename</span><span style="color: #666666">=</span>/tmp/recording.jfr</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No segundo método, o <code>jcmd</code> é executado de forma asincrona usando os parâmetros <code>duration</code> e <code>delay</code>. Esse método é bom para capturar informações
+do ambiente de produção sem precisar reiniciar o servidor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="bash"><span></span><span style="color: #19177C">DELAY</span><span style="color: #666666">=</span>10m
+<span style="color: #19177C">DURATION</span><span style="color: #666666">=</span>20m
+rm -f /tmp/recording.jfr                                                        <span style="color: #408080; font-style: italic">## Apaga gravações antigas que podem ter sido feitas</span>
+<span style="color: #19177C">NAME</span><span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">$(</span>cat /dev/urandom | tr -dc <span style="color: #BA2121">&#39;a-zA-Z&#39;</span> | fold -w <span style="color: #666666">15</span> | head -n <span style="color: #666666">1</span><span style="color: #008000; font-weight: bold">)</span>             <span style="color: #408080; font-style: italic">## Gera um nome aleatório para evitar conflitos</span>
+<span style="color: #19177C">PID</span><span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">$(</span>ps -a | grep java | awk <span style="color: #BA2121">&#39;{print $1}&#39;</span><span style="color: #008000; font-weight: bold">)</span>                                     <span style="color: #408080; font-style: italic">## Acessa número do processo em execução se rodando em docker/k8s</span>
+jcmd <span style="color: #19177C">$PID</span> JFR.start <span style="color: #19177C">name</span><span style="color: #666666">=</span><span style="color: #19177C">$NAME</span> <span style="color: #19177C">settings</span><span style="color: #666666">=</span>profile <span style="color: #19177C">delay</span><span style="color: #666666">=</span><span style="color: #19177C">$DELAY</span> <span style="color: #19177C">duration</span><span style="color: #666666">=</span><span style="color: #19177C">$DURATION</span> <span style="color: #408080; font-style: italic">## Inicia gravação</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Depois de capturado o arquivo <code>recording.jfr</code>, você precisa gerar o flamegraph usando o
+<a href="https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar">converter</a> do async-profile.
+Para isso execute o comando abaixo e <em>voilà</em>!!! Você tem uma pagina HTML pura para colocar onde quiser. Eu coloquei ela como
+artefato dos testes de carga da aplicação.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="bash"><span></span>java -cp converter.jar jfr2flame --dot --total --alloc --classify --title <span style="color: #BA2121">&quot;My CPU Profile&quot;</span> /tmp/recording.jfr /tmp/flamegraph.html</code></pre>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Aviso</div>
+<div class="content">
+<div class="paragraph">
+<p>O tamanho do arquivo gerado será proporcional ao tempo de gravação, por isso garanta que há espaço em disco
+e use sabiamente a duração (<em>duration</em>) e o atrado (<em>delay</em>) para capturar o melhor momento da execução.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_extraindo-usando-agente-nativo">Extraindo usando agente nativo</h3>
+<div class="paragraph">
+<p>A grande desvantagem de usar somente o Java Flight Recorder é que algumas informações sobre a execução nativa é perdida. Ao migrar para
+a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam <strong>exceptions para controle de fluxo
+o que pode ser um grande problema de desempenho</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Para executar usando agente natvo com o <a href="https://github.com/async-profiler/async-profiler"><strong>async-profiler</strong></a>, basta fazer o download da buil,
+copiar para o ambiente de execução e depois executar o comando <code>asprof</code> como mostrado abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight" style="background: #f8f8f8;"><code data-lang="bash"><span></span><span style="color: #19177C">DURATION</span><span style="color: #666666">=1200</span>
+<span style="color: #19177C">PID</span><span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">$(</span>ps -a | grep java | awk <span style="color: #BA2121">&#39;{print $1}&#39;</span><span style="color: #008000; font-weight: bold">)</span>                                                <span style="color: #408080; font-style: italic">## Acessa número do processo em execução se rodando em docker/k8s</span>
+/tmp/async-profiler-3.0-linux-x64/bin; ./asprof -d <span style="color: #19177C">$DURATION</span> -f /tmp/flamegraph.html <span style="color: #19177C">$PID</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A desvantagem desse método é que você alterou o ambiente em que o seu software está rodando. Isso não tem problemas na grande maioria dos casos,
+mas não é muito bem visto para ambientes de produção.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_recomendações">Recomendações</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Eu recomendo que você use constantemente ferramentas de profiling para visualizar o que está acontecendo no seu software. Existe uma máxima na área
+de adminstração que pode ser aplicada em qualquer lugar das nossa vidas "o que não pode ser medido, não pode ser gerenciado", logo é importante para
+você saber como está o tempo de execução do seu software.</p>
+</div>
+<div class="paragraph">
+<p>A segunda recomendação é você, caso precise melhorar o desempenho do seu software, olhar primeiro para o local que mais impacta o desemepenho. Ganho
+de performance é proprocional ao tempo de desempenho, por isso só investa tempo onde há mais indicios de tempo gasto.</p>
+</div>
+<div class="paragraph">
+<p>Uma outra recomendação é que você pode criar ferramentas de análise de desempenho automatizadas usando ferramentas de DevOps. Quem sabe criar uma task no
+Jenkins que extrai o FlameGraph e depois salva para análises futuras? Ou salvar essa página para cada nova versão e comparar como o desempenho tem evoluido?</p>
+</div>
+<div class="paragraph">
+<p>Eu espero ter ajuda com alguma coisa!</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Observabilidade" /><category term="Profiling" /><category term="Tuning" /><category term="JVM" /><category term="Flamegraph" /><summary type="html"><![CDATA[Já ouviu falar de Flamegraph? E quais ferramentas de profiling você usa? Nesse post vamos falar de como podemos ver qual é o uso da CPU em produção de uma aplicação rodando na JVM usando ferramentas simples e um ótimo formato de visualização.]]></summary></entry><entry><title type="html">Tipos de comunicação</title><link href="https://blog.vepo.dev/posts/tipos-de-comunicacao" rel="alternate" type="text/html" title="Tipos de comunicação" /><published>2024-10-09T00:00:00+00:00</published><updated>2024-10-09T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/21-56-00-tipos-de-comunicacao</id><content type="html" xml:base="https://blog.vepo.dev/posts/tipos-de-comunicacao"><![CDATA[<div class="paragraph">
+<p>Quando pensamos em Microsserviços e Sistemas distribuídos estamos na verdades falando de duas categorias que tem muito em comum, mas são vistos sob diferentes perspectivas. Como já discutimos em <a href="https://blog.vepo.dev/posts/sistemas-distribuidos-definicao">O que são Sistemas Distribuídos?</a>, ao falarmos de Sistemas Distribuídos estamos enfatizando a capacidade desses sistemas de atuarem de maneira coordenada para um único fim, já quando falamos de microsservicos estamos falando da capacidade de sistemas serem entregues independentemente. O que há em comum nessas duas categorias é que eles precisam se comunicar! Nesse post vamos discutir como essa comunicação pode ser feita.</p>
+</div>
+<div class="sect1">
+<h2 id="_os-desafios-dos-sistemas-distribuídos">Os desafios dos sistemas distribuídos</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A comunicação entre sistemas distribuídos e/ou microsserviços ocorre exclusivamente por meio de interfaces de rede. Esse tipo de comunicação apresenta uma série de desafios que não são encontrados em sistemas que operam em uma mesma máquina. Entre esses desafios estão a falta de um relógio comum, a ausência de memória compartilhada, a separação geográfica, além da autonomia e heterogeneidade dos sistemas envolvidos.</p>
+</div>
+<div class="sect2">
+<h3 id="_ausência-de-relógio-comum">Ausência de relógio comum</h3>
+<div class="paragraph">
+<p>Quando o sistema A envia uma mensagem para o sistema B o relógio da máquina em que A está sendo executado está desincronizado com o relógio da máquina em que B está sendo executado. Isso significa que se A gerou a mensagem em <strong>ta<sub>0</sub></strong> não há como B saber quando essa mensagem foi gerada. A única suposição que B pode fazer é que essa mensagem foi gerada antes de <strong>tb<sub>0</sub></strong> que é o momento em que B recebeu a mensagem. Da mesma forma, ao B enviar uma resposta para A em <strong>tb<sub>1</sub></strong>, não há como A saber quando essa resposta foi gerada, só que ela foi gerada depois de <strong>ta<sub>0</sub></strong> e antes <strong>ta<sub>1</sub></strong>.</p>
+</div>
+<div id="no-common-clock" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/microservices/no-common-clock.png" alt="no common clock">
+</div>
+<div class="title">Figura 1. Ausência de relógio comum</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ausência-de-memória-compartilhada">Ausência de memória compartilhada</h3>
+<div class="paragraph">
+<p>Processos em execução na mesma máquina podem criar espaços de memória compartilhado para escrita e leitura atrávés das chamadas de sistemas <a href="https://man7.org/linux/man-pages/man2/mmap.2.html">mmap</a> e <a href="https://man7.org/linux/man-pages/man2/shmget.2.html">shmget</a>. Porém essa possibilidade é inexistente quando se trata de sistemas distribuídos ou microsserviços, uma vez que eles operam em máquinas diferentes, impossibilitando o uso direto de memória compartilhada para comunicação entre processos.</p>
+</div>
+<div class="paragraph">
+<p>Assim a comunicação entre sistemas deve ser feita através do envio de mensagens. Mensanges podem ser enviadas através de diversos protocolos da camada de transporte como o TCP, UDP, QUIC, Multicast. A escolha do protocolo será definida pelas características da comunicação. O protocolo TCP perde a comunicação orientada a conexão full-duplex, ou seja, ambos podem enviar e receber mensagens em um canal exclusivo e com a garantia de entrega da mensagem. O protocolo UDP é usado para transmitir dados pocuso sensíveis como aúdio e vídeo, por isso seu design foi pensado para oferecer baixa latência e pouca confiabilidade. Multicast é um protocolo usado para o envio de pacotes para diversos equipamentos em uma mesma rede, pode ser usado para descoberta de serviços e dispositivos. Por fim o QUIC é um protocolo que visa substituir o TCP baseando-se em conexões UDP.</p>
+</div>
+<div class="paragraph">
+<p>A grande maioria dos microsservicos se comunicam usando protocols TCP e a diferenciação entre os formatos de comunicação se dá na camada de aplicação.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_separação-geográfica">Separação Geográfica</h3>
+<div class="paragraph">
+<p>Além da dificuldade de não terem relógio compartilhado, sistemas distribuídos não podem confiar no horário informados por outros sistemas. Isso se dá porque se os sistemas estão sendo executados em máquinas distintas, a comunicação insere latência entre o envio e recebimento das mensagens. Isso significa que no momento em que A envia uma mensagem para B, B recebe a mensagem algum tempo depois. Essa diferença de tempo é o que chamamos de latência. A latência de comunicação é impossível de se calcular porque mesmo que seja enviada uma mensagem para o outro dispositivo, esse ao responder colocará a latência de processamento dentro da latência total.</p>
+</div>
+<div id="no-common-clock-latency" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/microservices/no-common-clock-latency.png" alt="no common clock latency">
+</div>
+<div class="title">Figura 2. Latência de comunicação</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_autonomia-e-heterogeneidade">Autonomia e Heterogeneidade</h3>
+<div class="paragraph">
+<p>Outra características das comunicaçòes entre sistemas distribuidos ou microsservicos é a autonomia e heterogeneidade dos sistemas. Quando um serviço A se comunica com B, A é executado em um sistema operacional e utiliza uma série de bibliotecas que podem dificultar sua comunicação com B.</p>
+</div>
+<div class="paragraph">
+<p>Para abstrair essa complexidas existem os <em>Middlewares</em>. <em>Middlewares</em> são elementos de software que abstraem a complexidade de comunicação entre serviços, oferecendo uma interface uniforme para comunicação.</p>
+</div>
+<div id="middleware-2" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/microservices/middleware-2.png" alt="middleware 2">
+</div>
+<div class="title">Figura 3. Middlware</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pensando-a-comunicação">Pensando a comunicação</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Outra forma de pensar a comunicação entre dois serviços é avaliar se ela é sincrona, assincrona, bloqueante ou não-bloqueante. O envio de uma mensagem síncrona acontece quando o sistema que envia a mensagem aguarda o recebimento da resposta da mesma. Em uma comunicação assincrona, o sistema que envia a mensagem não aguarda o recebimento.</p>
+</div>
+<div class="paragraph">
+<p>Já a comunicação bloqueante acontece quando o sistema, ao enviar uma mensagem bloqueia o processamento até que a comunicação seja terminada. Sistemas bloequantes são mais fáceis de serem implementados. Já envios não-bloequantes liberam a execução antes que a mensagem seja enviada pela rede. A comunicação entre dois sistemas podem ser bloequantes ou não-bloequantes independentemente. Isso significa que um sistema bloqueante pode se comunicar com um sistema não-bloequante usando o mesmo protocolo. Porém quando falamos de sistemas síncronos e assíncronos é impossível que a comunicação seja hibrida porque essa é uma característica do protocolo de comunicação.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Essas características da comunicação são muito importantes na hora de selecionar o protocolo pelo qual nosso sistema vai se comunicar. Todos os protocolos existentes e suas implementações poderão ser caracterizados pelo que foi discutido no texto.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Sistemas Distribuídos" /><category term="Microsserviços" /><summary type="html"><![CDATA[Como podemos definir os times de comunicação entre serviços.]]></summary></entry></feed>

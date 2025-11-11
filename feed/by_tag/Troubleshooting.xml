@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Troubleshooting.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2025-11-11T22:24:01+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Troubleshooting.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Como a ciência pode te ajudar a resolver bugs</title><link href="https://blog.vepo.dev/posts/como-a-ciencia-pode-te-ajudar" rel="alternate" type="text/html" title="Como a ciência pode te ajudar a resolver bugs" /><published>2021-07-02T00:00:00+00:00</published><updated>2021-07-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-53-00-como-a-ciencia</id><content type="html" xml:base="https://blog.vepo.dev/posts/como-a-ciencia-pode-te-ajudar"><![CDATA[<p>Está na moda falar sobre ciência. Em meio a uma pandemia algumas pessoas estão louvando-a (<em>estou nesse grupo talkey!</em>) e outras odiando. Mas creio que muitos nem conhecem como a ciência funciona. Entender como ela funciona pode te ajudar em muitas coisas na sua vida, muitas decisões práticas podem ser tomadas de forma melhor se conhecermos o método da ciência. <strong><em>Método??!?!</em></strong> Sim meu caro, ciência é um método e não um ser mágico que detêm o conhecimento do além de como as coisas funcionam.</p>
+
+<p>Mas antes de começarmos vou fazer uma pergunta: <em>Qual é o seu método?</em> Talvez você não saiba responder a essa pergunta, mas você tem sim um método. Esse método pode ser até descrito. Tenta refletir aí baseado nas perguntas abaixo:</p>
+
+<ul>
+  <li>O que você faz quando recebe um ticket para implementar?</li>
+  <li>O que você faz pensa quando sabe que tem um bug?</li>
+  <li>Como você aprende?</li>
+</ul>
+
+<p>Tudo tem um método, as vezes ele é completamente subconsciente e emocional. Mas você pode refletir sobre ele e mudar ele.</p>
+
+<h2 id="como-funciona-o-método-científico">Como funciona o Método Científico?</h2>
+
+<p><em><strong>Aviso</strong>: Eu não sou filosofo e nem cientista e minha faculdade não tinha nenhuma matéria sobre método científico, logo não leve minhas afirmações como últimas, elas podem estar imprecisas. Aprendi sobre método científico na prática em laboratório de física.</em></p>
+
+<p>A base do método científico é a formulação e validação de hipóteses. Mas como isso funciona? Vamos dividir em passos e explicar cada passo pensando na solução de bugs.</p>
+
+<ol>
+  <li>Observação</li>
+  <li>Formulação de hipóteses</li>
+  <li>Elaboração de experimentos</li>
+  <li>Validação das hipóteses</li>
+  <li>Análise de dados</li>
+  <li>Conclusão</li>
+</ol>
+
+<h3 id="1-observação">1. Observação</h3>
+
+<p>A primeira coisa que devemos fazer quando nos deparamos com um bug é observar o que está acontecendo. Nesse caso precisamos levantar dados como em que ambiente o bug acontece, qual o contexto, saber se o sistema está sob estresse, há outros processos rodando na mesma máquina, quais foram as alterações recentes e quem fez, etc… Quanto mais perguntas você fizer nessa fase, mais informações vai ter.</p>
+
+<p>É muito importante saber todo o contexto, porque em muitos casos bugs são criados por efeitos colaterais de outras alterações e algumas soluções podem desfazer alterações prévias que são requisitos necessários.</p>
+
+<p>No final, a observação deve resultar em coleta de logs do sistema. Se o erro acontece sem nenhuma mensagem de erro ou alerta, isso por si já faz parte do bug.</p>
+
+<h3 id="2-formulação-de-hipóteses">2. Formulação de hipóteses</h3>
+
+<p>O segundo passo é formular hipóteses. Desenvolvimento de software também é baseado em hipóteses, algumas delas são requisitos e outras são padrões arquiteturais.</p>
+
+<p>A hipótese é nada mais do que uma afirmação sobre o contexto. Por que é importante formular hipóteses? Porque não podemos simplesmente sair alterando código sem saber o que ele faz. Precisamos ser cirúrgicos nas nossas alterações para evitar efeitos colaterais. Se formos cirúrgicos em nossas alterações, o código vai ficar cada vez mais estável, caso contrário teremos cada vez mais bugs em um processo que custará cada vez mais caro para o desenvolvimento. Nada é pior do que código instável.</p>
+
+<p>Quer exemplos de hipóteses?</p>
+<ul>
+  <li>O arquivo de configuração não está sendo lido</li>
+  <li>O processo não tem permissão de leitura</li>
+  <li>O HD está cheio</li>
+  <li>Há um memory leaky e o processo está sendo finalizado pelo sistema operacional</li>
+</ul>
+
+<h3 id="3-elaboração-de-experimentos">3. Elaboração de experimentos</h3>
+
+<p>Agora que temos uma hipótese, precisamos validar ela, mas para isso temos que fazer experimentos. Como eu posso criar um experimento a partir de uma hipótese? Nosso camarada Karl Popper pode nos ajudar (<em>acho que era outro Karl?</em> 🙃), precisamos falsear essa hipótese.</p>
+
+<p>Falsear é um termo que pode parecer estranho, mas é como se pegássemos nossa hipótese e tentássemos ver como ela pode ser refutada. Esse é o princípio básico para se criar testes. Se eu tenho uma hipotese que o erro acontece por um motivo, será que eu consigo criar um teste que reproduz aquele erro?</p>
+
+<p>Vamos tentar fazer isso com nossa primeira hipótese? Se o arquivo de configuração não está sendo lido, quais são as possibilidades que podem fazer isso acontecer? Será que ele existe? Se ele não existir há uma mensagem de erro? Será que o caminho dele está certo? Será que há alguma variável de ambiente que sobrescreve ele? Será que há algum erro no arquivo, algum parâmetro escrito de forma incorreta? Quais mensagens de logs demonstram isso?</p>
+
+<p>Falsear é refletir sobre a hipótese e em como construir testes que validem a hipótese. É simplesmente tentar destruir ela a todo custo.</p>
+
+<h3 id="4-validação-das-hipóteses">4. Validação das hipóteses</h3>
+
+<p>Agora com minhas suposições, precisamos criar testes para validar se é realmente isso que está acontecendo. Esses testes podem não ser testes automatizados, pode ser apenas <em>“pede pra pessoa de operação executar <code class="language-plaintext highlighter-rouge">df -h</code> e me mandar a resposta”</em>.</p>
+
+<p>Ou pode ser criar testes mesmo, no nosso exemplo, o que acontece se existe um arquivo de configuração especificado, mas ele não existe? Deve aparecer algum erro? O processo deve ser finalizado? Criar os testes automatizados podem ser importantes para que alterações futuras não tragam o erro de volta.</p>
+
+<p>Nessa fase da validação de hipóteses é necessário em muitos casos voltar a fase de observação. Na grande maioria dos bugs de produção não há dados para prever ele porque ninguém imaginava que ele poderia acontecer.</p>
+
+<h3 id="5-análise-de-dados">5. Análise de dados</h3>
+
+<p>Ao executar os testes, temos mais dados. Mas será que os testes realmente reproduzem o problema? É nessa hora vamos comprovar nossa hipótese. Se a mensagem de erro é a mesma ou o comportamento é similar podemos assumir que nossa hipótese é válida, caso contrário precisamos de uma nova hipótese e assim voltamos ao passo <strong>2</strong>. É muito importante que o erro seja reproduzido, pois só assim sabemos quais condições o levaram a acontecer.</p>
+
+<h3 id="6-conclusão">6. Conclusão</h3>
+
+<p>Ora, na ciência temos uma hipótese validada, mas e em desenvolvimento de software? Também temos uma hipótese validada! E isso pode levar a várias ações. Observe que nesse processo eu não falo de ações ou correções, pois esse é o processo de encontrar o problema.</p>
+
+<p>Mas dada a nossa hipótese, quais ações devem ser tomadas? O processo deve ser executado com permissão de administrador? O processo deve ser finalizado se houver um erro no arquivo de configuração? O software deve sempre colocar no log as configurações lidas? O software deve validar se tem permissão de leitura/escrita de certos arquivos?</p>
+
+<p>É muito importante que a conclusão leve a possíveis requisitos de automatização. Isso pode ser feito com a criação de testes ou com dashboards para validar a operação. O conceito de observabilidade é muito importante, devemos ter dados sobre a operação que possam validar e guiar o desenvolvimento.</p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Método é importante, sem ele atuamos cegamente sem sabermos o que realmente estamos fazendo. Há vários métodos no desenvolvimento de software e as vezes não pensamos sobre eles, como desenvolvimento tempos o Test Driven Development que é um método bem comum. Ter método é bastante útil porque nos ajuda a não procrastinar, sabemos como iniciar a fazer e quais são os passos. Em muitos casos a procrastinação é o medo de executar por não saber.</p>
+
+<p>Agora que você conhece como eu aplico o Método Científico no meu trabalho do dia a dia, me manda um oi para ver se eu te ajudei!</p>
+
+<p>Se quiser conhecer mais sobre Karl Popper, eu achei esse texto simples no blog Nau dos Loucos: <a href="https://naudosloucos.com.br/falseabilidade-descomplicada-karl-popper-e-o-falsificacionismo/">Falseabilidade Descomplicada: Karl Popper e o Falsificacionismo</a></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência" /><category term="Método Científico" /><category term="Troubleshooting" /><summary type="html"><![CDATA[Qual é o método que você usa para resolver bugs? Você tem método?]]></summary></entry><entry><title type="html">Debugando ou Troubleshooting</title><link href="https://blog.vepo.dev/posts/debugando-ou-troubleshooting" rel="alternate" type="text/html" title="Debugando ou Troubleshooting" /><published>2020-05-29T00:00:00+00:00</published><updated>2020-05-29T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-02-56-debugando-ou-troubleshooting</id><content type="html" xml:base="https://blog.vepo.dev/posts/debugando-ou-troubleshooting"><![CDATA[<p>Uma das funções de um desenvolvedor Sênior é fazer o time andar. Além dele ser melhorar a comunicação interna do time, será responsável também por não deixar o time parar. É aí que entra o <em>Debug</em>, <em>Troubleshooting</em>… ou em bom português Resolução de Problemas.</p>
+
+<p>Fazer troubleshooting é quase como investigar um crime. Você precisa tem muito conhecimento do que estava acontecendo, muito conhecimento do local e ir seguindo rastros.</p>
+
+<p>Então vamos lá em dicas de como encontrar e resolver problemas.</p>
+
+<h1 id="não-se-contente-com-a-aparência">Não se contente com a aparência</h1>
+
+<p>Muito tempo atrás, um um mundo onde <em>git</em> e <em>agile</em> ainda eram palavras exóticas, existia o <em>Waterfall</em>. <em>Waterfall</em> é o famoso processo de desenvolvimento que cada fase dura ao menos 3 meses. Você passa 3 semanas planejando, 2 meses desenvolvendo e uma semana testando. É uma loucura, literalmente. Mas tem uma coisa que o <em>Waterfall</em> me ensinou que eu nunca esqueço: <em>Root Cause Analysis</em>.</p>
+
+<p>Recebíamos um <strong>CR</strong> (<em>Change Request</em>) e antes de receber um branch pra desenvolver precisávamos fazer uma análise minuciosa da causa do problema em uma ferramenta web rudimentar.</p>
+
+<p>Vamos propor um problema: um simples <em>NullPointerException</em>.</p>
+
+<p>Na hora um júnior falaria pra colocar uma verificação de <code class="language-plaintext highlighter-rouge">null</code> e pronto.</p>
+
+<p>Mas uma boa Análise de Causa Raiz, pelo nome já diz que essa solução é inválida. Para fazer essa análise, você tem que fazer perguntas ao sistema:</p>
+
+<ol>
+  <li>De onde vem esse valor <code class="language-plaintext highlighter-rouge">null</code>?</li>
+  <li>Ele pode ser <code class="language-plaintext highlighter-rouge">null</code>? Ou deve sempre vir com algum valor?</li>
+  <li>Caso seja <code class="language-plaintext highlighter-rouge">null</code>, qual o comportamento do sistema?</li>
+</ol>
+
+<p>Dependendo das respostas acima, é bem provável que a solução proposta mude. Até porque você pode se perguntar: <em>Porque o cara que desenvolveu isso não o fez?</em> Óbvio?</p>
+
+<p>Pois bem, um Sênior não se contenta com análises superficiais. Vai investigar.</p>
+
+<h1 id="análise-de-logs">Análise de logs</h1>
+
+<p>Um Sênior sabe ler logs, mesmo que não seja de aplicações dele. Logs são o registro factual e uma execução. O passo a passo para um bug. Um log, em si, já diz muita coisa, mas se associarmos um log com o código temos tudo!</p>
+
+<p>Mas como ler um log? Vamos lá….</p>
+
+<ol>
+  <li>Encontre onde deu o problema</li>
+  <li>Analise a código levante algumas suposições</li>
+  <li>Retroceda no log, acompanhando com os trechos de código e validando suas suposições</li>
+  <li>Caso consiga uma suposição valida, crie um teste unitário que recria o estado da execução</li>
+</ol>
+
+<p>Fazer esses quatro passos exige muito treino. A principio é difícil analisar log, mas com o tempo vai se pegando o jeito e só de olhar o código é possível supor alguns possíveis problemas.</p>
+
+<h1 id="deixe-rastros">Deixe Rastros</h1>
+
+<p>Pior do que analisar logs é não ter logs para analisar. <a href="https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg">Nesse post expliquei como usar Log em Java</a>.</p>
+
+<p>Log consome performance, caso você não use log por causa disso, você não sabe usar log!</p>
+
+<p>Antes vamos entender os níveis de log…</p>
+
+<h2 id="níveis-de-log">Níveis de log</h2>
+
+<p>Em Java temos uma biblioteca padrão de log, a <a href="http://www.slf4j.org/">SLF4J</a>, eu recomendo que você a use, escolha uma implementação, mas pode olhar um benchmark.</p>
+
+<p>Cada mensagem de log tem um nível associado. No SLF4J há os seguintes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nivel</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TRACE</td>
+      <td>O mais interno. Use-o quando você quer marcar trechos de código executados. Por exemplo: “Iniciando getUsers”</td>
+    </tr>
+    <tr>
+      <td>DEBUG</td>
+      <td>Use-o para imprimir valores de variáveis durante a execução.</td>
+    </tr>
+    <tr>
+      <td>INFO</td>
+      <td>Use-o para imprimir informações uteis para a execução de informações. Em casos excepcionais, esse nível de log pode ser usado em produção.</td>
+    </tr>
+    <tr>
+      <td>WARN</td>
+      <td>Opa! Alguma coisa não devia ter acontecido. Porque? É bom investigar! Use esse nível para marcar comportamento inesperado, mas que não deram erro. Normalmente é aquela situação que pode ser contornada.</td>
+    </tr>
+    <tr>
+      <td>ERROR</td>
+      <td>Opa! Erro inesperado! Não fique logando com log erros esperados. Um ERROR já é sinal de um Bug…. Ou é um erro na lógica, ou algum serviço falhou!</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Use esses serviços sem cerimonia, para garantir a performance você deve configurar o nível de log de acordo com os ambientes. E, por favor, faça a <a href="https://12factor.net/pt_br/config">configuração ser por variável de ambiente</a>, <a href="https://12factor.net/pt_br/dev-prod-parity">nada de uma build pra cada ambiente!</a>.</p>
+
+<p>O que eu costumo fazer:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nivel</th>
+      <th>Ambiente</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TRACE</td>
+      <td>Desenvolvimento em debugging</td>
+    </tr>
+    <tr>
+      <td>DEBUG</td>
+      <td>Desenvolvimento, Staging</td>
+    </tr>
+    <tr>
+      <td>INFO</td>
+      <td>Testes, Staging, UAT</td>
+    </tr>
+    <tr>
+      <td>WARN</td>
+      <td>Produção</td>
+    </tr>
+    <tr>
+      <td>ERROR</td>
+      <td>Oi? Vai ignorar os warnings?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Os Níveis de log da produção eu baixo esporadicamente para determinados modulos somente quando há um Bug em Produção que não consigo reproduzir localmente. Mas é somente até conseguir encontrar registro do erro. Depois volta para WARN.</p>
+
+<h1 id="conheça-o-código">Conheça o Código</h1>
+
+<p>Muitos desenvolvedores consideram um produto/biblioteca/framework uma caixa preta. Trabalham na base do input/output. Essa abordagem é necessária quando se tem muito conhecimento a reter. Quando eu inicio o uso de um produto/biblioteca/framework eu tomo essa abordagem, mas com o andamento do projeto precisamos de mais informações.</p>
+
+<p>O conhecimento do funcionamento interno de todo o projeto é necessário para entender possíveis erros. Quando há um erro em produção, 1h é bastante tempo, logo tem que se ter uma boa ideia de tudo. O que pode tá errado?</p>
+
+<p>Um dica é aos poucos ir lendo os códigos que você usa como caixa preta. Mesmo que você não entenda, vá lendo e vendo o que ele faz com seus inputs.</p>
+
+<p>Quando estava desenvolvendo a Engine de Processos de Negócios de uma antiga empresa que trabalhei, enfretamos um grande problema de Memory Leak. Em resumo, toda intergração de negócio era escrita em XML e associado código Java. Assim um cara do comercial podia entender as integrações bizarras que existiam.</p>
+
+<p>Para fazer com que <code class="language-plaintext highlighter-rouge">if</code>, <code class="language-plaintext highlighter-rouge">case</code>, <code class="language-plaintext highlighter-rouge">switch</code>, <code class="language-plaintext highlighter-rouge">for</code>, etc… fosse colocados em XML, usamos o <a href="http://commons.apache.org/proper/commons-jexl/"><strong>Java Expression Language (JEXL)</strong></a> da Apache.</p>
+
+<p>Estava tudo indo certo até ir para Produção. Mas o negócio não ficava de pé por alguns dias. Estourava a memória. Depois de uma analise bem detalhada, percebi que não era no nosso código. Até encontrar que na limpesza do cache do JEXL, eles não limpavam as referências as classes utilizadas. Assim, se usassemos ClassLoaders dinamicos, como era uma escolha arquitetural nossa, ficavamos com muito lixo na Heap. Entendeu? Se não depois falo sobre Gerenciamento de Memória no Java.</p>
+
+<p>E agora, como resolver? Bom, tive que abrir os objetos pro Reflection, violando todos os principios de OOP para limpar o cache. E funcionou!</p>
+
+<p>Não dá pra garantir que exista um software sem erros, conhecer as suas dependências é um requisito.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Um Sênior deve saber resolver os problemas do time. Deve ser um guia para criar meios de deixar rastros e entender o que está acontecendo. Troubleshooting é difícil, mas é uma prática.</p>
+
+<p>Leia código, tente executar eles na sua mente. Simule execuções baseada em logs.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Troubleshooting" /><category term="Debugging" /><category term="Logging" /><summary type="html"><![CDATA[Um Sênior deve saber fazer troubleshooting. Aqui vão algumas dicas.]]></summary></entry></feed>
