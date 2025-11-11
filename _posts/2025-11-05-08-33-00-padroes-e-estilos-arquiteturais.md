@@ -7,7 +7,7 @@ tags: [Arquitetura de Software]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/padroes-e-estilos-arquiteturais
 series: Conversas sobre Arquitetura
-publish_date: 2025-10-05 08:33:00 +0300
+publish_date: 2025-11-05 08:33:00 +0300
 ---
 
 {% youtube Ub-RUQ_aQ8Q %}
