@@ -2,7 +2,7 @@
 title: O que é Arquitetura de Software
 published: true
 description: | 
-    Esse é o primeiro post da série Conversas sobre Arquitetura. Nele vamos discutir o que é Arquitetura de Software usando a definição do livro "Software Architecture in Practice", explorando como a arquitetura vai além do código para se tornar uma ferramenta de comunicação e racionalização sobre sistemas. Descubra como módulos, componentes, conectores e estruturas organizacionais se combinam para formar o esqueleto de qualquer sistema de software, e por que toda aplicação possui uma arquitetura - seja ela bem planejada ou não.
+    Esse é o primeiro post da série **Conversas sobre Arquitetura**. Nele vamos discutir o que é Arquitetura de Software usando a definição do livro "Software Architecture in Practice", explorando como a arquitetura vai além do código para se tornar uma ferramenta de comunicação e racionalização sobre sistemas. Descubra como módulos, componentes, conectores e estruturas organizacionais se combinam para formar o esqueleto de qualquer sistema de software, e por que toda aplicação possui uma arquitetura - seja ela bem planejada ou não.
 tags: [Arquitetura de Software]
 cover_image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/o-que-e-arquitetura-de-software
