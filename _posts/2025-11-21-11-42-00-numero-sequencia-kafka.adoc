@@ -1,6 +1,6 @@
 ---
 title: Como implementar um seletor de números sequenciais no Apache Kafka
-published: false
+published: true
 description: |
     Quando trabalhamos com sistemas distribuídos, muitas vezes precisamos de uma maneira de gerar números sequenciais únicos para identificar objetos. Existem diversas formas de implementar isso, mas as vezes algumas limitações técnicas nos obrigam a usar sistemas como o Apache Kafka para essa tarefa.
 tags: [Ciência da Computação, Sistemas Distribuídos, Microsserviços]
@@ -127,4 +127,4 @@ Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de lead
 .Diagrama de Sequência da Eleição do Líder
 image::kafka/leader-election.png[]
 
-Para implementar a eleição de líder, a Fil
+Para implementar a eleição de líder, a Fila Requisições será somente atualizada pela Thread de Consumo. Essa deve consumir as mensagens do tópico de controle e adicionar novas requisições a fila e remover as mesmas quando identificado uma mensagem de liberar.
