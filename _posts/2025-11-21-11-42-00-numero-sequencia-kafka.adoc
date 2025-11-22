@@ -131,6 +131,8 @@ Para implementar a eleição de líder, a Fila Requisições será somente atual
 
 A thread de aplicação deverá enviar a mensagem de requisição de liderança e aguardar até que a mesma seja a primeira da fila. Quando isso acontece, é certo que todos os outros processos participantes enviaram suas requisições e a liberação da condição de liderança.
 
+Nas imagens abaixo há uma demonstração de como a fila de requisições é gerida.
+
 // https://excalidraw.com/#json=p53_nMkj8YlL6m3sGL7KB,OILOa5-fQvEyBRjJJrGDBA
 .Quando os Sistemas A, B e E enviam requisições ao mesmo tempo, elas são ordenadas pelo consumidor e o primeiro a enviar se torna líder. No caso o sistema A.
 image::kafka/leader-election-queue-1.png[]
@@ -142,3 +144,25 @@ image::kafka/leader-election-queue-2.png[]
 // https://excalidraw.com/#json=BVlEQpMe2z64qG-DydwD7,6tPLRsxz0qsq3UqkCmPqdA
 .Quando o Sistema B envia a mensagem de abdicar a posição de líder, o Sistema C se torna o Líder.
 image::kafka/leader-election-queue-3.png[]
+
+Talvez você tenha ficado com algumas dúvidas porque esse algoritmo não está completo. Para que ele realmente funcione é preciso controlar duas situações:
+
+1. O que acontece se um sistema envia uma requisição e para de funcionar?
+2. O que acontece quando um sistema envia múltiplas requisições?
+
+Para resolver o primeiro caso, enquanto o sistema estiver esperando se tornar líder ou ao ser líder, ele deve enviar constantemente uma mensagem de _heartbeat_. Isso significa que a requisição deve ter validade de no máximo 2 segundos e caso o sistema não envie uma requisição de _heartbeat_ dentro desse intervalo, ela é arbitrariamente removida da fila e outro sistema envia uma notificação de remoção. Os sistemas devem enviar informando que uma requisição expirou para que outros participantes não esperem o tempo de expiração ao consumir as requisições.
+
+// https://editor.plantuml.com/uml/fL4v3i8m4Ept5QlqHAAbGB4ZKL712vPa1PPosux4YwWeUK4-XkC8J9HqL1xFh6Tsv4GRwemj2sZSgJBLK6KmEYjjk2GK4P96iIvAByfrCVLY2grbonWTL46OCvwujKghuJ6yMFkHKG6WpAYU3BkiBvG1fW5Eym8tUmzttfAr0RcaqYK5VXD7YnqUXsVE7K3kXAw-k-muZd6Bcg-socjqD_YrlR5hUc6Q6GVolzUpzSkwvz53p2i4-jD2XXPZUbPNHbMMfl343OzV-mO0
+
+.Diagrama de Sequência para quando um dos participantes falhar logo após virar líder, sem enviar as mensagens _heartbeat_.
+image::kafka/leader-election-dead.png
+
+É importante que a mensagem de _heartbeat_ seja enviada com uma frequência maior que o tempo de expiração da mensagem de requisição. 
+
+O segundo case pode ser resolvido com a modelagem da mensagem de requisição. A mensagem de requisição deve ter uma chave única para todos os participantes e os campos `id` para identificação do participante e o campo `seq` que deve conter um número sequêncial para controle de liberação da requisição.
+
+É importante notar que logicamente uma mensagem de LeaderRelease só é enviada quando o processo é líder, isso significa uma ordenação lógica nas mensagens.
+
+### Memória Compartilhada
+
+Uma vez que o processo é líder, ele pode assumir que consumiu todas as mensagens de todos os líderes anteriores. Dessa forma o tópico de controle pode ser usado como uma memória compartilhada onde qualquer valor pode ser enviado, usando a chave que controlará o acesso ao elemento compartilhado.
