@@ -1,0 +1,130 @@
+---
+title: Como implementar um seletor de números sequenciais no Apache Kafka
+published: false
+description: |
+    Quando trabalhamos com sistemas distribuídos, muitas vezes precisamos de uma maneira de gerar números sequenciais únicos para identificar objetos. Existem diversas formas de implementar isso, mas as vezes algumas limitações técnicas nos obrigam a usar sistemas como o Apache Kafka para essa tarefa.
+tags: [Ciência da Computação, Sistemas Distribuídos, Microsserviços]
+cover_image: /assets/images/microservices/cover-100-42.webp
+series: Sistemas Distribuídos & Microsserviços
+permalink: /posts/como-implementar-um-seletor-de-numeros-sequenciais-no-apache-kafka
+publish_date: 2025-11-21 11:47:00 +0300
+---
+
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+Esse é um relato de uma situação real que aconteceu no projeto em que trabalho. Temos uma solução baseada em Apache Kafka para processamento de CDRs (Call Detail Records). São bilhões de registros processados diariamente e tudo é feito usando Kafka. É um sistema que existe em diversos países, sob diversos clientes e diversas infraestruturas e cada novo serviço adicionado ao ecossistema precisa ser justificado, implantado e mantido. Ou seja, adicionar um novo sistema, por mais simples que seja, não é uma tarefa trivial.
+
+Quando chega uma funcionalidade que parece banal: "em um determinado ponto, precisamos usar números sequenciais como identificador para algo". 
+
+== A solução óbvia
+
+Primeira solução foi "vamos usar algo de mercado que já resolve nosso problema". Podemos colocar um Redis, ou na pior das hipóteses usar o Zookeeper, e implementar um contador simples.
+
+Ambas as soluções dão suporte. O Redis possui o comando https://redis.io/docs/latest/commands/incr/[INCR] que incrementa um valor armazenado em uma chave e retorna o novo valor. Já o Zookeeper possui o conceito de nós sequenciais, que são nós criados com um sufixo numérico que é incrementado automaticamente a cada nova criação.
+
+[source,ruby]
+----
+SET mykey "10"
+"OK"
+INCR mykey
+(integer) 11
+GET mykey
+"11"
+----
+
+Uma outra solução um pouco mais robusta seria usar o https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/[Redis] ou o Zookeeper para implementar https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks[Lock Distribuído e garantir que apenas um processo por vez consiga incrementar o contador]. Mas isso é mais complexo e não é necessário se o sistema já oferece suporte nativo.
+
+Em alguns clientes seria muito simples usar o Zookeeper, uma vez que naquela época era parte integrante do Kafka. MAS... havia 2 grandes problemas. O primeiro é que apesar de usarmos o Zookeeper, ele não era conhecido pela nossa aplicação. O Kafka usava o Zookeeper para gerenciar o estado do cluster e já estava em andamento a remoção do mesmo, uma vez que essa é uma das fontes de gargalo do Kafka. O segundo problema é que muitos clientes já haviam migrado para uma solução Managed Kafka, ou seja, o Kafka era oferecido como um serviço em nuvem e não tinhamos acesso ao Zookeeper. Ou seja, não podíamos contar com o Zookeeper mesmo que ele estivesse lá.
+
+Para essa implementação, vazão não era um problema, uma vez que o número sequencial seria usado apenas para identificar um lote de registros e não cada registro individualmente. Ou seja, a taxa de consumo do número sequencial seria baixa, muito baixa. E há outro ponto importante: não há como se definir um número sequencial global sem uma coordenação centralizada. Por mais que usassemos Redis ou Zookeeper, o sistema continuaria sendo centralizado, o que implicaria em baixa vazão.
+
+Logo, Apache Kafka era a única solução possível.
+
+== A solução estúpida!
+
+Mas antes de ir para o Kafka, preciso retirar da sala uma solução estúpida que foi lançada ao ar. 
+
+_— Porque não usar um simples arquivo de **lock** compartilhado?_
+
+Sério! Eu tive que me deparar com essa pergunta simples que foi levantada por um desenvolvedor. Então, se você pensou na mesma coisa, vamos entender um poquinho de Sistemas Operacionais e Docker.
+
+Lock de arquivo não é implementado no sistema de arquivos, mas sim no kernel do sistema operacional. Dessa forma, para que solução funcione é necessário que todos os processos estejam rodando em um mesmo sistema operacional, ou seja, precisariamos de um sistema operacional distribuído, o que não é muito comum...
+
+Além disso, não era possível usar soluções containerizadas, uma vez que quando o docker cria um namespace para o container, ele já isola o sistema de arquivos. 
+
+Para demonstrar que isso não funcionaria, fiz um pequeno experimento. Funcionou apenas quando duas JVMs rodavam na mesma máquina sem docker. Ao colocar o docker, o lock não funcionava mais. Ainda pediram para eu testar com Kubernetes... e tive que fazer o teste perdendo mais tempo....
+
+Mas conseguimos resolver isso e provei que o Kafka era realmente a única solução possível.
+
+== Decompondo o problema
+
+Então tínhamos um grande problema e uma ferramenta que não foi feita para resolver esse problema. Como resolver isso? Primeiro precisamos decompor o problema em partes menores.
+
+A seleção de números sequenciais pode ser decomposta em duas partes: (i) seleção de líder e (ii) criação de memória compartilhada. Para simplificar, resolvi escrever um código bem simples que seria a base da minha implementação.
+
+
+[source,java]
+----
+try(Leader leader = consensus.acquireLeader()) {
+    int currentValue = leader.getInteger(key, 0);
+    // use currentValue
+    leader.setInteger(key, currentValue + 1);
+}
+----
+
+Esse código é propositadamente simples e teria três interfaces compostas pelos métodos `acquireLeader`, `getInteger` e `setInteger`. Só o líder é capaz de alterar os valores da memória compartilhada e por isso _getters_ e _setters_ só são acessíveis pela interface `Leader`. Já a interface Consensus só teria um método, o `acquireLeader` que seria um método bloqueante até o líder ser eleito.
+
+Com isso o código principal da aplicação não seria "contaminado" pela complexidade da eleição do líder e nem pela memória compartilhada.
+
+Agora era hora de implementar os algoritmos necessários para fazer tudo funcionar perfeitamente.
+
+=== Como o Kafka permite consenso
+
+O Apache Kafka é um https://www.researchgate.net/publication/378309830_Middlewares_Orientados_a_Mensagens[middleware orientado a mensagens] que permite integrar sistema pela envio e recebimento de eventos. Existe duas formas de comunicação possíveis orientadas a mensagens, o Ponto a Ponto ou o Publish/Subscribe. O Kafka só oferece a possibilidade de comunicação via Publish/Subscribe, isso significa que o broker possui tópicos onde processos podem enviar mensagens e processos podem consumir as mensagens de forma sequêncial.
+
+Como o Kafka é distribuído por natureza, todo tópico é dividido em partições. Cada partição funciona como um log segmentado, ou seja, o broker sempre escreverá a mensagem recebida no final de um arquivo até que ele cresça e seja preciso criar um outro arquivo. Dessa forma, ao se enviar uma mensagem, o produtor pode selecionar a partição, ou ela é selecionada através da chave, e salva sequencialmente.
+
+.Referências
+****
+* https://dl.acm.org/doi/10.14778/2824032.2824063[Building a replicated logging system with Apache Kafka]
+* https://ieeexplore.ieee.org/document/9005583[Kafka: the Database Inverted, but Not Garbled or Compromised]
+* https://notes.stephenholiday.com/Kafka.pdf[Kafka: a Distributed Messaging System for Log Processing]
+****
+
+.Anatomia de um Tópico
+image::kafka/topico.png[]
+
+É preciso ressaltar que o Kafka não garante o consumo de mensagens sequenciais, porém dentro de uma partição as mensagens são consumidas sequencialmente. Isso significa que quando um consumidor inicia a subscrição, é garantido que o consumo é sequencial se, e somente se, o tópico tem apenas uma partição. Caso o tópico tenha mais de uma partição, apenas o consumo de mensagens com a mesma chave será sequencial.
+
+Dessa forma, o Kafka pode ser usado em algoritmos de consenso ao sabermos que o consumo de mensagens é sequêncial desde que elas tenham a mesma chave ou o tópico possua apenas uma partição.
+
+Outra peculiaridade dos tópicos Kafka é que eles estão submetidos a mecanismos de limpeza a depender do valor de `cleanup.policy`. Quando o mecanismo `compact` é selecionado, o Kafka evita que o tópico cresça indefinitivamente, mas mantém a última mensagem de cada chave enviada. Dessa forma o tópico pode ser usado como uma tabela distribuída que é reconstruída através de consumidores. Alguns autores até pontuam que o Kafka é uma base de dados invertida, é como se pegassemos os mecanismos de sincronia de bases relacionais e usassemos para construir sistemas distribuídos.
+
+// https://excalidraw.com/#json=jA6Py4ThbyR4b42i_i5vC,X-sQG6LuN85YA3_cEEmh0A 
+
+.Kafka como base de dados invertida
+image::kafka/database-inverted.png[]
+
+Talvez você já tenha capturado a mensagem. É possível construir uma tabela de chave valor durável e distribuída, só falta agora garantir a eleição do líder.
+
+### Leader Election (Eleição do Líder)
+
+Para construir as funcionalidades (i) e (ii) será necessário ter um mecanismo de troca de mensagens sequêncial e distribuído. De forma que cada participante pode enviar mensagens e consumir assincronamente. Dessa forma, nosso cliente de consenso terá 2 canais de comunicação, onde requisições são enviadas por um produtor e consumidas pelo consumidor. Ao se enviar requisições, não sabemos qual é o estado da aplicação, mas ao consumir elas sabemos que todos os participantes estão consumindo o mesmo conjunto de mensagens na mesma ordem. Por isso o algoritmo deverá se basear em um tópico de controle usando apenas uma partição e cada consumidor deverá consumir do tópico independentemente, ou seja, sem criar grupos de consumo para que cada consumidor receba todas as mensagens consumidas.
+
+A figura abaixo ilustra esse comportamento. Os sistemas S1 e S2 enviam as mensagens REQ_1 e REQ_2 e consomem do tópico de controle as requisições ordenadas REQ_1 e REQ_2. Dessa forma o sistema S1 saberá que envio primeiro a requisição e S2 também.
+
+// https://excalidraw.com/#json=amLuEMnf63gLXByN0tN7z,znjVD0cy2eX3wh_-fgyNrQ 
+.Kafka sendo usado como tópico de controle
+image::kafka/topico-controle.png[]
+
+É importante ressaltar que timestamp não é uma informação tão relevante em sistemas distribuídos, pois cada máquina tem seu clock independente, como já falei no post https://blog.vepo.dev/posts/relogios-fisicos-e-logicos[Relógios Físicos e Lógicos]. Em um tópico, o que define a ordenação cronológica do evento é a ordem de recebimento no broker, ou seja, o offset da mensagem e todos os consumidores receberão as mensagens com offset crescente.
+
+Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de leader election através do envio e recebimento de requisições. Cada processo participante, ao desejar se tornar líder, deve enviar uma requisição de candidatura ao tópico de controle e ao finalizar sua participação como líder, deve enviar uma requisição de renúncia.
+
+// https://editor.plantuml.com/uml/ZLFBJiCm4BpxArRb0WUQUwIW5bGGQYKgn0ziawMrwjYf7wZYTpXmuiWNzCUmawPnGf6uLD7kU6TdPZin5hLrfM0hjOVHoqOJ5b0GJ2l1Spny7ZxK22uMVBsnjy8HgpoSvxn2QMDChtwdf25fdEbLbreLpYhDI1RWsHZREN84etikC50-qyvnm_syRp8ZG0EXmzXmjJ3UbQUr7ZIH_CNlIbx4NFMCERvkqRzRShdjlRZLQaiH6dFBtz3sREYAdRvUwKXvgXs7iYo3H-cP46Q2l3nKGKMIBBmUqaa2MSPOH0JNDnr52kXTqTI0Bw_OgHDWhQTfRHuPsy3weE1Y2ZDJaKQeb8weMK5dLB5sR7ZTg4XXwLQ2cmtJP9sMy3HddUOOLoaXMb3fv-7Q_mompKPJwr3mTvzmVG5zrP4zqo8uuD-UIw2dD38ndX0IQBw3rUFn66PxobrZTgvA1Ol3L-ZwLetbAs-L7aJqTqAQ1A7vHqGHBF9uk7X3x-N6wSI7U3QqGV5uZ56rFSU9l_BmX_y1
+
+.Diagrama de Sequência da Eleição do Líder
+image::kafka/leader-election.png[]
+
+Para implementar a eleição de líder, a Fil
