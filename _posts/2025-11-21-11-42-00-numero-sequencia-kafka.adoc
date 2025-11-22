@@ -128,3 +128,17 @@ Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de lead
 image::kafka/leader-election.png[]
 
 Para implementar a eleição de líder, a Fila Requisições será somente atualizada pela Thread de Consumo. Essa deve consumir as mensagens do tópico de controle e adicionar novas requisições a fila e remover as mesmas quando identificado uma mensagem de liberar.
+
+A thread de aplicação deverá enviar a mensagem de requisição de liderança e aguardar até que a mesma seja a primeira da fila. Quando isso acontece, é certo que todos os outros processos participantes enviaram suas requisições e a liberação da condição de liderança.
+
+// https://excalidraw.com/#json=p53_nMkj8YlL6m3sGL7KB,OILOa5-fQvEyBRjJJrGDBA
+.Quando os Sistemas A, B e E enviam requisições ao mesmo tempo, elas são ordenadas pelo consumidor e o primeiro a enviar se torna líder. No caso o sistema A.
+image::kafka/leader-election-queue-1.png[]
+
+// https://excalidraw.com/#json=LvgbNBuRqt2p4RMf1pTL5,V-gLSUhV3JtK-veU4mQfbg
+.Quando o Sistema A envia a mensagem de abdicar a posição de líder, o Sistema B se torna o Líder.
+image::kafka/leader-election-queue-2.png[]
+
+// https://excalidraw.com/#json=BVlEQpMe2z64qG-DydwD7,6tPLRsxz0qsq3UqkCmPqdA
+.Quando o Sistema B envia a mensagem de abdicar a posição de líder, o Sistema C se torna o Líder.
+image::kafka/leader-election-queue-3.png[]
