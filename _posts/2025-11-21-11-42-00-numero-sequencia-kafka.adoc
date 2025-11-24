@@ -13,15 +13,15 @@ publish_date: 2025-11-21 11:47:00 +0300
 :figure-caption: Figura
 :imagesdir: /assets/images/
 
-Esse é um relato de uma situação real que aconteceu no projeto em que trabalho. Temos uma solução baseada em Apache Kafka para processamento de CDRs (Call Detail Records). São bilhões de registros processados diariamente e tudo é feito usando Kafka. É um sistema que existe em diversos países, sob diversos clientes e diversas infraestruturas e cada novo serviço adicionado ao ecossistema precisa ser justificado, implantado e mantido. Ou seja, adicionar um novo sistema, por mais simples que seja, não é uma tarefa trivial.
+Este relato é baseado em uma situação real do projeto em que atuo. Nossa solução utiliza Apache Kafka para processar CDRs (Call Detail Records), lidando com bilhões de registros diários. Todo o fluxo é construído em torno do Kafka, em um sistema que já opera em vários países, sob diferentes clientes e infraestruturas. Cada novo serviço incorporado ao ecossistema precisa ser planejado, justificado, implantado e mantido — o que torna a introdução de qualquer sistema adicional, por mais simples que pareça, uma tarefa nada trivial.
 
-Quando chega uma funcionalidade que parece banal: "em um determinado ponto, precisamos usar números sequenciais como identificador para algo". 
+Foi nesse contexto que surgiu uma necessidade aparentemente simples: em determinado ponto do processo, seria necessário utilizar números sequenciais como identificadores para um novo recurso.
 
 == A solução óbvia
 
-Primeira solução foi "vamos usar algo de mercado que já resolve nosso problema". Podemos colocar um Redis, ou na pior das hipóteses usar o Zookeeper, e implementar um contador simples.
+A primeira solução considerada foi: _"vamos adotar uma ferramenta pronta que já resolva isso"_. Poderíamos implementar um contador simples usando Redis ou, como alternativa, o próprio Zookeeper.
 
-Ambas as soluções dão suporte. O Redis possui o comando https://redis.io/docs/latest/commands/incr/[INCR] que incrementa um valor armazenado em uma chave e retorna o novo valor. Já o Zookeeper possui o conceito de nós sequenciais, que são nós criados com um sufixo numérico que é incrementado automaticamente a cada nova criação.
+Ambas as tecnologias oferecem suporte nativo para essa funcionalidade. O Redis dispõe do comando ttps://redis.io/docs/latest/commands/incr/[INCR], que incrementa um valor associado a uma chave e retorna o resultado atualizado. Já o Zookeeper trabalha com o conceito de nós sequenciais — ou seja, cada novo nó criado recebe automaticamente um sufixo numérico incremental.
 
 [source,ruby]
 ----
@@ -35,34 +35,41 @@ GET mykey
 
 Uma outra solução um pouco mais robusta seria usar o https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/[Redis] ou o Zookeeper para implementar https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks[Lock Distribuído e garantir que apenas um processo por vez consiga incrementar o contador]. Mas isso é mais complexo e não é necessário se o sistema já oferece suporte nativo.
 
-Em alguns clientes seria muito simples usar o Zookeeper, uma vez que naquela época era parte integrante do Kafka. MAS... havia 2 grandes problemas. O primeiro é que apesar de usarmos o Zookeeper, ele não era conhecido pela nossa aplicação. O Kafka usava o Zookeeper para gerenciar o estado do cluster e já estava em andamento a remoção do mesmo, uma vez que essa é uma das fontes de gargalo do Kafka. O segundo problema é que muitos clientes já haviam migrado para uma solução Managed Kafka, ou seja, o Kafka era oferecido como um serviço em nuvem e não tinhamos acesso ao Zookeeper. Ou seja, não podíamos contar com o Zookeeper mesmo que ele estivesse lá.
+Uma alternativa mais robusta seria utilizar o https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/[Redis] ou o https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks[Zookeeper] para implementar um Lock Distribuído, garantindo que apenas um processo por vez possa incrementar o contador. No entanto, essa abordagem é mais complexa e desnecessária, uma vez que ambas as tecnologias já oferecem suporte nativo para a funcionalidade de contador.
 
-Para essa implementação, vazão não era um problema, uma vez que o número sequencial seria usado apenas para identificar um lote de registros e não cada registro individualmente. Ou seja, a taxa de consumo do número sequencial seria baixa, muito baixa. E há outro ponto importante: não há como se definir um número sequencial global sem uma coordenação centralizada. Por mais que usassemos Redis ou Zookeeper, o sistema continuaria sendo centralizado, o que implicaria em baixa vazão.
+Em alguns clientes, usar o Zookeeper parecia uma solução simples, já que na época ele ainda era um componente integral do Kafka. No entanto, dois grandes obstáculos se apresentavam.
 
-Logo, Apache Kafka era a única solução possível.
+Primeiro: embora o Kafka utilizasse o Zookeeper para gerenciar o estado do cluster, nossa aplicação não tinha usava essa tecnologia. Além disso, já estava em curso a remoção do Zookeeper do ecossistema do Kafka, justamente por ser considerado uma das fontes de gargalo.
 
-== A solução estúpida!
+O segundo problema era que muitos clientes já haviam migrado para soluções de Kafka gerenciado (Managed Kafka), onde o serviço é oferecido como um produto em nuvem — e nessas situações, não tínhamos acesso ao Zookeeper. Portanto, mesmo que ele estivesse presente, não podíamos contar com essa solução.
 
-Mas antes de ir para o Kafka, preciso retirar da sala uma solução estúpida que foi lançada ao ar. 
+Nessa implementação, a vazão não seria um problema crítico, pois os números sequenciais seriam usados apenas para identificar lotes de registros — e não cada registro individualmente. Isso significa que a taxa de consumo desses sequenciais seria bastante reduzida.
 
-_— Porque não usar um simples arquivo de **lock** compartilhado?_
+Há ainda outro aspecto fundamental: é impossível estabelecer uma sequência numérica global sem algum tipo de coordenação centralizada. Seja usando Redis ou Zookeeper, a solução continuaria sendo centralizada por natureza — o que, em cenários de alto volume, naturalmente limita a vazão máxima.
 
-Sério! Eu tive que me deparar com essa pergunta simples que foi levantada por um desenvolvedor. Então, se você pensou na mesma coisa, vamos entender um poquinho de Sistemas Operacionais e Docker.
+Diante dessas restrições, o Apache Kafka surgia como a única solução viável.
 
-Lock de arquivo não é implementado no sistema de arquivos, mas sim no kernel do sistema operacional. Dessa forma, para que solução funcione é necessário que todos os processos estejam rodando em um mesmo sistema operacional, ou seja, precisariamos de um sistema operacional distribuído, o que não é muito comum...
+== A solução ingênua!
 
-Além disso, não era possível usar soluções containerizadas, uma vez que quando o docker cria um namespace para o container, ele já isola o sistema de arquivos. 
+Antes de mergulharmos na solução com Kafka, preciso descartar uma ideia que surgiu durante a discussão — e que, com o perdão da palavra, era tecnicamente ingênua.
 
-Para demonstrar que isso não funcionaria, fiz um pequeno experimento. Funcionou apenas quando duas JVMs rodavam na mesma máquina sem docker. Ao colocar o docker, o lock não funcionava mais. Ainda pediram para eu testar com Kubernetes... e tive que fazer o teste perdendo mais tempo....
+_— Por que não usar um simples arquivo de lock compartilhado?_
 
-Mas conseguimos resolver isso e provei que o Kafka era realmente a única solução possível.
+Sim, essa sugestão realmente apareceu, proposta por um desenvolvedor. Se você também considerou essa possibilidade, vamos revisar alguns conceitos básicos de Sistemas Operacionais e Docker para entender por que ela não se aplica ao nosso cenário.
+
+O bloqueio por arquivo (_file lock_) não é uma funcionalidade do sistema de arquivos em si, mas sim implementada diretamente no kernel do sistema operacional. Isso significa que, para essa solução funcionar, todos os processos envolvidos precisariam estar executando no mesmo sistema operacional — o que equivaleria a ter um "sistema operacional distribuído", um conceito não muito comum na prática.
+
+Além disso, a solução se mostrava inviável em ambientes containerizados. Quando o Docker cria um namespace para um container, ele isola também o sistema de arquivos — o que impede o compartilhamento do _lock_ entre containers.
+
+Para comprovar essa limitação, conduzi um teste simples: o _lock_ funcionou corretamente quando duas JVMs eram executadas diretamente na mesma máquina, sem Docker. No entanto, ao usar containers, o mecanismo deixou de funcionar. Ainda assim, me pediram para testar no Kubernetes... e tive que investir mais tempo para demonstrar, novamente, que a abordagem não era viável.
+
+No final, conseguimos resolver o problema — e comprovei que o Kafka era, de fato, a única solução viável.
 
 == Decompondo o problema
 
-Então tínhamos um grande problema e uma ferramenta que não foi feita para resolver esse problema. Como resolver isso? Primeiro precisamos decompor o problema em partes menores.
+Tínhamos, portanto, um desafio complexo e uma ferramenta que não havia sido projetada para resolvê-lo. Como superar essa situação? A estratégia foi decompor o problema em partes menores.
 
-A seleção de números sequenciais pode ser decomposta em duas partes: (i) seleção de líder e (ii) criação de memória compartilhada. Para simplificar, resolvi escrever um código bem simples que seria a base da minha implementação.
-
+A geração de números sequenciais pode ser decomposta em dois componentes principais: (i) eleição de um líder e (ii) implementação de uma memória compartilhada. Para simplificar o processo, decidi desenvolver um código básico que serviria como base para a implementação final.
 
 [source,java]
 ----
@@ -73,17 +80,26 @@ try(Leader leader = consensus.acquireLeader()) {
 }
 ----
 
-Esse código é propositadamente simples e teria três interfaces compostas pelos métodos `acquireLeader`, `getInteger` e `setInteger`. Só o líder é capaz de alterar os valores da memória compartilhada e por isso _getters_ e _setters_ só são acessíveis pela interface `Leader`. Já a interface Consensus só teria um método, o `acquireLeader` que seria um método bloqueante até o líder ser eleito.
+Este código foi propositalmente desenvolvido com simplicidade e organizado em três interfaces principais:
 
-Com isso o código principal da aplicação não seria "contaminado" pela complexidade da eleição do líder e nem pela memória compartilhada.
+* `acquireLeader`: método bloqueante que aguarda até que um líder seja eleito
+* `getInteger` e `setInteger`: para leitura e escrita de valores na memória compartilhada
 
-Agora era hora de implementar os algoritmos necessários para fazer tudo funcionar perfeitamente.
+Apenas o líder possui permissão para modificar os valores na memória compartilhada. Por isso, os métodos de leitura e escrita (`getInteger`/`setInteger`) estão disponíveis apenas na interface `Leader`. Já a interface `Consensus` contém apenas o método `acquireLeader`, responsável por coordenar a eleição de forma bloqueante.
+
+Dessa forma, o código principal da aplicação permaneceria isolado da complexidade inerente à eleição de líder e ao gerenciamento da memória compartilhada.
+
+Com a abstração definida, era hora de implementar os algoritmos necessários para colocar toda a solução em funcionamento.
 
 === Como o Kafka permite consenso
 
-O Apache Kafka é um https://www.researchgate.net/publication/378309830_Middlewares_Orientados_a_Mensagens[middleware orientado a mensagens] que permite integrar sistema pela envio e recebimento de eventos. Existe duas formas de comunicação possíveis orientadas a mensagens, o Ponto a Ponto ou o Publish/Subscribe. O Kafka só oferece a possibilidade de comunicação via Publish/Subscribe, isso significa que o broker possui tópicos onde processos podem enviar mensagens e processos podem consumir as mensagens de forma sequêncial.
+O Apache Kafka é um https://www.researchgate.net/publication/378309830_Middlewares_Orientados_a_Mensagens[middleware orientado a mensagens] que permite a integração entre sistemas por meio do envio e recebimento de eventos. Existem dois modelos de comunicação comuns nesse contexto: Ponto a Ponto e Publish/Subscribe.
 
-Como o Kafka é distribuído por natureza, todo tópico é dividido em partições. Cada partição funciona como um log segmentado, ou seja, o broker sempre escreverá a mensagem recebida no final de um arquivo até que ele cresça e seja preciso criar um outro arquivo. Dessa forma, ao se enviar uma mensagem, o produtor pode selecionar a partição, ou ela é selecionada através da chave, e salva sequencialmente.
+O Kafka adota exclusivamente o modelo Publish/Subscribe. Nele, o broker organiza os eventos em tópicos, onde produtores publicam mensagens e consumidores as leem de forma sequencial.
+
+Por sua natureza distribuída, os tópicos no Kafka são divididos em partições. Cada partição atua como um log segmentado — ou seja, o broker sempre grava as mensagens recebidas no final de um arquivo, até que este atinja seu limite e um novo arquivo seja criado.
+
+Ao produzir uma mensagem, o produtor pode escolher explicitamente a partição de destino ou, alternativamente, utilizar uma chave para que a partição seja determinada automaticamente. Em ambos os casos, a mensagem é armazenada de forma sequencial dentro da partição.
 
 .Referências
 ****
@@ -95,43 +111,53 @@ Como o Kafka é distribuído por natureza, todo tópico é dividido em partiçõ
 .Anatomia de um Tópico
 image::kafka/topico.png[]
 
-É preciso ressaltar que o Kafka não garante o consumo de mensagens sequenciais, porém dentro de uma partição as mensagens são consumidas sequencialmente. Isso significa que quando um consumidor inicia a subscrição, é garantido que o consumo é sequencial se, e somente se, o tópico tem apenas uma partição. Caso o tópico tenha mais de uma partição, apenas o consumo de mensagens com a mesma chave será sequencial.
+É importante destacar que o Kafka não garante a ordem global de consumo das mensagens — apenas a ordem sequencial dentro de uma mesma partição.
 
-Dessa forma, o Kafka pode ser usado em algoritmos de consenso ao sabermos que o consumo de mensagens é sequêncial desde que elas tenham a mesma chave ou o tópico possua apenas uma partição.
+Isso significa que, quando um consumidor se inscreve em um tópico, a ordem sequencial só é garantida se o tópico possuir uma única partição. Se houver múltiplas partições, apenas as mensagens com a mesma chave de partição serão consumidas em sequência, pois serão sempre direcionadas à mesma partição.
 
-Outra peculiaridade dos tópicos Kafka é que eles estão submetidos a mecanismos de limpeza a depender do valor de `cleanup.policy`. Quando o mecanismo `compact` é selecionado, o Kafka evita que o tópico cresça indefinitivamente, mas mantém a última mensagem de cada chave enviada. Dessa forma o tópico pode ser usado como uma tabela distribuída que é reconstruída através de consumidores. Alguns autores até pontuam que o Kafka é uma base de dados invertida, é como se pegassemos os mecanismos de sincronia de bases relacionais e usassemos para construir sistemas distribuídos.
+Dessa forma, o Kafka pode ser utilizado em algoritmos de consenso, uma vez que garante o consumo sequencial de mensagens — desde que elas compartilhem a mesma chave de partição ou o tópico possua apenas uma partição.
+
+Outra característica importante dos tópicos do Kafka são os mecanismos de limpeza, controlados pela configuração `cleanup.policy`. Quando definida como `compact`, essa política impede o crescimento indefinido do tópico, preservando apenas a última mensagem associada a cada chave.
+
+Esse comportamento permite que o tópico funcione como uma espécie de tabela distribuída, que pode ser reconstruída por consumidores a partir do log de eventos. Alguns autores chegam a descrever o Kafka como um "banco de dados invertido" — como se ele utilizasse os mecanismos de sincronização típicos de bancos relacionais, mas aplicados à construção de sistemas distribuídos.
 
 // https://excalidraw.com/#json=jA6Py4ThbyR4b42i_i5vC,X-sQG6LuN85YA3_cEEmh0A 
 
 .Kafka como base de dados invertida
 image::kafka/database-inverted.png[]
 
-Talvez você já tenha capturado a mensagem. É possível construir uma tabela de chave valor durável e distribuída, só falta agora garantir a eleição do líder.
+Você já deve ter percebido onde quero chegar: é possível construir uma tabela distribuída de chave-valor com durabilidade usando o Kafka. Agora, só nos resta resolver a eleição do líder.
 
 ### Leader Election (Eleição do Líder)
 
-Para construir as funcionalidades (i) e (ii) será necessário ter um mecanismo de troca de mensagens sequêncial e distribuído. De forma que cada participante pode enviar mensagens e consumir assincronamente. Dessa forma, nosso cliente de consenso terá 2 canais de comunicação, onde requisições são enviadas por um produtor e consumidas pelo consumidor. Ao se enviar requisições, não sabemos qual é o estado da aplicação, mas ao consumir elas sabemos que todos os participantes estão consumindo o mesmo conjunto de mensagens na mesma ordem. Por isso o algoritmo deverá se basear em um tópico de controle usando apenas uma partição e cada consumidor deverá consumir do tópico independentemente, ou seja, sem criar grupos de consumo para que cada consumidor receba todas as mensagens consumidas.
+Para implementar as funcionalidades (i) e (ii), precisamos de um mecanismo de troca de mensagens que seja distribuído e garanta ordem sequencial. Cada participante deve ser capaz de enviar mensagens e consumi-las de forma assíncrona.
 
-A figura abaixo ilustra esse comportamento. Os sistemas S1 e S2 enviam as mensagens REQ_1 e REQ_2 e consomem do tópico de controle as requisições ordenadas REQ_1 e REQ_2. Dessa forma o sistema S1 saberá que envio primeiro a requisição e S2 também.
+Nosso cliente de consenso utilizará dois canais de comunicação: as requisições são enviadas por um produtor e consumidas por um consumidor. No momento do envio, não conhecemos o estado atual da aplicação. Porém, ao consumir as mensagens, temos a garantia de que todos os participantes estão processando o mesmo conjunto de mensagens, na mesma ordem.
+
+Para isso, o algoritmo deve operar através de um tópico de controle com apenas uma partição. Além disso, cada consumidor deve atuar de forma independente — ou seja, sem usar grupos de consumidores —, assegurando que todos recebam e processem integralmente todas as mensagens.
+
+A figura abaixo ilustra esse comportamento. Os sistemas *S1* e *S2* enviam as mensagens *REQ_1* e *REQ_2*, respectivamente, e ambos consomem do tópico de controle as requisições na ordem *REQ_1* → *REQ_2*. Dessa forma, tanto *S1* quanto *S2* terão ciência de que *REQ_1* foi enviada e processada antes de *REQ_2*.
 
 // https://excalidraw.com/#json=amLuEMnf63gLXByN0tN7z,znjVD0cy2eX3wh_-fgyNrQ 
 .Kafka sendo usado como tópico de controle
 image::kafka/topico-controle.png[]
 
-É importante ressaltar que timestamp não é uma informação tão relevante em sistemas distribuídos, pois cada máquina tem seu clock independente, como já falei no post https://blog.vepo.dev/posts/relogios-fisicos-e-logicos[Relógios Físicos e Lógicos]. Em um tópico, o que define a ordenação cronológica do evento é a ordem de recebimento no broker, ou seja, o offset da mensagem e todos os consumidores receberão as mensagens com offset crescente.
+É importante destacar que timestamps têm utilidade limitada em sistemas distribuídos, já que cada máquina possui seu próprio relógio independente — como já discuti no post https://blog.vepo.dev/posts/relogios-fisicos-e-logicos[Relógios Físicos e Lógicos].
 
-Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de leader election através do envio e recebimento de requisições. Cada processo participante, ao desejar se tornar líder, deve enviar uma requisição de candidatura ao tópico de controle e ao finalizar sua participação como líder, deve enviar uma requisição de renúncia.
+No Kafka, a ordem cronológica dos eventos é determinada pela ordem de recebimento no _broker_, refletida no _offset_ da mensagem. Todos os consumidores recebem as mensagens em ordem crescente de _offset_ e partição, garantindo uma visão consistente e sequencial do fluxo de eventos.
+
+Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de eleição de líder (_leader election_) baseado no envio e consumo de requisições. Cada processo participante que deseja se tornar líder envia uma requisição de candidatura ao tópico de controle. Da mesma forma, ao finalizar sua atuação como líder, o processo deve enviar uma requisição de renúncia.
 
 // https://editor.plantuml.com/uml/ZLFBJiCm4BpxArRb0WUQUwIW5bGGQYKgn0ziawMrwjYf7wZYTpXmuiWNzCUmawPnGf6uLD7kU6TdPZin5hLrfM0hjOVHoqOJ5b0GJ2l1Spny7ZxK22uMVBsnjy8HgpoSvxn2QMDChtwdf25fdEbLbreLpYhDI1RWsHZREN84etikC50-qyvnm_syRp8ZG0EXmzXmjJ3UbQUr7ZIH_CNlIbx4NFMCERvkqRzRShdjlRZLQaiH6dFBtz3sREYAdRvUwKXvgXs7iYo3H-cP46Q2l3nKGKMIBBmUqaa2MSPOH0JNDnr52kXTqTI0Bw_OgHDWhQTfRHuPsy3weE1Y2ZDJaKQeb8weMK5dLB5sR7ZTg4XXwLQ2cmtJP9sMy3HddUOOLoaXMb3fv-7Q_mompKPJwr3mTvzmVG5zrP4zqo8uuD-UIw2dD38ndX0IQBw3rUFn66PxobrZTgvA1Ol3L-ZwLetbAs-L7aJqTqAQ1A7vHqGHBF9uk7X3x-N6wSI7U3QqGV5uZ56rFSU9l_BmX_y1
 
 .Diagrama de Sequência da Eleição do Líder
 image::kafka/leader-election.png[]
 
-Para implementar a eleição de líder, a Fila Requisições será somente atualizada pela Thread de Consumo. Essa deve consumir as mensagens do tópico de controle e adicionar novas requisições a fila e remover as mesmas quando identificado uma mensagem de liberar.
+Na implementação da eleição de líder, a Fila de Requisições será atualizada exclusivamente pela Thread de Consumo. Essa thread é responsável por consumir mensagens do tópico de controle, adicionar novas requisições à fila e removê-las quando identificar uma mensagem de liberação.
 
-A thread de aplicação deverá enviar a mensagem de requisição de liderança e aguardar até que a mesma seja a primeira da fila. Quando isso acontece, é certo que todos os outros processos participantes enviaram suas requisições e a liberação da condição de liderança.
+A thread da aplicação deverá enviar uma mensagem de requisição de liderança e aguardar até que essa mensagem se torne a primeira da fila. Quando isso ocorrer, significa que todos os demais processos participantes já enviaram suas requisições e eventuais mensagens de liberação de liderança — garantindo assim que a eleição foi consolidada.
 
-Nas imagens abaixo há uma demonstração de como a fila de requisições é gerida.
+As imagens a seguir ilustram o processo de gerenciamento da fila de requisições.
 
 // https://excalidraw.com/#json=p53_nMkj8YlL6m3sGL7KB,OILOa5-fQvEyBRjJJrGDBA
 .Quando os Sistemas A, B e E enviam requisições ao mesmo tempo, elas são ordenadas pelo consumidor e o primeiro a enviar se torna líder. No caso o sistema A.
@@ -145,24 +171,43 @@ image::kafka/leader-election-queue-2.png[]
 .Quando o Sistema B envia a mensagem de abdicar a posição de líder, o Sistema C se torna o Líder.
 image::kafka/leader-election-queue-3.png[]
 
-Talvez você tenha ficado com algumas dúvidas porque esse algoritmo não está completo. Para que ele realmente funcione é preciso controlar duas situações:
+Você pode ter notado que este algoritmo ainda não está completo. Para que funcione corretamente, precisamos tratar duas situações críticas:
 
-1. O que acontece se um sistema envia uma requisição e para de funcionar?
-2. O que acontece quando um sistema envia múltiplas requisições?
+1. O que ocorre se um sistema enviar uma requisição e parar de funcionar?
+2. Como lidar quando um sistema envia múltiplas requisições?
 
-Para resolver o primeiro caso, enquanto o sistema estiver esperando se tornar líder ou ao ser líder, ele deve enviar constantemente uma mensagem de _heartbeat_. Isso significa que a requisição deve ter validade de no máximo 2 segundos e caso o sistema não envie uma requisição de _heartbeat_ dentro desse intervalo, ela é arbitrariamente removida da fila e outro sistema envia uma notificação de remoção. Os sistemas devem enviar informando que uma requisição expirou para que outros participantes não esperem o tempo de expiração ao consumir as requisições.
+Para resolver o primeiro caso, enquanto o sistema aguarda para se tornar líder ou durante sua atuação como líder, ele deve enviar mensagens de _heartbeat_ periodicamente. Cada requisição terá uma validade máxima de 2 segundos — caso o sistema não renove o _heartbeat_ dentro desse intervalo, a requisição será removida da fila.
+
+Além disso, quando um sistema detecta que uma requisição expirou, ele deve notificar os demais participantes por meio de uma mensagem de remoção. Isso evita que os outros processos precisem aguardar o tempo total de expiração ao consumirem as requisições, acelerando a resposta do sistema como um todo.
 
 // https://editor.plantuml.com/uml/fL4v3i8m4Ept5QlqHAAbGB4ZKL712vPa1PPosux4YwWeUK4-XkC8J9HqL1xFh6Tsv4GRwemj2sZSgJBLK6KmEYjjk2GK4P96iIvAByfrCVLY2grbonWTL46OCvwujKghuJ6yMFkHKG6WpAYU3BkiBvG1fW5Eym8tUmzttfAr0RcaqYK5VXD7YnqUXsVE7K3kXAw-k-muZd6Bcg-socjqD_YrlR5hUc6Q6GVolzUpzSkwvz53p2i4-jD2XXPZUbPNHbMMfl343OzV-mO0
 
 .Diagrama de Sequência para quando um dos participantes falhar logo após virar líder, sem enviar as mensagens _heartbeat_.
 image::kafka/leader-election-dead.png
 
-É importante que a mensagem de _heartbeat_ seja enviada com uma frequência maior que o tempo de expiração da mensagem de requisição. 
+É crucial que a mensagem de _heartbeat_ seja enviada com uma frequência superior ao tempo de expiração da requisição. Dessa forma, garante-se que o sistema tenha oportunidade de renovar sua presença antes que a requisição seja considerada inválida.
 
-O segundo case pode ser resolvido com a modelagem da mensagem de requisição. A mensagem de requisição deve ter uma chave única para todos os participantes e os campos `id` para identificação do participante e o campo `seq` que deve conter um número sequêncial para controle de liberação da requisição.
+Já o segundo caso pode ser resolvido através de uma modelagem adequada da mensagem de requisição. Cada mensagem deve possuir:
 
-É importante notar que logicamente uma mensagem de LeaderRelease só é enviada quando o processo é líder, isso significa uma ordenação lógica nas mensagens.
+* Uma chave única compartilhada por todos os participantes
+* Um campo `id` que identifique o participante
+* Um campo `seq` com um número sequencial para controlar a liberação da requisição
+
+Uma requisição será considerada expirada nas seguintes situações:
+
+1. Ao receber um _heartbeat_ com o mesmo `id` e um valor de `seq` superior ao da requisição;
+2. Ao receber uma mensagem de `LeaderRelease` com o mesmo `id` e `seq` maior ou igual ao da requisição.
+
+Vale destacar que, logicamente, uma mensagem de `LeaderRelease` só é enviada quando o processo já atua como líder. Isso estabelece uma ordenação lógica entre as mensagens, onde a liberação pressupõe que a liderança foi previamente adquirida.
 
 ### Memória Compartilhada
 
-Uma vez que o processo é líder, ele pode assumir que consumiu todas as mensagens de todos os líderes anteriores. Dessa forma o tópico de controle pode ser usado como uma memória compartilhada onde qualquer valor pode ser enviado, usando a chave que controlará o acesso ao elemento compartilhado.
+Uma vez eleito líder, o processo pode assumir que consumiu todas as mensagens de líderes anteriores. Dessa forma, o tópico de controle passa a funcionar como uma memória compartilhada, na qual qualquer valor pode ser publicado — utilizando uma chave específica para controlar o acesso a cada elemento compartilhado.
+
+## Kafka como Plataforma de Consenso
+
+Implementar consenso distribuído é desafiador. Esta solução com Kafka é uma opção elegante quando você já está imerso no nosso ecossistema, mas é importante avaliar se a complexidade justifica o benefício para o caso de uso. Para necessidades mais simples, um serviço gerenciado como o Redis ou Zookeeper (quando viável) pode ser mais adequado.
+
+O importante é lembrar que em sistemas distribuídos, nada é simples. A coordenação tem um custo, seja em complexidade, latência ou manutenção. Cabe a nós, engenheiros de software, escolher a moeda de troca mais adequada para cada contexto.
+
+
