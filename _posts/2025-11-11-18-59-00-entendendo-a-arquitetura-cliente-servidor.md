@@ -10,6 +10,8 @@ series: Conversas sobre Arquitetura
 publish_date: 2025-11-11 18:50:00 +0300
 ---
 
+{% youtube hPoHp0WhglA %}
+
 Antes de discutir os estilos arquiteturais mais comuns, é importante entender a base de muitos deles: a arquitetura Cliente-Servidor. Caracterizá-la é útil, pois ela é a compõe estilos como REST, RPC, GraphQL, entre outros. Podemos começar identificando alternativas a essa arquitetura. Existem outras formas de pensar sistemas que não sejam baseadas na relação cliente-servidor? A resposta é sim! A arquitetura Cliente-Servidor é fácil de entender e construir, pois 'pensar em termos de CLIENTES que fazem requisições a SERVIDORES ajuda a compreender e gerenciar a complexidade de sistemas distribuídos.' [Saltzer and Kaashoek, 2009] Sua principal característica é a centralização na figura do servidor, mas é possível construir arquiteturas descentralizadas, como o Peer-to-Peer (P2P).
 
 ## Definindo os papéis
