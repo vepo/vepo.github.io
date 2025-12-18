@@ -3,7 +3,7 @@ title: Sistemas Auto-Adaptáveis
 published: false
 description: 
 tags: [Ciência da Computação, Sistemas Auto-Adaptativos]
-cover_image: /assets/images/microservices/cover-100-42.webp
+cover_image: /assets/images/capas/engine-10042.jpg
 #series: Sistemas Distribuídos & Microsserviços
 permalink: /posts/sistemas-auto-adaptaveis
 publish_date: 2024-12-22 21:00:00 +0300
