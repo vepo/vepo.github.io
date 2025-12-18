@@ -21,7 +21,7 @@ Foi nesse contexto que surgiu uma necessidade aparentemente simples: em determin
 
 A primeira solução considerada foi: _"vamos adotar uma ferramenta pronta que já resolva isso"_. Poderíamos implementar um contador simples usando Redis ou, como alternativa, o próprio Zookeeper.
 
-Ambas as tecnologias oferecem suporte nativo para essa funcionalidade. O Redis dispõe do comando ttps://redis.io/docs/latest/commands/incr/[INCR], que incrementa um valor associado a uma chave e retorna o resultado atualizado. Já o Zookeeper trabalha com o conceito de nós sequenciais — ou seja, cada novo nó criado recebe automaticamente um sufixo numérico incremental.
+Ambas as tecnologias oferecem suporte nativo para essa funcionalidade. O Redis dispõe do comando https://redis.io/docs/latest/commands/incr/[INCR], que incrementa um valor associado a uma chave e retorna o resultado atualizado. Já o Zookeeper trabalha com o conceito de nós sequenciais — ou seja, cada novo nó criado recebe automaticamente um sufixo numérico incremental.
 
 [source,ruby]
 ----
@@ -32,8 +32,6 @@ INCR mykey
 GET mykey
 "11"
 ----
-
-Uma outra solução um pouco mais robusta seria usar o https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/[Redis] ou o Zookeeper para implementar https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks[Lock Distribuído e garantir que apenas um processo por vez consiga incrementar o contador]. Mas isso é mais complexo e não é necessário se o sistema já oferece suporte nativo.
 
 Uma alternativa mais robusta seria utilizar o https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/[Redis] ou o https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks[Zookeeper] para implementar um Lock Distribuído, garantindo que apenas um processo por vez possa incrementar o contador. No entanto, essa abordagem é mais complexa e desnecessária, uma vez que ambas as tecnologias já oferecem suporte nativo para a funcionalidade de contador.
 
@@ -182,8 +180,9 @@ Além disso, quando um sistema detecta que uma requisição expirou, ele deve no
 
 // https://editor.plantuml.com/uml/fL4v3i8m4Ept5QlqHAAbGB4ZKL712vPa1PPosux4YwWeUK4-XkC8J9HqL1xFh6Tsv4GRwemj2sZSgJBLK6KmEYjjk2GK4P96iIvAByfrCVLY2grbonWTL46OCvwujKghuJ6yMFkHKG6WpAYU3BkiBvG1fW5Eym8tUmzttfAr0RcaqYK5VXD7YnqUXsVE7K3kXAw-k-muZd6Bcg-socjqD_YrlR5hUc6Q6GVolzUpzSkwvz53p2i4-jD2XXPZUbPNHbMMfl343OzV-mO0
 
-.Diagrama de Sequência para quando um dos participantes falhar logo após virar líder, sem enviar as mensagens _heartbeat_.
-image::kafka/leader-election-dead.png
+.Diagrama de Sequência para quando um dos participantes falhar logo após virar líder, sem enviar as mensagens _heartbeat_.0
+
+image::kafka/leader-election-dead.png[]
 
 É crucial que a mensagem de _heartbeat_ seja enviada com uma frequência superior ao tempo de expiração da requisição. Dessa forma, garante-se que o sistema tenha oportunidade de renovar sua presença antes que a requisição seja considerada inválida.
 
