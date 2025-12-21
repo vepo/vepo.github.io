@@ -10,7 +10,8 @@ permalink: /posts/sql-e-a-algebra-relacional
 publish_date: 2025-12-21 10:57:00 +0300
 ---
 
-> Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado [CMU Intro to Database Systems (15-445/645 - Fall 2025)](https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5). O curso é ministrado por [Andy Pavlo](https://www.cs.cmu.edu/~pavlo/) e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na [página oficial do curso](https://15445.courses.cs.cmu.edu/fall2025/schedule   .html).
+> Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado [CMU Intro to Database Systems (15-445/645 - Fall 2025)](https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5). O curso é ministrado por [Andy Pavlo](https://www.cs.cmu.edu/~pavlo/) e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na [página oficial do curso](https://15445.courses.cs.cmu.edu/fall2025/schedule.html).
+
 
 No post anterior, discutimos o que são bases de dados, os modelos de dados mais comuns e a história por trás do modelo relacional. Neste post, vamos explorar a álgebra relacional, que é a base teórica para o SQL, a linguagem de consulta mais utilizada em bases de dados relacionais.
 
