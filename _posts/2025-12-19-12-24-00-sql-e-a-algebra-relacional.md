@@ -1,13 +1,13 @@
 ---
 title: SQL e a Álgebra Relacional
-published: false
+published: true
 description: |
     Nesse post, vamos explorar a álgebra relacional, que é a base teórica para o SQL, a linguagem de consulta mais utilizada em bases de dados relacionais.
 tags: [Ciência da Computação, Bases de Dados, Modelos de Dados, SQL, História da Computação]
 cover_image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
 permalink: /posts/sql-e-a-algebra-relacional
-publish_date: 2025-12-19 12:03:00 +0300
+publish_date: 2025-12-21 10:57:00 +0300
 ---
 
 > Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado [CMU Intro to Database Systems (15-445/645 - Fall 2025)](https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5). O curso é ministrado por [Andy Pavlo](https://www.cs.cmu.edu/~pavlo/) e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na [página oficial do curso](https://15445.courses.cs.cmu.edu/fall2025/schedule   .html).
@@ -329,3 +329,157 @@ Aplicando a junção Aluno ⨝ Curso usando o ID = Codigo, obtemos:
 002     Bob       19    Física         3
 003     Carol     23    Química        4
 ```
+
+### Como a Álgebra Relacional se Relaciona com SQL?
+
+Agora vamos ver como essas operações da álgebra relacional se traduzem em consultas SQL. É importante ressaltar que as consultas SQL apresentadas abaixo são apenas demonstrativas e não são otimizadas para desempenho. Você pode encontrar os exemplos no repositório [vepo/sql-database-tutorial](https://github.com/vepo/sql-database-tutorial).
+
+As consultas SQL a seguir são baseadas nas seguintes tabelas:
+
+```sql
+CREATE TABLE IF NOT EXISTS employees (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(100),
+    department VARCHAR(50),
+    salary     DECIMAL(10,2),
+    hire_date  DATE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id        SERIAL PRIMARY KEY,
+    dept_name VARCHAR(50) UNIQUE,
+    budget    DECIMAL(15,2),
+    location  VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+    id            SERIAL PRIMARY KEY,
+    project_name  VARCHAR(100),
+    start_date    DATE,
+    end_date      DATE,
+    budget        DECIMAL(15,2),
+    department_id INT REFERENCES departments(id)
+);
+```
+
+#### Seleção em SQL
+
+A seleção no SQL é realizada pela cláusula `SELECT [campos] FROM [tabela] WHERE [condição]`. Onde uma condição é aplicada a uma ou mais tabelas e retorna um subconjunto de tuplas selecioadas pelos campos. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 100000 e nenhuma projeção de campos é feita, uma vez que usamos o asterisco (*) para selecionar todos os campos.
+
+```sql
+-- Seleciona todos os funcionários com salário maior que 100000
+SELECT * FROM employees WHERE salary > 100000;
+```
+
+#### Projeção em SQL
+
+A projeção no SQL é realizada pela cláusula `SELECT [campos] FROM [tabela]`. Onde os campos especificados são retornados para todas as tuplas da tabela. No exemplo abaixo, projetamos apenas os campos `id`, `name` e `department` da tabela `employees`.
+
+```sql
+-- Projeta os campos id, name e department da tabela employees
+SELECT id, name, department FROM employees;
+```
+
+#### União em SQL
+
+A união no SQL é realizada pela cláusula `UNION` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário menor que 60000 e todos os funcionários com salário maior que 100000, combinando os resultados usando a união.
+
+```sql
+-- Criar união de duas consultas
+SELECT * FROM employees WHERE salary < 60000 
+UNION 
+SELECT * FROM employees WHERE salary > 100000;
+```
+
+Esse exemplo não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. O `UNION` não é restrito a uma só tabela, a única exigência é que as consultas retornem o mesmo número de colunas e tipos de dados compatíveis. Essa consulta pode ser reescrita de uma forma mais eficiente usando o operador lógico `OR`, como mostrado abaixo:
+
+```sql
+-- Versão mais eficiente usando OR
+SELECT * FROM employees WHERE salary < 60000 OR salary > 100000;
+```
+
+#### Interseção em SQL
+
+A interseção no SQL é realizada pela cláusula `INTERSECT` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e todos os funcionários com salário menor que 100000, retornando apenas os funcionários que satisfazem ambas as condições.
+
+
+```sql
+-- Criar interseção de duas consultas
+SELECT * FROM employees WHERE salary > 60000 
+INTERSECT 
+SELECT * FROM employees WHERE salary < 100000;
+```
+
+Esse também não é um exemplo eficiente, visto que ambas as consultas são feitas na mesma tabela. A interseção pode ser reescrita de uma forma mais eficiente usando o operador lógico `AND`, como mostrado abaixo:
+
+```sql
+-- Versão mais eficiente usando AND
+SELECT * FROM employees WHERE salary > 60000 AND salary < 100000;
+```
+
+#### Diferença em SQL
+
+A diferença no SQL é realizada pela cláusula `EXCEPT` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e menor que 100000, e removemos aqueles que trabalham no departamento de TI.
+
+```sql
+-- Criar diferença de duas consultas
+SELECT * FROM employees WHERE salary > 60000 AND salary < 100000 
+EXCEPT 
+SELECT * FROM employees WHERE department = 'IT';
+```
+
+Esse exemplo também não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. A diferença pode ser reescrita de uma forma mais eficiente usando o operador lógico `AND` junto com o operador `NOT`, como mostrado abaixo:
+
+```sql
+-- Versão mais eficiente usando AND e NOT
+SELECT * FROM employees WHERE (salary > 60000 AND salary < 100000) AND NOT (department = 'IT');
+```
+
+#### Produto Cartesiano em SQL
+
+O produto cartesiano no SQL é realizado pela cláusula `CROSS JOIN` entre duas tabelas. No exemplo abaixo, combinamos todas as tuplas da tabela `employees` com todas as tuplas da tabela `departments`, resultando em todas as combinações possíveis de funcionários e departamentos.
+
+```sql
+-- Produto cartesiano entre employees e departments
+SELECT * FROM employees CROSS JOIN departments;
+```
+
+Esse exemplo definitivamente não é o mais eficiente, visto que o produto cartesiano geralmente não tão comumente usado em consultas reais. Normalmente, o produto cartesiano é seguido por uma cláusula `WHERE` para filtrar os resultados com base em uma condição específica. Por exemplo, podemos combinar o produto cartesiano com uma condição para selecionar apenas os funcionários que trabalham em um departamento específico:
+
+```sql
+-- Produto cartesiano com condição de filtro
+SELECT * FROM employees CROSS JOIN departments 
+WHERE department = dept_name;
+```
+
+Esse exemplo é também ineficiente por usar um campo textual para fazer a junção entre as tabelas. O ideal seria usar uma chave estrangeira para fazer a junção, como será mostrado no `JOIN` abaixo.
+
+#### Junção em SQL
+
+A junção no SQL é realizada pela cláusula `JOIN` entre duas tabelas, geralmente acompanhada por uma condição `ON` que especifica como as tabelas devem ser combinadas. No exemplo abaixo, combinamos as tabelas `departments` e `projects` com base na correspondência entre o campo `id` da tabela `departments` e o campo `department_id` da tabela `projects`. Em seguida, agrupamos os resultados pelo campo `dpt.id` e contamos o número de projetos associados a cada departamento.
+
+```sql
+SELECT dpt.id, COUNT(prj.id) as projects 
+FROM departments dpt 
+LEFT JOIN projects prj ON dpt.id = prj.department_id 
+GROUP BY dpt.id;
+```
+
+Talvez você tenha notado que o **Produto Cartesiano** e a **Junção** são operações muito semelhantes usando tipos diferentes de `JOIN`. Na **Junção** há a obrigatoriedade de definir uma condição de junção. No SQL, existem diversos tipos de operadores `JOIN`, incluindo:
+
+- **CROSS JOIN**: Realiza o produto cartesiano entre duas tabelas.
+- **INNER JOIN**: Retorna apenas as tuplas que possuem correspondência em ambas as tabelas com base na condição especificada.
+- **LEFT JOIN**: Retorna todas as tuplas da tabela à esquerda e as tuplas correspondentes da tabela à direita. Se não houver correspondência, os valores da tabela à direita serão nulos.
+- **RIGHT JOIN**: Retorna todas as tuplas da tabela à direita e as tuplas correspondentes da tabela à esquerda. Se não houver correspondência, os valores da tabela à esquerda serão nulos.
+- **FULL JOIN**: Retorna todas as tuplas de ambas as tabelas, preenchendo com nulos onde não houver correspondência.
+
+
+<!-- https://excalidraw.com/#json=p7wUv4740ZFC4KIbupNYU,TyLtzCXugBiZfIn00_7uwQ -->
+![Tipos de JOIN](/assets/images/databases/join-types.png)
+
+## Conclusão
+
+Nesse post, exploramos como a álgebra relacional serve como a base teórica para o SQL. É importante ter ciência dessas operações fundamentais quando se escreve consultas SQL, visto que toda consulta SQL pode ser vista como uma operação de conjuntos. Compreender a álgebra relacional ajuda a escrever consultas mais eficientes e a entender como os sistemas de gerenciamento de banco de dados processam essas consultas.
+
+Talvez você tenha pensado que essas consultas poderiam ter sido escritas de forma mais eficiente, mas o objetivo aqui foi apenas ilustrar como as operações da álgebra relacional se traduzem em SQL. Em posts futuros, exploraremos técnicas de otimização de consultas e como os SGBDs processam essas consultas para melhorar o desempenho usando chaves e índices.
