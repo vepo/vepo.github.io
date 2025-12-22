@@ -9,7 +9,7 @@ publish_date: 2021-08-16 11:11:00 +0300
 permalink: /posts/elegant-objects-1
 ---
 
-Faz no mínimo uns 4 anos que queria ler [Elegant Objects](https://www.elegantobjects.org/). O livro não é acessível ao povo de *Pindorama* por causa das politicas economicas da última decada. Mas eu não quero discutir como o dolar alto faz bem para o agro-negócio e para quem quer fazer freela na gringa, e faz um mau danado pro resto inteiro do país. Mas esse ano tomei coragem e comprei! E depois encontrei ele baratinho num sebo... 🤦‍♂️
+Faz no mínimo uns 4 anos que queria ler [Elegant Objects](https://www.elegantobjects.org/). O livro não é acessível ao povo de *Pindorama* por causa das politicas econômicas da última decada. Mas eu não quero discutir como o dolar alto faz bem para o agro-negócio e para quem quer fazer freela na gringa, e faz um mau danado pro resto inteiro do país. Mas esse ano tomei coragem e comprei! E depois encontrei ele baratinho num sebo... 🤦‍♂️
 
 > **pindorama**
 > [pindorama]
