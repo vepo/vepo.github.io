@@ -3,9 +3,9 @@ title: Linguagem Onipresente
 permalink: /posts/linguagem-onipresente
 published: true
 description: Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design. 
-series: Domain-Driven Design
+# series: Domain-Driven Design
 tags: [Domain-Driven Design, DDD, Arquitetura de Software, Desenvolvimento de Software]
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/1lk5xixpio5zyp5271ml.jpg
+cover_image: /assets/images/capas/mulher-ao-quadro-negro.jpg
 publish_date: 2020-07-20 15:15:12 +0300
 original: "https://dev.to/vepo/linguagem-onipresente-1nld"
 ---
