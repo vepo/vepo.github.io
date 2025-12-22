@@ -5,7 +5,7 @@ permalink: /posts/log-cleanup-no-kafka
 description: Como o Kafka limpa as informações antigas? Quais parâmetros configurar?
 tags: [Kafka, Apache Kafka, Microservices]
 series: Entendendo o Kafka
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/1os85b4rmdpauz3yjbsu.jpg
+cover_image: /assets/images/capas/disco-rigido.jpg
 publish_date: 2020-11-27 16:10:00 +0300
 ---
 
