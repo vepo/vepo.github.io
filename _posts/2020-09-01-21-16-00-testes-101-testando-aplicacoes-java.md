@@ -4,7 +4,7 @@ published: true
 description: Um guia rápido para tudo o que você precisa saber para fazer testes em aplicações Java
 tags: [Java, Testes, TDD, JaCoCo]
 permalink: /posts/testes-101-testando-aplicacoes-java
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/36whvqvlgpj79iy7lzmc.jpg
+cover_image: /assets/images/capas/teste-carros.jpg
 series: Level Up
 publish_date: 2020-09-01 21:16:00 +0300
 original: "https://dev.to/vepo/testes-101-testando-aplicacoes-java-1m8i"
