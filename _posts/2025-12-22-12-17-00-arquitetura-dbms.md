@@ -1,0 +1,69 @@
+---
+title: Arquitetura de um Banco de Dados Relacional
+published: true
+description: |
+  Entenda a arquitetura interna de um sistema de gerenciamento de banco de dados relacional (DBMS) e como seus principais componentes funcionam juntos para armazenar, gerenciar e recuperar dados de forma eficiente.
+tags: [Ciência da Computação, Bases de Dados, DBMS, Banco de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/arquitetura-dbms
+publish_date: 2025-12-22 12:17:00 +0300
+---
+
+> Esse post é baseado em um capítulo do livro [**Database Internals** de Alex Petrov](https://amzn.to/44Iatr3).
+
+Agora que entendemos o que é uma base de dados relacional e como podemos interagir com ela usando SQL, vamos ver como uma base de dados relacional é construída internamente. Entender como umas base de dados funciona internamente pode nos ajudar a compreender melhor seu comportamento e com isso podemos tomar decisões mais informadas sobre o uso ou a escolha de uma base de dados.
+
+Todas as implementações de bancos de dados são diferentes, mas a maioria delas compartilha de funcionalidades e arquiteturas semelhantes. No diagrama abaixo, temos uma visão geral de uma possível arquitetura de um sistema de gerenciamento de banco de dados relacional (DBMS - *Database Management System*), mas é importante lembrar que cada implementação pode variar em detalhes específicos.
+
+<!-- https://excalidraw.com/#json=8hpT0a7rZzGnn2KMTUAHt,2PGDY8vJGGPWXtEVx8K0yA -->
+
+![Arquitetura de um DBMS Relacional](/assets/images/databases/dmbs-arquitecture.png)
+
+Para descrever essa arquitetura, vamos usar uma abordagem de cima para baixo, começando pelo módulo de transporte.
+
+## Módulo de Transporte (_Transport_)
+
+A grande maioria das bases de dados modernas são implementadas usando uma arquitetura cliente-servidor. Isso significa que a aplicação que utiliza o banco de dados atua como cliente, enquanto o processo do banco de dados atua como servidor.  Para isso o módulo de transporte é responsável por gerenciar a comunicação entre a aplicação cliente e, em caso de bancos distribuídos, entre as diferentes instâncias do banco de dados. 
+
+As _queries_ SQL são então processadas pelo módulo **Client Communication**, que interpreta as requisições vindas do cliente e as encaminha para o próximo módulo, o **Query Processor**. 
+
+Quando a comunicação é feita entre diferentes instâncias do banco de dados, ela não envolve o processamento de consultas SQL e por isso é tratada diretamente pela **Execution Engine**.
+
+## Módulo de Processamento de Consultas (_Query Processor_)
+
+O módulo de processamento de consultar é responsável por interpretar, validar e otimizar as consultas SQL recebidas do módulo de transporte. Ele é composto por dois submódulos principais: o **Query Parser** e o **Query Optimizer**. O submódulo **Query Optimizer** é responsável por analisar a consulta SQL e determinar a forma mais eficiente de executá-la, levando em consideração fatores como índices disponíveis, estatísticas de dados e custos de execução.
+
+Um plano de execução é gerado baseado na _query_ SQL recebida e é passado para o próximo módulo, a **Execution Engine**.
+
+## Módulo Motor de Execução (_Execution Engine_)
+
+Para que o plano de execução gerado pelo módulo de processamento de consultas seja executado, ele pode ser executado localmente ou remotamente, se o banco de dados for distribuído. O módulo de execução é responsável por interpretar o plano de execução e coordenar as operações necessárias para recuperar ou modificar os dados conforme especificado na consulta SQL.
+
+## Módulo Motor de Armazenamento (_Storage Engine_)
+
+O módulo motor de armazenamento é responsável por gerenciar a forma como os dados são armazenados fisicamente no disco. Ele é dividido em cinco submódulos principais: o **Transaction Manager**, o **Lock Manager**, o **Access Methods**, o **Buffer Manager** e o **Recovery Manager**.
+
+### Gerenciador de Transações (_Transaction Manager_)
+
+O gerenciador de transações é responsável por organizar a execução das transações garantindo que a base de dados esteja sempre em um estado consistente.
+
+### Gerenciador de Bloqueios (_Lock Manager_)
+
+O gerenciador de bloqueios é responsável por controlar o acesso concorrente aos dados envolvidos em transações concorrentes, garantindo o isolamento entre elas.
+
+### Métodos de Acesso (_Access Methods_)
+
+Os métodos de acesso são responsáveis por definir como os dados são organizados e acessados no armazenamento físico. Eles utilizam estruturas de dados como árvores B, árvores LSM e arquivos heap.
+
+### Gerenciador de Buffer (_Buffer Manager_)
+
+O gerenciador de buffer é responsável por gerenciar a memória volátil (RAM) utilizada para armazenar temporariamente os dados que estão sendo lidos ou escritos no disco. Ele otimiza o desempenho do banco de dados reduzindo o número de acessos ao disco.
+
+### Gerenciador de Recuperação (_Recovery Manager_)
+
+O gerenciador de recuperação é responsável por garantir a integridade dos dados em caso de falhas, como quedas de energia ou erros de software. Ele utiliza técnicas como logs de transações e pontos de verificação para restaurar o banco de dados a um estado consistente após uma falha.
+
+## Conclusão
+
+Bancos de Dados são sistemas com diversas implementações diferentes, mas a maioria deles compartilha de funcionalidades e arquiteturas semelhantes. Entender como uma base de dados relacional é construída internamente pode nos ajudar a compreender melhor seu comportamento e com isso podemos tomar decisões mais informadas sobre o uso ou a escolha de uma base de dados.
