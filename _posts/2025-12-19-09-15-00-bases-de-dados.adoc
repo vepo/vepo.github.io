@@ -10,23 +10,27 @@ permalink: /posts/introducao-a-bases-de-dados
 publish_date: 2025-12-19 12:03:00 +0300
 ---
 
-> Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado [CMU Intro to Database Systems (15-445/645 - Fall 2025)](https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5). O curso é ministrado por [Andy Pavlo](https://www.cs.cmu.edu/~pavlo/) e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na [página oficial do curso](https://15445.courses.cs.cmu.edu/fall2025/schedule.html).
+:figure-caption: Figura
+:imagesdir: /assets/images/
 
-O livro "**O Guia do Mochileiro das Galáxias**" traz uma grande lição. Em determinado momento, um supercomputador chamado Deep Thought é construído para responder a "**A Pergunta Fundamental sobre a Vida, o Universo e Tudo Mais**". Após milhões de anos de cálculo, o computador finalmente revela que a resposta é "**42**". No entanto, ninguém sabe qual é a pergunta. Se você não entendeu porque começar um post sobre bases de dados com uma referência a esse livro, é porque você não entendeu o que o autor Douglas Adams quis dizer com isso. Saber fazer boas perguntas é tão importante quanto ter boas respostas.
+[sidebar]
+Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5[CMU Intro to Database Systems (15-445/645 - Fall 2025)]. O curso é ministrado por https://www.cs.cmu.edu/~pavlo/[Andy Pavlo] e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na https://15445.courses.cs.cmu.edu/fall2025/schedule.html[página oficial do curso].
 
-## O que são Bases de Dados
+O livro "*O Guia do Mochileiro das Galáxias*" traz uma grande lição. Em determinado momento, um supercomputador chamado Deep Thought é construído para responder a "*A Pergunta Fundamental sobre a Vida, o Universo e Tudo Mais*". Após milhões de anos de cálculo, o computador finalmente revela que a resposta é "*42*". No entanto, ninguém sabe qual é a pergunta. Se você não entendeu porque começar um post sobre bases de dados com uma referência a esse livro, é porque você não entendeu o que o autor Douglas Adams quis dizer com isso. Saber fazer boas perguntas é tão importante quanto ter boas respostas.
+
+== O que são Bases de Dados
 
 Por isso, a primeira pergunta a ser feita é: _O que é uma base de dados?_ Bases de dados são o ponto central da maioria dos sistemas de software modernos e muitos se confundem ao não saber como usá-las corretamente ou não entendem a diferença entre os vários tipos de bases de dados disponíveis. Dessa forma, vamos elaborar uma simples definição:
 
-**_Uma base de dados é uma coleção organizada de dados inter-relacionados que modelam alguns aspectos do mundo real._**
+*_Uma base de dados é uma coleção organizada de dados inter-relacionados que modelam alguns aspectos do mundo real._*
 
 Agora que temos uma definição, precisamos entender que são só são úteis se estiverem corretos, acessíveis e seguros. Para isso, existem os Sistemas de Gerenciamento de Bases de Dados (SGBD, ou DBMS em inglês). Estes são sistemas de software que permitem armazenar e analizar informações em uma base de dados.
 
 Uma solução óbvia é usar arquivos para armazenar dados. No entanto, não é uma boa ideia, pois para se garantir que os dados estejam integros e sejam duráveis, é necessário implementar diversas funcionalidades que um SGBD já oferece, como controle de concorrência, recuperação de falhas, segurança e muito mais.
 
-## O que compõe uma base de dados?
+== O que compõe uma base de dados?
 
-Uma base de dados é sempre composta pelo **modelo de dados** e pelo **esquema**. 
+Uma base de dados é sempre composta pelo *modelo de dados* e pelo *esquema*. 
 
 O modelo de dados, ou _data model_, é uma coleção de conceitos que descrevem os dados em uma base de dados. O modelo de dados define os tipos de coisas que podem existir e como elas se relacionam entre si.
 
@@ -34,16 +38,16 @@ O esquema, ou _schema_, é a descrição de uma coleção de dados, usando um mo
 
 Essas definições podem parecer confusas se não forem exemplificadas. Por isso vamos listar alguns modelos de dados?
 
-- Relational
-- Key/Value 
-- Graph
-- Document/JSON/XML/Object
-- Wide-Column/Column-Family
-- Array (Vector, Matriz, Tensor)
-- Hierarchical/Tree
-- Network
-- Semantic
-- Entity-Relationship
+* Relational
+* Key/Value 
+* Graph
+* Document/JSON/XML/Object
+* Wide-Column/Column-Family
+* Array (Vector, Matriz, Tensor)
+* Hierarchical/Tree
+* Network
+* Semantic
+* Entity-Relationship
 
 Alguns desses modelos não são mais tão comuns, mas já foram usados no passado. O mais comum atualmente é o modelo relacional, que é usados em bases de dados que suportam SQL.
 
@@ -56,13 +60,14 @@ Os modelos Array são usados em bases de dados especializadas para aprendizado d
 Já os modelos Hierarchical/Tree, Network, Semantic e Entity-Relationship são mais antigos e não são mais tão comuns.
 
 
-## Quais foram as primeiras bases de dados?
+== Quais foram as primeiras bases de dados?
 
 Nos anos 1960, as primeiras bases de dados obrigavam o desenvolvedor a escrever consultas (_queries_) usando código procedural. O desenvolvedor precisava dizer ao sistema exatamente como navegar pelos dados baseado no conteúdo da base. Se a base de dados fosse alterada, o código precisava ser reescrito. 
 
 Pode-se citar bases como IDS, IMS e CODASYL como exemplos desse tipo de base de dados.
 
-```idms
+[source,idms]
+----
 PROCEDURE GET_ARTISTS_FOR_ALBUM;
 BEGIN
     /* Declare variables */
@@ -90,40 +95,40 @@ BEGIN
             ON ERROR EXIT;
     END REPEAT;
 END PROCEDURE;
-```
+----
 
-As bases de dados que conhecemos hoje começaram a ser desenvolvidas no início dos anos 1970 por nomes como Edgar F. Codd, Charles W. Bachman, Jim Gray e Michael Stonebraker. Para acompanhar a discussão, pode-se ler os artigos do SIGMOD de 1970 a 1947 em [ACM SIGFIDET/SIGMOD Workshop on Data Description, Access and Control](https://www.sigmod.org/publications/dblp/db/conf/sigmod/sigfidet.html).
+As bases de dados que conhecemos hoje começaram a ser desenvolvidas no início dos anos 1970 por nomes como Edgar F. Codd, Charles W. Bachman, Jim Gray e Michael Stonebraker. Para acompanhar a discussão, pode-se ler os artigos do SIGMOD de 1970 a 1947 em https://www.sigmod.org/publications/dblp/db/conf/sigmod/sigfidet.html[ACM SIGFIDET/SIGMOD Workshop on Data Description, Access and Control].
 
-## O que define o modelo relacional?
+== O que define o modelo relacional?
 
-Para entender o modelo relacional é preciso definir uma **relação**. 
+Para entender o modelo relacional é preciso definir uma *relação*. 
 
-**_Uma relação é um conjunto não ordenado que contém a relação entre atributos que representam entidades._**
+*_Uma relação é um conjunto não ordenado que contém a relação entre atributos que representam entidades._*
 
 Uma relação com n atributos é chamada de n-ária. Por exemplo, uma relação com três atributos é chamada de ternária. Apesar da palavra "relação" remeter a relacionamento, no contexto de bases de dados relacionais, ela pode ser usada como sinônimo de tabela. Cada relação é composta por tuplas (linhas). Para isso precisamos definir o que são tuplas. 
 
-**_Uma tupla é um conjunto de atributos em uma relação. Esses valores são atômicos ou escalares._** Por "escalar" entende-se um valor númerico, string, data/hora, booleano, etc. E por "atômico" entende-se que o valor não pode ser dividido em partes menores. 
+*_Uma tupla é um conjunto de atributos em uma relação. Esses valores são atômicos ou escalares._* Por "escalar" entende-se um valor númerico, string, data/hora, booleano, etc. E por "atômico" entende-se que o valor não pode ser dividido em partes menores. 
 
-Em um modelo relacional, cada relação pode ter propriedades que garantem a integridade dos dados. São elas: **chave primária** (_primary key_), **chave estrangeira** (_foreign key_) e **restrições de integridade** (_constraints_). 
+Em um modelo relacional, cada relação pode ter propriedades que garantem a integridade dos dados. São elas: *chave primária* (_primary key_), *chave estrangeira* (_foreign key_) e *restrições de integridade* (_constraints_). 
 
 * Uma chave primária de uma relação é um conjunto de atributos que identifica unicamente cada tupla na relação.
 * Uma chave estrangeira é um conjunto de atributos em uma relação que referencia a chave primária de outra relação, estabelecendo um vínculo entre as duas relações.
 * Uma restrição é uma condição definida pelo usuário que deve ser válida para qualquer instância do banco de dados. A chave primária e a chave estrangeira são tipos especiais de restrições, mas existem outras, como restrições de unicidade e restrições de nulidade.
 
-## Como interagir com bases de dados relacionais?
+== Como interagir com bases de dados relacionais?
 
 Toda base de dados fornecerá uma linguagem de manipulação de dados (DML, _Data Manipulation Language_) para interagir com os dados armazenados. A DML mais comum é a Structured Query Language (SQL). O SQL é uma linguagem declarativa que pode ser dividida em cinco partes principais: Linguagem de Manipulação de Dados (DML, _Data Manipulation Language_), Linguagem de Definição de Dados (DDL, _Data Definition Language_), Linguagem de Controle de Dados (DCL, _Data Control Language_), Linguagem de Transação de Dados (DTL, _Transaction Control Language_) e Linguagem de Consulta de Dados (DQL, _Data Query Language_).
 
 Abaixo estão alguns exemplos de comandos SQL para cada uma dessas partes:
 
-- DML: `INSERT`, `UPDATE`, `DELETE`
-- DDL: `CREATE`, `ALTER`, `DROP`
-- DCL: `GRANT`, `REVOKE`
-- DTL: `COMMIT`, `ROLLBACK`
-- DQL: `SELECT`
+* DML: `INSERT`, `UPDATE`, `DELETE`
+* DDL: `CREATE`, `ALTER`, `DROP`
+* DCL: `GRANT`, `REVOKE`
+* DTL: `COMMIT`, `ROLLBACK`
+* DQL: `SELECT`
 
 Essas linguagens podem ser usadas em conjunto para criação de scripts que automatizam tarefas de administração e manipulação de dados em uma base de dados relacional.
 
-## Conclusão
+== Conclusão
 
 Neste post, vimos uma introdução ao conceito de bases de dados, modelos de dados, esquema, história das bases de dados e o modelo relacional. Nos próximos posts, vamos entender o que é Algebra Relacional e como ela define as operações que podem ser realizadas em bases de dados relacionais.
