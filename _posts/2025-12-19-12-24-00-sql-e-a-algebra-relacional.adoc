@@ -10,72 +10,129 @@ permalink: /posts/sql-e-a-algebra-relacional
 publish_date: 2025-12-21 10:57:00 +0300
 ---
 
-> Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado [CMU Intro to Database Systems (15-445/645 - Fall 2025)](https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5). O curso é ministrado por [Andy Pavlo](https://www.cs.cmu.edu/~pavlo/) e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na [página oficial do curso](https://15445.courses.cs.cmu.edu/fall2025/schedule.html).
+:figure-caption: Figura
+:imagesdir: /assets/images/
+
+[sidebar]
+Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5[CMU Intro to Database Systems (15-445/645 - Fall 2025)]. O curso é ministrado por https://www.cs.cmu.edu/~pavlo/[Andy Pavlo] e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na https://15445.courses.cs.cmu.edu/fall2025/schedule.html[página oficial do curso].
 
 
 No post anterior, discutimos o que são bases de dados, os modelos de dados mais comuns e a história por trás do modelo relacional. Neste post, vamos explorar a álgebra relacional, que é a base teórica para o SQL, a linguagem de consulta mais utilizada em bases de dados relacionais.
 
-## O que é SQL?
+== O que é SQL?
 
 Como já falamos antes, SQL significa Structured Query Language (Linguagem de Consulta Estruturada) dessa breve definição já podemos extrair duas informações muito valiosas: SQL é uma linguagem e SQL é usada para fazer consultas.
 
-Todas as linguagens na computação possuem uma **sintaxe**, uma **semântica** e um proposito. Muitas pessoas gostam muito de pensar que toda linguagem é uma linguagem de programação, mas isso não é verdade. SQL é usada para interagir com bases de dados. HTML é usada para estruturar documentos web. CSS é usada para adicionar estilo. E existem as linguagens de programação de propósito geral, como Python, Java, C, JavaScript, entre outras. 
+Todas as linguagens na computação possuem uma *sintaxe*, uma *semântica* e um proposito. Muitas pessoas gostam muito de pensar que toda linguagem é uma linguagem de programação, mas isso não é verdade. SQL é usada para interagir com bases de dados. HTML é usada para estruturar documentos web. CSS é usada para adicionar estilo. E existem as linguagens de programação de propósito geral, como Python, Java, C, JavaScript, entre outras.
 
-O SQL por sua vez não é uma linguagem especifica de um banco de dados, mas sim um padrão suportado por diversos sistemas. Ela é especificada pela ISO (International Organization for Standardization) e pela ANSI (American National Standards Institute). O padrão SQL é atualizado periodicamente para incluir novos recursos e melhorias. Alguns dos sistemas de gerenciamento de banco de dados relacionais (SGBDR) mais populares que suportam SQL incluem MySQL, PostgreSQL, Oracle Database, Microsoft SQL Server e SQLite. A linguagem SQL é constantemente atualizada para incluir novos recursos e melhorias, mas as bases de dados nem sempre implementam todas as funcionalidades do padrão. 
+O SQL por sua vez não é uma linguagem especifica de um banco de dados, mas sim um padrão suportado por diversos sistemas. Ela é especificada pela ISO (International Organization for Standardization) e pela ANSI (American National Standards Institute). O padrão SQL é atualizado periodicamente para incluir novos recursos e melhorias. Alguns dos sistemas de gerenciamento de banco de dados relacionais (SGBDR) mais populares que suportam SQL incluem MySQL, PostgreSQL, Oracle Database, Microsoft SQL Server e SQLite. A linguagem SQL é constantemente atualizada para incluir novos recursos e melhorias, mas as bases de dados nem sempre implementam todas as funcionalidades do padrão.
 
 
 Por exemplo, algumas das versões do padrão SQL incluem:
 
-| Nome da Versão | Ano  | Especificação                                                 | Principais Recursos Introduzidos                   |
-|----------------|------|---------------------------------------------------------------|----------------------------------------------------|
-| SQL:1986       | 1986 | ANSI X3.135:1986 <br/> ISO/IEC 9075:1987 <br/> FIPS PUB 127   | Padrão inicial                                     |
-| SQL:1989       | 1989 | ANSI X3.135-1989 <br/> ISO/IEC 9075:1989 <br/> FIPS PUB 127-1 | Integridade (_Constraints_)                        |
-| SQL:1992       | 1992 | ANSI X3.135-1992 <br/> ISO/IEC 9075:1992 <br/> FIPS PUB 127-2 | Suport a Unions, Joins, Case                       |
-| SQL:1999       | 1999 | ISO/IEC 9075:1999                                             | Expressões Regulares, Triggers, Queries recursivas |
-| SQL:2003       | 2003 | ISO/IEC 9075:2003                                             | XML, Windows, Sequences                            |
-| SQL:2006       | 2006 | ISO/IEC 9075-14:2006                                          | Suporte aprimorado para XML                        | 
-| SQL:2008       | 2008 | ISO/IEC 9075:2008                                             | Truncation, Fancy Sorting                          |
-| SQL:2011       | 2011 | ISO/IEC 9075:2011                                             | Temporal DBs, Fetch e Windows Functions            |
-| SQL:2016       | 2016 | ISO/IEC 9075:2016                                             | JSON, Polymorphic tables                           |
-| SQL:2019       | 2019 | ISO/IEC 9075-15:2019                                          | Multi-Dimensional Arrays                           |
-| SQL:2023       | 2023 | ISO/IEC 9075-2023                                             | Property Graph Queries                             |
+[cols="2,^1,3,4"]
+|====
+| Nome da Versão | Ano | Especificação | Principais Recursos Introduzidos
 
-## O que é Álgebra Relacional?
+| SQL:1986
+| 1986
+| ANSI X3.135:1986 +
+ISO/IEC 9075:1987 +
+FIPS PUB 127
+| Padrão inicial
+
+| SQL:1989
+| 1989 | ANSI X3.135-1989 +
+ISO/IEC 9075:1989 +
+FIPS PUB 127-1
+| Integridade (_Constraints_)
+
+| SQL:1992
+| 1992
+| ANSI X3.135-1992 +
+ISO/IEC 9075:1992 +
+FIPS PUB 127-2
+| Suport a Unions, Joins, Case
+
+| SQL:1999
+| 1999
+| ISO/IEC 9075:1999
+| Expressões Regulares, Triggers, Queries recursivas
+
+| SQL:2003
+| 2003
+| ISO/IEC 9075:2003
+| XML, Windows, Sequences
+
+| SQL:2006
+| 2006
+| ISO/IEC 9075-14:2006
+| Suporte aprimorado para XML
+
+| SQL:2008
+| 2008
+| ISO/IEC 9075:2008
+| Truncation, Fancy Sorting
+
+| SQL:2011
+| 2011
+| ISO/IEC 9075:2011
+| Temporal DBs, Fetch e Windows Functions
+
+| SQL:2016
+| 2016
+| ISO/IEC 9075:2016
+| JSON, Polymorphic tables
+
+| SQL:2019
+| 2019
+| ISO/IEC 9075-15:2019
+| Multi-Dimensional Arrays
+
+| SQL:2023
+| 2023
+| ISO/IEC 9075-2023
+| Property Graph Queries
+|====
+
+== O que é Álgebra Relacional?
 
 Agora que entendemos o que é SQL, temos que nos perguntar porque a linguagem é baseada na álgebra relacional e o que é essa tal de álgebra relacional.
 
-**_A Álgebra Relacional é um conjunto de operações fundamentais para recuperar e manipular tuplas em uma relação. Cada operador recebe uma ou mais relações como entrada e produz uma nova relação como saída. Para escrever consultas, podemos "encadear" esses operadores._**
+*_A Álgebra Relacional é um conjunto de operações fundamentais para recuperar e manipular tuplas em uma relação. Cada operador recebe uma ou mais relações como entrada e produz uma nova relação como saída. Para escrever consultas, podemos "encadear" esses operadores._*
 
 A álgebra relacional é uma derivação da lógica de primeira ordem e da teoria dos conjuntos com o propósito de prover operações que possam ser usadas para selecionar e manipular dados em bases relacionais (ver o livro _Relational completeness of data base sublanguages_).
 
 Em uma base relacional, podemos imaginar que cada relação (ou tabela) é um conjunto de tuplas que podem ser manipuladas por meio de operações da álgebra relacional. As principais operações são:
 
-- **Seleção (σ)**: Seleciona tuplas que satisfazem uma condição específica.
-- **Projeção (π)**: Seleciona colunas específicas de uma relação.
-- **União (∪)**: Combina tuplas de duas relações, removendo duplicatas.
-- **Interseção (∩)**: Retém apenas as tuplas que estão presentes em ambas as relações.
-- **Diferença (-)**: Retira tuplas de uma relação que também estão em outra relação.
-- **Produto Cartesiano (×)**: Combina todas as tuplas de duas relações possíveis.
-- **Junção (⨝)**: Combina tuplas de duas relações com base em uma condição de correspondência.
+- *Seleção (σ)*: Seleciona tuplas que satisfazem uma condição específica.
+- *Projeção (π)*: Seleciona colunas específicas de uma relação.
+- *União (∪)*: Combina tuplas de duas relações, removendo duplicatas.
+- *Interseção (∩)*: Retém apenas as tuplas que estão presentes em ambas as relações.
+- *Diferença (-)*: Retira tuplas de uma relação que também estão em outra relação.
+- *Produto Cartesiano (×)*: Combina todas as tuplas de duas relações possíveis.
+- *Junção (⨝)*: Combina tuplas de duas relações com base em uma condição de correspondência.
 
 
 Nas próximas seções, vamos explorar cada uma dessas operações e como elas se relacionam com consultas SQL comuns. Para exemplificar, vamos usar as seguintes relações:
 
-```plaintext
+[source,plaintext]
+----
 Aluno(ID, Nome, Idade)
 Curso(Codigo, Nome, Creditos)
-```
+----
 
 
-### Seleção (σ)
+=== Seleção (σ)
 
 A seleção recebe uma relação e retorna um subconjunto das tuplas dessa relação que satisfazem um predicado da seleção. O predicado atua como um filtro, e podemos combinar múltiplos predicados usando conjunções e disjunções.
 
-#### Exemplo de Seleção
+==== Exemplo de Seleção
 
 Dado a relação Alunos, podemos selecionar todos os alunos com idade maior que 20 anos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -86,27 +143,29 @@ Dado a relação Alunos, podemos selecionar todos os alunos com idade maior que 
 008     Heidi     24
 009     Ivan      22
 010     Judy      19
-```
+----
 
 Aplicando a seleção σ(Idade > 20)(Aluno), obtemos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 003     Carol     23
 004     Dave      21
 008     Heidi     24
 009     Ivan      22
-```
+----
 
-### Projeção (π)
+=== Projeção (π)
 
 A projeção recebe uma relação como entrada e retorna uma relação com tuplas que contêm apenas os atributos especificados. Você pode reorganizar a ordem dos atributos na relação de entrada, bem como manipular os valores.
 
-#### Exemplo de Projeção
+==== Exemplo de Projeção
 
 Dado a relação Alunos, podemos projetar apenas os nomes dos alunos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -117,11 +176,12 @@ Dado a relação Alunos, podemos projetar apenas os nomes dos alunos:
 008     Heidi     24
 009     Ivan      22
 010     Judy      19
-```
+----
 
 Aplicando a projeção π(Nome)(Aluno), obtemos:
 
-```plaintext
+[source,plaintext]
+----
 Alice
 Bob
 Carol
@@ -132,17 +192,18 @@ Grace
 Heidi
 Ivan
 Judy
-```
+----
 
-### União (∪)
+=== União (∪)
 
 A união recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem em pelo menos uma das relações de entrada. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.
 
-#### Exemplo de União
+==== Exemplo de União
 
 Dadas as relações Aluno1 e Aluno2:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -153,19 +214,21 @@ Dadas as relações Aluno1 e Aluno2:
 008     Heidi     24
 009     Ivan      22
 010     Judy      19
-```
+----
 
-```plaintext
+[source,plaintext]
+----
 011     Kevin     20
 012     Laura     21
 013     Mallory   22
 014     Nancy     23
 015     Oscar     24
-```
+----
 
 Aplicando a união Aluno1 ∪ Aluno2, obtemos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -181,17 +244,18 @@ Aplicando a união Aluno1 ∪ Aluno2, obtemos:
 013     Mallory   22
 014     Nancy     23
 015     Oscar     24
-```
+----
 
-### Interseção (∩)
+=== Interseção (∩)
 
 A interseção recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem em ambas as relações de entrada. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.
 
-#### Exemplo de Interseção
+==== Exemplo de Interseção
 
 Dadas as relações Aluno1 e Aluno2:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -202,9 +266,10 @@ Dadas as relações Aluno1 e Aluno2:
 008     Heidi     24
 009     Ivan      22
 010     Judy      19
-```
+----
 
-```plaintext
+[source,plaintext]
+----
 002     Bob       19
 003     Carol     23
 004     Dave      21
@@ -214,28 +279,30 @@ Dadas as relações Aluno1 e Aluno2:
 011     Kevin     20
 013     Mallory   22
 015     Oscar     24
-```
+----
 
 Aplicando a interseção Aluno1 ∩ Aluno2, obtemos:
 
-```plaintext
+[source,plaintext]
+----
 002     Bob       19
 003     Carol     23
 004     Dave      21
 006     Frank     17
 007     Grace     20
 009     Ivan      22
-```
+----
 
-### Diferença (-)
+=== Diferença (-)
 
 A diferença recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem na primeira relação, mas não na segunda. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.
 
-#### Exemplo de Diferença
+==== Exemplo de Diferença
 
 Dadas as relações Aluno1 e Aluno2:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
@@ -246,9 +313,10 @@ Dadas as relações Aluno1 e Aluno2:
 008     Heidi     24
 009     Ivan      22
 010     Judy      19
-```
+----
 
-```plaintext
+[source,plaintext]
+----
 002     Bob       19
 003     Carol     23
 004     Dave      21
@@ -258,40 +326,44 @@ Dadas as relações Aluno1 e Aluno2:
 011     Kevin     20
 013     Mallory   22
 015     Oscar     24
-```
+----
 
 Aplicando a diferença Aluno1 - Aluno2, obtemos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 005     Eve       18
 008     Heidi     24
 010     Judy      19
-```
+----
 
-### Produto Cartesiano (×)
+=== Produto Cartesiano (×)
 
 O produto cartesiano recebe duas relações e retorna uma relação que contém todas as combinações possíveis de tuplas das relações de entrada.
 
-#### Exemplo de Produto Cartesiano
+==== Exemplo de Produto Cartesiano
 
 Dadas as relações Aluno e Curso:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
-```
+----
 
-```plaintext
+[source,plaintext]
+----
 C001    Matemática     4
 C002    Física         3
 C003    Química        4
-```
+----
 
 Aplicando o produto cartesiano Aluno × Curso, obtemos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22    C001    Matemática     4
 001     Alice     22    C002    Física         3
 001     Alice     22    C003    Química        4
@@ -301,43 +373,47 @@ Aplicando o produto cartesiano Aluno × Curso, obtemos:
 003     Carol     23    C001    Matemática     4
 003     Carol     23    C002    Física         3
 003     Carol     23    C003    Química        4
-```
+----
 
-### Junção (⨝)
+=== Junção (⨝)
 
 A junção recebe duas relações e retorna uma relação que contém todas as tuplas que são uma combinação de duas tuplas, onde, para cada atributo que as duas relações compartilham, os valores desse atributo em ambas as tuplas são iguais.
 
-#### Exemplo de Junção
+==== Exemplo de Junção
 
 Dadas as relações Aluno e Curso:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22
 002     Bob       19
 003     Carol     23
-```
+----
 
-```plaintext
+[source,plaintext]
+----
 001    Matemática     4
 002    Física         3
 003    Química        4
-```
+----
 
 Aplicando a junção Aluno ⨝ Curso usando o ID = Codigo, obtemos:
 
-```plaintext
+[source,plaintext]
+----
 001     Alice     22    Matemática     4
 002     Bob       19    Física         3
 003     Carol     23    Química        4
-```
+----
 
-### Como a Álgebra Relacional se Relaciona com SQL?
+=== Como a Álgebra Relacional se Relaciona com SQL?
 
-Agora vamos ver como essas operações da álgebra relacional se traduzem em consultas SQL. É importante ressaltar que as consultas SQL apresentadas abaixo são apenas demonstrativas e não são otimizadas para desempenho. Você pode encontrar os exemplos no repositório [vepo/sql-database-tutorial](https://github.com/vepo/sql-database-tutorial).
+Agora vamos ver como essas operações da álgebra relacional se traduzem em consultas SQL. É importante ressaltar que as consultas SQL apresentadas abaixo são apenas demonstrativas e não são otimizadas para desempenho. Você pode encontrar os exemplos no repositório https://github.com/vepo/sql-database-tutorial[vepo/sql-database-tutorial].
 
 As consultas SQL a seguir são baseadas nas seguintes tabelas:
 
-```sql
+[source,sql]
+----
 CREATE TABLE IF NOT EXISTS employees (
     id         SERIAL PRIMARY KEY,
     name       VARCHAR(100),
@@ -362,124 +438,137 @@ CREATE TABLE IF NOT EXISTS projects (
     budget        DECIMAL(15,2),
     department_id INT REFERENCES departments(id)
 );
-```
+----
 
-#### Seleção em SQL
+==== Seleção em SQL
 
 A seleção no SQL é realizada pela cláusula `SELECT [campos] FROM [tabela] WHERE [condição]`. Onde uma condição é aplicada a uma ou mais tabelas e retorna um subconjunto de tuplas selecioadas pelos campos. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 100000 e nenhuma projeção de campos é feita, uma vez que usamos o asterisco (*) para selecionar todos os campos.
 
-```sql
+[source,sql]
+----
 -- Seleciona todos os funcionários com salário maior que 100000
 SELECT * FROM employees WHERE salary > 100000;
-```
+----
 
-#### Projeção em SQL
+==== Projeção em SQL
 
 A projeção no SQL é realizada pela cláusula `SELECT [campos] FROM [tabela]`. Onde os campos especificados são retornados para todas as tuplas da tabela. No exemplo abaixo, projetamos apenas os campos `id`, `name` e `department` da tabela `employees`.
 
-```sql
+[source,sql]
+----
 -- Projeta os campos id, name e department da tabela employees
 SELECT id, name, department FROM employees;
-```
+----
 
-#### União em SQL
+==== União em SQL
 
 A união no SQL é realizada pela cláusula `UNION` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário menor que 60000 e todos os funcionários com salário maior que 100000, combinando os resultados usando a união.
 
-```sql
+[source,sql]
+----
 -- Criar união de duas consultas
-SELECT * FROM employees WHERE salary < 60000 
-UNION 
+SELECT * FROM employees WHERE salary < 60000
+UNION
 SELECT * FROM employees WHERE salary > 100000;
-```
+----
 
 Esse exemplo não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. O `UNION` não é restrito a uma só tabela, a única exigência é que as consultas retornem o mesmo número de colunas e tipos de dados compatíveis. Essa consulta pode ser reescrita de uma forma mais eficiente usando o operador lógico `OR`, como mostrado abaixo:
 
-```sql
+[source,sql]
+----
 -- Versão mais eficiente usando OR
 SELECT * FROM employees WHERE salary < 60000 OR salary > 100000;
-```
+----
 
-#### Interseção em SQL
+==== Interseção em SQL
 
 A interseção no SQL é realizada pela cláusula `INTERSECT` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e todos os funcionários com salário menor que 100000, retornando apenas os funcionários que satisfazem ambas as condições.
 
 
-```sql
+[source,sql]
+----
 -- Criar interseção de duas consultas
-SELECT * FROM employees WHERE salary > 60000 
-INTERSECT 
+SELECT * FROM employees WHERE salary > 60000
+INTERSECT
 SELECT * FROM employees WHERE salary < 100000;
-```
+----
 
 Esse também não é um exemplo eficiente, visto que ambas as consultas são feitas na mesma tabela. A interseção pode ser reescrita de uma forma mais eficiente usando o operador lógico `AND`, como mostrado abaixo:
 
-```sql
+[source,sql]
+----
 -- Versão mais eficiente usando AND
 SELECT * FROM employees WHERE salary > 60000 AND salary < 100000;
-```
+----
 
-#### Diferença em SQL
+==== Diferença em SQL
 
 A diferença no SQL é realizada pela cláusula `EXCEPT` entre duas consultas `SELECT`. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e menor que 100000, e removemos aqueles que trabalham no departamento de TI.
 
-```sql
+[source,sql]
+----
 -- Criar diferença de duas consultas
-SELECT * FROM employees WHERE salary > 60000 AND salary < 100000 
-EXCEPT 
+SELECT * FROM employees WHERE salary > 60000 AND salary < 100000
+EXCEPT
 SELECT * FROM employees WHERE department = 'IT';
-```
+----
 
 Esse exemplo também não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. A diferença pode ser reescrita de uma forma mais eficiente usando o operador lógico `AND` junto com o operador `NOT`, como mostrado abaixo:
 
-```sql
+[source,sql]
+----
 -- Versão mais eficiente usando AND e NOT
 SELECT * FROM employees WHERE (salary > 60000 AND salary < 100000) AND NOT (department = 'IT');
-```
+----
 
-#### Produto Cartesiano em SQL
+==== Produto Cartesiano em SQL
 
 O produto cartesiano no SQL é realizado pela cláusula `CROSS JOIN` entre duas tabelas. No exemplo abaixo, combinamos todas as tuplas da tabela `employees` com todas as tuplas da tabela `departments`, resultando em todas as combinações possíveis de funcionários e departamentos.
 
-```sql
+[source,sql]
+----
 -- Produto cartesiano entre employees e departments
 SELECT * FROM employees CROSS JOIN departments;
-```
+----
 
 Esse exemplo definitivamente não é o mais eficiente, visto que o produto cartesiano geralmente não tão comumente usado em consultas reais. Normalmente, o produto cartesiano é seguido por uma cláusula `WHERE` para filtrar os resultados com base em uma condição específica. Por exemplo, podemos combinar o produto cartesiano com uma condição para selecionar apenas os funcionários que trabalham em um departamento específico:
 
-```sql
+[source,sql]
+----
 -- Produto cartesiano com condição de filtro
-SELECT * FROM employees CROSS JOIN departments 
+SELECT * FROM employees CROSS JOIN departments
 WHERE department = dept_name;
-```
+----
 
 Esse exemplo é também ineficiente por usar um campo textual para fazer a junção entre as tabelas. O ideal seria usar uma chave estrangeira para fazer a junção, como será mostrado no `JOIN` abaixo.
 
-#### Junção em SQL
+==== Junção em SQL
 
 A junção no SQL é realizada pela cláusula `JOIN` entre duas tabelas, geralmente acompanhada por uma condição `ON` que especifica como as tabelas devem ser combinadas. No exemplo abaixo, combinamos as tabelas `departments` e `projects` com base na correspondência entre o campo `id` da tabela `departments` e o campo `department_id` da tabela `projects`. Em seguida, agrupamos os resultados pelo campo `dpt.id` e contamos o número de projetos associados a cada departamento.
 
-```sql
-SELECT dpt.id, COUNT(prj.id) as projects 
-FROM departments dpt 
-LEFT JOIN projects prj ON dpt.id = prj.department_id 
+[source,sql]
+----
+SELECT dpt.id, COUNT(prj.id) as projects
+FROM departments dpt
+LEFT JOIN projects prj ON dpt.id = prj.department_id
 GROUP BY dpt.id;
-```
+----
 
-Talvez você tenha notado que o **Produto Cartesiano** e a **Junção** são operações muito semelhantes usando tipos diferentes de `JOIN`. Na **Junção** há a obrigatoriedade de definir uma condição de junção. No SQL, existem diversos tipos de operadores `JOIN`, incluindo:
+Talvez você tenha notado que o *Produto Cartesiano* e a *Junção* são operações muito semelhantes usando tipos diferentes de `JOIN`. Na *Junção* há a obrigatoriedade de definir uma condição de junção. No SQL, existem diversos tipos de operadores `JOIN`, incluindo:
 
-- **CROSS JOIN**: Realiza o produto cartesiano entre duas tabelas.
-- **INNER JOIN**: Retorna apenas as tuplas que possuem correspondência em ambas as tabelas com base na condição especificada.
-- **LEFT JOIN**: Retorna todas as tuplas da tabela à esquerda e as tuplas correspondentes da tabela à direita. Se não houver correspondência, os valores da tabela à direita serão nulos.
-- **RIGHT JOIN**: Retorna todas as tuplas da tabela à direita e as tuplas correspondentes da tabela à esquerda. Se não houver correspondência, os valores da tabela à esquerda serão nulos.
-- **FULL JOIN**: Retorna todas as tuplas de ambas as tabelas, preenchendo com nulos onde não houver correspondência.
+- *CROSS JOIN*: Realiza o produto cartesiano entre duas tabelas.
+- *INNER JOIN*: Retorna apenas as tuplas que possuem correspondência em ambas as tabelas com base na condição especificada.
+- *LEFT JOIN*: Retorna todas as tuplas da tabela à esquerda e as tuplas correspondentes da tabela à direita. Se não houver correspondência, os valores da tabela à direita serão nulos.
+- *RIGHT JOIN*: Retorna todas as tuplas da tabela à direita e as tuplas correspondentes da tabela à esquerda. Se não houver correspondência, os valores da tabela à esquerda serão nulos.
+- *FULL JOIN*: Retorna todas as tuplas de ambas as tabelas, preenchendo com nulos onde não houver correspondência.
 
 
-<!-- https://excalidraw.com/#json=p7wUv4740ZFC4KIbupNYU,TyLtzCXugBiZfIn00_7uwQ -->
-![Tipos de JOIN](/assets/images/databases/join-types.png)
+// https://excalidraw.com/#json=p7wUv4740ZFC4KIbupNYU,TyLtzCXugBiZfIn00_7uwQ
 
-## Conclusão
+.Tipos de JOIN
+image::databases/join-types.png[]
+
+== Conclusão
 
 Nesse post, exploramos como a álgebra relacional serve como a base teórica para o SQL. É importante ter ciência dessas operações fundamentais quando se escreve consultas SQL, visto que toda consulta SQL pode ser vista como uma operação de conjuntos. Compreender a álgebra relacional ajuda a escrever consultas mais eficientes e a entender como os sistemas de gerenciamento de banco de dados processam essas consultas.
 
