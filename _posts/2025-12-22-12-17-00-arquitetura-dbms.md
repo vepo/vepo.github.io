@@ -44,6 +44,9 @@ Para que o plano de execução gerado pelo módulo de processamento de consultas
 
 O módulo motor de armazenamento é responsável por gerenciar a forma como os dados são armazenados fisicamente no disco. Ele é dividido em cinco submódulos principais: o **Transaction Manager**, o **Lock Manager**, o **Access Methods**, o **Buffer Manager** e o **Recovery Manager**.
 
+<!-- https://excalidraw.com/#json=xP2Zve4gvwrtBfl0Dx7Dq,UWyro2CwB4GOdxysyL4KUw -->
+![Tipos de armazenamentos disponíveis](/assets/images/databases/storage-types.png)
+
 Um dos grandes desafios enfrentados pelas bases de dados é melhorar o desempenho do acesso ao disco. Todas as informações em um banco de dados são armazenadas em algum tipo de mídia não-volátil, mesmo que esteja em algum sistema de armazenamento em nuvem, e qualquer acesso a esses dados envolve operações de leitura e escrita que são muito mais lentas que as operações realizadas na memória volátil (RAM). 
 
 Outro desafio é que a leitura e escrita de dados no disco é feita em blocos de tamanho fixo, o que significa que mesmo que apenas um pequeno pedaço de informação seja necessário, o sistema precisa ler ou escrever o bloco inteiro. Esse comportamento é diferente do acesso à memória volátil, onde é possível acessar qualquer byte individualmente.
