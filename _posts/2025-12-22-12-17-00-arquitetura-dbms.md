@@ -51,6 +51,16 @@ Um dos grandes desafios enfrentados pelas bases de dados é melhorar o desempenh
 
 Outro desafio é que a leitura e escrita de dados no disco é feita em blocos de tamanho fixo, o que significa que mesmo que apenas um pequeno pedaço de informação seja necessário, o sistema precisa ler ou escrever o bloco inteiro. Esse comportamento é diferente do acesso à memória volátil, onde é possível acessar qualquer byte individualmente.
 
+| Tempo de Acesso  | Tipo de Memória |
+|------------------|-----------------|
+| ~1ns             | L1 Cache Ref    |
+| ~4ns             | L2 Cache Ref    |
+| ~100ns           | DRAM            |
+| ~16.000ns        | SSD             |
+| ~2.000.000ns     | HDD             |
+| ~50.000.000ns    | Rede            |
+| ~1.000.000.000ns | Fita            | 
+
 ### Gerenciador de Transações (_Transaction Manager_)
 
 O gerenciador de transações é responsável por organizar a execução das transações garantindo que a base de dados esteja sempre em um estado consistente.
