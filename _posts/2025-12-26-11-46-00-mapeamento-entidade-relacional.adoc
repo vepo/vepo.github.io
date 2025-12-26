@@ -2,19 +2,17 @@
 title: Mapeamento Entidade-Relacional para Modelo Relacional
 published: false
 description: |
-    Neste post, vamos explorar os conceitos fundamentais de bases de dados, incluindo o que são, como funcionam e a história por trás do modelo relacional.
-tags: [Ciência da Computação, Bases de Dados, Modelos de Dados, SQL, História da Computação]
+    Neste post, exploramos como mapear um modelo entidade-relacional para um banco de dados relacional utilizando SQL. Vemos como definir entidades, objetos de valor e relacionamentos entre tabelas, além de aplicar restrições de integridade para garantir a consistência dos dados. Também discutimos a importância dos índices para melhorar o desempenho das consultas.
+tags: [Ciência da Computação, Bases de Dados, SQL, Modelo Entidade-Relacional, Modelagem de Dados]
 cover_image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
 permalink: /posts/mapeamento-entidade-relacional
 publish_date: 2025-12-26 11:46:00 +0300
 ---
 
-:figure-caption: Figura
-:table-caption: Tabela
-:imagesdir: /assets/images/
+Agora que entendemos os conceitos básicos de uma base de dados relacional e como ela é estruturada, vamos explorar como mapear um modelo entidade-relacional (ER) para uma aplicação. Nesse processo os dados representados no modelo ER são representados em tabelas relacionais que podem ser consultadas e manipuladas usando SQL. 
 
-Agora que entendemos os conceitos básicos de uma base de dados relacional e como ela é estruturada, vamos explorar como mapear um modelo entidade-relacional (ER) para uma aplicação. Nesse processo os dados representados no modelo ER são representados em tabelas relacionais que podem ser consultadas e manipuladas usando SQL.
+TIP: Você pode encontrar os exemplos no repositório https://github.com/vepo/sql-database-tutorial[vepo/sql-database-tutorial].
 
 == O que são Entidades?
 
@@ -30,7 +28,7 @@ Para exemplificar, vamos considerar uma tabela chamada `tb_funcionarios` que arm
 [source,sql]
 ----
 CREATE TABLE tb_funcionarios (
-    id              INT PRIMARY KEY, -- Chave Primária
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
     nome            VARCHAR(100),
     sobrenome       VARCHAR(100),
     data_nascimento DATE,
@@ -46,18 +44,18 @@ _*Um Conjunto de Entidades é uma coleção de entidades do mesmo tipo que compa
 
 == O que são Objetos de Valor e Relacionamentos?
 
-Agora precisamos adicionar mais informações sobre os funcionários como o endereço e telefone. Essas informações não serão armazenadas na tabela `tb_funcionarios`, pois elas não definem a identidade do funcionário. Para isso, criaremos uma nova tabela chamada `tb_enderecos` e outra chamada `tb_contatos` para armazenar essas informações como objetos de valor relacionados à entidade funcionário.
+Agora precisamos adicionar mais informações sobre os funcionários como o endereço e telefone. Essas informações não serão armazenadas na tabela `tb_funcionarios`, pois elas não definem a identidade do funcionário. Para isso, criaremos uma nova tabela chamada `tb_funcionarios_enderecos` e outra chamada `tb_funcionarios_contatos` para armazenar essas informações como objetos de valor relacionados à entidade funcionário.
 
 _*Um Objeto de Valor é um objeto que não possui identidade própria e sua existência é baseada em seus atributos.*_ Diferente das entidades, os objetos de valor são definidos pelos atributos que possuem. Dois objetos de valor são considerados iguais se todos os seus atributos forem iguais, o que não significa que eles são a mesma linha em uma tabela relacional.
 
-Vamos criar as tabelas `tb_enderecos` e `tb_contatos` para armazenar os endereços e contatos dos funcionários:
+Vamos criar as tabelas `tb_funcionarios_enderecos` e `tb_funcionarios_contatos` para armazenar os endereços e contatos dos funcionários:
 
 .Script para criação das tabelas de Endereços e Contatos
 [source,sql]
 ----
-CREATE TABLE tb_enderecos (
-    id              INT PRIMARY KEY, -- Chave Primária
-    funcionario_id  INT,             -- Chave Estrangeira para tb_funcionarios
+CREATE TABLE tb_funcionarios_enderecos (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    funcionario_id  BIGINT NOT NULL,       -- Chave Estrangeira para tb_funcionarios
     rua             VARCHAR(200),
     cidade          VARCHAR(100),
     estado          VARCHAR(100),
@@ -65,22 +63,22 @@ CREATE TABLE tb_enderecos (
     FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
 );
 
-CREATE TABLE tb_contatos (
-    id              INT PRIMARY KEY, -- Chave Primária
-    funcionario_id  INT,             -- Chave Estrangeira para tb_funcionarios
+CREATE TABLE tb_funcionarios_contatos (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    funcionario_id  BIGINT NOT NULL, -- Chave Estrangeira para tb_funcionarios
     tipo            VARCHAR(50),     -- Ex: 'telefone', 'email'
     valor           VARCHAR(100),    -- Ex: número de telefone ou endereço de email
     FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
 );
 ----
 
-Talvez você tenha notado que as tabelas `tb_enderecos` e `tb_contatos` possuem uma coluna chamada `funcionario_id`, que é uma chave estrangeira referenciando a tabela `tb_funcionarios`. Isso estabelece um relacionamento entre as tabelas, indicando que cada endereço e contato está associado a um funcionário específico.
+Talvez você tenha notado que as tabelas `tb_funcionarios_enderecos` e `tb_funcionarios_contatos` possuem uma coluna chamada `funcionario_id`, que é uma chave estrangeira referenciando a tabela `tb_funcionarios`. Isso estabelece um relacionamento entre as tabelas, indicando que cada endereço e contato está associado a um funcionário específico.
 
 _*Um Relacionamento é uma associação entre uma ou mais tabelas que define como os dados se relacionam entre si.*_ Relacionamentos são essenciais para manter a integridade dos dados e garantir que as informações estejam corretamente vinculadas.
 
 == Como podemos classificar os tipos de Relacionamentos?
 
-No nosso exemplo, o relacionamento entre as tabelas `tb_funcionarios`, `tb_enderecos` e `tb_contatos` é do tipo um-para-muitos (_one-to-many_). Isso significa que um funcionário pode ter múltiplos endereços e contatos, mas cada endereço ou contato está associado a apenas um funcionário.
+No nosso exemplo, o relacionamento entre as tabelas `tb_funcionarios`, `tb_funcionarios_enderecos` e `tb_funcionarios_contatos` é do tipo um-para-muitos (_one-to-many_). Isso significa que um funcionário pode ter múltiplos endereços e contatos, mas cada endereço ou contato está associado a apenas um funcionário.
 
 // https://editor.plantuml.com/uml/SoWkIImgISv8pUFYIiqhoIofL70hpKikoSpFIopAp5Uevgg5IxZcfQGMfIQZ2ZhdvvKaba35KBJg-kd2jM3AGFLnSN4vfEQbW1q00000
 
@@ -95,26 +93,26 @@ Relacionamentos podem ser classificados em três tipos principais:
 
 Apesar dos tipos de relacionamentos serem importantes, eles não são diretamente definidos na linguagem SQL. Em vez disso, eles são definidos pela forma em que as chaves primárias e as estrangeiras são configuradas entre as tabelas. 
 
-Vamos imaginar agora que queremos armazenar as informações profissionais prévias dos funcionários em uma tabela chamada `tb_experiencias_profissionais`, que terá um relacionamento um-para-um com a tabela `tb_funcionarios`. Cada funcionário terá apenas uma experiência profissional registrada. Para isso precisamos alterar a tabela `tb_funcionarios` e criar a nova tabela `tb_experiencias_profissionais`:
+Vamos imaginar agora que queremos armazenar a informação da profissional anterior dos funcionários em uma tabela chamada `tb_funcionarios_experiencias_anterior`, que terá um relacionamento um-para-um com a tabela `tb_funcionarios`. Cada funcionário terá apenas uma experiência profissional registrada. Para isso precisamos alterar a tabela `tb_funcionarios` e criar a nova tabela `tb_funcionarios_experiencias_anterior`:
 
 .Script para criação da tabela de Experiências Profissionais
 [source,sql]
 ----
-CREATE TABLE tb_experiencias_profissionais (
-    id              INT PRIMARY KEY, -- Chave Primária
+CREATE TABLE tb_funcionarios_experiencias_anterior (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
     empresa         VARCHAR(100),
     cargo           VARCHAR(100),
-    inicio          DATE,
-    fim             DATE
+    data_inicio     DATE,
+    data_fim        DATE
 );
 
 ALTER TABLE tb_funcionarios
-ADD experiencia_profissional_id INT, -- Chave Estrangeira para tb_experiencias_profissionais
-ADD FOREIGN KEY (experiencia_profissional_id) REFERENCES tb_experiencias_profissionais(id), -- Chave Estrangeira
-ADD UNIQUE (experiencia_profissional_id); -- Garante o relacionamento um-para-um
+ADD experiencia_anterior_id BIGINT, -- Chave Estrangeira para tb_funcionarios_experiencias_anterior
+ADD FOREIGN KEY (tb_funcionarios) REFERENCES tb_funcionarios_experiencias_anterior(id), -- Chave Estrangeira
+ADD UNIQUE (tb_funcionarios); -- Garante o relacionamento um-para-um
 ----
 
-Nesse exemplo, a tabela `tb_experiencias_profissionais` armazena as informações sobre as experiências profissionais dos funcionários. A tabela `tb_funcionarios` foi alterada para incluir uma coluna `experiencia_profissional_id`, que é uma chave estrangeira referenciando a tabela `tb_experiencias_profissionais`. A restrição `UNIQUE` garante que cada funcionário possa ter no máximo uma experiência profissional associada, estabelecendo assim o relacionamento um-para-um.
+Nesse exemplo, a tabela `tb_funcionarios_experiencias_anterior` armazena as informações sobre as experiências profissionais dos funcionários. A tabela `tb_funcionarios` foi alterada para incluir uma coluna `experiencia_anterior_id`, que é uma chave estrangeira referenciando a tabela `tb_funcionarios_experiencias_anterior`. A restrição `UNIQUE` garante que cada funcionário possa ter no máximo uma experiência profissional associada, estabelecendo assim o relacionamento um-para-um.
 
 Com essa estrutura, podemos ter a certeza que cada funcionário terá apenas uma experiência profissional registrada, e cada experiência profissional estará associada a apenas um funcionário.
 
@@ -149,3 +147,26 @@ Mas ainda falta um detalhe importante: e se nossa empresa for muito grande e qui
 
 == O que são Índices (_Indexes_)?
 
+Para entender como a consulta é realizada em uma base de dados, podemos pedir para a base explicar como ela pretende executar a consulta. Isso é possível utilizando o comando `EXPLAIN` antes da consulta SQL. Vamos imaginar que queremos encontrar todos os funcionários com o cargo de "Desenvolvedor". A consulta SQL seria a seguinte:
+
+.Script para consulta de funcionários pelo cargo
+[source,sql]
+----
+EXPLAIN SELECT * FROM tb_funcionarios WHERE cargo = 'Desenvolvedor';
+----
+
+A resposta do comando `EXPLAIN` nos mostrará o plano de execução que a base de dados pretende utilizar para realizar a consulta. Se não houver um índice na coluna `cargo`, a base de dados terá que fazer uma varredura completa na tabela `tb_funcionarios`, o que pode ser lento se a tabela tiver muitos registros.
+
+Mas podemos melhorar o desempenho da consulta criando um índice na coluna `cargo`:
+
+.Script para criação de índice na coluna cargo
+[source,sql]
+----
+CREATE INDEX idx_funcionarios_cargo ON tb_funcionarios(cargo);
+----
+
+Com o índice criado, a base de dados poderá utilizar o índice para localizar rapidamente os registros que correspondem ao cargo "Desenvolvedor", melhorando significativamente o desempenho da consulta.
+
+== Conclusão
+
+Neste post, exploramos como mapear um modelo entidade-relacional para um banco de dados relacional utilizando SQL. Vimos como definir entidades, objetos de valor e relacionamentos entre tabelas, além de aplicar restrições de integridade para garantir a consistência dos dados. Também discutimos a importância dos índices para melhorar o desempenho das consultas. Compreender esses conceitos é fundamental para projetar e implementar aplicações usando bases de dados relacionais de forma eficiente e eficaz.
