@@ -1,10 +1,9 @@
 source "https://rubygems.org"
 ruby RUBY_VERSION
 
-gem 'jekyll', '~> 3.8.5'
-gem 'coderay', '~> 1.1.0'
+gem "jekyll", "~> 4.2.2"
 
-gem "minima", "~> 2.5.2"
+gem "minima", "~> 2.5"
 gem 'webrick'
 gem 'rest-client'
 gem 'json'
@@ -12,7 +11,7 @@ gem 'kramdown-parser-gfm'
 gem 'pygments.rb', '~> 2.4.0'
 
 group :jekyll_plugins do
-  gem 'jekyll-asciidoc', '~> 2.1.1'
+  gem 'jekyll-asciidoc'
   gem 'jekyll-feed'
   gem 'jekyll-sitemap'
   gem 'jekyll-paginate'
