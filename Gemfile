@@ -8,7 +8,6 @@ gem 'webrick'
 gem 'rest-client'
 gem 'json'
 gem 'kramdown-parser-gfm'
-gem 'pygments.rb', '~> 2.4.0'
 
 group :jekyll_plugins do
   gem 'jekyll-asciidoc'
