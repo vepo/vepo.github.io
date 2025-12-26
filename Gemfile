@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 ruby RUBY_VERSION
 
-gem "jekyll", "~> 4.2.0"
+gem "jekyll", "~> 4.4.1"
 
-gem "minima", "~> 2.5"
+gem "minima", "~> 2.5.2"
 gem 'webrick'
 gem 'rest-client'
 gem 'json'
