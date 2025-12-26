@@ -1,0 +1,151 @@
+---
+title: Mapeamento Entidade-Relacional para Modelo Relacional
+published: false
+description: |
+    Neste post, vamos explorar os conceitos fundamentais de bases de dados, incluindo o que são, como funcionam e a história por trás do modelo relacional.
+tags: [Ciência da Computação, Bases de Dados, Modelos de Dados, SQL, História da Computação]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/mapeamento-entidade-relacional
+publish_date: 2025-12-26 11:46:00 +0300
+---
+
+:figure-caption: Figura
+:table-caption: Tabela
+:imagesdir: /assets/images/
+
+Agora que entendemos os conceitos básicos de uma base de dados relacional e como ela é estruturada, vamos explorar como mapear um modelo entidade-relacional (ER) para uma aplicação. Nesse processo os dados representados no modelo ER são representados em tabelas relacionais que podem ser consultadas e manipuladas usando SQL.
+
+== O que são Entidades?
+
+A base de um modelo relacional são as tabelas que armazenam entidades, objetos de valor e os relacionamentos entre eles. Para entender melhor como fazer esse mapeamento, vamos definir o que são esses conceitos. 
+
+_*Uma Entidade é um objeto ou ente do mundo real que possui existência própria e cujas características ou propriedades desejamos armazenar.*_ Uma entidade pode ser um ente físico (uma pessoa, um carro, um livro ou uma peça) ou um ente abstrato (um curso, um evento, uma conta bancária ou uma transação). O que define uma entidade é que sua existência é baseda em sua identidade única e não nos atributos que ela possui.
+
+Por exemplo, vamos supor que temos um banco de dados para armazenar as informações de funcionários de uma grande empresa. Os campos que queremos armazenar são: nome, sobrenome, data de nascimento e cargo. É possível que existam dois funcionários com o mesmo nome, sobrenome e data de nascimento, mas eles sejam entidades diferentes? Sim, pois cada funcionário é uma pessoa no mundo real. Se depois de adicionado o funcionário desejarmos adicionar um novo campo para armazenar o número de CPF, isso diferenciará os dois funcionários.
+
+Para exemplificar, vamos considerar uma tabela chamada `tb_funcionarios` que armazena as informações dos funcionários da empresa:
+
+.Script para criação da tabela de Funcionários
+[source,sql]
+----
+CREATE TABLE tb_funcionarios (
+    id              INT PRIMARY KEY, -- Chave Primária
+    nome            VARCHAR(100),
+    sobrenome       VARCHAR(100),
+    data_nascimento DATE,
+    cargo           VARCHAR(100)
+);
+----
+
+Nesse exemplo, a tabela `tb_funcionarios` representa a entidade "Funcionário". Cada linha na tabela corresponde a um funcionário específico, identificado de forma única pelo campo `id`, que é a chave primária da tabela. Os outros campos armazenam os atributos do funcionário, como nome, sobrenome, data de nascimento e cargo.
+
+Cada funcionário é considerada uma entidade distinta e única que pode ser identificada pelo seu `id`, independentemente dos outros atributos que possam ser iguais entre diferentes funcionários. A tabela `tb_funcionarios` que armazena as entidades, pode ser considerada um _conjunto de entidades_.
+
+_*Um Conjunto de Entidades é uma coleção de entidades do mesmo tipo que compartilham os mesmos atributos ou propriedades.*_ Cada conjunto de entidades pode ser visto como um conjunto matemático no sentido que todos os seus elementos são distintos e não há uma ordem específica entre eles.
+
+== O que são Objetos de Valor e Relacionamentos?
+
+Agora precisamos adicionar mais informações sobre os funcionários como o endereço e telefone. Essas informações não serão armazenadas na tabela `tb_funcionarios`, pois elas não definem a identidade do funcionário. Para isso, criaremos uma nova tabela chamada `tb_enderecos` e outra chamada `tb_contatos` para armazenar essas informações como objetos de valor relacionados à entidade funcionário.
+
+_*Um Objeto de Valor é um objeto que não possui identidade própria e sua existência é baseada em seus atributos.*_ Diferente das entidades, os objetos de valor são definidos pelos atributos que possuem. Dois objetos de valor são considerados iguais se todos os seus atributos forem iguais, o que não significa que eles são a mesma linha em uma tabela relacional.
+
+Vamos criar as tabelas `tb_enderecos` e `tb_contatos` para armazenar os endereços e contatos dos funcionários:
+
+.Script para criação das tabelas de Endereços e Contatos
+[source,sql]
+----
+CREATE TABLE tb_enderecos (
+    id              INT PRIMARY KEY, -- Chave Primária
+    funcionario_id  INT,             -- Chave Estrangeira para tb_funcionarios
+    rua             VARCHAR(200),
+    cidade          VARCHAR(100),
+    estado          VARCHAR(100),
+    cep             VARCHAR(20),
+    FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
+);
+
+CREATE TABLE tb_contatos (
+    id              INT PRIMARY KEY, -- Chave Primária
+    funcionario_id  INT,             -- Chave Estrangeira para tb_funcionarios
+    tipo            VARCHAR(50),     -- Ex: 'telefone', 'email'
+    valor           VARCHAR(100),    -- Ex: número de telefone ou endereço de email
+    FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
+);
+----
+
+Talvez você tenha notado que as tabelas `tb_enderecos` e `tb_contatos` possuem uma coluna chamada `funcionario_id`, que é uma chave estrangeira referenciando a tabela `tb_funcionarios`. Isso estabelece um relacionamento entre as tabelas, indicando que cada endereço e contato está associado a um funcionário específico.
+
+_*Um Relacionamento é uma associação entre uma ou mais tabelas que define como os dados se relacionam entre si.*_ Relacionamentos são essenciais para manter a integridade dos dados e garantir que as informações estejam corretamente vinculadas.
+
+== Como podemos classificar os tipos de Relacionamentos?
+
+No nosso exemplo, o relacionamento entre as tabelas `tb_funcionarios`, `tb_enderecos` e `tb_contatos` é do tipo um-para-muitos (_one-to-many_). Isso significa que um funcionário pode ter múltiplos endereços e contatos, mas cada endereço ou contato está associado a apenas um funcionário.
+
+// https://editor.plantuml.com/uml/SoWkIImgISv8pUFYIiqhoIofL70hpKikoSpFIopAp5Uevgg5IxZcfQGMfIQZ2ZhdvvKaba35KBJg-kd2jM3AGFLnSN4vfEQbW1q00000
+
+.PlantUML Diagrama de Relacionamento entre Funcionários, Endereços e Contatos
+image::databases/er-funcionario-contatos-enderecos.png[]
+
+Relacionamentos podem ser classificados em três tipos principais:
+
+* _Um-para-um (one-to-one)_: Cada registro em uma tabela está associado a no máximo um registro em outra tabela.
+* _Um-para-muitos (one-to-many)_: Um registro em uma tabela pode estar associado a múltiplos registros em outra tabela.
+* _Muitos-para-muitos (many-to-many)_: Múltiplos registros em uma tabela podem estar associados a múltiplos registros em outra tabela. Esse tipo de relacionamento geralmente requer uma tabela intermediária para gerenciar as associações.
+
+Apesar dos tipos de relacionamentos serem importantes, eles não são diretamente definidos na linguagem SQL. Em vez disso, eles são definidos pela forma em que as chaves primárias e as estrangeiras são configuradas entre as tabelas. 
+
+Vamos imaginar agora que queremos armazenar as informações profissionais prévias dos funcionários em uma tabela chamada `tb_experiencias_profissionais`, que terá um relacionamento um-para-um com a tabela `tb_funcionarios`. Cada funcionário terá apenas uma experiência profissional registrada. Para isso precisamos alterar a tabela `tb_funcionarios` e criar a nova tabela `tb_experiencias_profissionais`:
+
+.Script para criação da tabela de Experiências Profissionais
+[source,sql]
+----
+CREATE TABLE tb_experiencias_profissionais (
+    id              INT PRIMARY KEY, -- Chave Primária
+    empresa         VARCHAR(100),
+    cargo           VARCHAR(100),
+    inicio          DATE,
+    fim             DATE
+);
+
+ALTER TABLE tb_funcionarios
+ADD experiencia_profissional_id INT, -- Chave Estrangeira para tb_experiencias_profissionais
+ADD FOREIGN KEY (experiencia_profissional_id) REFERENCES tb_experiencias_profissionais(id), -- Chave Estrangeira
+ADD UNIQUE (experiencia_profissional_id); -- Garante o relacionamento um-para-um
+----
+
+Nesse exemplo, a tabela `tb_experiencias_profissionais` armazena as informações sobre as experiências profissionais dos funcionários. A tabela `tb_funcionarios` foi alterada para incluir uma coluna `experiencia_profissional_id`, que é uma chave estrangeira referenciando a tabela `tb_experiencias_profissionais`. A restrição `UNIQUE` garante que cada funcionário possa ter no máximo uma experiência profissional associada, estabelecendo assim o relacionamento um-para-um.
+
+Com essa estrutura, podemos ter a certeza que cada funcionário terá apenas uma experiência profissional registrada, e cada experiência profissional estará associada a apenas um funcionário.
+
+== O que são Restrições de Integridade (_Constraints_)?
+
+Não sei se você notou, mas no exemplo acima, utilizamos algumas restrições de integridade (_constraints_) para garantir a consistência dos dados no banco de dados relacional. As restrições de integridade são regras que definem como os dados podem ser inseridos, atualizados ou deletados em uma tabela. Elas ajudam a manter a integridade dos dados e evitam inconsistências.
+
+Bases de dados relacionais permitem definir as restrições de integridade diretamente na definição das tabelas usando a linguagem SQL. Algumas das restrições mais comuns incluem:
+
+* _Chave Primária (PRIMARY KEY)_: Garante que cada registro em uma tabela seja único e não nulo. No exemplo, usamos a chave primária para identificar unicamente cada funcionário, endereço, contato e experiência profissional.
+* _Chave Estrangeira (FOREIGN KEY)_: Garante que os valores em uma coluna correspondam aos valores em outra tabela, estabelecendo um relacionamento entre as tabelas. No exemplo, usamos chaves estrangeiras para associar endereços e contatos aos funcionários.
+* _Único (UNIQUE)_: Garante que os valores em uma coluna sejam únicos. No exemplo, usamos a restrição `UNIQUE` para garantir que cada funcionário tenha no máximo uma experiência profissional associada.
+* _Não Nulo (NOT NULL)_: Garante que uma coluna não possa conter valores nulos. Isso é útil para garantir que certos atributos essenciais estejam sempre presentes em um registro.
+* _Verificação (CHECK)_: Permite definir uma condição que os valores em uma coluna devem satisfazer. Por exemplo, podemos usar uma restrição `CHECK` para garantir que a data de término de uma experiência profissional seja posterior à data de início.
+* _Padrão (DEFAULT)_: Define um valor padrão para uma coluna quando nenhum valor é especificado durante a inserção de um registro.
+
+Com as restrições de integridade, podemos garantir que os dados no banco de dados relacional estejam sempre consistentes e válidos, evitando problemas como duplicidade de registros, referências inválidas entre tabelas e valores nulos em campos essenciais. 
+
+E se no nosso exemplo quisermos garantir que o campo `cargo` na tabela `tb_funcionarios` não possa ser nulo? Podemos adicionar a restrição `NOT NULL` na definição da tabela:
+
+
+.Script para criação da tabela de Funcionários com restrição NOT NULL
+[source,sql]
+----
+ALTER TABLE tb_funcionarios
+MODIFY cargo VARCHAR(100) NOT NULL; -- Adiciona a restrição NOT NULL
+----
+
+Esse exemplo não é completo, poderiamos também que os valores dos demais campos não fossem nulos, mas serve para ilustrar como as restrições de integridade podem ser aplicadas para garantir a consistência dos dados no banco de dados relacional.
+
+Mas ainda falta um detalhe importante: e se nossa empresa for muito grande e quisermos encontrar facilmente um determinado funcionário pelo nome ou cargo? Para isso, podemos criar índices nas colunas `nome`, `sobrenome` e `cargo` da tabela `tb_funcionarios`.
+
+== O que são Índices (_Indexes_)?
+
