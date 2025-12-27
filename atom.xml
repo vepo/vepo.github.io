@@ -1,0 +1,2166 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/atom.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2025-12-27T01:30:52+00:00</updated><id>https://blog.vepo.dev/atom.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Mapeamento Entidade-Relacional para Modelo Relacional</title><link href="https://blog.vepo.dev/posts/mapeamento-entidade-relacional" rel="alternate" type="text/html" title="Mapeamento Entidade-Relacional para Modelo Relacional" /><published>2025-12-26T00:00:00+00:00</published><updated>2025-12-26T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-46-00-mapeamento-entidade-relacional</id><content type="html" xml:base="https://blog.vepo.dev/posts/mapeamento-entidade-relacional"><![CDATA[<div class="paragraph">
+<p>Agora que entendemos os conceitos básicos de uma base de dados relacional e como ela é estruturada, vamos explorar como mapear um modelo entidade-relacional (ER) para uma aplicação. Nesse processo os dados representados no modelo ER são representados em tabelas relacionais que podem ser consultadas e manipuladas usando SQL.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Dica</div>
+</td>
+<td class="content">
+Você pode encontrar os exemplos no repositório <a href="https://github.com/vepo/sql-database-tutorial">vepo/sql-database-tutorial</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-entidades">O que são Entidades?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A base de um modelo relacional são as tabelas que armazenam entidades, objetos de valor e os relacionamentos entre eles. Para entender melhor como fazer esse mapeamento, vamos definir o que são esses conceitos.</p>
+</div>
+<div class="paragraph">
+<p><em>*Uma Entidade é um objeto ou ente do mundo real que possui existência própria e cujas características ou propriedades desejamos armazenar.*</em> Uma entidade pode ser um ente físico (uma pessoa, um carro, um livro ou uma peça) ou um ente abstrato (um curso, um evento, uma conta bancária ou uma transação). O que define uma entidade é que sua existência é baseda em sua identidade única e não nos atributos que ela possui.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, vamos supor que temos um banco de dados para armazenar as informações de funcionários de uma grande empresa. Os campos que queremos armazenar são: nome, sobrenome, data de nascimento e cargo. É possível que existam dois funcionários com o mesmo nome, sobrenome e data de nascimento, mas eles sejam entidades diferentes? Sim, pois cada funcionário é uma pessoa no mundo real. Se depois de adicionado o funcionário desejarmos adicionar um novo campo para armazenar o número de CPF, isso diferenciará os dois funcionários.</p>
+</div>
+<div class="paragraph">
+<p>Para exemplificar, vamos considerar uma tabela chamada <code>tb_funcionarios</code> que armazena as informações dos funcionários da empresa:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para criação da tabela de Funcionários</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios</span> <span class="p">(</span>
+    <span class="n">id</span>              <span class="n">BIGSERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="c1">-- Chave Primária</span>
+    <span class="n">nome</span>            <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">sobrenome</span>       <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">data_nascimento</span> <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">cargo</span>           <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nesse exemplo, a tabela <code>tb_funcionarios</code> representa a entidade "Funcionário". Cada linha na tabela corresponde a um funcionário específico, identificado de forma única pelo campo <code>id</code>, que é a chave primária da tabela. Os outros campos armazenam os atributos do funcionário, como nome, sobrenome, data de nascimento e cargo.</p>
+</div>
+<div class="paragraph">
+<p>Cada funcionário é considerada uma entidade distinta e única que pode ser identificada pelo seu <code>id</code>, independentemente dos outros atributos que possam ser iguais entre diferentes funcionários. A tabela <code>tb_funcionarios</code> que armazena as entidades, pode ser considerada um <em>conjunto de entidades</em>.</p>
+</div>
+<div class="paragraph">
+<p><em>*Um Conjunto de Entidades é uma coleção de entidades do mesmo tipo que compartilham os mesmos atributos ou propriedades.*</em> Cada conjunto de entidades pode ser visto como um conjunto matemático no sentido que todos os seus elementos são distintos e não há uma ordem específica entre eles.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-objetos-de-valor-e-relacionamentos">O que são Objetos de Valor e Relacionamentos?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora precisamos adicionar mais informações sobre os funcionários como o endereço e telefone. Essas informações não serão armazenadas na tabela <code>tb_funcionarios</code>, pois elas não definem a identidade do funcionário. Para isso, criaremos uma nova tabela chamada <code>tb_funcionarios_enderecos</code> e outra chamada <code>tb_funcionarios_contatos</code> para armazenar essas informações como objetos de valor relacionados à entidade funcionário.</p>
+</div>
+<div class="paragraph">
+<p><em>*Um Objeto de Valor é um objeto que não possui identidade própria e sua existência é baseada em seus atributos.*</em> Diferente das entidades, os objetos de valor são definidos pelos atributos que possuem. Dois objetos de valor são considerados iguais se todos os seus atributos forem iguais, o que não significa que eles são a mesma linha em uma tabela relacional.</p>
+</div>
+<div class="paragraph">
+<p>Vamos criar as tabelas <code>tb_funcionarios_enderecos</code> e <code>tb_funcionarios_contatos</code> para armazenar os endereços e contatos dos funcionários:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para criação das tabelas de Endereços e Contatos</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios_enderecos</span> <span class="p">(</span>
+    <span class="n">id</span>              <span class="n">BIGSERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="c1">-- Chave Primária</span>
+    <span class="n">funcionario_id</span>  <span class="nb">BIGINT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>       <span class="c1">-- Chave Estrangeira para tb_funcionarios</span>
+    <span class="n">rua</span>             <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span>
+    <span class="n">cidade</span>          <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">estado</span>          <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">cep</span>             <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+    <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">funcionario_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">tb_funcionarios</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="c1">-- Chave Estrangeira</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios_contatos</span> <span class="p">(</span>
+    <span class="n">id</span>              <span class="n">BIGSERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="c1">-- Chave Primária</span>
+    <span class="n">funcionario_id</span>  <span class="nb">BIGINT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span> <span class="c1">-- Chave Estrangeira para tb_funcionarios</span>
+    <span class="n">tipo</span>            <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>     <span class="c1">-- Ex: 'telefone', 'email'</span>
+    <span class="n">valor</span>           <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>    <span class="c1">-- Ex: número de telefone ou endereço de email</span>
+    <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">funcionario_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">tb_funcionarios</span><span class="p">(</span><span class="n">id</span><span class="p">)</span> <span class="c1">-- Chave Estrangeira</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Talvez você tenha notado que as tabelas <code>tb_funcionarios_enderecos</code> e <code>tb_funcionarios_contatos</code> possuem uma coluna chamada <code>funcionario_id</code>, que é uma chave estrangeira referenciando a tabela <code>tb_funcionarios</code>. Isso estabelece um relacionamento entre as tabelas, indicando que cada endereço e contato está associado a um funcionário específico.</p>
+</div>
+<div class="paragraph">
+<p><em>*Um Relacionamento é uma associação entre uma ou mais tabelas que define como os dados se relacionam entre si.*</em> Relacionamentos são essenciais para manter a integridade dos dados e garantir que as informações estejam corretamente vinculadas.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-podemos-classificar-os-tipos-de-relacionamentos">Como podemos classificar os tipos de Relacionamentos?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>No nosso exemplo, o relacionamento entre as tabelas <code>tb_funcionarios</code>, <code>tb_funcionarios_enderecos</code> e <code>tb_funcionarios_contatos</code> é do tipo um-para-muitos (<em>one-to-many</em>). Isso significa que um funcionário pode ter múltiplos endereços e contatos, mas cada endereço ou contato está associado a apenas um funcionário.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/er-funcionario-contatos-enderecos.png" alt="er funcionario contatos enderecos">
+</div>
+<div class="title">Figura 1. PlantUML Diagrama de Relacionamento entre Funcionários, Endereços e Contatos</div>
+</div>
+<div class="paragraph">
+<p>Relacionamentos podem ser classificados em três tipos principais:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Um-para-um (one-to-one)</em>: Cada registro em uma tabela está associado a no máximo um registro em outra tabela.</p>
+</li>
+<li>
+<p><em>Um-para-muitos (one-to-many)</em>: Um registro em uma tabela pode estar associado a múltiplos registros em outra tabela.</p>
+</li>
+<li>
+<p><em>Muitos-para-muitos (many-to-many)</em>: Múltiplos registros em uma tabela podem estar associados a múltiplos registros em outra tabela. Esse tipo de relacionamento geralmente requer uma tabela intermediária para gerenciar as associações.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Apesar dos tipos de relacionamentos serem importantes, eles não são diretamente definidos na linguagem SQL. Em vez disso, eles são definidos pela forma em que as chaves primárias e as estrangeiras são configuradas entre as tabelas.</p>
+</div>
+<div class="paragraph">
+<p>Vamos imaginar agora que queremos armazenar a informação da profissional anterior dos funcionários em uma tabela chamada <code>tb_funcionarios_experiencias_anterior</code>, que terá um relacionamento um-para-um com a tabela <code>tb_funcionarios</code>. Cada funcionário terá apenas uma experiência profissional registrada. Para isso precisamos alterar a tabela <code>tb_funcionarios</code> e criar a nova tabela <code>tb_funcionarios_experiencias_anterior</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para criação da tabela de Experiências Profissionais</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios_experiencias_anterior</span> <span class="p">(</span>
+    <span class="n">id</span>              <span class="n">BIGSERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="c1">-- Chave Primária</span>
+    <span class="n">empresa</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">cargo</span>           <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">data_inicio</span>     <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">data_fim</span>        <span class="nb">DATE</span>
+<span class="p">);</span>
+
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios</span>
+<span class="k">ADD</span> <span class="n">experiencia_anterior_id</span> <span class="nb">BIGINT</span><span class="p">,</span> <span class="c1">-- Chave Estrangeira para tb_funcionarios_experiencias_anterior</span>
+<span class="k">ADD</span> <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">tb_funcionarios</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">tb_funcionarios_experiencias_anterior</span><span class="p">(</span><span class="n">id</span><span class="p">),</span> <span class="c1">-- Chave Estrangeira</span>
+<span class="k">ADD</span> <span class="k">UNIQUE</span> <span class="p">(</span><span class="n">tb_funcionarios</span><span class="p">);</span> <span class="c1">-- Garante o relacionamento um-para-um</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nesse exemplo, a tabela <code>tb_funcionarios_experiencias_anterior</code> armazena as informações sobre as experiências profissionais dos funcionários. A tabela <code>tb_funcionarios</code> foi alterada para incluir uma coluna <code>experiencia_anterior_id</code>, que é uma chave estrangeira referenciando a tabela <code>tb_funcionarios_experiencias_anterior</code>. A restrição <code>UNIQUE</code> garante que cada funcionário possa ter no máximo uma experiência profissional associada, estabelecendo assim o relacionamento um-para-um.</p>
+</div>
+<div class="paragraph">
+<p>Com essa estrutura, podemos ter a certeza que cada funcionário terá apenas uma experiência profissional registrada, e cada experiência profissional estará associada a apenas um funcionário.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-restrições-de-integridade-constraints">O que são Restrições de Integridade (<em>Constraints</em>)?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não sei se você notou, mas no exemplo acima, utilizamos algumas restrições de integridade (<em>constraints</em>) para garantir a consistência dos dados no banco de dados relacional. As restrições de integridade são regras que definem como os dados podem ser inseridos, atualizados ou deletados em uma tabela. Elas ajudam a manter a integridade dos dados e evitam inconsistências.</p>
+</div>
+<div class="paragraph">
+<p>Bases de dados relacionais permitem definir as restrições de integridade diretamente na definição das tabelas usando a linguagem SQL. Algumas das restrições mais comuns incluem:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Chave Primária (PRIMARY KEY)</em>: Garante que cada registro em uma tabela seja único e não nulo. No exemplo, usamos a chave primária para identificar unicamente cada funcionário, endereço, contato e experiência profissional.</p>
+</li>
+<li>
+<p><em>Chave Estrangeira (FOREIGN KEY)</em>: Garante que os valores em uma coluna correspondam aos valores em outra tabela, estabelecendo um relacionamento entre as tabelas. No exemplo, usamos chaves estrangeiras para associar endereços e contatos aos funcionários.</p>
+</li>
+<li>
+<p><em>Único (UNIQUE)</em>: Garante que os valores em uma coluna sejam únicos. No exemplo, usamos a restrição <code>UNIQUE</code> para garantir que cada funcionário tenha no máximo uma experiência profissional associada.</p>
+</li>
+<li>
+<p><em>Não Nulo (NOT NULL)</em>: Garante que uma coluna não possa conter valores nulos. Isso é útil para garantir que certos atributos essenciais estejam sempre presentes em um registro.</p>
+</li>
+<li>
+<p><em>Verificação (CHECK)</em>: Permite definir uma condição que os valores em uma coluna devem satisfazer. Por exemplo, podemos usar uma restrição <code>CHECK</code> para garantir que a data de término de uma experiência profissional seja posterior à data de início.</p>
+</li>
+<li>
+<p><em>Padrão (DEFAULT)</em>: Define um valor padrão para uma coluna quando nenhum valor é especificado durante a inserção de um registro.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Com as restrições de integridade, podemos garantir que os dados no banco de dados relacional estejam sempre consistentes e válidos, evitando problemas como duplicidade de registros, referências inválidas entre tabelas e valores nulos em campos essenciais.</p>
+</div>
+<div class="paragraph">
+<p>E se no nosso exemplo quisermos garantir que o campo <code>cargo</code> na tabela <code>tb_funcionarios</code> não possa ser nulo? Podemos adicionar a restrição <code>NOT NULL</code> na definição da tabela:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para criação da tabela de Funcionários com restrição NOT NULL</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">tb_funcionarios</span>
+<span class="k">MODIFY</span> <span class="n">cargo</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">;</span> <span class="c1">-- Adiciona a restrição NOT NULL</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse exemplo não é completo, poderiamos também que os valores dos demais campos não fossem nulos, mas serve para ilustrar como as restrições de integridade podem ser aplicadas para garantir a consistência dos dados no banco de dados relacional.</p>
+</div>
+<div class="paragraph">
+<p>Mas ainda falta um detalhe importante: e se nossa empresa for muito grande e quisermos encontrar facilmente um determinado funcionário pelo nome ou cargo? Para isso, podemos criar índices nas colunas <code>nome</code>, <code>sobrenome</code> e <code>cargo</code> da tabela <code>tb_funcionarios</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-índices-indexes">O que são Índices (<em>Indexes</em>)?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para entender como a consulta é realizada em uma base de dados, podemos pedir para a base explicar como ela pretende executar a consulta. Isso é possível utilizando o comando <code>EXPLAIN</code> antes da consulta SQL. Vamos imaginar que queremos encontrar todos os funcionários com o cargo de "Desenvolvedor". A consulta SQL seria a seguinte:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para consulta de funcionários pelo cargo</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">EXPLAIN</span> <span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">tb_funcionarios</span> <span class="k">WHERE</span> <span class="n">cargo</span> <span class="o">=</span> <span class="s1">'Desenvolvedor'</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A resposta do comando <code>EXPLAIN</code> nos mostrará o plano de execução que a base de dados pretende utilizar para realizar a consulta. Se não houver um índice na coluna <code>cargo</code>, a base de dados terá que fazer uma varredura completa na tabela <code>tb_funcionarios</code>, o que pode ser lento se a tabela tiver muitos registros.</p>
+</div>
+<div class="paragraph">
+<p>Mas podemos melhorar o desempenho da consulta criando um índice na coluna <code>cargo</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Script para criação de índice na coluna cargo</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">INDEX</span> <span class="n">idx_funcionarios_cargo</span> <span class="k">ON</span> <span class="n">tb_funcionarios</span><span class="p">(</span><span class="n">cargo</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Com o índice criado, a base de dados poderá utilizar o índice para localizar rapidamente os registros que correspondem ao cargo "Desenvolvedor", melhorando significativamente o desempenho da consulta.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Neste post, exploramos como mapear um modelo entidade-relacional para um banco de dados relacional utilizando SQL. Vimos como definir entidades, objetos de valor e relacionamentos entre tabelas, além de aplicar restrições de integridade para garantir a consistência dos dados. Também discutimos a importância dos índices para melhorar o desempenho das consultas. Compreender esses conceitos é fundamental para projetar e implementar aplicações usando bases de dados relacionais de forma eficiente e eficaz.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Bases de Dados" /><category term="SQL" /><category term="Modelo Entidade-Relacional" /><category term="Modelagem de Dados" /><summary type="html"><![CDATA[Neste post, exploramos como mapear um modelo entidade-relacional para um banco de dados relacional utilizando SQL. Vemos como definir entidades, objetos de valor e relacionamentos entre tabelas, além de aplicar restrições de integridade para garantir a consistência dos dados. Também discutimos a importância dos índices para melhorar o desempenho das consultas.]]></summary></entry><entry><title type="html">Arquitetura de um Banco de Dados Relacional</title><link href="https://blog.vepo.dev/posts/arquitetura-dbms" rel="alternate" type="text/html" title="Arquitetura de um Banco de Dados Relacional" /><published>2025-12-22T00:00:00+00:00</published><updated>2025-12-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-17-00-arquitetura-dbms</id><content type="html" xml:base="https://blog.vepo.dev/posts/arquitetura-dbms"><![CDATA[<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Nota</div>
+</td>
+<td class="content">
+Esse post é baseado em um capítulo do livro <a href="https://amzn.to/44Iatr3"><strong>Database Internals</strong> de Alex Petrov</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Agora que entendemos o que é uma base de dados relacional e como podemos interagir com ela usando SQL, vamos ver como uma base de dados relacional é construída internamente. Entender como umas base de dados funciona internamente pode nos ajudar a compreender melhor seu comportamento e com isso podemos tomar decisões mais informadas sobre o uso ou a escolha de uma base de dados.</p>
+</div>
+<div class="paragraph">
+<p>Todas as implementações de bancos de dados são diferentes, mas a maioria delas compartilha de funcionalidades e arquiteturas semelhantes. No diagrama abaixo, temos uma visão geral de uma possível arquitetura de um sistema de gerenciamento de banco de dados relacional (DBMS - <strong>Database Management System</strong>), mas é importante lembrar que cada implementação pode variar em detalhes específicos.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/dmbs-arquitecture.png" alt="dmbs arquitecture">
+</div>
+<div class="title">Figura 1. Arquitetura de um Sistema de Gerenciamento de Banco de Dados Relacional (DBMS)</div>
+</div>
+<div class="paragraph">
+<p>Para descrever essa arquitetura, vamos usar uma abordagem de cima para baixo, começando pelo módulo de transporte.</p>
+</div>
+<div class="sect1">
+<h2 id="_módulo-de-transporte-transport">Módulo de Transporte (<em>Transport</em>)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A grande maioria das bases de dados modernas são implementadas usando uma arquitetura cliente-servidor. Isso significa que a aplicação que utiliza o banco de dados atua como cliente, enquanto o processo do banco de dados atua como servidor.  Para isso o módulo de transporte é responsável por gerenciar a comunicação entre a aplicação cliente e, em caso de bancos distribuídos, entre as diferentes instâncias do banco de dados.</p>
+</div>
+<div class="paragraph">
+<p>As <em>queries</em> SQL são então processadas pelo módulo <strong>Client Communication</strong>, que interpreta as requisições vindas do cliente e as encaminha para o próximo módulo, o <strong>Query Processor</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Quando a comunicação é feita entre diferentes instâncias do banco de dados, ela não envolve o processamento de consultas SQL e por isso é tratada diretamente pela <strong>Execution Engine</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_módulo-de-processamento-de-consultas-query-processor">Módulo de Processamento de Consultas (<em>Query Processor</em>)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O módulo de processamento de consultar é responsável por interpretar, validar e otimizar as consultas SQL recebidas do módulo de transporte. Ele é composto por dois submódulos principais: o <strong>Query Parser</strong> e o <strong>Query Optimizer</strong>. O submódulo <strong>Query Optimizer</strong> é responsável por analisar a consulta SQL e determinar a forma mais eficiente de executá-la, levando em consideração fatores como índices disponíveis, estatísticas de dados e custos de execução.</p>
+</div>
+<div class="paragraph">
+<p>Um plano de execução é gerado baseado na <em>query</em> SQL recebida e é passado para o próximo módulo, a <strong>Execution Engine</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_módulo-motor-de-execução-execution-engine">Módulo Motor de Execução (<em>Execution Engine</em>)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para que o plano de execução gerado pelo módulo de processamento de consultas seja executado, ele pode ser executado localmente ou remotamente, se o banco de dados for distribuído. O módulo de execução é responsável por interpretar o plano de execução e coordenar as operações necessárias para recuperar ou modificar os dados conforme especificado na consulta SQL.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_módulo-motor-de-armazenamento-storage-engine">Módulo Motor de Armazenamento (<em>Storage Engine</em>)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O módulo motor de armazenamento é responsável por gerenciar a forma como os dados são armazenados fisicamente no disco. Ele é dividido em cinco submódulos principais: o <strong>Transaction Manager</strong>, o <strong>Lock Manager</strong>, o <strong>Access Methods</strong>, o <strong>Buffer Manager</strong> e o <strong>Recovery Manager</strong>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/storage-types.png" alt="storage types">
+</div>
+<div class="title">Figura 2. Tipos de armazenamentos possíveis para bases de dados</div>
+</div>
+<div class="paragraph">
+<p>Um dos grandes desafios enfrentados pelas bases de dados é melhorar o desempenho do acesso ao disco. Todas as informações em um banco de dados são armazenadas em algum tipo de mídia não-volátil, mesmo que esteja em algum sistema de armazenamento em nuvem, e qualquer acesso a esses dados envolve operações de leitura e escrita que são muito mais lentas que as operações realizadas na memória volátil (RAM).</p>
+</div>
+<div class="paragraph">
+<p>Outro desafio é que a leitura e escrita de dados no disco é feita em blocos de tamanho fixo, o que significa que mesmo que apenas um pequeno pedaço de informação seja necessário, o sistema precisa ler ou escrever o bloco inteiro. Esse comportamento é diferente do acesso à memória volátil, onde é possível acessar qualquer byte individualmente.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Tempos médios de acesso para diferentes tipos de memória e armazenamento</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-right valign-top">Tempo de Acesso</th>
+<th class="tableblock halign-left valign-top">Tipo de Memória</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~1ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">L1 Cache Ref</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~4ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">L2 Cache Ref</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~100ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DRAM</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~16.000ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSD</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~2.000.000ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HDD</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~50.000.000ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Rede</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock">~1.000.000.000ns</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fita</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_gerenciador-de-transações-transaction-manager">Gerenciador de Transações (<em>Transaction Manager</em>)</h3>
+<div class="paragraph">
+<p>O gerenciador de transações é responsável por organizar a execução das transações garantindo que a base de dados esteja sempre em um estado consistente.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gerenciador-de-bloqueios-lock-manager">Gerenciador de Bloqueios (<em>Lock Manager</em>)</h3>
+<div class="paragraph">
+<p>O gerenciador de bloqueios é responsável por controlar o acesso concorrente aos dados envolvidos em transações concorrentes, garantindo o isolamento entre elas.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_métodos-de-acesso-access-methods">Métodos de Acesso (<em>Access Methods</em>)</h3>
+<div class="paragraph">
+<p>Os métodos de acesso são responsáveis por definir como os dados são organizados e acessados no armazenamento físico. Eles utilizam estruturas de dados como árvores B, árvores LSM e arquivos heap.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gerenciador-de-buffer-buffer-manager">Gerenciador de Buffer (<em>Buffer Manager</em>)</h3>
+<div class="paragraph">
+<p>O gerenciador de buffer é responsável por gerenciar a memória volátil (RAM) utilizada para armazenar temporariamente os dados que estão sendo lidos ou escritos no disco. Ele otimiza o desempenho do banco de dados reduzindo o número de acessos ao disco.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gerenciador-de-recuperação-recovery-manager">Gerenciador de Recuperação (<em>Recovery Manager</em>)</h3>
+<div class="paragraph">
+<p>O gerenciador de recuperação é responsável por garantir a integridade dos dados em caso de falhas, como quedas de energia ou erros de software. Ele utiliza técnicas como logs de transações e pontos de verificação para restaurar o banco de dados a um estado consistente após uma falha.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Bancos de Dados são sistemas com diversas implementações diferentes, mas a maioria deles compartilha de funcionalidades e arquiteturas semelhantes. Entender como uma base de dados relacional é construída internamente pode nos ajudar a compreender melhor seu comportamento e com isso podemos tomar decisões mais informadas sobre o uso ou a escolha de uma base de dados.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Bases de Dados" /><category term="DBMS" /><category term="Banco de Dados" /><summary type="html"><![CDATA[Entenda a arquitetura interna de um sistema de gerenciamento de banco de dados relacional (DBMS) e como seus principais componentes funcionam juntos para armazenar, gerenciar e recuperar dados de forma eficiente.]]></summary></entry><entry><title type="html">SQL e a Álgebra Relacional</title><link href="https://blog.vepo.dev/posts/sql-e-a-algebra-relacional" rel="alternate" type="text/html" title="SQL e a Álgebra Relacional" /><published>2025-12-19T00:00:00+00:00</published><updated>2025-12-19T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-24-00-sql-e-a-algebra-relacional</id><content type="html" xml:base="https://blog.vepo.dev/posts/sql-e-a-algebra-relacional"><![CDATA[<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Nota</div>
+</td>
+<td class="content">
+Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado <a href="https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5">CMU Intro to Database Systems (15-445/645 - Fall 2025)</a>. O curso é ministrado por <a href="https://www.cs.cmu.edu/~pavlo/">Andy Pavlo</a> e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na <a href="https://15445.courses.cs.cmu.edu/fall2025/schedule.html">página oficial do curso</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>No post anterior, discutimos o que são bases de dados, os modelos de dados mais comuns e a história por trás do modelo relacional. Neste post, vamos explorar a álgebra relacional, que é a base teórica para o SQL, a linguagem de consulta mais utilizada em bases de dados relacionais.</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-é-sql">O que é SQL?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Como já falamos antes, SQL significa Structured Query Language (Linguagem de Consulta Estruturada) dessa breve definição já podemos extrair duas informações muito valiosas: SQL é uma linguagem e SQL é usada para fazer consultas.</p>
+</div>
+<div class="paragraph">
+<p>Todas as linguagens na computação possuem uma <strong>sintaxe</strong>, uma <strong>semântica</strong> e um proposito. Muitas pessoas gostam muito de pensar que toda linguagem é uma linguagem de programação, mas isso não é verdade. SQL é usada para interagir com bases de dados. HTML é usada para estruturar documentos web. CSS é usada para adicionar estilo. E existem as linguagens de programação de propósito geral, como Python, Java, C, JavaScript, entre outras.</p>
+</div>
+<div class="paragraph">
+<p>O SQL por sua vez não é uma linguagem especifica de um banco de dados, mas sim um padrão suportado por diversos sistemas. Ela é especificada pela ISO (International Organization for Standardization) e pela ANSI (American National Standards Institute). O padrão SQL é atualizado periodicamente para incluir novos recursos e melhorias. Alguns dos sistemas de gerenciamento de banco de dados relacionais (SGBDR) mais populares que suportam SQL incluem MySQL, PostgreSQL, Oracle Database, Microsoft SQL Server e SQLite. A linguagem SQL é constantemente atualizada para incluir novos recursos e melhorias, mas as bases de dados nem sempre implementam todas as funcionalidades do padrão.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, algumas das versões do padrão SQL incluem:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Versões do Padrão SQL e Principais Recursos</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 10%;">
+<col style="width: 30%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Nome da Versão</th>
+<th class="tableblock halign-center valign-top">Ano</th>
+<th class="tableblock halign-left valign-top">Especificação</th>
+<th class="tableblock halign-left valign-top">Principais Recursos Introduzidos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:1986</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1986</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI X3.135:1986<br>
+ISO/IEC 9075:1987<br>
+FIPS PUB 127</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Padrão inicial</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:1989</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1989</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI X3.135-1989<br>
+ISO/IEC 9075:1989<br>
+FIPS PUB 127-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Integridade (<em>Constraints</em>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:1992</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1992</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANSI X3.135-1992<br>
+ISO/IEC 9075:1992<br>
+FIPS PUB 127-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Suport a Unions, Joins, Case</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:1999</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1999</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075:1999</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Expressões Regulares, Triggers, Queries recursivas</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2003</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075:2003</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XML, Windows, Sequences</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2006</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075-14:2006</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Suporte aprimorado para XML</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2008</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075:2008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Truncation, Fancy Sorting</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2011</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2011</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075:2011</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Temporal DBs, Fetch e Windows Functions</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2016</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2016</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075:2016</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON, Polymorphic tables</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2019</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2019</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075-15:2019</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-Dimensional Arrays</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SQL:2023</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2023</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ISO/IEC 9075-2023</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property Graph Queries</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-é-álgebra-relacional">O que é Álgebra Relacional?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora que entendemos o que é SQL, temos que nos perguntar porque a linguagem é baseada na álgebra relacional e o que é essa tal de álgebra relacional.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>A Álgebra Relacional é um conjunto de operações fundamentais para recuperar e manipular tuplas em uma relação. Cada operador recebe uma ou mais relações como entrada e produz uma nova relação como saída. Para escrever consultas, podemos "encadear" esses operadores.</em></strong></p>
+</div>
+<div class="paragraph">
+<p>A álgebra relacional é uma derivação da lógica de primeira ordem e da teoria dos conjuntos com o propósito de prover operações que possam ser usadas para selecionar e manipular dados em bases relacionais (ver o livro <em>Relational completeness of data base sublanguages</em>).</p>
+</div>
+<div class="paragraph">
+<p>Em uma base relacional, podemos imaginar que cada relação (ou tabela) é um conjunto de tuplas que podem ser manipuladas por meio de operações da álgebra relacional. As principais operações são:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Seleção (σ)</strong>: Seleciona tuplas que satisfazem uma condição específica.</p>
+</li>
+<li>
+<p><strong>Projeção (π)</strong>: Seleciona colunas específicas de uma relação.</p>
+</li>
+<li>
+<p><strong>União (∪)</strong>: Combina tuplas de duas relações, removendo duplicatas.</p>
+</li>
+<li>
+<p><strong>Interseção (∩)</strong>: Retém apenas as tuplas que estão presentes em ambas as relações.</p>
+</li>
+<li>
+<p><strong>Diferença (-)</strong>: Retira tuplas de uma relação que também estão em outra relação.</p>
+</li>
+<li>
+<p><strong>Produto Cartesiano (×)</strong>: Combina todas as tuplas de duas relações possíveis.</p>
+</li>
+<li>
+<p><strong>Junção (⨝)</strong>: Combina tuplas de duas relações com base em uma condição de correspondência.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Nas próximas seções, vamos explorar cada uma dessas operações e como elas se relacionam com consultas SQL comuns. Para exemplificar, vamos usar as seguintes relações:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">Aluno(ID, Nome, Idade)
+Curso(Codigo, Nome, Creditos)</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_seleção-σ">Seleção (σ)</h3>
+<div class="paragraph">
+<p>A seleção recebe uma relação e retorna um subconjunto das tuplas dessa relação que satisfazem um predicado da seleção. O predicado atua como um filtro, e podemos combinar múltiplos predicados usando conjunções e disjunções.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-seleção">Exemplo de Seleção</h4>
+<div class="paragraph">
+<p>Dado a relação Alunos, podemos selecionar todos os alunos com idade maior que 20 anos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a seleção σ(Idade &gt; 20)(Aluno), obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+003     Carol     23
+004     Dave      21
+008     Heidi     24
+009     Ivan      22</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_projeção-π">Projeção (π)</h3>
+<div class="paragraph">
+<p>A projeção recebe uma relação como entrada e retorna uma relação com tuplas que contêm apenas os atributos especificados. Você pode reorganizar a ordem dos atributos na relação de entrada, bem como manipular os valores.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-projeção">Exemplo de Projeção</h4>
+<div class="paragraph">
+<p>Dado a relação Alunos, podemos projetar apenas os nomes dos alunos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a projeção π(Nome)(Aluno), obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">Alice
+Bob
+Carol
+Dave
+Eve
+Frank
+Grace
+Heidi
+Ivan
+Judy</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_união">União (∪)</h3>
+<div class="paragraph">
+<p>A união recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem em pelo menos uma das relações de entrada. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-união">Exemplo de União</h4>
+<div class="paragraph">
+<p>Dadas as relações Aluno1 e Aluno2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">011     Kevin     20
+012     Laura     21
+013     Mallory   22
+014     Nancy     23
+015     Oscar     24</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a união Aluno1 ∪ Aluno2, obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19
+011     Kevin     20
+012     Laura     21
+013     Mallory   22
+014     Nancy     23
+015     Oscar     24</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_interseção">Interseção (∩)</h3>
+<div class="paragraph">
+<p>A interseção recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem em ambas as relações de entrada. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-interseção">Exemplo de Interseção</h4>
+<div class="paragraph">
+<p>Dadas as relações Aluno1 e Aluno2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">002     Bob       19
+003     Carol     23
+004     Dave      21
+006     Frank     17
+007     Grace     20
+009     Ivan      22
+011     Kevin     20
+013     Mallory   22
+015     Oscar     24</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a interseção Aluno1 ∩ Aluno2, obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">002     Bob       19
+003     Carol     23
+004     Dave      21
+006     Frank     17
+007     Grace     20
+009     Ivan      22</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_diferença">Diferença (-)</h3>
+<div class="paragraph">
+<p>A diferença recebe duas relações e retorna uma relação que contém todas as tuplas que aparecem na primeira relação, mas não na segunda. Observação: as duas relações de entrada devem ter exatamente os mesmos atributos.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-diferença">Exemplo de Diferença</h4>
+<div class="paragraph">
+<p>Dadas as relações Aluno1 e Aluno2:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23
+004     Dave      21
+005     Eve       18
+006     Frank     17
+007     Grace     20
+008     Heidi     24
+009     Ivan      22
+010     Judy      19</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">002     Bob       19
+003     Carol     23
+004     Dave      21
+006     Frank     17
+007     Grace     20
+009     Ivan      22
+011     Kevin     20
+013     Mallory   22
+015     Oscar     24</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a diferença Aluno1 - Aluno2, obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+005     Eve       18
+008     Heidi     24
+010     Judy      19</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_produto-cartesiano">Produto Cartesiano (×)</h3>
+<div class="paragraph">
+<p>O produto cartesiano recebe duas relações e retorna uma relação que contém todas as combinações possíveis de tuplas das relações de entrada.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-produto-cartesiano">Exemplo de Produto Cartesiano</h4>
+<div class="paragraph">
+<p>Dadas as relações Aluno e Curso:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">C001    Matemática     4
+C002    Física         3
+C003    Química        4</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando o produto cartesiano Aluno × Curso, obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22    C001    Matemática     4
+001     Alice     22    C002    Física         3
+001     Alice     22    C003    Química        4
+002     Bob       19    C001    Matemática     4
+002     Bob       19    C002    Física         3
+002     Bob       19    C003    Química        4
+003     Carol     23    C001    Matemática     4
+003     Carol     23    C002    Física         3
+003     Carol     23    C003    Química        4</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_junção">Junção (⨝)</h3>
+<div class="paragraph">
+<p>A junção recebe duas relações e retorna uma relação que contém todas as tuplas que são uma combinação de duas tuplas, onde, para cada atributo que as duas relações compartilham, os valores desse atributo em ambas as tuplas são iguais.</p>
+</div>
+<div class="sect3">
+<h4 id="_exemplo-de-junção">Exemplo de Junção</h4>
+<div class="paragraph">
+<p>Dadas as relações Aluno e Curso:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22
+002     Bob       19
+003     Carol     23</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001    Matemática     4
+002    Física         3
+003    Química        4</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aplicando a junção Aluno ⨝ Curso usando o ID = Codigo, obtemos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="plaintext">001     Alice     22    Matemática     4
+002     Bob       19    Física         3
+003     Carol     23    Química        4</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-a-álgebra-relacional-se-relaciona-com-sql">Como a Álgebra Relacional se Relaciona com SQL?</h3>
+<div class="paragraph">
+<p>Agora vamos ver como essas operações da álgebra relacional se traduzem em consultas SQL. É importante ressaltar que as consultas SQL apresentadas abaixo são apenas demonstrativas e não são otimizadas para desempenho.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Dica</div>
+</td>
+<td class="content">
+Você pode encontrar os exemplos no repositório <a href="https://github.com/vepo/sql-database-tutorial">vepo/sql-database-tutorial</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As consultas SQL a seguir são baseadas nas seguintes tabelas:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="n">employees</span> <span class="p">(</span>
+    <span class="n">id</span>         <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">name</span>       <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">department</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+    <span class="n">salary</span>     <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">hire_date</span>  <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">created_at</span> <span class="nb">TIMESTAMP</span> <span class="k">DEFAULT</span> <span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="n">departments</span> <span class="p">(</span>
+    <span class="n">id</span>        <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">dept_name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">UNIQUE</span><span class="p">,</span>
+    <span class="n">budget</span>    <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="k">location</span>  <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="n">projects</span> <span class="p">(</span>
+    <span class="n">id</span>            <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">project_name</span>  <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">start_date</span>    <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">end_date</span>      <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">budget</span>        <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">department_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">departments</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_seleção-em-sql">Seleção em SQL</h4>
+<div class="paragraph">
+<p>A seleção no SQL é realizada pela cláusula <code>SELECT [campos] FROM [tabela] WHERE [condição]</code>. Onde uma condição é aplicada a uma ou mais tabelas e retorna um subconjunto de tuplas selecioadas pelos campos. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 100000 e nenhuma projeção de campos é feita, uma vez que usamos o asterisco (*) para selecionar todos os campos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Seleciona todos os funcionários com salário maior que 100000</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">100000</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_projeção-em-sql">Projeção em SQL</h4>
+<div class="paragraph">
+<p>A projeção no SQL é realizada pela cláusula <code>SELECT [campos] FROM [tabela]</code>. Onde os campos especificados são retornados para todas as tuplas da tabela. No exemplo abaixo, projetamos apenas os campos <code>id</code>, <code>name</code> e <code>department</code> da tabela <code>employees</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Projeta os campos id, name e department da tabela employees</span>
+<span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">department</span> <span class="k">FROM</span> <span class="n">employees</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_união-em-sql">União em SQL</h4>
+<div class="paragraph">
+<p>A união no SQL é realizada pela cláusula <code>UNION</code> entre duas consultas <code>SELECT</code>. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário menor que 60000 e todos os funcionários com salário maior que 100000, combinando os resultados usando a união.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Criar união de duas consultas</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">60000</span>
+<span class="k">UNION</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">100000</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse exemplo não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. O <code>UNION</code> não é restrito a uma só tabela, a única exigência é que as consultas retornem o mesmo número de colunas e tipos de dados compatíveis. Essa consulta pode ser reescrita de uma forma mais eficiente usando o operador lógico <code>OR</code>, como mostrado abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Versão mais eficiente usando OR</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">60000</span> <span class="k">OR</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">100000</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interseção-em-sql">Interseção em SQL</h4>
+<div class="paragraph">
+<p>A interseção no SQL é realizada pela cláusula <code>INTERSECT</code> entre duas consultas <code>SELECT</code>. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e todos os funcionários com salário menor que 100000, retornando apenas os funcionários que satisfazem ambas as condições.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Criar interseção de duas consultas</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">60000</span>
+<span class="k">INTERSECT</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse também não é um exemplo eficiente, visto que ambas as consultas são feitas na mesma tabela. A interseção pode ser reescrita de uma forma mais eficiente usando o operador lógico <code>AND</code>, como mostrado abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Versão mais eficiente usando AND</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">60000</span> <span class="k">AND</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_diferença-em-sql">Diferença em SQL</h4>
+<div class="paragraph">
+<p>A diferença no SQL é realizada pela cláusula <code>EXCEPT</code> entre duas consultas <code>SELECT</code>. Ambas as consultas devem retornar o mesmo número de colunas e tipos de dados compatíveis. No exemplo abaixo, selecionamos todos os funcionários com salário maior que 60000 e menor que 100000, e removemos aqueles que trabalham no departamento de TI.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Criar diferença de duas consultas</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">60000</span> <span class="k">AND</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">100000</span>
+<span class="k">EXCEPT</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="n">department</span> <span class="o">=</span> <span class="s1">'IT'</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse exemplo também não é o mais eficiente, visto que ambas as consultas são feitas na mesma tabela. A diferença pode ser reescrita de uma forma mais eficiente usando o operador lógico <code>AND</code> junto com o operador <code>NOT</code>, como mostrado abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Versão mais eficiente usando AND e NOT</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">WHERE</span> <span class="p">(</span><span class="n">salary</span> <span class="o">&gt;</span> <span class="mi">60000</span> <span class="k">AND</span> <span class="n">salary</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">)</span> <span class="k">AND</span> <span class="k">NOT</span> <span class="p">(</span><span class="n">department</span> <span class="o">=</span> <span class="s1">'IT'</span><span class="p">);</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_produto-cartesiano-em-sql">Produto Cartesiano em SQL</h4>
+<div class="paragraph">
+<p>O produto cartesiano no SQL é realizado pela cláusula <code>CROSS JOIN</code> entre duas tabelas. No exemplo abaixo, combinamos todas as tuplas da tabela <code>employees</code> com todas as tuplas da tabela <code>departments</code>, resultando em todas as combinações possíveis de funcionários e departamentos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Produto cartesiano entre employees e departments</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">CROSS</span> <span class="k">JOIN</span> <span class="n">departments</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse exemplo definitivamente não é o mais eficiente, visto que o produto cartesiano geralmente não tão comumente usado em consultas reais. Normalmente, o produto cartesiano é seguido por uma cláusula <code>WHERE</code> para filtrar os resultados com base em uma condição específica. Por exemplo, podemos combinar o produto cartesiano com uma condição para selecionar apenas os funcionários que trabalham em um departamento específico:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Produto cartesiano com condição de filtro</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">employees</span> <span class="k">CROSS</span> <span class="k">JOIN</span> <span class="n">departments</span>
+<span class="k">WHERE</span> <span class="n">department</span> <span class="o">=</span> <span class="n">dept_name</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Esse exemplo é também ineficiente por usar um campo textual para fazer a junção entre as tabelas. O ideal seria usar uma chave estrangeira para fazer a junção, como será mostrado no <code>JOIN</code> abaixo.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_junção-em-sql">Junção em SQL</h4>
+<div class="paragraph">
+<p>A junção no SQL é realizada pela cláusula <code>JOIN</code> entre duas tabelas, geralmente acompanhada por uma condição <code>ON</code> que especifica como as tabelas devem ser combinadas. No exemplo abaixo, combinamos as tabelas <code>departments</code> e <code>projects</code> com base na correspondência entre o campo <code>id</code> da tabela <code>departments</code> e o campo <code>department_id</code> da tabela <code>projects</code>. Em seguida, agrupamos os resultados pelo campo <code>dpt.id</code> e contamos o número de projetos associados a cada departamento.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span> <span class="n">dpt</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="n">prj</span><span class="p">.</span><span class="n">id</span><span class="p">)</span> <span class="k">as</span> <span class="n">projects</span>
+<span class="k">FROM</span> <span class="n">departments</span> <span class="n">dpt</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">projects</span> <span class="n">prj</span> <span class="k">ON</span> <span class="n">dpt</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">prj</span><span class="p">.</span><span class="n">department_id</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">dpt</span><span class="p">.</span><span class="n">id</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Talvez você tenha notado que o <strong>Produto Cartesiano</strong> e a <strong>Junção</strong> são operações muito semelhantes usando tipos diferentes de <code>JOIN</code>. Na <strong>Junção</strong> há a obrigatoriedade de definir uma condição de junção. No SQL, existem diversos tipos de operadores <code>JOIN</code>, incluindo:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>CROSS JOIN</strong>: Realiza o produto cartesiano entre duas tabelas.</p>
+</li>
+<li>
+<p><strong>INNER JOIN</strong>: Retorna apenas as tuplas que possuem correspondência em ambas as tabelas com base na condição especificada.</p>
+</li>
+<li>
+<p><strong>LEFT JOIN</strong>: Retorna todas as tuplas da tabela à esquerda e as tuplas correspondentes da tabela à direita. Se não houver correspondência, os valores da tabela à direita serão nulos.</p>
+</li>
+<li>
+<p><strong>RIGHT JOIN</strong>: Retorna todas as tuplas da tabela à direita e as tuplas correspondentes da tabela à esquerda. Se não houver correspondência, os valores da tabela à esquerda serão nulos.</p>
+</li>
+<li>
+<p><strong>FULL JOIN</strong>: Retorna todas as tuplas de ambas as tabelas, preenchendo com nulos onde não houver correspondência.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/join-types.png" alt="join types">
+</div>
+<div class="title">Figura 1. Tipos de JOIN</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nesse post, exploramos como a álgebra relacional serve como a base teórica para o SQL. É importante ter ciência dessas operações fundamentais quando se escreve consultas SQL, visto que toda consulta SQL pode ser vista como uma operação de conjuntos. Compreender a álgebra relacional ajuda a escrever consultas mais eficientes e a entender como os sistemas de gerenciamento de banco de dados processam essas consultas.</p>
+</div>
+<div class="paragraph">
+<p>Talvez você tenha pensado que essas consultas poderiam ter sido escritas de forma mais eficiente, mas o objetivo aqui foi apenas ilustrar como as operações da álgebra relacional se traduzem em SQL. Em posts futuros, exploraremos técnicas de otimização de consultas e como os SGBDs processam essas consultas para melhorar o desempenho usando chaves e índices.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Bases de Dados" /><category term="Algebra Relacional" /><category term="SQL" /><summary type="html"><![CDATA[Nesse post, vamos explorar a álgebra relacional, que é a base teórica para o SQL, a linguagem de consulta mais utilizada em bases de dados relacionais.]]></summary></entry><entry><title type="html">Bases de Dados e o Modelo Relacional</title><link href="https://blog.vepo.dev/posts/introducao-a-bases-de-dados" rel="alternate" type="text/html" title="Bases de Dados e o Modelo Relacional" /><published>2025-12-19T00:00:00+00:00</published><updated>2025-12-19T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-15-00-bases-de-dados</id><content type="html" xml:base="https://blog.vepo.dev/posts/introducao-a-bases-de-dados"><![CDATA[<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Nota</div>
+</td>
+<td class="content">
+Esse post é baseado nas notas sobre um curso que estou acompanhando no YouTube, chamado <a href="https://www.youtube.com/playlist?list=PLSE8ODhjZXjYMAgsGH-GtY5rJYZ6zjsd5">CMU Intro to Database Systems (15-445/645 - Fall 2025)</a>. O curso é ministrado por <a href="https://www.cs.cmu.edu/~pavlo/">Andy Pavlo</a> e cobre diversos tópicos relacionados a sistemas de banco de dados, incluindo arquitetura, indexação, transações, recuperação e muito mais. Todas as notas de aulas e os slides estão disponíveis na <a href="https://15445.courses.cs.cmu.edu/fall2025/schedule.html">página oficial do curso</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>O livro "<strong>O Guia do Mochileiro das Galáxias</strong>" traz uma grande lição. Em determinado momento, um supercomputador chamado Deep Thought é construído para responder a "<strong>A Pergunta Fundamental sobre a Vida, o Universo e Tudo Mais</strong>". Após milhões de anos de cálculo, o computador finalmente revela que a resposta é "<strong>42</strong>". No entanto, ninguém sabe qual é a pergunta. Se você não entendeu porque começar um post sobre bases de dados com uma referência a esse livro, é porque você não entendeu o que o autor Douglas Adams quis dizer com isso. Saber fazer boas perguntas é tão importante quanto ter boas respostas.</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-bases-de-dados">O que são Bases de Dados?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Por isso, a primeira pergunta a ser feita é: <em>O que é uma base de dados?</em> Bases de dados são o ponto central da maioria dos sistemas de software modernos e muitos se confundem ao não saber como usá-las corretamente ou não entendem a diferença entre os vários tipos de bases de dados disponíveis. Dessa forma, vamos elaborar uma simples definição:</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Uma base de dados é uma coleção organizada de dados inter-relacionados que modelam alguns aspectos do mundo real.</em></strong></p>
+</div>
+<div class="paragraph">
+<p>Agora que temos uma definição, precisamos entender que são só são úteis se estiverem corretos, acessíveis e seguros. Para isso, existem os Sistemas de Gerenciamento de Bases de Dados (SGBD, ou DBMS em inglês). Estes são sistemas de software que permitem armazenar e analizar informações em uma base de dados.</p>
+</div>
+<div class="paragraph">
+<p>Uma solução óbvia é usar arquivos para armazenar dados. No entanto, não é uma boa ideia, pois para se garantir que os dados estejam integros e sejam duráveis, é necessário implementar diversas funcionalidades que um SGBD já oferece, como controle de concorrência, recuperação de falhas, segurança e muito mais.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-compõe-uma-base-de-dados">O que compõe uma base de dados?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Uma base de dados é sempre composta pelo <strong>modelo de dados</strong> e pelo <strong>esquema</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>O modelo de dados, ou _data model</em>, é uma coleção de conceitos que descrevem os dados em uma base de dados. O modelo de dados define os tipos de coisas que podem existir e como elas se relacionam entre si._</strong></p>
+</div>
+<div class="paragraph">
+<p><strong><em>O esquema, ou _schema</em>, é a descrição de uma coleção de dados, usando um modelo de dados específico. Um esquema define a estrutura dos dados em um modelo de dados. Dados sem um esquema são apenas um conjunto de bits sem significado._</strong></p>
+</div>
+<div class="paragraph">
+<p>Essas definições podem parecer confusas se não forem exemplificadas. Por isso vamos listar alguns modelos de dados?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Relational</p>
+</li>
+<li>
+<p>Key/Value</p>
+</li>
+<li>
+<p>Graph</p>
+</li>
+<li>
+<p>Document/JSON/XML/Object</p>
+</li>
+<li>
+<p>Wide-Column/Column-Family</p>
+</li>
+<li>
+<p>Array (Vector, Matriz, Tensor)</p>
+</li>
+<li>
+<p>Hierarchical/Tree</p>
+</li>
+<li>
+<p>Network</p>
+</li>
+<li>
+<p>Semantic</p>
+</li>
+<li>
+<p>Entity-Relationship</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Alguns desses modelos não são mais tão comuns, mas já foram usados no passado. O mais comum atualmente é o modelo relacional, que é usados em bases de dados que suportam SQL.</p>
+</div>
+<div class="paragraph">
+<p>O modelo Key/Value é usado para aplicações simples e/ou <em>caching</em> de informações.</p>
+</div>
+<div class="paragraph">
+<p>O que hoje se conhece como NoSQL, que não verdade não significa "não SQL", mas sim "not only SQL", é composto pelos modelos Graph, Document/JSON/XML/Object e Wide-Column/Column-Family. É importante ressaltar que não existe uma definição formal para a categoria NoSQL.</p>
+</div>
+<div class="paragraph">
+<p>Os modelos Array são usados em bases de dados especializadas para aprendizado de máquina e inteligência artificial.</p>
+</div>
+<div class="paragraph">
+<p>Já os modelos Hierarchical/Tree, Network, Semantic e Entity-Relationship são mais antigos e não são mais tão comuns.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quais-foram-as-primeiras-bases-de-dados">Quais foram as primeiras bases de dados?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nos anos 1960, as primeiras bases de dados obrigavam o desenvolvedor a escrever consultas (<em>queries</em>) usando código procedural. O desenvolvedor precisava dizer ao sistema exatamente como navegar pelos dados baseado no conteúdo da base. Se a base de dados fosse alterada, o código precisava ser reescrito.</p>
+</div>
+<div class="paragraph">
+<p>Pode-se citar bases como IDS, IMS e CODASYL como exemplos desse tipo de base de dados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="idms"><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">GET_ARTISTS_FOR_ALBUM</span><span class="p">;</span><span class="w">
+</span><span class="k">BEGIN</span><span class="w">
+    </span><span class="cm">/* Declare variables */</span><span class="w">
+    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">ARTIST_RECORD</span><span class="w"> </span><span class="n">ARTIST</span><span class="p">;</span><span class="w">
+    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">APPEARS_RECORD</span><span class="w"> </span><span class="n">APPEARS</span><span class="p">;</span><span class="w">
+    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">ALBUM_RECORD</span><span class="w"> </span><span class="n">ALBUM</span><span class="p">;</span><span class="w">
+
+    </span><span class="cm">/* Start navigation */</span><span class="w">
+    </span><span class="k">FIND</span><span class="w"> </span><span class="n">ALBUM</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">ALBUM</span><span class="p">.</span><span class="n">NAME</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">"Mooshoo Tribute"</span><span class="w">
+        </span><span class="k">ON</span><span class="w"> </span><span class="k">ERROR</span><span class="w"> </span><span class="k">DISPLAY</span><span class="w"> </span><span class="s2">"Album not found"</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">EXIT</span><span class="p">;</span><span class="w">
+
+    </span><span class="cm">/* For each appearance on the album */</span><span class="w">
+    </span><span class="k">FIND</span><span class="w"> </span><span class="k">FIRST</span><span class="w"> </span><span class="n">APPEARS</span><span class="w"> </span><span class="k">WITHIN</span><span class="w"> </span><span class="n">APPEARS_ALBUM</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">ALBUM_RECORD</span><span class="w">
+        </span><span class="k">ON</span><span class="w"> </span><span class="k">ERROR</span><span class="w"> </span><span class="k">DISPLAY</span><span class="w"> </span><span class="s2">"No artists found for this album"</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">EXIT</span><span class="p">;</span><span class="w">
+
+    </span><span class="cm">/* Loop through the set of APPEARS */</span><span class="w">
+    </span><span class="k">REPEAT</span><span class="w">
+        </span><span class="cm">/* Navigate to the corresponding artist */</span><span class="w">
+        </span><span class="k">FIND</span><span class="w"> </span><span class="k">OWNER</span><span class="w"> </span><span class="k">WITHIN</span><span class="w"> </span><span class="n">ARTIST_APPEARS</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">APPEARS_RECORD</span><span class="w">
+            </span><span class="k">ON</span><span class="w"> </span><span class="k">ERROR</span><span class="w"> </span><span class="k">DISPLAY</span><span class="w"> </span><span class="s2">"Error finding artist"</span><span class="p">;</span><span class="w">
+        </span><span class="cm">/* Display artist name */</span><span class="w">
+        </span><span class="k">DISPLAY</span><span class="w"> </span><span class="n">ARTIST_RECORD</span><span class="p">.</span><span class="n">NAME</span><span class="p">;</span><span class="w">
+        </span><span class="cm">/* Move to the next APPEARS record in the set */</span><span class="w">
+        </span><span class="k">FIND</span><span class="w"> </span><span class="k">NEXT</span><span class="w"> </span><span class="n">APPEARS</span><span class="w"> </span><span class="k">WITHIN</span><span class="w"> </span><span class="n">APPEARS_ALBUM</span><span class="w"> </span><span class="k">OF</span><span class="w"> </span><span class="n">ALBUM_RECORD</span><span class="w">
+            </span><span class="k">ON</span><span class="w"> </span><span class="k">ERROR</span><span class="w"> </span><span class="k">EXIT</span><span class="p">;</span><span class="w">
+    </span><span class="k">END</span><span class="w"> </span><span class="k">REPEAT</span><span class="p">;</span><span class="w">
+</span><span class="k">END</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As bases de dados que conhecemos hoje começaram a ser desenvolvidas no início dos anos 1970 por nomes como Edgar F. Codd, Charles W. Bachman, Jim Gray e Michael Stonebraker. Para acompanhar a discussão, pode-se ler os artigos do SIGMOD de 1970 a 1947 em <a href="https://www.sigmod.org/publications/dblp/db/conf/sigmod/sigfidet.html">ACM SIGFIDET/SIGMOD Workshop on Data Description, Access and Control</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_o-que-define-o-modelo-relacional">O que define o modelo relacional?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para entender o modelo relacional é preciso definir uma <strong>relação</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Uma relação é um conjunto não ordenado que contém a relação entre atributos que representam entidades.</em></strong></p>
+</div>
+<div class="paragraph">
+<p>Uma relação com n atributos é chamada de n-ária. Por exemplo, uma relação com três atributos é chamada de ternária. Apesar da palavra "relação" remeter a relacionamento, no contexto de bases de dados relacionais, ela pode ser usada como sinônimo de tabela. Cada relação é composta por tuplas (linhas). Para isso precisamos definir o que são tuplas.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Uma tupla é um conjunto de atributos em uma relação. Esses valores são atômicos ou escalares.</em></strong> Por "escalar" entende-se um valor númerico, string, data/hora, booleano, etc. E por "atômico" entende-se que o valor não pode ser dividido em partes menores.</p>
+</div>
+<div class="paragraph">
+<p>Em um modelo relacional, cada relação pode ter propriedades que garantem a integridade dos dados. São elas: <strong>chave primária</strong> (<em>primary key</em>), <strong>chave estrangeira</strong> (<em>foreign key</em>) e <strong>restrições de integridade</strong> (<em>constraints</em>).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Uma chave primária de uma relação é um conjunto de atributos que identifica unicamente cada tupla na relação.</p>
+</li>
+<li>
+<p>Uma chave estrangeira é um conjunto de atributos em uma relação que referencia a chave primária de outra relação, estabelecendo um vínculo entre as duas relações.</p>
+</li>
+<li>
+<p>Uma restrição é uma condição definida pelo usuário que deve ser válida para qualquer instância do banco de dados. A chave primária e a chave estrangeira são tipos especiais de restrições, mas existem outras, como restrições de unicidade e restrições de nulidade.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-interagir-com-bases-de-dados-relacionais">Como interagir com bases de dados relacionais?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Toda base de dados fornecerá uma linguagem de manipulação de dados (DML, <em>Data Manipulation Language</em>) para interagir com os dados armazenados. A DML mais comum é a Structured Query Language (SQL). O SQL é uma linguagem declarativa que pode ser dividida em cinco partes principais: Linguagem de Manipulação de Dados (DML, <em>Data Manipulation Language</em>), Linguagem de Definição de Dados (DDL, <em>Data Definition Language</em>), Linguagem de Controle de Dados (DCL, <em>Data Control Language</em>), Linguagem de Transação de Dados (DTL, <em>Transaction Control Language</em>) e Linguagem de Consulta de Dados (DQL, <em>Data Query Language</em>).</p>
+</div>
+<div class="paragraph">
+<p>Abaixo estão alguns exemplos de comandos SQL para cada uma dessas partes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>DML: <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></p>
+</li>
+<li>
+<p>DDL: <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code></p>
+</li>
+<li>
+<p>DCL: <code>GRANT</code>, <code>REVOKE</code></p>
+</li>
+<li>
+<p>DTL: <code>COMMIT</code>, <code>ROLLBACK</code></p>
+</li>
+<li>
+<p>DQL: <code>SELECT</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Essas linguagens podem ser usadas em conjunto para criação de scripts que automatizam tarefas de administração e manipulação de dados em uma base de dados relacional.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Neste post, vimos uma introdução ao conceito de bases de dados, modelos de dados, esquema, história das bases de dados e o modelo relacional. Nos próximos posts, vamos entender o que é Algebra Relacional e como ela define as operações que podem ser realizadas em bases de dados relacionais.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Bases de Dados" /><category term="Modelos de Dados" /><category term="SQL" /><category term="História da Computação" /><summary type="html"><![CDATA[Neste post, vamos explorar os conceitos fundamentais de bases de dados, incluindo o que são, como funcionam e a história por trás do modelo relacional.]]></summary></entry><entry><title type="html">Como implementar um seletor de números sequenciais no Apache Kafka</title><link href="https://blog.vepo.dev/posts/como-implementar-um-seletor-de-numeros-sequenciais-no-apache-kafka" rel="alternate" type="text/html" title="Como implementar um seletor de números sequenciais no Apache Kafka" /><published>2025-11-21T00:00:00+00:00</published><updated>2025-11-21T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-42-00-numero-sequencia-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/como-implementar-um-seletor-de-numeros-sequenciais-no-apache-kafka"><![CDATA[<div class="paragraph">
+<p>Este relato é baseado em uma situação real do projeto em que atuo. Nossa solução utiliza Apache Kafka para processar CDRs (Call Detail Records), lidando com bilhões de registros diários. Todo o fluxo é construído em torno do Kafka, em um sistema que já opera em vários países, sob diferentes clientes e infraestruturas. Cada novo serviço incorporado ao ecossistema precisa ser planejado, justificado, implantado e mantido — o que torna a introdução de qualquer sistema adicional, por mais simples que pareça, uma tarefa nada trivial.</p>
+</div>
+<div class="paragraph">
+<p>Foi nesse contexto que surgiu uma necessidade aparentemente simples: em determinado ponto do processo, seria necessário utilizar números sequenciais como identificadores para um novo recurso.</p>
+</div>
+<div class="sect1">
+<h2 id="_a-solução-óbvia">A solução óbvia</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A primeira solução considerada foi: <em>"vamos adotar uma ferramenta pronta que já resolva isso"</em>. Poderíamos implementar um contador simples usando Redis ou, como alternativa, o próprio Zookeeper.</p>
+</div>
+<div class="paragraph">
+<p>Ambas as tecnologias oferecem suporte nativo para essa funcionalidade. O Redis dispõe do comando <a href="https://redis.io/docs/latest/commands/incr/">INCR</a>, que incrementa um valor associado a uma chave e retorna o resultado atualizado. Já o Zookeeper trabalha com o conceito de nós sequenciais — ou seja, cada novo nó criado recebe automaticamente um sufixo numérico incremental.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="ruby"><span class="no">SET</span> <span class="n">mykey</span> <span class="s2">"10"</span>
+<span class="s2">"OK"</span>
+<span class="no">INCR</span> <span class="n">mykey</span>
+<span class="p">(</span><span class="n">integer</span><span class="p">)</span> <span class="mi">11</span>
+<span class="no">GET</span> <span class="n">mykey</span>
+<span class="s2">"11"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Uma alternativa mais robusta seria utilizar o <a href="https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/">Redis</a> ou o <a href="https://zookeeper.apache.org/doc/r3.8.5/recipes.html#sc_recipes_Locks">Zookeeper</a> para implementar um Lock Distribuído, garantindo que apenas um processo por vez possa incrementar o contador. No entanto, essa abordagem é mais complexa e desnecessária, uma vez que ambas as tecnologias já oferecem suporte nativo para a funcionalidade de contador.</p>
+</div>
+<div class="paragraph">
+<p>Em alguns clientes, usar o Zookeeper parecia uma solução simples, já que na época ele ainda era um componente integral do Kafka. No entanto, dois grandes obstáculos se apresentavam.</p>
+</div>
+<div class="paragraph">
+<p>Primeiro: embora o Kafka utilizasse o Zookeeper para gerenciar o estado do cluster, nossa aplicação não tinha usava essa tecnologia. Além disso, já estava em curso a remoção do Zookeeper do ecossistema do Kafka, justamente por ser considerado uma das fontes de gargalo.</p>
+</div>
+<div class="paragraph">
+<p>O segundo problema era que muitos clientes já haviam migrado para soluções de Kafka gerenciado (Managed Kafka), onde o serviço é oferecido como um produto em nuvem — e nessas situações, não tínhamos acesso ao Zookeeper. Portanto, mesmo que ele estivesse presente, não podíamos contar com essa solução.</p>
+</div>
+<div class="paragraph">
+<p>Nessa implementação, a vazão não seria um problema crítico, pois os números sequenciais seriam usados apenas para identificar lotes de registros — e não cada registro individualmente. Isso significa que a taxa de consumo desses sequenciais seria bastante reduzida.</p>
+</div>
+<div class="paragraph">
+<p>Há ainda outro aspecto fundamental: é impossível estabelecer uma sequência numérica global sem algum tipo de coordenação centralizada. Seja usando Redis ou Zookeeper, a solução continuaria sendo centralizada por natureza — o que, em cenários de alto volume, naturalmente limita a vazão máxima.</p>
+</div>
+<div class="paragraph">
+<p>Diante dessas restrições, o Apache Kafka surgia como a única solução viável.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a-solução-ingênua">A solução ingênua!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Antes de mergulharmos na solução com Kafka, preciso descartar uma ideia que surgiu durante a discussão — e que, com o perdão da palavra, era tecnicamente ingênua.</p>
+</div>
+<div class="paragraph">
+<p><em>— Por que não usar um simples arquivo de lock compartilhado?</em></p>
+</div>
+<div class="paragraph">
+<p>Sim, essa sugestão realmente apareceu, proposta por um desenvolvedor. Se você também considerou essa possibilidade, vamos revisar alguns conceitos básicos de Sistemas Operacionais e Docker para entender por que ela não se aplica ao nosso cenário.</p>
+</div>
+<div class="paragraph">
+<p>O bloqueio por arquivo (<em>file lock</em>) não é uma funcionalidade do sistema de arquivos em si, mas sim implementada diretamente no kernel do sistema operacional. Isso significa que, para essa solução funcionar, todos os processos envolvidos precisariam estar executando no mesmo sistema operacional — o que equivaleria a ter um "sistema operacional distribuído", um conceito não muito comum na prática.</p>
+</div>
+<div class="paragraph">
+<p>Além disso, a solução se mostrava inviável em ambientes containerizados. Quando o Docker cria um namespace para um container, ele isola também o sistema de arquivos — o que impede o compartilhamento do <em>lock</em> entre containers.</p>
+</div>
+<div class="paragraph">
+<p>Para comprovar essa limitação, conduzi um teste simples: o <em>lock</em> funcionou corretamente quando duas JVMs eram executadas diretamente na mesma máquina, sem Docker. No entanto, ao usar containers, o mecanismo deixou de funcionar. Ainda assim, me pediram para testar no Kubernetes&#8230;&#8203; e tive que investir mais tempo para demonstrar, novamente, que a abordagem não era viável.</p>
+</div>
+<div class="paragraph">
+<p>No final, conseguimos resolver o problema — e comprovei que o Kafka era, de fato, a única solução viável.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_decompondo-o-problema">Decompondo o problema</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Tínhamos, portanto, um desafio complexo e uma ferramenta que não havia sido projetada para resolvê-lo. Como superar essa situação? A estratégia foi decompor o problema em partes menores.</p>
+</div>
+<div class="paragraph">
+<p>A geração de números sequenciais pode ser decomposta em dois componentes principais: (i) eleição de um líder e (ii) implementação de uma memória compartilhada. Para simplificar o processo, decidi desenvolver um código básico que serviria como base para a implementação final.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="k">try</span><span class="o">(</span><span class="nc">Leader</span> <span class="n">leader</span> <span class="o">=</span> <span class="n">consensus</span><span class="o">.</span><span class="na">acquireLeader</span><span class="o">())</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">currentValue</span> <span class="o">=</span> <span class="n">leader</span><span class="o">.</span><span class="na">getInteger</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="c1">// use currentValue</span>
+    <span class="n">leader</span><span class="o">.</span><span class="na">setInteger</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">currentValue</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este código foi propositalmente desenvolvido com simplicidade e organizado em três interfaces principais:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>acquireLeader</code>: método bloqueante que aguarda até que um líder seja eleito</p>
+</li>
+<li>
+<p><code>getInteger</code> e <code>setInteger</code>: para leitura e escrita de valores na memória compartilhada</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Apenas o líder possui permissão para modificar os valores na memória compartilhada. Por isso, os métodos de leitura e escrita (<code>getInteger</code>/<code>setInteger</code>) estão disponíveis apenas na interface <code>Leader</code>. Já a interface <code>Consensus</code> contém apenas o método <code>acquireLeader</code>, responsável por coordenar a eleição de forma bloqueante.</p>
+</div>
+<div class="paragraph">
+<p>Dessa forma, o código principal da aplicação permaneceria isolado da complexidade inerente à eleição de líder e ao gerenciamento da memória compartilhada.</p>
+</div>
+<div class="paragraph">
+<p>Com a abstração definida, era hora de implementar os algoritmos necessários para colocar toda a solução em funcionamento.</p>
+</div>
+<div class="sect2">
+<h3 id="_como-o-kafka-permite-consenso">Como o Kafka permite consenso</h3>
+<div class="paragraph">
+<p>O Apache Kafka é um <a href="https://www.researchgate.net/publication/378309830_Middlewares_Orientados_a_Mensagens">middleware orientado a mensagens</a> que permite a integração entre sistemas por meio do envio e recebimento de eventos. Existem dois modelos de comunicação comuns nesse contexto: Ponto a Ponto e Publish/Subscribe.</p>
+</div>
+<div class="paragraph">
+<p>O Kafka adota exclusivamente o modelo Publish/Subscribe. Nele, o broker organiza os eventos em tópicos, onde produtores publicam mensagens e consumidores as leem de forma sequencial.</p>
+</div>
+<div class="paragraph">
+<p>Por sua natureza distribuída, os tópicos no Kafka são divididos em partições. Cada partição atua como um log segmentado — ou seja, o broker sempre grava as mensagens recebidas no final de um arquivo, até que este atinja seu limite e um novo arquivo seja criado.</p>
+</div>
+<div class="paragraph">
+<p>Ao produzir uma mensagem, o produtor pode escolher explicitamente a partição de destino ou, alternativamente, utilizar uma chave para que a partição seja determinada automaticamente. Em ambos os casos, a mensagem é armazenada de forma sequencial dentro da partição.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Referências</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://dl.acm.org/doi/10.14778/2824032.2824063">Building a replicated logging system with Apache Kafka</a></p>
+</li>
+<li>
+<p><a href="https://ieeexplore.ieee.org/document/9005583">Kafka: the Database Inverted, but Not Garbled or Compromised</a></p>
+</li>
+<li>
+<p><a href="https://notes.stephenholiday.com/Kafka.pdf">Kafka: a Distributed Messaging System for Log Processing</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/topico.png" alt="topico">
+</div>
+<div class="title">Figura 1. Anatomia de um Tópico</div>
+</div>
+<div class="paragraph">
+<p>É importante destacar que o Kafka não garante a ordem global de consumo das mensagens — apenas a ordem sequencial dentro de uma mesma partição.</p>
+</div>
+<div class="paragraph">
+<p>Isso significa que, quando um consumidor se inscreve em um tópico, a ordem sequencial só é garantida se o tópico possuir uma única partição. Se houver múltiplas partições, apenas as mensagens com a mesma chave de partição serão consumidas em sequência, pois serão sempre direcionadas à mesma partição.</p>
+</div>
+<div class="paragraph">
+<p>Dessa forma, o Kafka pode ser utilizado em algoritmos de consenso, uma vez que garante o consumo sequencial de mensagens — desde que elas compartilhem a mesma chave de partição ou o tópico possua apenas uma partição.</p>
+</div>
+<div class="paragraph">
+<p>Outra característica importante dos tópicos do Kafka são os mecanismos de limpeza, controlados pela configuração <code>cleanup.policy</code>. Quando definida como <code>compact</code>, essa política impede o crescimento indefinido do tópico, preservando apenas a última mensagem associada a cada chave.</p>
+</div>
+<div class="paragraph">
+<p>Esse comportamento permite que o tópico funcione como uma espécie de tabela distribuída, que pode ser reconstruída por consumidores a partir do log de eventos. Alguns autores chegam a descrever o Kafka como um "banco de dados invertido" — como se ele utilizasse os mecanismos de sincronização típicos de bancos relacionais, mas aplicados à construção de sistemas distribuídos.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/database-inverted.png" alt="database inverted">
+</div>
+<div class="title">Figura 2. Kafka como base de dados invertida</div>
+</div>
+<div class="paragraph">
+<p>Você já deve ter percebido onde quero chegar: é possível construir uma tabela distribuída de chave-valor com durabilidade usando o Kafka. Agora, só nos resta resolver a eleição do líder.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_leader-election-eleição-do-líder">Leader Election (Eleição do Líder)</h3>
+<div class="paragraph">
+<p>Para implementar as funcionalidades (i) e (ii), precisamos de um mecanismo de troca de mensagens que seja distribuído e garanta ordem sequencial. Cada participante deve ser capaz de enviar mensagens e consumi-las de forma assíncrona.</p>
+</div>
+<div class="paragraph">
+<p>Nosso cliente de consenso utilizará dois canais de comunicação: as requisições são enviadas por um produtor e consumidas por um consumidor. No momento do envio, não conhecemos o estado atual da aplicação. Porém, ao consumir as mensagens, temos a garantia de que todos os participantes estão processando o mesmo conjunto de mensagens, na mesma ordem.</p>
+</div>
+<div class="paragraph">
+<p>Para isso, o algoritmo deve operar através de um tópico de controle com apenas uma partição. Além disso, cada consumidor deve atuar de forma independente — ou seja, sem usar grupos de consumidores —, assegurando que todos recebam e processem integralmente todas as mensagens.</p>
+</div>
+<div class="paragraph">
+<p>A figura abaixo ilustra esse comportamento. Os sistemas <strong>S1</strong> e <strong>S2</strong> enviam as mensagens <strong>REQ_1</strong> e <strong>REQ_2</strong>, respectivamente, e ambos consomem do tópico de controle as requisições na ordem <strong>REQ_1</strong> → <strong>REQ_2</strong>. Dessa forma, tanto <strong>S1</strong> quanto <strong>S2</strong> terão ciência de que <strong>REQ_1</strong> foi enviada e processada antes de <strong>REQ_2</strong>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/topico-controle.png" alt="topico controle">
+</div>
+<div class="title">Figura 3. Kafka sendo usado como tópico de controle</div>
+</div>
+<div class="paragraph">
+<p>É importante destacar que timestamps têm utilidade limitada em sistemas distribuídos, já que cada máquina possui seu próprio relógio independente — como já discuti no post <a href="https://blog.vepo.dev/posts/relogios-fisicos-e-logicos">Relógios Físicos e Lógicos</a>.</p>
+</div>
+<div class="paragraph">
+<p>No Kafka, a ordem cronológica dos eventos é determinada pela ordem de recebimento no <em>broker</em>, refletida no <em>offset</em> da mensagem. Todos os consumidores recebem as mensagens em ordem crescente de <em>offset</em> e partição, garantindo uma visão consistente e sequencial do fluxo de eventos.</p>
+</div>
+<div class="paragraph">
+<p>Conhecendo esse comportamento do Kafka, podemos implementar um mecanismo de eleição de líder (<em>leader election</em>) baseado no envio e consumo de requisições. Cada processo participante que deseja se tornar líder envia uma requisição de candidatura ao tópico de controle. Da mesma forma, ao finalizar sua atuação como líder, o processo deve enviar uma requisição de renúncia.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/leader-election.png" alt="leader election">
+</div>
+<div class="title">Figura 4. Diagrama de Sequência da Eleição do Líder</div>
+</div>
+<div class="paragraph">
+<p>Na implementação da eleição de líder, a Fila de Requisições será atualizada exclusivamente pela Thread de Consumo. Essa thread é responsável por consumir mensagens do tópico de controle, adicionar novas requisições à fila e removê-las quando identificar uma mensagem de liberação.</p>
+</div>
+<div class="paragraph">
+<p>A thread da aplicação deverá enviar uma mensagem de requisição de liderança e aguardar até que essa mensagem se torne a primeira da fila. Quando isso ocorrer, significa que todos os demais processos participantes já enviaram suas requisições e eventuais mensagens de liberação de liderança — garantindo assim que a eleição foi consolidada.</p>
+</div>
+<div class="paragraph">
+<p>As imagens a seguir ilustram o processo de gerenciamento da fila de requisições.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/leader-election-queue-1.png" alt="leader election queue 1">
+</div>
+<div class="title">Figura 5. Quando os Sistemas A, B e E enviam requisições ao mesmo tempo, elas são ordenadas pelo consumidor e o primeiro a enviar se torna líder. No caso o sistema A.</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/leader-election-queue-2.png" alt="leader election queue 2">
+</div>
+<div class="title">Figura 6. Quando o Sistema A envia a mensagem de abdicar a posição de líder, o Sistema B se torna o Líder.</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/leader-election-queue-3.png" alt="leader election queue 3">
+</div>
+<div class="title">Figura 7. Quando o Sistema B envia a mensagem de abdicar a posição de líder, o Sistema C se torna o Líder.</div>
+</div>
+<div class="paragraph">
+<p>Você pode ter notado que este algoritmo ainda não está completo. Para que funcione corretamente, precisamos tratar duas situações críticas:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>O que ocorre se um sistema enviar uma requisição e parar de funcionar?</p>
+</li>
+<li>
+<p>Como lidar quando um sistema envia múltiplas requisições?</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Para resolver o primeiro caso, enquanto o sistema aguarda para se tornar líder ou durante sua atuação como líder, ele deve enviar mensagens de <em>heartbeat</em> periodicamente. Cada requisição terá uma validade máxima de 2 segundos — caso o sistema não renove o <em>heartbeat</em> dentro desse intervalo, a requisição será removida da fila.</p>
+</div>
+<div class="paragraph">
+<p>Além disso, quando um sistema detecta que uma requisição expirou, ele deve notificar os demais participantes por meio de uma mensagem de remoção. Isso evita que os outros processos precisem aguardar o tempo total de expiração ao consumirem as requisições, acelerando a resposta do sistema como um todo.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/kafka/leader-election-dead.png" alt="leader election dead">
+</div>
+<div class="title">Figura 8. Diagrama de Sequência para quando um dos participantes falhar logo após virar líder, sem enviar as mensagens <em>heartbeat</em>.0</div>
+</div>
+<div class="paragraph">
+<p>É crucial que a mensagem de <em>heartbeat</em> seja enviada com uma frequência superior ao tempo de expiração da requisição. Dessa forma, garante-se que o sistema tenha oportunidade de renovar sua presença antes que a requisição seja considerada inválida.</p>
+</div>
+<div class="paragraph">
+<p>Já o segundo caso pode ser resolvido através de uma modelagem adequada da mensagem de requisição. Cada mensagem deve possuir:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Uma chave única compartilhada por todos os participantes</p>
+</li>
+<li>
+<p>Um campo <code>id</code> que identifique o participante</p>
+</li>
+<li>
+<p>Um campo <code>seq</code> com um número sequencial para controlar a liberação da requisição</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Uma requisição será considerada expirada nas seguintes situações:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Ao receber um <em>heartbeat</em> com o mesmo <code>id</code> e um valor de <code>seq</code> superior ao da requisição;</p>
+</li>
+<li>
+<p>Ao receber uma mensagem de <code>LeaderRelease</code> com o mesmo <code>id</code> e <code>seq</code> maior ou igual ao da requisição.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Vale destacar que, logicamente, uma mensagem de <code>LeaderRelease</code> só é enviada quando o processo já atua como líder. Isso estabelece uma ordenação lógica entre as mensagens, onde a liberação pressupõe que a liderança foi previamente adquirida.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_memória-compartilhada">Memória Compartilhada</h3>
+<div class="paragraph">
+<p>Uma vez eleito líder, o processo pode assumir que consumiu todas as mensagens de líderes anteriores. Dessa forma, o tópico de controle passa a funcionar como uma memória compartilhada, na qual qualquer valor pode ser publicado — utilizando uma chave específica para controlar o acesso a cada elemento compartilhado.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_kafka-como-plataforma-de-consenso">Kafka como Plataforma de Consenso</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Implementar consenso distribuído é desafiador. Esta solução com Kafka é uma opção elegante quando você já está imerso no nosso ecossistema, mas é importante avaliar se a complexidade justifica o benefício para o caso de uso. Para necessidades mais simples, um serviço gerenciado como o Redis ou Zookeeper (quando viável) pode ser mais adequado.</p>
+</div>
+<div class="paragraph">
+<p>O importante é lembrar que em sistemas distribuídos, nada é simples. A coordenação tem um custo, seja em complexidade, latência ou manutenção. Cabe a nós, engenheiros de software, escolher a moeda de troca mais adequada para cada contexto.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Ciência da Computação" /><category term="Sistemas Distribuídos" /><category term="Microsserviços" /><summary type="html"><![CDATA[Quando trabalhamos com sistemas distribuídos, muitas vezes precisamos de uma maneira de gerar números sequenciais únicos para identificar objetos. Existem diversas formas de implementar isso, mas as vezes algumas limitações técnicas nos obrigam a usar sistemas como o Apache Kafka para essa tarefa.]]></summary></entry><entry><title type="html">Entendendo a arquitetura Cliente-Servidor</title><link href="https://blog.vepo.dev/posts/entendendo-a-arquitetura-cliente-servidor" rel="alternate" type="text/html" title="Entendendo a arquitetura Cliente-Servidor" /><published>2025-11-11T00:00:00+00:00</published><updated>2025-11-11T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/18-59-00-entendendo-a-arquitetura-cliente-servidor</id><content type="html" xml:base="https://blog.vepo.dev/posts/entendendo-a-arquitetura-cliente-servidor"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/hPoHp0WhglA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Antes de discutir os estilos arquiteturais mais comuns, é importante entender a base de muitos deles: a arquitetura Cliente-Servidor. Caracterizá-la é útil, pois ela é a compõe estilos como REST, RPC, GraphQL, entre outros. Podemos começar identificando alternativas a essa arquitetura. Existem outras formas de pensar sistemas que não sejam baseadas na relação cliente-servidor? A resposta é sim! A arquitetura Cliente-Servidor é fácil de entender e construir, pois ‘pensar em termos de CLIENTES que fazem requisições a SERVIDORES ajuda a compreender e gerenciar a complexidade de sistemas distribuídos.’ [Saltzer and Kaashoek, 2009] Sua principal característica é a centralização na figura do servidor, mas é possível construir arquiteturas descentralizadas, como o Peer-to-Peer (P2P).</p>
+
+<h2 id="definindo-os-papéis">Definindo os papéis</h2>
+
+<p>Então para entendermos como funciona e caracterizar uma arquitetura cliente-servidor, vamos definir o que é um cliente e o que é um servidor? Esses são os dois principais papeis dentro dessa arquitetura.</p>
+<ul>
+  <li>“Um <strong>servidor</strong> (<em>server</em>) é um processo implementando um servico específico, por exemplo, um serviço de sistema de arquivos ou um serviço de banco de dados.” [van Steen and Tanenbaum, 2017]</li>
+  <li>“Um <strong>cliente</strong> (<em>client</em>) é um processo que requisita um serviço de um servidor através do envio de uma requisição e subsequentemente esperando pela resposta do servidor.” [van Steen and Tanenbaum, 2017]</li>
+</ul>
+
+<p>A interação entre cliente e servidor é conhecida como comportamento reqsuisição-resposta (<em>request-response</em>), ela é sempre síncrona, uma vez que toda requisição precisa de uma resposta.</p>
+
+<!-- https://excalidraw.com/#json=36iWOKx0T_gNqjvb4lZAi,h1wqtDM0cvA9U6ek_NEuWQ -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-01-client-server.png" alt="Comunicação Cliente-Servicor" /></p>
+
+<h2 id="caracterizando-um-protocolo-cliente-servidor">Caracterizando um protocolo Cliente-Servidor</h2>
+
+<p>Quando falamos de requisição e respostas, estamos obrigatóriamente falando de protocolos e os protocolos de uma arquitetura <strong>Cliente-Servidor</strong> podem ser caracterizados como Orientado à Conexão e Protocolos sem Conexão (<em>connectionless</em>). Apesar de estarmos falando de protocolos da camada de aplicação, eles são construídos através de escolhas bem definidas de protocolos na camada de rede. Usualmente, protocolos orientados a conexão usam o protocolo TCP, e protocolos sem conexão usam o protocolo UDP. Uma exceção se dá com o uso do protocolo QUIC que é uma construção em cima do UDP para estabelecimento de uma conexão de baixa latência, este usado pelo HTTP3.</p>
+
+<p>A vantagem de se usar o protocolo sem conexão é garantir que a mensagem é enviada com baixa latência, mas não há garantias de entrega da mensagem, o que pode implicar em reenvio da mensagem para o cliente e na necessidade de se implementar operações idempotente para o servidor.</p>
+
+<p>Já quando temos protocolos orientados a conexão, o mesmo pode ser classificado como Sem Estado (<em>stateless</em>) ou Com Estado (<em>stateful</em>). O HTTP é um protocolo sem estado, já o SSH é um protocolo com estado.</p>
+
+<h3 id="conceito-de-idempotência">Conceito de idempotência</h3>
+
+<p>Quando falamos de idempotência estamos caracterizando uma operação que pode ser repetida multiplas vezes sem efeitos colaterais. Qualquer operação que não altere o estado interno da aplicação é idempotente, mas uma operação potencialmente altere o estado da aplicação, para ser idempotente tem que identificar se ela já foi aplicada e responder como se fosse aplicada.</p>
+
+<h3 id="diferentes-camadas-e-suas-implicações">Diferentes Camadas e suas implicações</h3>
+
+<p>Uma aplicação pode ser facilmente dividida em camadas, não estamos falando sobre arquitura em camadas, mas apenas em camadas como um estrutura de analise. O mais comum é a divisão em interface de usuário, aplicação e base de dados. É interessante notar que camadas mais superiores tendem a ter as caracteristicas de clientes enquanto camadas mais inferiores se comportam cada vez mais como servidores. Dessa forma, em algum momento uma dessas camadas ou interfaces implementará uma comunicação cliente-servidor, separando a aplicação fisicamente. E quais as implicações disso?</p>
+
+<p>A primeira implicação é a adição de latência na comunicação. Cada vez que uma camada se comunica com outra através de uma interface de rede, essa comunicação é mais lenta do que uma comunicação local. A segunda implicação é a possibilidade de falhas de comunicação. Toda comunicação através de rede está sujeita a falhas, seja por perda de pacotes, indisponibilidade do servidor, etc…</p>
+
+<p>No artigo <a href="https://queue.acm.org/detail.cfm?id=3096459">“The Calculus of Service Availability”</a> o autor descreve como a adição de camadas pode reduzir significativamente a disponibilidade de um serviço. Quando dependemos de um serviço que tem disponibilidade de 99.99%, a disponibilidade do nosso serviço já está limitado por esse valor, ao depender de outro, o que implicaria em uma indisponibilida de ao menos 52 minutos em um ano. Ao se depender de mais serviços, essa disponibilidade pode aumentar, visto que os mesmo podem ficar também indisponíveis.</p>
+
+<p>O calculo da disponbilidade é feito através da formula abaixo onde <code class="language-plaintext highlighter-rouge">MTTF</code> significa o tempo médio até falhar (do inglês <em>mean time to failure</em>) e <code class="language-plaintext highlighter-rouge">MTTR</code> significa tempo médio até o reparo (do inglês <em>mean time to repair</em>). A formua <code class="language-plaintext highlighter-rouge">A = MTTF / (MTTF + MTTR)</code> pode ser calculada usando qualquer unidade de medida, desde que <code class="language-plaintext highlighter-rouge">MTTF</code> e <code class="language-plaintext highlighter-rouge">MTTR</code> possuam a mesma unidade.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-02-calculo-disponibilidade.png" alt="Formula do calculo da disponbilidade: A=MTTF/(MTTF+MTTR)" /></p>
+
+<p>Fazendo um calculo hipotético de uma aplicação que falha a cada 2 meses e leva 3 horas para se recuperar, essa aplicação está disponível por 1440 horas a cada 1443 horas, ou seja, ela tem disponibilidade de apenas 99,8% do tempo, o que é uma disponibilidade considerada baixa para alguns serviços, como provedores de nuvem que pedem disponbilidade de 99,999%, ou seja, aproximadamente 5 minutos ao ano de indisponibilidade.</p>
+
+<!-- https://excalidraw.com/#json=unD4F6EHvF0nkDjZg1EbQ,tIckKWssfycFnr-3Kz1GIw -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-03-calculo-disponibilidade-exemplo.png" alt="Aplicação" /></p>
+
+<h3 id="processos-síncronos-vs-assíncronos">Processos Síncronos vs Assíncronos</h3>
+
+<p>Uma característica importante de uma arquitetura cliente-servidor é que a comunicação entre cliente e servidor é sempre síncrona, ou seja, o cliente envia uma requisição e espera pela resposta do servidor. Isso não significa que o cliente ou o servidor não possam ser assíncronos internamente, ou que a requisição não possa iniciar um processo assíncrono no servidor, mas a comunicação é sempre síncrona.</p>
+
+<p>Isso levanta algumas discussões interessantes, pois podemos implementar nossos sistemas assincronamente, usando clientes assincronos, ou implmentar no servidor operações assíncronas que podem ser respondidas imediatamentes porém sem a operação ser finalizada.</p>
+
+<p>No primeiro caso, é necessário que o cliente seja assíncrono, isso significa que ao invés de bloquear a thread da aplicação enquanto a resposta não chega, o cliente envia a requisição com um callback associado, liberando a thread para que outra operação seja realizada.</p>
+
+<p>No segundo caso, o servidor não processa a requisição, mas adiciona ela a uma fila de execução respondendo com um identificador para verificar o estado da execução,</p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Entender a arquitetura Cliente-Servidor é um dos pilares fundamentais para se compreender o desafio de construir sistemas distribuídos. Sua simplicidade conceitual — baseada em requisições e respostas — facilita a implementação e o entendimento de sistemas complexos, porém adiciona desafios quando se trata de escalabilidade e disponibilidade.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o quinto post da série **Conversas sobre Arquitetura**. Nele, mergulhamos no estilo arquitetural fundamental para a web: a **arquitetura Cliente-Servidor**. Você vai entender como se define os papéis de cliente e servidor, como a comunicação entre eles funciona na prática e quais são as implicações dessa relação — desde protocolos de rede até o impacto na disponibilidade do sistema.]]></summary></entry><entry><title type="html">Padrões e Estilos Arquiteturais</title><link href="https://blog.vepo.dev/posts/padroes-e-estilos-arquiteturais" rel="alternate" type="text/html" title="Padrões e Estilos Arquiteturais" /><published>2025-11-05T00:00:00+00:00</published><updated>2025-11-05T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/08-33-00-padroes-e-estilos-arquiteturais</id><content type="html" xml:base="https://blog.vepo.dev/posts/padroes-e-estilos-arquiteturais"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/Ub-RUQ_aQ8Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Quando se fala de arquitetura, a primeira imagem que se vem a cabeça é a organização de um projeto. Se vamos usar uma Arquitetura Model-View-Controller (MVC) ou uma Arquitetura em Camadas ou até mesmo uma Arquitetura Hexagonal. Isso também é arquitetura, mas não é a única forma de se discutir arquitetura. Nessa seção quero discutir a diferença entre Estilos e Padrões Arquiteturais mostrando como eles podem ser usados.</p>
+
+<p>Primeiro precisamos definir o que são Estilos e Padrões. Padrões são os mais conhecidos, e <a href="/posts/uma-conversa-sobre-padroes">já falamos sobre eles</a>, mas agora não vamos falar de padrões que se aplicam localmente no código, mas não em uma classe ou arquivo em especifico e sim no projeto como um todo. Quando falamos de Padrões, já pensamos em um contexto e um problema. Logo quando vamos ler sobre MVC, Hexagonal ou Camadas, lembramos do contexto e do problema que eles tentam resolver. Vamos falar deles mais a frente e eles existem para resolver um problema em especifico. Já os Estilos Arquiteturais não tem o propósito de resolver um problema, mas são um conjunto de condicionantes escolhidas para se alcançar Atributos de Qualidades. É importante ressaltar que nem todo autor faz essa distinção entre padrão e estilo arquitetural, dessa forma você pode encontrar discussões sobre arquitetura que mistura esses conceito, mesmo eles sendo diferentes.</p>
+
+<p>Roy Fielding em sua tese de doutorado definie estilos arquiteturais como <strong>um conjunto coordenado de condicionantes que restringe as funções/características dos elementos e os relacionamentos permitidos entre esses elementos dentro de qualquer arquitetura que esteja em conformidade com esse estilo</strong>. Ou seja, ao contrário do padrão que define uma forma de se resolver um problema, o estilo é um conjunto de regras que definem como o sistema deve ser construído.</p>
+
+<p>Da mesma forma do padrão, o estilo também é um referencial para a construção de sistemas, mas ele não foca em resolver problemas mas em alcançar atributos de qualidade. Eles são qualitativamente diferentes dos padrões e não são mutuamente exclusivos. Mas eu costumo simplificar a discussão dizendo que um padrão arquitetural define como o seu componente será organizado internamente, enquanto o estilo define como o seu componente irá interagir com os outros componentes do sistema. Ou seja, quando eu falo de padrão estou pensando nas classes enquanto quando falo de estilo estou pensando em protocolos de comunicação, formatos de mensagens, etc. Mas a diferença primordia é que enquanto o padrão está tentando resolver um problema, o estilo arquitetural está procurando habilitar formas de interação entre os componentes.</p>
+
+<p>Nas próximas seções vou apresentar os diversos padrões e estilos que serão discutidos posteriormente. Mas por enquanto vamos discutir os elementos que compõe um estilo arquitetural e como podemos usar os estilos para compor arquiteturas.</p>
+
+<h2 id="abstrações-de-tempo-de-execução">Abstrações de Tempo de Execução</h2>
+
+<p>Para melhor caracterizarmos precisamos entender como caracterizar cada estilo arquitetural e para isso precisamos definir quais elementos básicos compõe um estilo arquitetural. Esses elementos são: componentes, conectores, dados, configurações e condicionantes (<em>constraints</em>).</p>
+
+<h3 id="componentes">Componentes</h3>
+
+<p>Os componentes são as unidades computacionais que possuem estado e comportamento. Em uma arquitetura, os componentes em execução em algum determinado momento. É importante não confundir com componentes de software. Componentes arquiteturais são importantes para se descrever o software em execução, mas em muitos casos, componentes de software como classes, módulos ou bibliotecas não são componentes arquiteturais relevantes. Um componente arquitetural sempre é uma instância de software em execução.</p>
+
+<h3 id="conectores">Conectores</h3>
+
+<p>Um conector é um mecanismo abstrato que media a comunicação, coordenação e cooperação entre os componentes. Eles definem como os componentes interagem entre si. Exemplos de conectores incluem chamadas de procedimento remoto (RPC), brokers de mensagens, APIs HTTP, entre outros.</p>
+
+<h3 id="dados">Dados</h3>
+
+<p>Dados são as informações trocadas entre os componentes através dos conectores. Eles podem ser caracterizados pelo seu formato de serialização, estrutura e semântica. Se considerarmos por exemplo uma arquitetura REST, as mensagem pode ser serviços JSON, XML, Protobuf, AVRO, etc. Mas cada mensagem pode ter uma estrutura diferente e a semântica depende da interface sendo invocada.</p>
+
+<h3 id="configurações">Configurações</h3>
+
+<p>Configurações definem as relações entre os componentes, conectores e dados em uma arquitetura.</p>
+
+<h3 id="condicionantes">Condicionantes</h3>
+
+<p>Condicionantes são o que propriamente definem um estilo arquitetural. Eles são um conjunto de regras que restringem como os componentes, conectores e dados podem ser organizados e interagir entre si. Essas restrições podem incluir regras sobre o número de componentes, tipos de conectores permitidos, formatos de dados suportados, entre outros.</p>
+
+<h2 id="padrões-arquiteturais">Padrões Arquiteturais</h2>
+
+<p>Como já falamos anteriormente, Padrões Arquiteturais são definidos com o objetivos de se resolver problemas especificos. Dessa forma faremos uma lista de alguns padrões disponíveis e uma brevíssima discussão. Esses padrões serão discutidos em outra oportunidade.</p>
+
+<ul>
+  <li>Model-View-Controller (MVC)</li>
+  <li>Arquitetura em Camadas</li>
+  <li>Arquitetura Hexagonal</li>
+  <li>Monolito Modular</li>
+  <li>Serverless</li>
+</ul>
+
+<h3 id="model-view-controller-mvc">Model-View-Controller (MVC)</h3>
+
+<p>O padrão <strong>Model-View-Controller</strong> (ou MVC) é normalmente usado para se construir interfaces gráficas. Ela se baseia na separação de responsabilidades entre Modelo, Interface e Controlador. A ideia é evitar que o software seja contaminado pela lógica da interface dificultando a reutilização do mesmo.</p>
+
+<p>Dessa forma, três tipos de componentes devem ser construído:</p>
+
+<ol>
+  <li><strong>Modelo</strong>: define a lógica de negócios da aplicação;</li>
+  <li><strong>View</strong>: lida com o layout e a exibição dos dados;</li>
+  <li><strong>Controlador</strong>: interage com a view para implementar a lógica da interface usando a lógica da aplicação.</li>
+</ol>
+
+<p>O Modelo não deve ser contaminado pela linguagem da interface e deve prover uma interface que possa ser usada em diversas interfaces. Já o controlador pode se contaminar com a lógica da interface, visto que ele naturalmente depende da interface.</p>
+
+<h3 id="arquitetura-em-camadas">Arquitetura em Camadas</h3>
+
+<p>A Arquitetura em Camadas também observa a lógica da divisão de responsabilidades, mas voltada para aplicações web. Uma arquitetura em camada prevê que chamadas são sempre executadas das camadas mais elevadas para as camadas mais baixas e que uma camada só pode chamar a camada imediatamente inferior.</p>
+
+<p>Uma arquitetura em camadas normalmente se utiliza de três camadas: Apresentação, Negócios e Persistência.</p>
+
+<p>A <strong>Camada de Apresentação</strong> é responsável por interagir com a interface gráfica ou com a interface de comunicação, ou seja, um framework web. A responsabilidade dela é criar uma fronteira de separação entre os frameworks utilizados e o código da aplicação. Como esse padrão foi definido antes da popularização da separação de responsabilidades entre back-end e front-end, ela é hoje normalmente adaptada para APIs REST.</p>
+
+<p>Hoje é difícil compreender a utilidade dela, visto que os frameworks web modernos acabaram por absorver grande parte dessa responsabilidadfe.</p>
+
+<p>A <strong>Camada de Negócios</strong> visa implementar a lógica de negócios da aplicação sem depender do framework web e do ORM utilizado.</p>
+
+<p>Já a <strong>Camada de Persistência</strong> visa fazer a conexão entre a base de dados, ou o mecanismo de armazenamento de dados e a camada de negócios. Hoje ela é bem reduzida, pois os frameworks facilitaram a implementação da mesma. Hoje é possível implementar a camada de persistência com apenas algumas interfaces.</p>
+
+<h3 id="arquitetura-hexagonal">Arquitetura Hexagonal</h3>
+
+<p>Arquitetura Hexagonal foi <a href="https://alistair.cockburn.us/hexagonal-architecture">proposta em em 2005 por Alistair Cockburn como uma forma de facilitar os testes de aplicações que dependem de outros sistemas</a>. O padrão define o conceito de Portas e Adaptadores. Um adaptador é uma interface da qual o sistema implementa e depende. O código de negócio da aplicação deve interagir somente através do adaptador. Uma porta é uma implementação do adaptador que pode ser trocado dependendo do propósito.</p>
+
+<p>É importante ressaltar que esse estilo foi proposto em uma época que os frameworks não eram implementados para facilitar a criação de testes automatizados, dessa forma o padrão previa que em tempo de execução fosse utilizado o componente real e nos testes unitários fossem usados outros adaptadores que não dependessem dos componentes externos.</p>
+
+<h3 id="monolito-modular">Monolito Modular</h3>
+
+<p>Uma aplicação organizada como um Monolito Modular é organizada pelos domínios de negócios da aplicação. O objetivo de se desenvolver uma aplicação como monolito modular é isolar dominínios e reduzir a sobreposição de dominios.</p>
+
+<h3 id="serverless">Serverless</h3>
+
+<p>Serverless é um estilo de deployment em que a máquina física não está disponível o tempo inteiro. Ela pode ser compartilhada com outros serviços ou mesmo alocada de acordo com a necessidade.</p>
+
+<h2 id="estilos-arquiteturais">Estilos Arquiteturais</h2>
+
+<p>Diferentemente dos Padrões arquiteturais, os Estilos não se propõe a resolver um problema, mas a atingir atributos de qualidade.</p>
+
+<ul>
+  <li>Client-Server</li>
+  <li>Event-Driven Architecture (EDA)</li>
+  <li>GraphQL</li>
+  <li>Message Queueing</li>
+  <li>Publish-Subscribe (Pub/Sub)</li>
+  <li>Microservices</li>
+  <li>Remote Procedurel Call (RPC)</li>
+  <li>Representational State Transfer (REST)</li>
+  <li>Service-Oriented Architecture (SOA)</li>
+  <li>Data Stream Processing</li>
+  <li>Microkernel</li>
+</ul>
+
+<h3 id="client-server">Client-Server</h3>
+
+<p>Uma aplicação organizada como Cliente/Servidor pela separação de responsabilidades. Um servidor está sempre disponível para responder requisições elaboradas pelo cliente. O cliente utiliza o servidor que possui estado interno.</p>
+
+<h3 id="event-driven-architecture">Event-Driven Architecture</h3>
+
+<p>Em uma arquitetura baseada em eventos, os sistemas se comunicam através da emissão eventos em canais de comunicação, ou brokers de mensagens.</p>
+
+<h3 id="graphql">GraphQL</h3>
+
+<p>GraphQL é um tipo especial de servidor em que o formato do dado requerido é defindo pelo cliente. O cliente elabora uma requisição e o servidor elabora a mensagem, incluindo a estrutura dela, baseado na requisição do cliente.</p>
+
+<h3 id="message-queueing">Message Queueing</h3>
+
+<p>Enfileiramento de mensagens é um tipo comunicação via mensagens em que cada mensagem é consumida apenas uma vez. Ao ser consumida, a mensagem é removida da fila quando confirmada pelo serviço. A responsabilidade do canal de comunicação é entregar a mensagem para ser consumida.</p>
+
+<h3 id="publish-subscribe-pubsub">Publish-Subscribe (Pub/Sub)</h3>
+
+<p>Publish-Subscribe é um tipo de comunicação via mensagens em que cada mensagem pertence ao canal de comunicação. O serviço que publica mensagens não espera por respostas e a mensagem é persistida no canal de comunicação sendo possível de ser consumida por mais de um serviço independentemente.</p>
+
+<h3 id="microservices">Microservices</h3>
+
+<p>Microsserviços é uma forma de implementação de sistemas distribuídos em que cada serviço pode ser entregue de forma independentemente e eles dependem apenas de uma interface de comunicação externa. A principal caracteristica dos microsserviços, segundo Sam Newman, é que eles são entregues independentemente.</p>
+
+<h3 id="remote-procedurel-call-rpc">Remote Procedurel Call (RPC)</h3>
+
+<p><strong>Remote Procedurel Call</strong> (RPC) é uma forma de implementações de interfaces que homogeniza a comunicação abstraindo o protocolo de comunicação. Todo framework RPC implementa uma linguagem definidora de interface e gera código para clientes e servidores baseados nessa linguagem. O desenvolvedor já interagem com o cliente ou o servidor gerado pelo framework, não se preocupando com as implementações dos protocolos, apenas com as interfaces de código. É importante ressaltar que um framework RPC não busca abstrair a ausência da comunicação em rede, mas a complexidade da implementação dos protocolos envolvidos na comunicação em rede.</p>
+
+<h3 id="representational-state-transfer-rest">Representational State Transfer (REST)</h3>
+
+<p>REST é um estilo de composição de APIs HTTP focado na definição de recuros e na exposição de operações dos recursos usando nativamente o protocolo HTTP. O estilo REST usará praticamente todos os elementos do protocolo HTTP na composição do serviço, mas toda a modelagem da API é centrada na definição da entidade e nas operações expostas pela API.</p>
+
+<h3 id="service-oriented-architecture-soa">Service-Oriented Architecture (SOA)</h3>
+
+<p>Um <strong>Service-Oriented Architecture</strong> é uma arquitetura modular orientada por divisões de domínios do negócio. Um serviço representa um funçõa especifica de domínio. Em muitos casos uma arquitetura SOA pode se parecer com uma arquitetura de microsserviços, mas elas terão granularidade e formas de se integrar diferentes.</p>
+
+<h3 id="data-stream-processing">Data Stream Processing</h3>
+
+<p>Um sistema Data Stream Processing se baseia no consumo e produção de eventos. Ele dependerá de um broker de mensagens e as mensagens são recebidas, consumidas e produzidas com a mínima latência possível.</p>
+
+<h3 id="microkernel">Microkernel</h3>
+
+<p>Uma Arquitetura de Microkernel é desenvolvida para facilitar a extensão através da composição usando plugins. Em uma aplicação usando microkernel, a aplicação implementa o kernel, que é o motor central da aplicação e provê um mecanismo de registro de plugins. A aplicação, e possívelmente os plugins, podem registrar e consultar o registro de plugins para executar processos de negócios.</p>
+
+<h2 id="composição-arquitetural">Composição Arquitetural</h2>
+
+<p>É importante notar que uma arquitura pode ser composta tanto por estilo como por padrões. Estilos vão ter um impacto maior em toda a arquitetura escolhida, enquanto padrões terão um impacto menor, sendo, em alguns casos, limitados a um serviço em questão. Em ambos os casos, estilos e padrões podem ser compostos entre si. Uma arquitetura não precisa ser de um estilo puro, podemos fazer composição, como por exemplo implementar um serviço que tanto usa REST quando comunicação via eventos.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o quarto post da série **Conversas sobre Arquitetura**. Nele, exploramos a diferença entre padrões e estilos arquiteturais, mostrando como cada um se aplica na construção de sistemas. Enquanto os padrões, como MVC e Hexagonal, focam em resolver problemas específicos de organização interna, os estilos, como REST e Event-Driven, definem como os componentes interagem entre si para alcançar atributos de qualidade. Descubra como combinar essas abordagens pode resultar em soluções mais flexíveis, testáveis e alinhadas aos objetivos do negócio.]]></summary></entry><entry><title type="html">O Papel da Arquitetura de Software</title><link href="https://blog.vepo.dev/posts/o-papel-da-arquitetura" rel="alternate" type="text/html" title="O Papel da Arquitetura de Software" /><published>2025-10-02T00:00:00+00:00</published><updated>2025-10-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/07-44-00-o-papel-da-arquitetura</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-papel-da-arquitetura"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/uVIMee-yIaI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>A Arquitetura de Software é uma disciplina que se relaciona com diversos contexto. Podemos afirmar que uma pessoa atuando como arquiteto de software atua em pelo menos quatro contextos diferentes:</p>
+<ol>
+  <li>Técnico: <em>como o sistema é construído?</em></li>
+  <li>Estratégico: <em>qual o impacto do sistema no negócio?</em></li>
+  <li>Pessoal: <em>como o arquiteto lida com as diferentes pessoas envolvidas no projeto?</em></li>
+  <li>Cultural: <em>como a cultura da organização impacta o desenvolvimento do sistema?</em></li>
+</ol>
+
+<p>É importante ressaltar que estamos falando do papel do arquiteto de software que pode ser desempenhado por diferentes pessoas em diferentes momentos de um projeto. Em equipes pequenas, o papel do arquiteto pode ser desempenhado por um desenvolvedor sênior ou líder técnico. Em equipes maiores, pode haver um arquiteto dedicado ou uma equipe de arquitetos. Em alguns casos, o papel do arquiteto pode ser desempenhado por um gerente de projeto ou um gerente de produto.</p>
+
+<h2 id="arquitetura-no-contexto-técnico">Arquitetura no contexto Técnico</h2>
+
+<p>É comum as pessoas associarem arquitetura de software a atividade de escolher tecnologias, frameworks e ferramentas. Embora essas atividades façam realmente parte do trabalho do arquiteto, elas são pautadas pela atuação de outros contextos. Todos os contextos se influenciam mutuamente e um arquiteto deve ser capaz de navegar por todos eles. Dessa forma, como veremos, o contexto técnico não é uma mera questão de escolhas técnicas, as vezes uma escolha técnica pode ser decidida por questões estratégicas, pessoais ou culturais.</p>
+
+<h3 id="1-arquitetura-inibe-ou-habilita-o-alcance-de-atributos-de-qualidade">1. Arquitetura inibe ou habilita o alcance de Atributos de Qualidade</h3>
+
+<p>A primeira responsabilidade de um arquiteto de software é definir os atributos de qualidade e garantir que os mesmos sejam alcançados. Um atributo de qualidade é uma característica do sistema que é importante para os stakeholders, falaremos mais sobre stakeholders dentro do contexto pessoal.</p>
+
+<p><strong>Atributo de Qualidade</strong> é uma propriedade testável e mensurável de um sistema que é usada para avaliar como o sistema satisfaz as necessidades dos stakeholders.</p>
+
+<p>Podemos definir os requisitos dos sistema como Funcionalidades, Atributos de Qualidade e Condicionantes (<em>Constraints</em>). Em muitas situações, o arquiteto não tem influência sobre as funcionalidades do sistema, mas é de sua responsabilidade garantir que os atributos de qualidade sejam alcançados e para isso deve ser capaz de tomar decisões que impactam os escolhas técnicas do sistema para que esses atributos sejam mensuráveis e testáveis.</p>
+
+<p>Alguns exemplos de atributos de qualidade são:</p>
+<ul>
+  <li><strong>Disponibilidade</strong>: O sistema está disponível para uso quando necessário?</li>
+  <li><strong>Escalabilidade</strong>: O sistema pode lidar com um aumento na carga de trabalho?</li>
+  <li><strong>Elasticidade</strong>: O sistema pode alocar mais recursos conforme a demanda aumenta?</li>
+  <li><strong>Interoperabilidade</strong>: O sistema pode interagir com outros sistemas?</li>
+  <li><strong>Modificabilidade</strong>: O sistema pode ser modificado facilmente para atender a novas necessidades?</li>
+  <li><strong>Manutenibilidade</strong>: O sistema pode ser mantido e atualizado com facilidade?</li>
+  <li><strong>Desempenho</strong>: O sistema usa eficientemente os recursos disponíveis?</li>
+  <li><strong>Segurança</strong>: O sistema é vulnerável a ataques e protege os dados contra acessos não autorizados?</li>
+  <li><strong>Testabilidade</strong>: O sistema pode ser testado facilmente para garantir que funciona conforme o esperado?</li>
+  <li><strong>Usabilidade</strong>: O sistema é fácil de usar e entender?</li>
+  <li><strong>Confiabilidade</strong>: O sistema funciona de maneira consistente e previsível?</li>
+</ul>
+
+<p>Os atributos de qualidade não são definidos pelo arquiteto, mas são requisitos dos stakeholders que o arquiteto deve garantir que sejam alcançados. Sistemas são criados para garantir os objetivos de negócios de instituições, organizações ou empresas, e esses objetivos definem os atributos de qualidade que o sistema deve assegurar. Alguns desses atributos podem ter grande influência nas decisões técnicas dos sistemas.</p>
+
+<p>Outro fator importante é que atributos de qualidades não são independentes, ou seja, um atributo pode impactar outro. Por exemplo, aumentar disponibilidade pode impactar negativamente a manutenibilidade. A interoperabilidade pode impactar a segurança. O arquiteto deve estar ciente dessas interações e ser capaz de tomar decisões que equilibram os diferentes atributos de qualidade.</p>
+
+<h3 id="2-arquitetura-e-o-ambiente-técnico">2. Arquitetura e o Ambiente Técnico</h3>
+
+<p>O ambiente técnico (<em>technical environment</em>) influência diretamente as decisões arquiteturais. Para entender melhor é preciso primeiro definir o que é o ambiente técnico. Segundo o livro <em>Software Architecture in Practice</em> (Len Bass, Paul Clements, Rick Kazman), o ambiente técnico inclui padrões da industria ou técnicas de engenharia de software dominantes quando o sistema está sendo desenvolvido.</p>
+
+<p>Hoje todo mundo fala de nuvem, microsserviços, containers, DevOps, etc. Mas há 20 anos atrás nenhum desses nomes existia e por isso um sistema desenvolvido naquela época não poderia usar essas tecnologias. Da mesma forma, daqui a 20 anos, novas tecnologias e práticas surgirão e elas terão grande influência nas decisões arquiteturais dos sistemas que serão desenvolvidos naquele momento.</p>
+
+<p>Isso significa que um arquiteto deve estar ciente das tendências tecnológicas e das práticas de engenharia de software para que saiba utiliza-las em seus projetos. Isso não significa ter um conhecimento pleno das mesmas ou muito menos se deixar vender pelo “papo de vendedor”. O arquiteto deve ter um apurado senso crítico e ser capaz de realizar provas de conceito (<em>proof of concept</em>) para validar se uma tecnologia ou prática é adequada para o sistema que está sendo desenvolvido.</p>
+
+<p>Eu sempre recomendo que o arquiteto deve acompanhar conferências, ler livros bons técnicos, relatórios de mercado (como o <a href="https://www.thoughtworks.com/pt-br/radar">Radar da Thoughtworks</a> ou <a href="https://www.infoq.com/infoq-trends-report/">InfoQ Trends Report</a>) e participar de comunidades técnicas.</p>
+
+<h3 id="3-trade-offs-e-decisões-arquiteturais">3. Trade-offs e Decisões Arquiteturais</h3>
+
+<p>Arquitetura de software é sobre tomar decisões. Essas decisões são tomadas para garantir os atributos de qualidade do sistema e para isso o arquiteto deve estar ciente das consequências dessas decisões. Essas consequências são chamadas de <em>trade-offs</em>. O <a href="https://www.sei.cmu.edu/documents/629/2000_005_001_13706.pdf"><strong>Architecture Tradeoff Analysis Method</strong> (ATAM)</a> surge como uma abordagem sistemática para avaliar essas compensações, ajudando arquitetos a tomar decisões conscientes e fundamentadas.</p>
+
+<p>Desenvolvido pela <strong>Software Engineering Institute</strong> (SEI), o ATAM baseia-se na premissa de que não existem soluções arquiteturais perfeitas, apenas soluções adequadas para contextos específicos. O método fornece um framework para:</p>
+
+<ul>
+  <li><strong>Identificar pontos de sensibilidade</strong>: Elementos arquiteturais críticos para atingir atributos de qualidade específicos</li>
+  <li><strong>Reconhecer trade-offs</strong>: Decisões que beneficiam um atributo em detrimento de outro</li>
+  <li><strong>Detectar riscos</strong>: Escolhas que podem comprometer o sucesso do sistema</li>
+</ul>
+
+<p>O ATAM envolve várias etapas estruturadas para garantir uma análise abrangente da arquitetura:</p>
+<ul>
+  <li><strong>Etapa 1</strong> - Coletar Cenários: o que o sistema DEVE fazer?</li>
+  <li><strong>Etapa 2</strong> - Coletar Requisitos/Restrições/Ambiente: quais condicões o sistema deve satisfazer?</li>
+  <li><strong>Etapa 3</strong> - Descrever Visões Arquitetônicas: criar visualizações/descrições dos sistemas. Descrever as restrições, ambientes e requisitos.</li>
+  <li><strong>Etapa 4</strong> - Análises Específicas de Atributos: avaliar como cada atributo de qualidade isoladamente é impactado ela arquitetura atual.</li>
+  <li><strong>Etapa 5</strong> - Identificar Sensibilidades: identificar a sensibilidade de cada atributo de acordo com variações na arquitetura. Quais são os pontos sensíveis?</li>
+  <li><strong>Etapa 6</strong> - Identificar Trade-off: os pontos sensíveis vão levar a identificar os trade-offs da aplicação.</li>
+</ul>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-05-atam-steps.png" alt="Etapas do ATAM" /></p>
+
+<p>No entanto, o arquiteto não precisa seguir o processo do ATAM à risca. É importante entender o conceito de trade-offs e adaptar o processo para o contexto do projeto. O mais importante é que o arquiteto seja capaz de realizar análise e fazer decisões conscientes.</p>
+
+<h2 id="arquitetura-no-contexto-estratégico">Arquitetura no contexto Estratégico</h2>
+
+<h3 id="1-documentando-e-comunicando-a-arquitetura">1. Documentando e Comunicando a Arquitetura</h3>
+
+<p>Documentar e comunicar a arquitetura é função primordial de alguém responsável pela arquitetura. É essencial que todos os <em>stakeholders</em> envolvidos no projeto compreendam não apenas a arquitetura definida, mas também as suas implicações técnicas e de negócio.</p>
+
+<p>A documentação não é um fim em si mesma, mas um meio de comunicação adaptado ao perfil de cada stakeholder. Por exemplo:</p>
+<ul>
+  <li>Desenvolvedores precisam entender a arquitetura para implementar componentes de forma alinhada com as decisões técnicas e restrições estabelecidas.</li>
+  <li>Clientes devem compreender como a arquitetura suporta o funcionamento do sistema e entrega valor ao negócio.</li>
+  <li>Equipes de suporte e operações necessitam de conhecimento arquitetural para monitorar, manter e ajustar o sistema de forma eficiente.</li>
+</ul>
+
+<p>Dessa forma, a documentação atua como um veículo de transparência, alinhamento e governança, assegurando que todas as partes envolvidas compartilhem uma visão comum e atuem de maneira coordenada.</p>
+
+<h3 id="2-analisando-ou-avaliando-a-arquitetura">2. Analisando ou Avaliando a Arquitetura</h3>
+
+<p>A avaliação da arquitetura é um processo sistemático para verificar se a arquitetura proposta atende aos requisitos dos <em>stakeholders</em>, especialmente os atributos de qualidade. Len Bass destaca a importância de métodos como o ATAM (<em>Architecture Tradeoff Analysis Method</em>) para essa finalidade. Já Fred Brooks avaliar que a integridade conceitual é uma das propriedades chaves de um sistema sólido, e isso só pode ser alcançado se existem escolhas arquiteturais claras.</p>
+
+<h2 id="arquitetura-no-contexto-pessoal">Arquitetura no contexto Pessoal</h2>
+
+<h3 id="1-quem-são-os-stakeholders">1. Quem são os <em>Stakeholders</em>?</h3>
+
+<p><em>Stakeholders</em> são todos os indivíduos, grupos ou organizações que têm interesse no sistema, sejam eles usuários finais, desenvolvedores, gerentes, equipe de operações, clientes ou patrocinadores. Eles são fontes essenciais para a definição de requisitos funcionais, atributos de qualidade e restrições do sistema. O arquiteto deve identificar, envolver e gerenciar as expectativas dos <em>stakeholders</em>, garantindo que a arquitetura atenda às suas necessidades e prioridades.</p>
+
+<h3 id="2-administrando-expectativas">2. Administrando expectativas</h3>
+
+<p>Um sistema possui inúmeros <em>stakeholders</em> e cada um dele pode influencer no design do software. Cabe a pessoa responsável pela arquitetura administrar as expectativas de cada <em>stakeholder</em> envolvido e fazer uma escolha de atributos de qualidade que maximize a satisfação das pessoas envolvidas. Sempre costumo lembrar dos antigos frameworks Java EE que priorizavam a personalização e o desempenho ao invês da experiência de usuário e foram facilmente substituído por frameworks que eram mais amigáveis e de certa forma eram menos eficientes.</p>
+
+<h3 id="3-arquitetura-e-as-hypes">3. Arquitetura e as hypes</h3>
+
+<p>O mercado de desenvolvimento de software é constantemente abalado por modas que chegam prometendo mudar a forma como desenvolvemos software. Mas para quem já é macaco velho, sabemos que a forma como se desenvolve software muda lentamente. E mesmo que mude, antigos sistemas continuam ativos e eficientes. Legado é uma das grandes forças do desenvolvimento de software.</p>
+
+<p>O arquiteto deve ser capaz de compreender as hypes e saber avaliar como uma tecnologia pdoe impactar o negócios. Ela é madura o suficiente para ser abraçada? Ela terá sobrevida no mercado?</p>
+
+<p>Para entender como os ciclos das modas funcionam, o <a href="https://www.gartner.com/en/research/methodologies/gartner-hype-cycle">Gartner</a> tem uma metodologia chamada <em>Hype Cycle</em> (ou ciclo da moda em tradução livre) que avalia e emite relatórios sobre as tecnologias. Cada ciclo de hype consiste em cinco fases principais do ciclo de vida de uma tecnologia.:</p>
+
+<ol>
+  <li><strong>Gatilho tecnológico</strong> (<em>Technology trigger</em>): Um potencial avanço tecnológico dá o pontapé inicial. Histórias iniciais de prova de conceito e interesse da mídia geram publicidade significativa. Muitas vezes, não existem produtos utilizáveis ​​e a viabilidade comercial não é comprovada.</li>
+  <li><strong>Pico de expectativas infladas</strong> (<em>Peak of inflated expectations</em>): A publicidade inicial produz uma série de histórias de sucesso — frequentemente acompanhadas por dezenas de fracassos. Algumas empresas agem; a maioria, não.</li>
+  <li><strong>Poço da desilusão</strong> (<em>Trough of disillusionment</em>): O interesse diminui à medida que experimentos e implementações falham. Os produtores da tecnologia se desfazem ou fracassam. O investimento só continua se os fornecedores sobreviventes melhorarem seus produtos para a satisfação dos primeiros usuários.</li>
+  <li><strong>Declive da iluminação</strong> (<em>Slope of enlightenment</em>): Mais exemplos dos benefícios da tecnologia começam a se cristalizar e se tornarem mais amplamente compreendidos. Produtos de segunda e terceira gerações surgem de fornecedores de tecnologia. Mais empresas financiam pilotos; empresas conservadoras permanecem cautelosas.</li>
+  <li><strong>Platô da produtividade</strong> (<em>Plateau of productivity</em>): A adoção em massa começa a decolar. Os critérios para avaliar a viabilidade do provedor estão mais claramente definidos. A ampla aplicabilidade e relevância da tecnologia no mercado estão claramente dando resultados. Se a tecnologia tiver mais do que um nicho de mercado, ela continuará a crescer.</li>
+</ol>
+
+<p>Esse ciclo pode ser descrito como um gráfico de expectativa no tempo.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-06-gartner-hype-cycle.png" alt="Gráfico de expectativa no tempo. Inicia com uma curva ascendente que tem um pico e uma queda até chegar ao inicio da curva. Depois cresce lentamente até chegar no platô da produtividade." /></p>
+
+<h2 id="arquitetura-no-contexto-cultural">Arquitetura no contexto Cultural</h2>
+
+<h3 id="1-arquitetura-e-o-ciclo-de-vida-de-um-projeto-de-software">1. Arquitetura e o Ciclo de Vida de um Projeto de Software</h3>
+
+<p>Arquitetura de software está intrisecamente ligada ao ciclo de vida de um projeto de software. Decisões arquiteturais são tomadas em diferentes momentos e o tempo de vida de um projeto pode impactar a arquitetura pois os requisitos de negócios do sistema podem mudar ao longo do tempo.</p>
+
+<p>Projetos de software podem ser gerenciados sob diferentes metodologias. Eu gosto de classificar essa metodologias através de dois grandes eixos: o eixo de <strong>Planejamento</strong> e o eixo de <strong>Agilidade</strong>.</p>
+
+<!-- https://excalidraw.com/#json=urWtlpjtSc7AUNJi4cClH,Gu77f3wAJ8gExwQwXTfzMw -->
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-04-metodologias-de-desenvolvimento.png" alt="Metodologias classificadas nos eixos de Planejamento e Interatividade" /></p>
+
+<p>É importante não confundir Agilidade, Metodologias Ágeis e Manifesto Ágil. Agilidade é a capacidade de se adaptar rapidamente às mudanças. Metodologias Ágeis são aquelas que foram propostas como uma resposta ao Manifesto Ágil e muitas vezes evoluiram, ou são aplicadas, sem nenhum grau de agilidade. Já o Manifesto Ágil é um conjunto de valores e princípios que foram propostas por um grupo de desenvolvedores de software em 2001 como uma respostas às metodologias tradicionais de desenvolvimento de software.</p>
+
+<p>Todo desenvolvedor deve conhecer ao menos a metodologia que está sendo aplicada no seu projeto e compreender o ciclo de vida do projeto. É importante lembrar que um software só é útil se ele funciona e entrega valor para o negócio, ou seja, somente software em produção é software que entrega valor. E o arquiteto deve também encontrar seu lugar dentro dos processos para que o desenvolvimento não seja interrompido por decisões arquiteturais que não foram tomadas a tempo.</p>
+
+<p>Um dos Anti-Padrões em arquitetura é o <a href="https://agilemodeling.com/essays/bmuf.htm"><strong>Big Design Up Front (BDUF)</strong></a>, que é quando o arquiteto tenta definir toda a arquitetura do sistema antes do desenvolvimento começar. Isso pode levar a atrasos no início do desenvolvimento e pode resultar em uma arquitetura que não atende às necessidades reais do sistema, pois os requisitos podem mudar durante o desenvolvimento. Simon Brown sugere fazer o <a href="https://www.infoq.com/news/2014/05/minimal-architecture-design/">apenas design suficiente para começar o desenvolvimento</a>.</p>
+
+<h3 id="2-arquitetura-e-os-objetivos-de-negócio">2. Arquitetura e os Objetivos de Negócio</h3>
+
+<p>Arquitetura também impacta e é influenciada pelos objetivos de negócios de uma organização. Cada software ou projeto pode ser pensado como um <strong>caso de negócio</strong>, que é, brevemente, uma justificativa para um investimento organizacional. Isso significa que a arquitetura também tem Qualidades de negócios como:</p>
+
+<ul>
+  <li><strong>Time to Market</strong>: O tempo que leva entre pensar uma ideia e testar ela no mercado é essencial para a validação de uma ideia e a arquitetura pode minimizar esse tempo. A escolha dos processos de desenvolvimento, de requisitos de qualidades ou até mesmo a escolha de ferramenas pode influenciar no tempo de entrega do sistema.</li>
+  <li><strong>Custo/Benefício</strong>: A arquitetura deve equilibrar o custo de desenvolvimento e manutenção com o valor gerado para o negócio. Decisões arquiteturais podem otimizar recursos, reduzir desperdícios e maximizar o retorno sobre o investimento</li>
+  <li><strong>Longevidade</strong>: A capacidade do sistema de permanecer relevante e sustentável ao longo do tempo. Uma arquitetura bem fundamentada permite evolução e adaptação a mudanças tecnológicas e de negócio, estendendo o ciclo de vida do software.</li>
+  <li><strong>Público-Alvo</strong>: A arquitetura deve considerar as características e necessidades dos usuários finais, influenciando atributos como usabilidade, desempenho e acessibilidade para garantir a adoção e satisfação do público.</li>
+  <li><strong>Cronograma</strong>: Decisões arquiteturais impactam diretamente a viabilidade e o cumprimento dos prazos do projeto. Uma arquitetura muito complexa pode atrasar o desenvolvimento, enquanto uma arquitetura bem planejada facilita a parallelização de tarefas e a entrega incremental.</li>
+  <li><strong>Interoperabilidade</strong>: A capacidade do sistema de se integrar com outros sistemas existentes ou futuros na organização. Isso afeta diretamente a eficiência operacional e a capacidade de expandir funcionalidades sem rupturas.</li>
+</ul>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>A Arquitetura de Software revela-se, portanto, como uma disciplina multifacetada e estratégica, cujo papel transcende em muito a simples escolha de tecnologias. Como vimos, o arquiteto atua na interseção de quatro contextos fundamentais — técnico, estratégico, pessoal e cultural — e deve equilibrar constantemente as demandas de cada um deles.</p>
+
+<p>No âmbito <strong>técnico</strong>, a arquitetura é responsável por habilitar os atributos de qualidade do sistema, tomando decisões conscientes em um ambiente tecnológico em constante evolução e gerenciando os inevitáveis <em>trade-offs</em> entre diferentes requisitos não funcionais.</p>
+
+<p>No contexto <strong>estratégico</strong>, a arquitetura serve como ponte entre os objetivos de negócio e a realização técnica, exigindo uma comunicação clara e transparente com todos os <em>stakeholders</em> e uma avaliação contínua de suas decisões.</p>
+
+<p>No plano <strong>pessoal</strong>, o arquiteto atua como um facilitador e mediador, administrando expectativas, identificando necessidades e garantindo que a visão do sistema seja compartilhada e compreendida por todos os envolvidos.</p>
+
+<p>E, por fim, no contexto <strong>cultural</strong>, a arquitetura é moldada e, ao mesmo tempo, molda a organização — adaptando-se a metodologias, ciclos de vida e, principalmente, aos objetivos de negócio de longo prazo.</p>
+
+<p>Mais do que um planejador técnico, o arquiteto é um facilitador de valor, um estrategista e um agente de mudança. Sua atuação consciente e contextualizada é essencial para construir sistemas não apenas funcionais, mas também resilientes, adaptáveis e alinhados com o propósito do negócio que sustentam. A arquitetura, quando bem compreendida e praticada, deixa de ser um fim em si mesma e se torna um meio poderoso para a entrega de software com impacto real e duradouro.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o terceiro post da série **Conversas sobre Arquitetura**. A arquitetura de software vai muito além da tecnologia. Descubra como ela conecta aspectos técnicos, estratégicos, humanos e culturais para criar sistemas que realmente entregam valor de negócio, equilibrando decisões que vão desde a garantia de atributos de qualidade até a administração de expectativas de stakeholders em um ambiente em constante mudança.]]></summary></entry><entry><title type="html">Uma conversa sobre Padrões de Projeto</title><link href="https://blog.vepo.dev/posts/uma-conversa-sobre-padroes" rel="alternate" type="text/html" title="Uma conversa sobre Padrões de Projeto" /><published>2025-09-22T00:00:00+00:00</published><updated>2025-09-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/08-28-00-uma-conversa-sobre-padroes</id><content type="html" xml:base="https://blog.vepo.dev/posts/uma-conversa-sobre-padroes"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/6snGJFaj0ig" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Quando tentamos definir arquitetura de software não podemos fugir de discutir o conceito de padrões de projeto. No fundo, o papel de um arquiteto é encontrar dentro de um conjunto de padrões, a solução que melhor se adequa aos requisitos de negócio que o sistema que está sendo arquitetado precisa atender.</p>
+
+<p>Padrões de Projetos não surgiram com o livro de 1995 de Erich Gamma, Richard Helm, Ralph Johnson e John Vlissides, mais conhecidos como a Gang of Four (GoF). O conceito de padrões de projeto foi inicialmente discutido por Christopher Alexander no livro <strong>A Pattern Language: Towns, Buildings, Construction</strong> em 1977. Alexander foi um arquiteto e urbanista que propôs que existem soluções recorrentes para problemas recorrentes na arquitetura e no design urbano. Ele sugeriu que essas soluções poderiam ser documentadas como “padrões” que poderiam ser reutilizados em diferentes contextos.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-02-padroes.png" alt="Christopher Alexander" /></p>
+
+<p>Isso é dito no proprio livro <strong>Design Patterns: Elements of Reusable Object-Oriented Software</strong>. Abaixo, reproduzo um trecho do prefácio do livro:</p>
+
+<blockquote>
+  <p>Christopher Alexander afirma: “<em>Cada padrão descreve um problema que ocorre repetidamente em nosso ambiente e, em seguida, descreve o cerne da solução para esse problema, de tal forma que você pode usar essa solução um milhão de vezes, sem nunca fazer da mesma maneira duas vezes</em>”. Embora Alexander estivesse falando sobre padrões em edifícios e cidades, o que ele diz é verdade sobre padrões de projeto orientados a objetos. Nossas soluções são expressas em termos de objetos e interfaces em vez de paredes e portas, mas no cerne de ambos os tipos de padrões está uma solução para um problema em um contexto.</p>
+
+  <p>Em geral, um padrão possui quatro elementos essenciais:</p>
+  <ol>
+    <li>O <strong>nome do padrão</strong> é um identificador que podemos usar para descrever um problema de projeto, suas soluções e consequências em uma ou duas palavras. Nomear um padrão aumenta imediatamente nosso vocabulário de projeto. Isso nos permite projetar em um nível mais alto de abstração. Ter um vocabulário para padrões nos permite falar sobre eles com nossos colegas, em nossa documentação e até mesmo conosco mesmos. Isso torna mais fácil pensar sobre projetos e comunicá-los, juntamente com suas compensações, a outros. Encontrar bons nomes tem sido uma das partes mais difíceis do desenvolvimento do nosso catálogo.</li>
+    <li>O <strong>problema</strong> descreve quando aplicar o padrão. Ele explica o problema e seu contexto. Pode descrever problemas específicos de design, como representar algoritmos como objetos. Pode descrever estruturas de classes ou objetos que são sintomáticas de um design inflexível. Às vezes, o problema inclui uma lista de condições que devem ser atendidas antes que faça sentido aplicar o padrão.</li>
+    <li>A <strong>solução</strong> descreve os elementos que compõem o design, seus relacionamentos, responsabilidades e colaborações. A solução não descreve um design ou implementação concreto específico, porque um padrão é como um modelo que pode ser aplicado em muitas situações diferentes. Em vez disso, o padrão fornece uma descrição abstrata de um problema de design e como um arranjo geral de elementos (classes e objetos, no nosso caso) o resolve.</li>
+    <li>As <strong>consequências</strong> são os resultados e as compensações da aplicação do padrão. Embora as consequências muitas vezes não sejam mencionadas quando descrevemos decisões de design, elas são cruciais para avaliar alternativas de design e para entender os custos e benefícios da aplicação do padrão. As consequências para o software frequentemente envolvem compensações de espaço e tempo. Elas também podem abordar questões de linguagem e implementação. Como a reutilização costuma ser um fator no design orientado a objetos, as consequências de um padrão incluem seu impacto na flexibilidade, extensibilidade ou portabilidade de um sistema. Listar essas consequências explicitamente ajuda a entendê-las e avaliá-las.</li>
+  </ol>
+</blockquote>
+
+<p>Observe que o livro identifica claramente qual é a vantagem de se conhecer padrões: aumentar a nossa capacidade de se descrever software aumentando o nosso nível de abstração. Mas um grande problema é achar que os padrões se reduzem aos padrões de projetos descritos no GoF, eles vão além. Os padrões do GoF se reduzem aos padrões Criacionais, Estruturais e Comportamentais pois foi uma das primeiras discussões sobre o tema, mas logo após o livro a discussão sobre padrões se expandiu criando uma nova série de linguagens de padrões. Agora vamos falar um pouco de Linguagem de Padrões e como surge os padrões.</p>
+
+<p>Ao contrário do que o especialista de internet imagina, padrões não são criados, eles são identificados e apresentados a comunidade. Qualquer pessoa pode fazer isso, só precisa estruturar seu padrão em um formato especifico, ou um template como o GoF propõe e escrever sobre ele. Existem conferências de padrões como a Pattern Languages of Programs (PLoP), onde eu participei em 2021 apresentando um padrão chamado <a href="https://dl.acm.org/doi/10.5555/3712039.3712049">Lazy Clone</a> com pesquisadores da área. Um padrão ele é identificado em código já existente, registrado em um template e discutido no template. Ele pode ser um bom padrão ou um padrão problemático, que chamamos de Anti-Padrão.</p>
+
+<p>Padrões também podem ser organizados em Linguagens de Padrões, o proprio GoF propõe uma linguagem de padrão ao catalogar os padrões em 3 tipos e propor a seção “Padrões Relacionados” no template. Um linguagem de padrões é uma coleção estruturada e relacionada de padrões. Linguagens de padrões servem para organizar os padrões e relacionar eles por objetivos ou por soluções alternativas, dessa forma uma linguagem de padrões bem construída torna fácil você indentificar padrões e associar padrões alternativos.</p>
+
+<p>Vamos olhar para a <a href="https://microservices.io/patterns/index.html">linugagem de padrões de microsserviços</a>, na primeira visualização conseguimos identificar que existem padrões de infraestrutura, de descoberta de serviços, observabilidade e etc… E que entre os padrões de descoberta posso escolher entre Registro de Serviço, Descoberta Server-side ou Client-side, etc… Isso tudo está obvio na figura. Eu como arquiteto não preciso conhecer todos os padrões a fundo, mas quando eu for projetar uma funcionalidade que envolva descoberta de serviços, possa usar um ou mais padrões para compor minha solução.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-03-microservices-pattern-language.jpg" alt="Linguagem de Padrões de microsserviços" /></p>
+
+<p>Outras linguagens de padrões que devem ser conhecidas são o <a href="https://martinfowler.com/eaaCatalog/">Catalogo de Padrões de Enterprise Application Architecture</a>, o <a href="https://github.com/spgroup/ORM-Smells-Catalog">Catálogo de Code Smells ORM</a>, <a href="https://blog.vepo.dev/posts/como-avaliar-uma-api">padrões para construção de APIs REST</a> e os <a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/">Enterprise Integration Patterns</a>.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><category term="Padrões de Projetos" /><summary type="html"><![CDATA[Esse é o segundo post da série **Conversas sobre Arquitetura**. Nele vamos discutir o que são Padrões de Projetos e como eles vão muito além do livro inicial do Gang of Four. Descubra como os padrões aumentam nosso vocabulário técnico, permitem comunicação mais eficiente entre desenvolvedores e formam linguagens que nos ajudam a compor soluções arquiteturais mais robustas e adequadas aos problemas que precisamos resolver.]]></summary></entry><entry><title type="html">O que é Arquitetura de Software</title><link href="https://blog.vepo.dev/posts/o-que-e-arquitetura-de-software" rel="alternate" type="text/html" title="O que é Arquitetura de Software" /><published>2025-09-19T00:00:00+00:00</published><updated>2025-09-19T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-18-00-o-que-e-arquitetura-de-software</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-que-e-arquitetura-de-software"><![CDATA[<iframe width="560" height="315" src="https://www.youtube.com/embed/OviOkjmOFEA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p>Para entender melhor o que é arquitetura de software, fiz um exercício de buscar definições nas redes sociais. Criei uma pesquisa e coletei respostas no Blue Sky, Mastodon e LinkedIn. Apesar de parecer amador, essa técnica é conhecida como <a href="https://dl.acm.org/doi/10.1109/ICSE-Companion52605.2021.00139">“Teoria Embasada” (Grounded Theory)</a>, onde você coleta dados e a partir deles constrói uma teoria. Mas eu não quero fazer um artigo científico sobre como os desenvolvedores brasileiros entendem arquitetura de software, quero apenas entender o que eles pensam sobre o assunto.</p>
+
+<p>Entre as respostas, encontrei definições interessantes, como:</p>
+
+<ol>
+  <li>“<em>É o planejamento e a organização em alto nível dos componentes de um sistema computacional, como estes componentes trocam informações entre si, como as informações são armazenadas e coletadas, quais os procedimentos de segurança envolvidos nestes processos, entre outros aspectos, utilizando boas  práticas e padrões de design.</em>”</li>
+  <li>“<em>Penso como sendo o esqueleto de um sistema, a forma como os principais componentes são organizados e conectados para que funcionem de forma coerente. Vai além de diagramas, envolve decisões sobre tecnologias, padrões e compromissos para orientar o desenvolvimento e a evolução do sistema.</em>”</li>
+  <li>“<em>Conhecimento da solução como um todo (integrar hardware, software de maneira eficiente).</em>”</li>
+  <li>“<em>Arquitetura é um olhar ‘de longe’ analisando como cada componente do sistema (ou sistemas) vai ser integrado, visando performance e facilidade de manutenção.</em>”</li>
+  <li>“<em>Arte de planejar um software bem estruturado.</em>”</li>
+  <li>“<em>Seria o ‘design’ de arquitetura que o projeto segue sendo MVC, DDD, TDD, BDD ou algo similar.</em>”</li>
+</ol>
+
+<p>Sendo sincero, essa pergunta não tem uma resposta correta, pois cada um vai entender arquitetura dentro do seu contexto e experiência. Mas, existem discussões que estão sendo realizadas há décadas e não podemos fugir delas. Len Bass, Paul Clements e Rick Kazman, autores do livro “Software Architecture in Practice”, definem arquitetura de software como: “<em>A arquitetura de um sistema de software é um conjunto de estruturas necessárias para raciocinar sobre o sistema, que compreende elementos de software, relações entre eles e propriedades desses elementos e relações.</em>”</p>
+
+<p>É interessante notar que essa definição não foca no software em execução, mas na compreensão e no entendimento dos sistemas. Arquiteturas são feitas para pessoas e não para as máquinas. Mas para entender melhor essa definição, vamos discutir ponto a ponto delea.</p>
+
+<h2 id="arquitetura-é-um-conjunto-de-estruturas-de-software">Arquitetura é um conjunto de Estruturas de Software</h2>
+
+<p>Um software não é apenas código. Existe racionalização dentro dele, existem decisões tomadas e através dessas decisões podemos compreender certas estruturas de software. Podemos começar falando e módulos, toda arquitetura possui intrisecamente o conceito de módulos.</p>
+
+<h3 id="módulos">Módulos</h3>
+
+<p>Um módulo é uma porção de código que possuim uma ou mais responsabilidades. Em muitos casos essas responsabilidades podem não ser bem definidas, mas elas existem. Mas um módulo sempre possui uma separação lógica, e as vezes físicas, com os outros módulos.</p>
+
+<p>Vamos pensar em um sistema que foi desenvolvido sem muito planejamento. Ele é apenas uma API HTTP, que se comunica com uma aplicação <em>mobile</em> e usa um banco de dados. Apesar do sistema ser simples e não existir muito esforço para se definir a arquitetura, ele possui módulos bem definidos e que podem ser facilmente identificados: a API HTTP, a aplicação <em>mobile</em> e o banco de dados. Pode parecer óbvio e é, ao se começar a racionalizar sobre a arquitetura, esse serão os primeiros módulos que serão identificados.</p>
+
+<p>Mas essa não é a única forma de se identificar módulos. Podemos pegar uma lupa e analisar o código da API HTTP. Ao se identificar os endpoints, as classes, os pacotes e as bibliotecas, podemos identificar outros módulos. Cada módulo desse possui uma ou mais responsabilidades que trabalham em conjunto para compor a API HTTP.</p>
+
+<p>Aqui surge uma pergunta? Essa API HTTP pode evoluir? A resposta é sim. As estruturas de software são dinâmicas e em algum momento da história desse software, os desenvolvedores podem decidir decompor as responsabilidades desse módulo em outros módulos.</p>
+
+<h3 id="componentes-e-conectores">Componentes e Conectores</h3>
+
+<p>Ao olhar para a arquitetura, vemos que os módulos interagem entre si. A aplicação <em>mobile</em> envia requisições HTTP para a API, que por sua vez consulta o banco de dados. Podemos mapaer essa interações como componentes e conectores, que também são partes importantes de uma arquitetura de software.</p>
+
+<p>Roy Fielding na sua tese de doutorado que definiu o estilo arquitetural REST, define componentes como “<em>uma unidade abstrata de instruções de software e estado interno que fornece uma transformação de dados por meio de sua interface</em>”. Essa definição pode ser complicada, e por isso eu redefiniria como “_uma unidade de software vista como um peça que pode interagir com outras peças através de uma interface. Ela recebe e envia dados transformando a informação”.</p>
+
+<p>Mas caso você não tenha reparado, há uma definição faltante. O que é uma interface e como se dá a comunicação entre os componentes? É aí que entram os conectores. Segundo Fielding, “<em>um conector é um mecanismo abstrato que medeia a comunicação, a coordenação ou a cooperação entre componentes</em>”. Em outras palavras, um conector é a forma como definimos a comunicação entre os componentes. Ela não será uma porção de código, mas uma abstração. No nosso exemplo, o conector é a API HTTP. O componente não é a API HTTP, aliás, não seria nem correto chamarmos genericamente de API HTTP pois é muito importante dar nomes corretos aos componentes. Nesse caso podemos chamar o componente de “Backend”, depois ao se identificar os submodulos, estes podem ser separados em serviços menores e chamados conforme a sua responsabilidade de domínio.</p>
+
+<p><img src="/assets/images/conversas-sobre-arquitetura/fig-01-arquitetura-basica.png" alt="Arquitetura básica do sistema" /></p>
+
+<p>Essa arquitetura pode também ser descrita usando UML, conforme o código plantuml abaixo:</p>
+
+<pre><code class="language-plantuml">@startuml
+component "Mobile APP"
+component Backend
+database PostgreSQL
+
+"Mobile APP" --(0-&gt; Backend: HTTP
+Backend --(0-&gt; PostgreSQL
+
+@enduml
+</code></pre>
+
+<h3 id="estruturas-organizacionais">Estruturas Organizacionais</h3>
+
+<p>A terceira forma de se compreender as estruturas de software é através das estruturas organizacionais da empresa. Software são feito por times de desenvolvimento e são mantidos por times de operaçoes. Esses times podem ser o mesmo, cabendo a uma só equipe desenvolver e cuidar da execução do software, ou podem ser times diferentes.</p>
+
+<p>Todo o processo de desenvolvimento, instalação, observação e manutenção do software são estruturas que podem ser detalhadas arquituralmente.</p>
+
+<h2 id="arquitetura-é-uma-abstração">Arquitetura é uma abstração</h2>
+
+<p>Podemos ver também a arquitetura como uma abstração. Toda arquitetura de software é uma representação de um sistema existente através de conceitos abstratos que servem para facilitar a compreensão do sistema e de suas interações.</p>
+
+<p>Vamos voltar ao sistema já discutido. Ao olharmos para o componente Backend, já o definimos como uma API HTTP. Isso pode ser compreendido que ele é um servidor que responde requisições HTTP. Através dessa definição, somos levados a pensar em um modelo de comunicação que é chamado cliente-servidor. Não existe um modelo concreto de cliente-servidor, mas isso é uma abstração que ajuda a descrever a forma como esse sistema se comunica com os seus clientes.</p>
+
+<p>Ao usar de forma genérica o termo API HTTP, também podemos supor que este não pode ser classificado como uma API REST. O que nos leva a pergunta: “o que é uma API REST?”. Tudo isso são abstrações, pois se pegarmos dois sistemas que são servidores RESTful, eles podem ser completamente diferentes entre si, mas podemos afirmar que ambos tem uma interface HTTP que segue complemetarmente o estilo arquitetural REST.</p>
+
+<p>Dessa forma, podemos ver que a arquitetura de software é uma elaboração abstrata que nos ajuda a descrever sistema. Mas não podemos parar por aí. Uma arquitetura pode ser descrita de forma diferente a depender de para quem ela está sendo apresentada e de qual o nível de detalhe que se deseja apresentar.</p>
+
+<h2 id="todo-software-possui-uma-arquitetura">Todo software possui uma arquitetura</h2>
+
+<p>Outra implicação importante da definição de Arquitetura é que todo software possui uma arquitetura, seja ela bem definida ou não. Todo sistema possui módulos, componentes, conectores e estruturas organizacionais que os sustentam. Mesmo que ninguém nunca tenha parado para racionalizar sobre esses aspectos.</p>
+
+<p>Esses aspectos existem e podem ser identificados com clareza por arquitetos experientes. Se pegarmos um mesmo sistema e apresentarmos a dois arquitetos diferentes, é bem provável que ambos cheguem a conclusões parecidas sobre qual arquitetura o sistema possui. Eles podem discordar em pequenos detalhes, mas isso não seria um problema.</p>
+
+<h2 id="arquitetura-inclui-comportamento">Arquitetura inclui comportamento</h2>
+
+<p>Como já foi discutido anteriormente, arquitetura é uma forma de se informar sobre o software que temos, ou desejamos ter, em execução e o comportamento desse software não pode ser ignorado. Em muitos casos criar um diagrama só com componentes e conectores pode ser suficiente, mas há situações em que o comportamento precisa ser melhor detalhado.</p>
+
+<p>Vamos imaginar que temos dois sistemas que possuem um algoritmo para garantir a consistência dos dados em longas transações. Como eu posso representar esse algoritmo com linhas ligando sistemas? É impossível. Para isso é preciso explorar as notações existentes.</p>
+
+<p>Nessa introdução posso citar duas notações que podem ser úteis. <strong>BPMN</strong> e <strong>UML</strong>.</p>
+
+<p><strong>BPMN</strong> é o acronimo de <em>Business Process Notation Model</em>. É uma notação usada, como o nome já diz, para descrever processos de negócios e pode ser usada para se descrever longas transações ou mesmo longos processos. Por exemplo, você pode modelar uma Saga <a href="https://microservices.io/patterns/data/saga.html">[1]</a> <a href="https://dl.acm.org/doi/10.1145/38713.38742">[2]</a> como usando <strong>BPMN</strong>.</p>
+
+<p>Outra notação importante é o diagrama de sequência do <strong>UML</strong>. <strong>UML</strong>, <em>Unified Modeling Language</em>, é uma linguagem de modelagem de sistemas de software que possui um grande conjunto de diagramas. Apesar do UML não ser tão popular quanto antigamente, ele ainda segue sendo bastante útil. Construir e apresentar um diagrama de sequência pode ser o diferencial em uma apresentação técnica ou mesmo na comunicação de um processo em desenvolvimento.</p>
+
+<h2 id="nem-toda-arquitetura-é-uma-boa-arquitetura">Nem toda Arquitetura é uma boa arquitetura</h2>
+
+<p>Por fim, precisamos dizer que nem toda arquitetura é boa. Arquitetura de Software também serve para avaliar se um sistema atinge os requisitos de negócio para que ele foi desenvolvido.</p>
+
+<p>A escolha de uma arquitetura é um processo importante no desenvolvimento de sistemas críticos. Você não pode subir um sistema qualquer se ele for essêncial ou se a demanada de uso for elevada. Sistemas essênciais ou sistemas críticos devem ter alta disponibilidade, o que implica em certos requisitos de qualidades que devem ser endereçados na arquitura. Já sistema de alta demanda também precisam ter alta disponilidade, mas precisam escalar que também é um requisito de qualidade.</p>
+
+<p>Existem várias metodologias para definição de uma arquitetura. Podemos falar da <a href="https://www.sei.cmu.edu/documents/1186/1998_005_001_16646.pdf">Metodologia de Analise de Trade Off</a>, de <a href="https://evolutionaryarchitecture.com/precis.html">Arquitetura Evolucionaria</a> e muitos outros métodos. Mas o que precisamos ter em mente é que alguns requisitos de qualidades são incompatíveis.</p>
+
+<p>Vamos analisar por exemplo o Teorema CAP. CAP é um acrônimo que significa Consistência, Disponibilidade e Particionamento. Segundo o Teorema, para se ter alta disponibilidade é preciso abdicar da consistência e parater disponibilidade e consistência é preciso abdicar do particionamento. Já há bastante <a href="https://arxiv.org/abs/1509.05393">crítica a esse teorema</a>, que não vamos tratar agora, mas ele revela como se dá a análise de requisitos não funcionais. Se você precisar de uma aplicação com alta disponibilidade e consistência forte, você vai ter que abdicar de particionamento, o que significa que sua aplicação poderá ter dificuldades no escalonamento.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Podemos concluir que Arquitetura de Software não é uma disciplina exata, nem uma formula pronta para construção de sistemas. Arquitetura é um papel que pode ser desempenhada por arquitetos de softwares e desenvolvedores que tem como objetivo compreender, comunicar e racionalizar um sistema de software.</p>
+
+<p>Pensar a arquitetura de um sistema é fundamental para projetos críticos e para a evolução de sistemas. Um sistema pode até evoluir sem ninguém olhar para a sua arquitetura, mas ele com certeza não terá sucesso de satisfazer os requisitos de negócios.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Arquitetura de Software" /><summary type="html"><![CDATA[Esse é o primeiro post da série **Conversas sobre Arquitetura**. Nele vamos discutir o que é Arquitetura de Software usando a definição do livro "Software Architecture in Practice", explorando como a arquitetura vai além do código para se tornar uma ferramenta de comunicação e racionalização sobre sistemas. Descubra como módulos, componentes, conectores e estruturas organizacionais se combinam para formar o esqueleto de qualquer sistema de software, e por que toda aplicação possui uma arquitetura - seja ela bem planejada ou não.]]></summary></entry></feed>
