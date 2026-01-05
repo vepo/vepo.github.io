@@ -66,8 +66,6 @@ Para entender a importância da normalização de dados, precisamos primeiro ent
 * *Dificuldade de Manutenção*: Quando a estrutura do banco de dados é complexa demais, tornando difícil adicionar, atualizar ou excluir dados sem afetar outras partes do banco de dados.
 * *Complexidade nas Consultas*: Quando a estrutura do banco de dados torna as consultas SQL mais complicadas do que o necessário, dificultando a recuperação eficiente dos dados.
 
-
-
 Sistemas computacionais precisam ser compreensíveis, fáceis de manter e eficientes. A normalização de dados é uma técnica que ajuda a alcançar esses objetivos. Se olharmos para o modelo ER que projetamos, podemos identificar algumas áreas onde a normalização pode ser aplicada para melhorar a estrutura do banco de dados.
 
 1. *Cargo do Funcionário*: No modelo atual, o cargo do funcionário está armazenado na tabela `tb_funcionarios` e isso não garante que cargos iguais sejam representados de forma consistente. Se um cargo for atualizado, todas as ocorrências desse cargo precisam ser atualizadas manualmente, o que pode levar a inconsistências.
@@ -174,10 +172,12 @@ CREATE TABLE tb_funcionarios_projetos (
 ----
 
 Neste exemplo, temos dois problemas principais:
+
 1. `nome_funcionario` depende apenas de `funcionario_id`, não da chave completa (`funcionario_id`, `projeto_id`)
 2. `nome_projeto` depende apenas de `projeto_id`, não da chave completa
 
 Essa estrutura viola a 2NF e pode causar anomalias:
+
 * *Anomalia de atualização*: Se um funcionário mudar de nome, precisamos atualizar múltiplas linhas.
 * *Anomalia de inserção*: Não podemos inserir um novo projeto sem associá-lo a um funcionário.
 * *Anomalia de exclusão*: Se excluirmos a última associação de um funcionário, perdemos seu nome.
@@ -226,11 +226,14 @@ CREATE TABLE tb_funcionarios (
 ----
 
 Neste exemplo:
+
 * `salario`, `gestao` e `nivel_cargo` dependem de `cargo`
 * `cargo` depende de `id` (chave primária)
-* Portanto, temos uma cadeia de dependências: `id` → `cargo` → `{salario, gestao, nivel_cargo}`
+
+Portanto, temos uma cadeia de dependências: `id` → `cargo` → `{salario, gestao, nivel_cargo}`
 
 Isso cria dependências transitivas que podem causar problemas:
+
 * *Redundância*: O mesmo salário é repetido para cada funcionário com o mesmo cargo.
 * *Inconsistência*: Se atualizarmos o salário para um funcionário, precisamos lembrar de atualizar para todos.
 * *Complexidade*: Alterações na política salarial exigem múltiplas atualizações.
@@ -274,6 +277,7 @@ CREATE TABLE tb_funcionarios_formacoes (
 ----
 
 Aqui identificamos duas dependências funcionais:
+
 1. `{funcionario_id, formacao}` → `instrutor` (da chave primária)
 2. `instrutor` → `formacao` (da suposição do negócio)
 
@@ -315,11 +319,13 @@ CREATE TABLE tb_funcionarios_habilidades_idiomas (
 ----
 
 Neste exemplo:
+
 * Um funcionário pode ter múltiplas habilidades
 * Um funcionário pode falar múltiplos idiomas
 * Habilidades e idiomas são independentes (aprender uma habilidade não implica saber um idioma)
 
 Isso gera *combinações redundantes*. Se Alice tem habilidades `{Java, SQL}` e idiomas `{Português, Inglês}`, a tabela terá 4 linhas:
+
 * `{Alice, Java, Português}`
 * `{Alice, Java, Inglês}`
 * `{Alice, SQL, Português}`
@@ -352,6 +358,7 @@ Agora cada multivalor está em sua própria tabela, eliminando as combinações 
 A 5NF trata de *dependências de junção*. Uma tabela viola a 5NF quando pode ser decomposta em tabelas menores sem perder informação, mas essa decomposição revela restrições de negócio implícitas que não estão explicitamente modeladas.
 
 Para entender melhor, considere o cenário de vendas onde:
+
 * Agentes vendem produtos
 * Produtos são vendidos para empresas
 * Agentes trabalham com empresas
@@ -375,6 +382,7 @@ CREATE TABLE tb_vendas (
 ----
 
 Suponha que sabemos separadamente que:
+
 * Alice vende Notebooks e Tablets;
 * Notebooks são vendidos para TechCorp e InovaTech;
 * Alice trabalha com TechCorp e InovaTech.
@@ -400,6 +408,7 @@ Mas essa informação está descrita pelas linhas:
 
 
 Se a regra de negócio mencionada for verdadeira, então Alice necessariamente vende Notebook para TechCorp (o que está na tabela), mas também deveria vender Notebook para InovaTech e Tablet para TechCorp, pois:
+
 * Alice vende Notebook (fato 1)
 * Notebook é vendido para InovaTech (fato 2)
 * Alice trabalha com TechCorp (fato 3)
@@ -407,6 +416,7 @@ Se a regra de negócio mencionada for verdadeira, então Alice necessariamente v
 No entanto, esses registros não existem na tabela original. A tabela viola a 5NF porque não reflete completamente a dependência de junção implícita no negócio.
 
 As anomalias causadas:
+
 * *Inserção*: Para adicionar que Alice vende Tablet, precisamos criar múltiplas combinações manualmente
 * *Consulta*: Buscar todas as vendas possíveis requer verificar três tabelas diferentes
 * *Consistência*: É possível ter dados inconsistentes (Alice vende Notebook, Notebook vai para InovaTech, mas não há registro dessa venda)
@@ -437,6 +447,7 @@ CREATE TABLE tb_agentes_empresas (
 ----
 
 Por que isso é melhor?
+
 * *Explicita as regras*: Cada tabela captura uma relação de negócio específica;
 * *Evita redundância*: Não armazena combinações deriváveis;
 * *Garante consistência*: Se Alice vende Notebook e Notebook vai para TechCorp e Alice trabalha com TechCorp, então essa venda existe na junção;
