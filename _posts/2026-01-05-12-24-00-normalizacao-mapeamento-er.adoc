@@ -1,0 +1,451 @@
+---
+title: Normalização de Dados
+published: true
+description: |
+    Neste post, aprofundamos os fundamentos da normalização de dados, explorando como organizar as tabelas de um banco de dados relacional para eliminar redundâncias, garantir integridade e facilitar a manutenção. Passaremos pelos conceitos essenciais de dependência funcional, chaves e superchaves, e percorreremos passo a passo as seis formas normais — da 1NF à 5NF — ilustrando com exemplos práticos de violação e correção baseados em um modelo de funcionários. Ideal para quem já compreende o mapeamento ER-relacional e deseja evoluir sua modelagem para estruturas mais robustas e eficientes.
+tags: [Ciência da Computação, Bases de Dados, SQL, Formas Normais, Dependência Funcional, Modelagem de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/normalizacao-de-modelos-er
+publish_date: 2026-01-05 12:24:00 +0300
+---
+
+No post anterior, projetamos um modelo entidade-relacional (ER) para representar os dados de funcionários de uma empresa. Nele definimos quatro tabelas para representar as entidades `Funcionário`, `Endereço`, `Contato` e `Experiência Anterior`, além dos relacionamentos entre elas. Talvez vocë tenha se perguntado se o modelo não poderia ser feito de outra forma, ou mais simples ou, quem sabe, mais complexo. SIM! Modelagem de dados depende de muitos fatores e pode ser feita de várias formas diferentes, mas há algumas boas práticas que possuem implicações na quantidade e na qualidade dos dados armazenados. Para entender melhor essas boas práticas, vamos falar de normalização de dados.
+
+.Script SQL para criação das tabelas do modelo entidade-relacional de funcionários
+[source,sql]
+----
+CREATE TABLE tb_funcionarios_experiencias_anterior (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    empresa         VARCHAR(100),
+    cargo           VARCHAR(100),
+    data_inicio     DATE,
+    data_fim        DATE
+);
+
+CREATE TABLE tb_funcionarios (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    nome            VARCHAR(100),
+    sobrenome       VARCHAR(100),
+    CPF             VARCHAR(11) UNIQUE,
+    data_nascimento DATE,
+    cargo           VARCHAR(100),   -- Cargo do funcionário
+    salario         DECIMAL(10,2),  -- Salário do funcionário
+    gestor_id       BIGINT,         -- Chave Estrangeira para tb_funcionarios (autorreferência)
+    gestao          BOOLEAN,        -- Indica se o funcionário está em uma posição de gestão
+    experiencia_anterior_id BIGINT, -- Chave Estrangeira para tb_funcionarios_experiencias_anterior
+    FOREIGN KEY (experiencia_anterior_id) REFERENCES tb_funcionarios_experiencias_anterior(id),
+    FOREIGN KEY (gestor_id) REFERENCES tb_funcionarios(id),
+    UNIQUE (experiencia_anterior_id)  -- Garante o relacionamento um-para-um
+);
+CREATE TABLE tb_funcionarios_enderecos (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    funcionario_id  BIGINT NOT NULL,       -- Chave Estrangeira para tb_funcionarios
+    rua             VARCHAR(200),
+    cidade          VARCHAR(100),
+    estado          VARCHAR(100),
+    cep             VARCHAR(20),
+    FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
+);
+
+CREATE TABLE tb_funcionarios_contatos (
+    id              BIGSERIAL PRIMARY KEY, -- Chave Primária
+    funcionario_id  BIGINT NOT NULL, -- Chave Estrangeira para tb_funcionarios
+    tipo            VARCHAR(50),     -- Ex: 'telefone', 'email'
+    valor           VARCHAR(100),    -- Ex: número de telefone ou endereço de email
+    FOREIGN KEY (funcionario_id) REFERENCES tb_funcionarios(id) -- Chave Estrangeira
+);
+----
+
+== Quais problemas a normalização de dados busca resolver?
+
+Para entender a importância da normalização de dados, precisamos primeiro entender alguns problemas comuns que podem ocorrer em bancos de dados mal projetados. Esses problemas incluem:
+
+* *Redundância de Dados*: Quando os mesmos dados são armazenados em múltiplos lugares, o que pode levar a inconsistências e desperdício de espaço.
+* *Inconsistência de Dados*: Quando diferentes versões dos mesmos dados existem em diferentes lugares, levando a confusão e erros.
+* *Dificuldade de Manutenção*: Quando a estrutura do banco de dados é complexa demais, tornando difícil adicionar, atualizar ou excluir dados sem afetar outras partes do banco de dados.
+* *Complexidade nas Consultas*: Quando a estrutura do banco de dados torna as consultas SQL mais complicadas do que o necessário, dificultando a recuperação eficiente dos dados.
+
+
+
+Sistemas computacionais precisam ser compreensíveis, fáceis de manter e eficientes. A normalização de dados é uma técnica que ajuda a alcançar esses objetivos. Se olharmos para o modelo ER que projetamos, podemos identificar algumas áreas onde a normalização pode ser aplicada para melhorar a estrutura do banco de dados.
+
+1. *Cargo do Funcionário*: No modelo atual, o cargo do funcionário está armazenado na tabela `tb_funcionarios` e isso não garante que cargos iguais sejam representados de forma consistente. Se um cargo for atualizado, todas as ocorrências desse cargo precisam ser atualizadas manualmente, o que pode levar a inconsistências.
+2. *Salário do Funcionário*: Similar ao cargo, o salário do funcionário está armazenado diretamente na tabela `tb_funcionarios`. Se houver uma política de aumento salarial que afete múltiplos funcionários ou cargos, isso pode levar a redundância e inconsistência.
+
+Para resolver esses problemas, e tantos outros similares, precisamos identificar dentro do nosso modelo de dados quais são as informações redundantes e que possuem dependências funcionais. No caso acima, podemos identificar claramente que o cargo do funcionário e o salário possuem uma dependência funcional, ou seja, o salário depende do cargo. 
+
+== O que é dependência funcional?
+
+A dependência funcional é um conceito da álgebra relacional que descreve a relação entre subconjuntos de atributos de uma relação que podem ser determinados por outros atributos. Em termos simples, dizemos que um atributo B é funcionalmente dependente de um atributo A se, para cada valor de A, existe exatamente um valor correspondente de B. Por exemplo, em um banco de dados de funcionários, o salário pode ser funcionalmente dependente do cargo do funcionário e vice-versa.
+
+Matematicamente, dizemos que `X → Y` (X determina Y) se, para cada valor de `X`, existe exatamente um valor correspondente de `Y`. No nosso exemplo, podemos dizer que *Cargo → Salário*. 
+
+Através da dependência funcional, podemos definir os conceitos de chave, superchave, atributo primo e atributo não-primo, que são fundamentais para a normalização de dados.
+
+=== O que é uma chave em um banco de dados?
+
+Uma chave é um conjunto de atributos que identifica unicamente uma tupla (linha) em uma relação (tabela). Para que o conjunto de atributos seja considerado uma chave, ele deve satisfazer duas propriedades principais:
+
+* *Unicidade*: Nenhuma duas tuplas na relação podem ter os mesmos valores para os atributos da chave.
+* *Minimalidade*: Nenhum subconjunto dos atributos da chave pode satisfazer a propriedade de unicidade.
+
+Exemplo? Considere a tabela `tb_funcionarios` que possui os atributos `id`, `nome`, `sobrenome` e `CPF`. A chave primária poderia ser o atributo `id`, pois ele identifica unicamente cada funcionário na tabela. Outra possível chave seria o atributo `CPF`, que também é único para cada funcionário.
+
+Já `nome` e `sobrenome` não podem ser considerados chaves, pois podem haver funcionários com o mesmo nome e sobrenome.
+
+=== O que é uma superchave?
+
+Uma superchave é um subconjunto de atributos que identifica unicamente uma tupla em uma relação, mas pode conter atributos adicionais que não são necessários para a identificação única. Em outras palavras, uma superchave pode ser uma chave, mas também pode incluir atributos extras que não são essenciais para a unicidade.
+
+Exemplo? Considere a tabela `tb_funcionarios` que possui os atributos `id`, `nome`, `sobrenome` e `CPF`. O atributo `CPF` é uma superchave, pois identifica unicamente cada funcionário na tabela. No entanto, o conjunto de atributos `{CPF, nome, sobrenome}` também é uma superchave, pois identifica unicamente cada funcionário na tabela, mesmo que `nome` e `sobrenome` não sejam necessários para essa identificação.
+
+Todo atributo que compõe uma chave é chamado de *atributo primo*, enquanto os atributos que não fazem parte de nenhuma chave são chamados de *atributos não-primos*.
+
+== Qual é a relação entre normalização e dependência funcional?
+
+A normalização de dados é um processo que utiliza o conceito de dependência funcional para organizar os dados em um banco de dados de forma eficiente. O objetivo da normalização é eliminar a redundância e garantir a integridade dos dados, dividindo as tabelas em estruturas menores e mais gerenciáveis. Isso é feito através de várias formas normais (normal forms), cada uma com suas próprias regras e critérios baseados em dependências funcionais.
+
+== Quais são as formas normais existentes?
+
+As formas normais existentes são: 
+
+* *Primeira Forma Normal* (1NF): Garante que todos os atributos de uma tabela sejam atômicos, ou seja, indivisíveis. Isso significa que cada campo deve conter apenas um valor e não uma lista ou conjunto de valores. Naturalmente, todas as tabelas já estão na 1NF, exceto quando há problemas na modelagem.
+* *Segunda Forma Normal* (2NF): Garante que todos os atributos não-chave sejam totalmente dependentes da chave primária. Isso significa que não deve haver dependências parciais, onde um atributo depende apenas de parte da chave primária.
+* *Terceira Forma Normal* (3NF): Garante que todos os atributos não-chave sejam diretamente dependentes da chave primária e não de outros atributos não-chave. Isso elimina dependências transitivas. 
+* *Forma Normal de Boyce-Codd* (BCNF): Uma versão mais rigorosa da 3NF, onde todos os atributos dependem apenas da chave.
+* *Quarta Forma Normal* (4NF): Garante que não haja dependências multivaloradas, onde um atributo pode ter múltiplos valores independentes de outro atributo.
+* *Quinta Forma Normal* (5NF): Garante que todas as dependências de junção sejam eliminadas, o que significa que uma tabela não pode ser dividida em tabelas menores sem perder informações.
+
+=== Como violar a Primeira Forma Normal (1NF)?
+
+Existem algumas formas de se violar a primeira forma normal.
+
+1. Não é permitido usar a ordem das linhas para transmitir informações.
+2. Não é permitido misturar tipos de dados na mesma coluna.
+3. Não é permitido ter uma tabela sem chave primária.
+4. Não é permitido repetir grupos.
+
+Para violar a 1NF, uma tabela deve conter atributos que não são atômicos
+
+.A tabela abaixo viola a 1NF porque o atributo `telefone_1`, `telefone_2` e `telefone_3` formam um conjunto de valores não atômicos.
+[source,sql]
+----
+CREATE TABLE tb_funcionarios (
+    id INT PRIMARY KEY,
+    nome VARCHAR(100),
+    sobrenome VARCHAR(100),
+    cpf VARCHAR(11),
+    telefone_1 VARCHAR(15),
+    telefone_2 VARCHAR(15),
+    telefone_3 VARCHAR(15),
+);
+----
+
+.A tabela abaixo viola a 1NF porque o atributo `telefones` não é atômico, ou seja, ele armazena múltiplos valores em um único campo.
+[source,sql]
+----
+CREATE TABLE tb_funcionarios (
+    id INT PRIMARY KEY,
+    nome VARCHAR(100),
+    sobrenome VARCHAR(100),
+    cpf VARCHAR(11),
+    telefone_1 VARCHAR(15),
+    telefone_2 VARCHAR(15),
+    telefone_3 VARCHAR(15),
+);
+----
+
+=== Como violar a Segunda Forma Normal (2NF)?
+
+Para violar a 2NF, uma tabela deve conter atributos não-chave que dependem apenas de parte da chave primária. Isso ocorre principalmente em tabelas com chaves compostas, onde alguns atributos podem ser determinados por apenas um dos componentes da chave.
+
+.Violando a 2NF com dependências parciais
+[source,sql]
+----
+CREATE TABLE tb_funcionarios_projetos (
+    funcionario_id BIGINT,
+    projeto_id BIGINT,
+    nome_funcionario VARCHAR(100),  -- depende apenas de funcionario_id
+    nome_projeto VARCHAR(100),      -- depende apenas de projeto_id
+    horas_trabalhadas INT,
+    PRIMARY KEY (funcionario_id, projeto_id)
+);
+----
+
+Neste exemplo, temos dois problemas principais:
+1. `nome_funcionario` depende apenas de `funcionario_id`, não da chave completa (`funcionario_id`, `projeto_id`)
+2. `nome_projeto` depende apenas de `projeto_id`, não da chave completa
+
+Essa estrutura viola a 2NF e pode causar anomalias:
+* *Anomalia de atualização*: Se um funcionário mudar de nome, precisamos atualizar múltiplas linhas.
+* *Anomalia de inserção*: Não podemos inserir um novo projeto sem associá-lo a um funcionário.
+* *Anomalia de exclusão*: Se excluirmos a última associação de um funcionário, perdemos seu nome.
+
+.Solução normalizada (2NF)
+[source,sql]
+----
+-- Tabela de funcionários
+CREATE TABLE tb_funcionarios (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100)
+);
+
+-- Tabela de projetos
+CREATE TABLE tb_projetos (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100)
+);
+
+-- Tabela de associação (relacionamento muitos-para-muitos)
+CREATE TABLE tb_funcionarios_projetos (
+    funcionario_id BIGINT REFERENCES tb_funcionarios(id),
+    projeto_id BIGINT REFERENCES tb_projetos(id),
+    horas_trabalhadas INT,
+    PRIMARY KEY (funcionario_id, projeto_id)
+);
+----
+
+Agora cada atributo não-chave depende da chave primária completa de sua tabela, eliminando as dependências parciais.
+
+=== Como violar a Terceira Forma Normal (3NF)?
+
+Uma tabela viola a 3NF quando existem dependências transitivas: um atributo não-chave depende de outro atributo não-chave, e não diretamente da chave primária.
+
+.Violando a 3NF com dependências transitivas
+[source,sql]
+----
+CREATE TABLE tb_funcionarios (
+    id          BIGSERIAL PRIMARY KEY,
+    nome        VARCHAR(100),
+    cargo       VARCHAR(100),
+    salario     DECIMAL(10,2),  -- depende do cargo, não diretamente do id
+    gestao      BOOLEAN,  -- depende do cargo, não diretamente do id
+    nivel_cargo VARCHAR(50)  -- depende do cargo, não diretamente do id
+);
+----
+
+Neste exemplo:
+* `salario`, `gestao` e `nivel_cargo` dependem de `cargo`
+* `cargo` depende de `id` (chave primária)
+* Portanto, temos uma cadeia de dependências: `id` → `cargo` → `{salario, gestao, nivel_cargo}`
+
+Isso cria dependências transitivas que podem causar problemas:
+* *Redundância*: O mesmo salário é repetido para cada funcionário com o mesmo cargo.
+* *Inconsistência*: Se atualizarmos o salário para um funcionário, precisamos lembrar de atualizar para todos.
+* *Complexidade*: Alterações na política salarial exigem múltiplas atualizações.
+
+.Solução normalizada (3NF)
+[source,sql]
+----
+-- Tabela de cargos (nova entidade)
+CREATE TABLE tb_cargos (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100) UNIQUE,
+    nivel VARCHAR(50),
+    gestao BOOLEAN
+);
+
+-- Tabela de funcionários com referência ao cargo
+CREATE TABLE tb_funcionarios (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(100),
+    cargo_id BIGINT REFERENCES tb_cargos(id),
+    salario DECIMAL(10,2)
+);
+----
+
+Agora cada atributo não-chave depende diretamente da chave primária de sua tabela, eliminando as dependências transitivas.
+
+=== Como violar a Forma Normal de Boyce-Codd (BCNF)?
+
+A BCNF é uma versão mais rigorosa da 3NF. Uma tabela viola a BCNF se existe uma dependência funcional onde o determinante não é uma superchave.
+
+.Violando a BCNF com determinante não-superchave
+[source,sql]
+----
+CREATE TABLE tb_funcionarios_formacoes (
+    funcionario_id BIGINT,
+    formacao VARCHAR(100),
+    instrutor VARCHAR(100),
+    PRIMARY KEY (funcionario_id, formacao)
+);
+-- Suposição: instrutor → formacao (cada instrutor leciona apenas uma formação)
+----
+
+Aqui identificamos duas dependências funcionais:
+1. `{funcionario_id, formacao}` → `instrutor` (da chave primária)
+2. `instrutor` → `formacao` (da suposição do negócio)
+
+O problema é que `instrutor` determina `formacao`, mas `instrutor` não é uma superchave (não identifica unicamente cada linha). Isso viola a BCNF.
+
+.Solução normalizada (BCNF)
+[source,sql]
+----
+-- Tabela de instrutores e formações (um-para-um)
+CREATE TABLE tb_instrutores_formacoes (
+    instrutor VARCHAR(100) PRIMARY KEY,
+    formacao VARCHAR(100) UNIQUE
+);
+
+-- Tabela de funcionários e formações
+CREATE TABLE tb_funcionarios_formacoes (
+    funcionario_id BIGINT,
+    formacao VARCHAR(100),
+    PRIMARY KEY (funcionario_id, formacao),
+    FOREIGN KEY (formacao) REFERENCES tb_instrutores_formacoes(formacao)
+);
+----
+
+Agora, em cada tabela, todo determinante é uma superchave, satisfazendo a BCNF.
+
+=== Como violar a Quarta Forma Normal (4NF)?
+
+A 4NF trata de dependências multivaloradas. Uma tabela viola a 4NF se contém pelo menos duas colunas multivaloradas independentes para a mesma chave.
+
+.Violando a 4NF com dependências multivaloradas independentes
+[source,sql]
+----
+CREATE TABLE tb_funcionarios_habilidades_idiomas (
+    funcionario_id BIGINT,
+    habilidade VARCHAR(100),
+    idioma VARCHAR(100)
+);
+-- Suposição: Habilidades e idiomas são independentes entre si
+----
+
+Neste exemplo:
+* Um funcionário pode ter múltiplas habilidades
+* Um funcionário pode falar múltiplos idiomas
+* Habilidades e idiomas são independentes (aprender uma habilidade não implica saber um idioma)
+
+Isso gera *combinações redundantes*. Se Alice tem habilidades `{Java, SQL}` e idiomas `{Português, Inglês}`, a tabela terá 4 linhas:
+* `{Alice, Java, Português}`
+* `{Alice, Java, Inglês}`
+* `{Alice, SQL, Português}`
+* `{Alice, SQL, Inglês}`
+
+Essa redundância viola a 4NF.
+
+.Solução normalizada (4NF)
+[source,sql]
+----
+-- Tabela para habilidades dos funcionários
+CREATE TABLE tb_funcionarios_habilidades (
+    funcionario_id BIGINT,
+    habilidade VARCHAR(100),
+    PRIMARY KEY (funcionario_id, habilidade)
+);
+
+-- Tabela para idiomas dos funcionários
+CREATE TABLE tb_funcionarios_idiomas (
+    funcionario_id BIGINT,
+    idioma VARCHAR(100),
+    PRIMARY KEY (funcionario_id, idioma)
+);
+----
+
+Agora cada multivalor está em sua própria tabela, eliminando as combinações redundantes.
+
+=== Como violar a Quinta Forma Normal (5NF)?
+
+A 5NF trata de *dependências de junção*. Uma tabela viola a 5NF quando pode ser decomposta em tabelas menores sem perder informação, mas essa decomposição revela restrições de negócio implícitas que não estão explicitamente modeladas.
+
+Para entender melhor, considere o cenário de vendas onde:
+* Agentes vendem produtos
+* Produtos são vendidos para empresas
+* Agentes trabalham com empresas
+
+O problema da violação da 5NF ocorre quando há uma regra de negócio oculta:
+
+[quote]
+----
+Se um agente A vende um produto P, e o produto P é vendido para a empresa E, e o agente A trabalha com a empresa E, então necessariamente A vende P para E.
+----
+
+.Violando potencialmente a 5NF com dependências de junção
+[source,sql]
+----
+CREATE TABLE tb_vendas (
+    agente VARCHAR(100),
+    produto VARCHAR(100),
+    empresa VARCHAR(100),
+    PRIMARY KEY (agente, produto, empresa)
+);
+----
+
+Suponha que sabemos separadamente que:
+* Alice vende Notebooks e Tablets;
+* Notebooks são vendidos para TechCorp e InovaTech;
+* Alice trabalha com TechCorp e InovaTech.
+
+Mas essa informação está descrita pelas linhas:
+
+|===
+| Agente | Produto | Empresa
+
+| Alice
+| Notebook
+| TechCorp
+
+| Alice
+| Tablet
+| InovaTech
+
+| Bob
+| Notebook
+| InovaTech
+
+|===
+
+
+Se a regra de negócio mencionada for verdadeira, então Alice necessariamente vende Notebook para TechCorp (o que está na tabela), mas também deveria vender Notebook para InovaTech e Tablet para TechCorp, pois:
+* Alice vende Notebook (fato 1)
+* Notebook é vendido para InovaTech (fato 2)
+* Alice trabalha com TechCorp (fato 3)
+
+No entanto, esses registros não existem na tabela original. A tabela viola a 5NF porque não reflete completamente a dependência de junção implícita no negócio.
+
+As anomalias causadas:
+* *Inserção*: Para adicionar que Alice vende Tablet, precisamos criar múltiplas combinações manualmente
+* *Consulta*: Buscar todas as vendas possíveis requer verificar três tabelas diferentes
+* *Consistência*: É possível ter dados inconsistentes (Alice vende Notebook, Notebook vai para InovaTech, mas não há registro dessa venda)
+
+.Solução normalizada (5NF)
+[source,sql]
+----
+-- Agentes e produtos que eles vendem
+CREATE TABLE tb_agentes_produtos (
+    agente VARCHAR(100),
+    produto VARCHAR(100),
+    PRIMARY KEY (agente, produto)
+);
+
+-- Produtos e empresas onde são vendidos
+CREATE TABLE tb_produtos_empresas (
+    produto VARCHAR(100),
+    empresa VARCHAR(100),
+    PRIMARY KEY (produto, empresa)
+);
+
+-- Agentes e empresas com quem trabalham
+CREATE TABLE tb_agentes_empresas (
+    agente VARCHAR(100),
+    empresa VARCHAR(100),
+    PRIMARY KEY (agente, empresa)
+);
+----
+
+Por que isso é melhor?
+* *Explicita as regras*: Cada tabela captura uma relação de negócio específica;
+* *Evita redundância*: Não armazena combinações deriváveis;
+* *Garante consistência*: Se Alice vende Notebook e Notebook vai para TechCorp e Alice trabalha com TechCorp, então essa venda existe na junção;
+* *Facilita manutenção*: Adicionar um novo produto para um agente automaticamente cria combinações com todas as empresas adequadas.
+
+== Preciso usar todas essa formas normais?
+
+Na prática, a maioria dos sistemas de banco de dados para na *3NF* ou *BCNF*. Essas formas eliminam as anomalias mais comuns de inserção, atualização e exclusão, mantendo um bom equilíbrio entre normalização e desempenho.
+
+As formas normais mais altas (4NF e 5NF) são aplicadas apenas em casos específicos com estruturas de dados complexas. Vale lembrar que a desnormalização controlada é comum em data warehouses e sistemas analíticos para otimizar consultas complexas, mostrando que a normalização deve ser vista como uma ferramenta, não como um dogma.
+
+A escolha do nível adequado de normalização depende do contexto: sistemas transacionais (OLTP) beneficiam-se de maior normalização, enquanto sistemas analíticos (OLAP) podem usar estruturas desnormalizadas para melhor desempenho.
