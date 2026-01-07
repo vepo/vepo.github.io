@@ -1,22 +1,401 @@
 ---
 title: Habilitando HTTPS com Let's Encrypt!
-published: false
+published: true
 description: |
-    
-tags: []
-cover_image: /assets/images/capas/disquete-100-42.jpg
-permalink: /posts/imersao-sql
-publish_date: 2026-01-05 12:24:00 +0300
+    Nesse post vamos configurar HTTPS com certificados Let's Encrypt para qualquer aplicação web, usando NGINX como proxy reverso e Docker para um ambiente isolado e reproduzível.
+tags: [HTTPS, HTTP, Docker, NGINX, Let's Encrypt, DevOps]
+cover_image: /assets/images/capas/cadeado-corrente.jpg
+permalink: /posts/usando-https-com-lets-encrypt
+publish_date: 2026-01-07 09:04:00 +0300
 ---
 
-Esse post é um pequeno tutorial sobre como habilita HTTPS em qualquer framework usando o NGINX e o Let's Encrypt.
+Se você tem uma aplicação web rodando em qualquer framework — como Quarkus, Spring Boot ou outro — e quer proteger sua comunicação usando HTTPS, este tutorial é para você.
+
+Aqui, vamos configurar o NGINX como um *servidor proxy reverso*, responsável por gerenciar as conexões seguras (TLS/SSL) com os certificados gratuitos da *Let's Encrypt*. Sua aplicação continuará rodando normalmente, enquanto o NGINX cuida da criptografia, liberando você para focar no código.
+
+A ideia é simples: configuramos um domínio apontando para o nosso servidor, obtemos um certificado digital que valida a propriedade desse domínio e, por fim, ajustamos o NGINX para redirecionar o tráfego criptografado para a sua aplicação, independentemente da tecnologia que você usa.
+
+Vamos começar?
 
 == Porque usar HTTPS?
 
-Bom para quem não sabe, HTTPS é nada mais nada menos do que HTTP com TLS. Não pense que é um protocolo diferente, nada muda do lado do nosso servidor web. O que acontece é que se adiciona uma nova camada sobre a conexão HTTP.
+O HTTPS nada mais é que o protocolo HTTP protegido por uma camada de TLS. 
 
+É importante destacar que não se trata de um protocolo completamente novo — do ponto de vista do servidor da aplicação, a comunicação continua sendo HTTP.
+
+A diferença está na conexão entre cliente e servidor, que agora passa por uma etapa adicional de segurança antes de transmitir os dados, conforme ilustrado no diagrama abaixo.
 
 // https://excalidraw.com/#json=AkoaXau9kAVIRLbTkQejk,jCVj6uOE2idtMzodqDJPXg
 
 .HTTP, HTTPS e o Modelo OSI como comparação
 image::http/https-osi.png[]
+
+Nosso servidor web continua funcionando exatamente como antes. A diferença é que, com o HTTPS, ele pode ser acessado por meio de um *gateway* HTTP — como o NGINX — que fica entre o cliente e a aplicação.
+
+O fluxo funciona assim:
+
+1. O cliente se conecta na porta 443 (HTTPS padrão).
+2. O gateway recebe a requisição criptografada, descriptografa-a e a converte em uma requisição HTTP comum.
+3. Em seguida, ele a encaminha ao servidor da aplicação, que responde como de costume.
+
+Além disso, esse mesmo gateway pode ser configurado para redirecionar automaticamente qualquer tentativa de acesso pela porta 80 (HTTP) para a porta 443 (HTTPS), garantindo que toda a comunicação aconteça de forma segura.
+
+// https://excalidraw.com/#json=3NqXy2j8aR23kNSEuCxKV,-ImC0uuHxbEeUrpe7UjT-w
+
+.Arquitetura de uma comunicação Cliente-Servidor que tenta primeiro acessar a porta 80 mas é redirecionado para 443.
+image::http/arquitetura-http-https.png[]
+
+A imagem acima ilustra exatamente como nossa arquitetura pode ser implementada usando apenas uma máquina e o Docker, unindo todos os componentes que acabamos de descrever.
+
+== Porque Let's Encrypt?
+
+Talvez você esteja se perguntando: por que precisamos de algo além do nosso servidor HTTP para usar HTTPS?
+
+A resposta está no *TLS* — a camada de segurança que torna o HTTP seguro. Vamos entender como essa comunicação funciona e como ela protege seus dados.
+
+O TLS protege a comunicação entre cliente e servidor com dois objetivos principais:
+
+1. Autenticar o servidor, garantindo que você está se conectando ao destino verdadeiro — por exemplo, ao acessar blog.vepo.dev, ter certeza de que é realmente o meu blog, e não um site impostor.
+2. Criptografar os dados trocados, assegurando que apenas você e o servidor possam ler o conteúdo da comunicação.
+
+Para isso, o TLS usa *criptografia assimétrica* durante a fase inicial da conexão, permitindo que cliente e servidor estabeleçam uma chave secreta de forma segura — mesmo em um canal potencialmente inseguro como a internet.
+
+A criptografia assimétrica usa um par de chaves: a *chave privada* (que é secreta) e a *chave pública* (que pode ser distribuída).
+Uma mensagem criptografada com a chave privada só pode ser descriptografada usando a chave pública correspondente. Como apenas o dono da chave privada poderia ter criado essa mensagem, ela funciona como uma assinatura digital, provando a identidade de quem a enviou.
+
+Na prática, quando seu navegador se conecta a um servidor HTTPS, ele verifica o certificado digital apresentado — que contém a chave pública do site e é assinado por uma autoridade confiável. Isso permite confirmar que você está realmente se comunicando com o domínio correto, e não com um impostor.
+
+No entanto, para serviços simples, sem muito riscos, alguns optam por usar certificados autoassinados. Eles ainda criptografam o tráfego, impedindo que ferramentas como o https://www.wireshark.org[Wireshark] leiam os dados da comunicação, mas não fornecem autenticação confiável para o público geral, já que não são validados por uma autoridade externa.
+
+É aí que entra o *Let's Encrypt*!
+
+Esse serviço automatiza a criação e a validação de certificados TLS. Ele gera o par de chaves pública e privada para você e, para confirmar que você realmente controla o domínio, realiza uma verificação simples — normalmente via DNS ou por meio de um arquivo temporário no seu servidor.
+
+Uma vez aprovado, o Let's Encrypt assina seu certificado digital, permitindo que qualquer navegador reconheça seu site como seguro — tudo de forma gratuita e automatizada.
+
+== 1. Configurando o ambiente
+
+Antes de começar, vamos preparar o ambiente:
+
+1. Uma máquina com IP fixo
+   Você pode provisioná-la em qualquer provedor de nuvem (Magalu Cloud, AWS, DigitalOcean, Google Cloud, etc.) ou usar um servidor próprio.
+2. Linux com Docker instalado
+   É o único requisito de software — garantindo que possamos rodar os contêineres de forma isolada e reproduzível.
+
+== 2. Criando o serviço NGINX
+
+Com isso pronto, criaremos um arquivo chamado `docker-compose.yml`. Ele define toda a configuração dos nossos serviços em código, tornando a implantação consistente e fácil de gerenciar.
+
+[source,yaml]
+----
+services:
+  nginx:
+    image: nginx:1.29-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+----
+
+Com o `docker-compose.yml` acima configurado, o NGINX já estará escutando nas portas 80 (HTTP) e 443 (HTTPS) da sua máquina. Isso significa que você pode apontar seu domínio no DNS para o IP fixo do servidor.
+
+Agora, precisamos definir o conteúdo do arquivo `./data/nginx/app.conf`. É nele que configuramos o comportamento do servidor — como redirecionamentos, regras de proxy e a associação do certificado SSL.
+
+[source,nginx]
+----
+server {
+    listen 80;
+    server_name example.org;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }    
+}
+
+server {
+    listen 443 ssl;
+    server_name example.org;
+    
+    location / {
+        proxy_pass http://example.org; #for demo purposes
+    }
+}
+----
+
+Neste arquivo, configuramos dois servidores virtuais no NGINX:
+
+1. Um servidor HTTP comum, que escuta na porta 80.
+2. Um servidor HTTPS, que escuta na porta 443 e usa SSL/TLS.
+
+No entanto, o servidor HTTPS ainda não funcionará, pois falta configurar corretamente os certificados SSL — etapa que faremos em seguida com a ajuda do Let's Encrypt.
+
+== 3. Configurando o CertBot Let's Encrypt
+
+O *Let's Encrypt* valida o domínio por meio de um desafio HTTP: ele tenta acessar uma URL específica no seu domínio e espera uma resposta conhecida. Se o servidor responder corretamente, fica provado que você controla o domínio — um mecanismo parecido com o usado pelo Google Search Console para verificar a propriedade de um site.
+
+Para gerar e responder a esse desafio, usamos o Certbot. Por isso, precisamos configurar o contêiner do NGINX para servir os arquivos temporários que o Certbot cria durante o processo de validação.
+
+Primeiro, vamos ajustar o ambiente para incluir o Certbot. Para isso, precisamos:
+
+1. Declarar o serviço do Certbot no nosso `docker-compose.yml`.
+2. Criar um volume compartilhado entre os containers do NGINX e do Certbot, permitindo que eles troquem os arquivos necessários para a validação do domínio.
+
+O arquivo `docker-compose.yml` atualizado é mostrado a seguir:
+
+[source,yaml]
+----
+services:
+  nginx:
+    image: nginx:1.29-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt    ## Configurações geradas pelo CertBot
+      - ./data/certbot/www:/var/www/certbot     ## Chaves geradas pelo CertBot
+    networks:
+      - app-network
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+----
+
+Agora, precisamos configurar o servidor NGINX para responder ao desafio HTTP do *Let's Encrypt*.
+
+Ele espera que uma URL específica — `/.well-known/acme-challenge/` — esteja acessível via porta 80 (HTTP). Portanto, vamos direcionar todas as requisições para esse caminho a um local onde o Certbot possa fornecer a resposta correta.
+
+Após o desafio ser resolvido com sucesso, o Certbot gerará automaticamente os certificados e chaves necessários para o TLS.
+
+Eles serão armazenados nos seguintes caminhos dentro do container:
+
+* Certificado público (fullchain):
+  `/etc/letsencrypt/live/example.org/fullchain.pem`
+* Chave privada (privkey):
+  `/etc/letsencrypt/live/example.org/privkey.pem`
+
+Esses arquivos são essenciais para que o NGINX configure a conexão HTTPS corretamente. O CertBot também gera alguns arquivos de configuração que podem ser visto abaixo.
+
+[source,nginx]
+----
+server {
+    listen 80;
+    server_name example.org;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+    
+    location /.well-known/acme-challenge/ {  ## Define o desafio
+        root /var/www/certbot;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name example.org;
+
+    ssl_certificate /etc/letsencrypt/live/example.org/fullchain.pem;    ## Define a chave pública
+    ssl_certificate_key /etc/letsencrypt/live/example.org/privkey.pem;  ## Define a chave privada
+
+    include /etc/letsencrypt/options-ssl-nginx.conf;   ## Configurações geradas pelo CertBot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; 
+    
+    location / {
+        proxy_pass http://example.org; #for demo purposes
+    }
+}
+----
+
+== 4. Inicializando o CertBot
+
+Se você tentar subir o ambiente agora com `docker-compose up`, ele ainda não funcionará completamente. Isso porque os certificados SSL precisam ser solicitados e configurados pela primeira vez.
+
+Para facilitar esse processo inicial, criamos um script de inicialização que automatiza todos os passos. Você só precisa executá-lo após atualizar o seu e-mail na linha onde está definido `email=""`.
+
+[source,bash]
+----
+# Baixa o script de inicialização oficial do repositório nginx-certbot
+curl -L https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsencrypt.sh > init-letsencrypt.sh
+
+# Abre o script no editor vi para personalização
+# IMPORTANTE: Atualize o e-mail na linha que contém 'email=""'
+vi init-letsencrypt.sh
+
+# Torna o script executável (adiciona permissão de execução)
+chmod +x init-letsencrypt.sh
+
+# Executa o script com privilégios de superusuário
+# O script irá configurar automaticamente os certificados SSL/TLS
+sudo ./init-letsencrypt.sh
+----
+
+Após executar o script, todos os arquivos de certificado e configuração necessários serão criados.
+
+O próximo passo é reconfigurar o sistema para renovação automática: os certificados da Let's Encrypt têm validade limitada, então precisamos garantir que sejam renovados automaticamente antes de expirar.
+
+
+[source,yaml]
+----
+services:
+  nginx:
+    image: nginx:1.29-alpine
+    ## Força o NGINX atualizar a cada 6hs
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt    ## Configurações geradas pelo CertBot
+      - ./data/certbot/www:/var/www/certbot     ## Chaves geradas pelo CertBot
+    networks:
+      - app-network
+  certbot:
+    image: certbot/certbot
+    ## Força o CertBot atualizar a cada 6hs
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+----
+
+== 5. Configurando o Banco e Aplicação
+
+Para finalizar, vamos configurar o banco de dados e a aplicação. Como esses passos podem variar conforme o framework ou tecnologia utilizada, apresentaremos uma configuração genérica abaixo, que você poderá adaptar conforme sua necessidade.
+
+[source,yaml]
+----
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-AppPassword1234}
+    volumes:
+      - /mnt/data/postgres:/var/lib/postgresql/18/docker    ## Salva os dados em um Volume persistente
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql     ## Inicializa o banco
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c log_statement=all
+      -c log_destination=stderr
+  app:
+    image: my-user/my-app:main
+    container_name: app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_USERNAME: app_user
+      QUARKUS_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-AppPassword1234}
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/app_db
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  nginx:
+    image: nginx:1.29-alpine
+    ## Força o NGINX atualizar a cada 6hs
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt    ## Configurações geradas pelo CertBot
+      - ./data/certbot/www:/var/www/certbot     ## Chaves geradas pelo CertBot
+    networks:
+      - app-network
+  certbot:
+    image: certbot/certbot
+    ## Força o CertBot atualizar a cada 6hs
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+----
+
+Por fim, precisamos informar ao NGINX onde nossa aplicação está disponível.
+Ela está rodando na porta 8080 e, dentro da rede Docker, pode ser acessada pelo nome do serviço: "app".
+
+[source,nginx]
+----
+server {
+    listen 80;
+    server_name example.org;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+    
+    location /.well-known/acme-challenge/ {  ## Define o desafio
+        root /var/www/certbot;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name example.org;
+
+    ssl_certificate /etc/letsencrypt/live/example.org/fullchain.pem;    ## Define a chave pública
+    ssl_certificate_key /etc/letsencrypt/live/example.org/privkey.pem;  ## Define a chave privada
+
+    include /etc/letsencrypt/options-ssl-nginx.conf;   ## Configurações geradas pelo CertBot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; 
+    
+    location / {
+        proxy_pass http://app:8080;    ## Aqui finalmente acessamos a aplicação
+    }
+}
+----
+
+== Conclusão
+
+Com essa configuração, sua aplicação — independentemente do framework utilizado — agora está acessível via HTTPS, com certificados válidos e renovação automática gerenciada pela Let's Encrypt.
+
+O NGINX atua como um gateway seguro, descriptografando o tráfego externo e redirecionando-o para sua app interna, enquanto o Docker mantém os serviços isolados e fáceis de atualizar.
+
+Se tiver dúvidas ou sugestões, entra em contato comigo pelas redes sociais! 
