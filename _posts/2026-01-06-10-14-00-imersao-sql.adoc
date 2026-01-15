@@ -25,3 +25,52 @@ Alguns bancos também podem optar por fazer adaptações, ou extensões, da ling
 Para melhor didática vamos começar a configurar o ambiente do zero criando e configurando uma base de dados. Então acessa o repositório https://github.com/vepo/sql-database-tutorial[github.com/vepo/sql-database-tutorial] e segue pelo tópico https://github.com/vepo/sql-database-tutorial/blob/main/docs/03-sql-tutorial.md[3. SQL Tutorial: Database Navigation and Querying].
 
 === Como é o modelo de dados que estamos trabalhando?
+
+// XLJHRgCm47ptLwnuQNCwf3HINwggQfIalUWkKPLozuesu0jEmKQswGcL_Fijf0c69gs4GFREBZFZWNjZKTiYIza5J5IMOsHXYXRNQ3WyHmdF46Ohc0hSQCmOuz8AMmBFybILd1juOm3VZkjGn703ysKmUwIkszkddtTt1F1zklqLsjXGOiO9ycUyclmOhowlXmE2BPSDBCKl0CH6f4xnQdYiqkDtWyaJ9Tq1e-60TXEXUHYZhIlJSJ1hPsxLEYHDAJyzbn0npycZZAJtvJtivHbCKPVrvDbalXZ_elxleth0P5_FKEA6wpFTaUR4AmxHKZMOBsRFmNZnn7P7izlt7-m-pyWrt47rJEtgIrM4LYZP0r1bNSGRRbrXroJi2qKjyLohBO-EhD-Ndr4-G7fyHns-JMJTmwoJ8UFUpbdkr6uBqqt8uQns7n8UzaISItejlHLpLcmNrcZMAkq5liwhAhG9_odzmcD7GoE1I5x0Wz9SR2Iyy18qJvi3D8d83Mk_pLtb-rNbVAmtuBsVdDU3gQeJCmAsIu-vfLD3dQITc5_LyzzEE4gTjK8JAkcnu-vdy0HDYCQGy8QCLpknG5dwLldqvguL89Lj5WIw319XeBveh21FroNOXCEsa56JVVhbqJ5qd0HSgrS-e6x7guQRIsbFXoPQvS6hm8_46RkdUD8_zZy0
+
+image::databases/company_db_diagram.png[]
+
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    hire_date DATE NOT NULL,
+    job_title VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id INT REFERENCES employees(employee_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Departments table
+CREATE TABLE departments (
+    department_id SERIAL PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL,
+    location VARCHAR(100),
+    budget DECIMAL(15,2),
+    manager_id INT REFERENCES employees(employee_id)
+);
+
+-- Projects table
+CREATE TABLE projects (
+    project_id SERIAL PRIMARY KEY,
+    project_name VARCHAR(200) NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    budget DECIMAL(15,2),
+    status VARCHAR(20) CHECK (status IN ('Planning', 'Active', 'On Hold', 'Completed', 'Cancelled'))
+);
+
+-- Employee projects (junction table)
+CREATE TABLE employee_projects (
+    employee_id INT REFERENCES employees(employee_id),
+    project_id INT REFERENCES projects(project_id),
+    role VARCHAR(50),
+    hours_worked DECIMAL(5,2),
+    PRIMARY KEY (employee_id, project_id)
+);
+----
