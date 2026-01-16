@@ -26,6 +26,8 @@ Para melhor didática vamos começar a configurar o ambiente do zero criando e c
 
 === Como é o modelo de dados que estamos trabalhando?
 
+Antes de começarmos, precisamos brevemente entender o modelo de dados que vamos usar. Vamos usar uma base de dados que mapeia a estrutura de uma empresa. Quais funcionários existem, quais departamentos eles estão alocados, quais são os orçamentos alocados e quais projetos existem. Na imagem abaixo, está o diagrama de entidades e mais abaixo o script usando para criação das tabelas.
+
 // XLJHRgCm47ptLwnuQNCwf3HINwggQfIalUWkKPLozuesu0jEmKQswGcL_Fijf0c69gs4GFREBZFZWNjZKTiYIza5J5IMOsHXYXRNQ3WyHmdF46Ohc0hSQCmOuz8AMmBFybILd1juOm3VZkjGn703ysKmUwIkszkddtTt1F1zklqLsjXGOiO9ycUyclmOhowlXmE2BPSDBCKl0CH6f4xnQdYiqkDtWyaJ9Tq1e-60TXEXUHYZhIlJSJ1hPsxLEYHDAJyzbn0npycZZAJtvJtivHbCKPVrvDbalXZ_elxleth0P5_FKEA6wpFTaUR4AmxHKZMOBsRFmNZnn7P7izlt7-m-pyWrt47rJEtgIrM4LYZP0r1bNSGRRbrXroJi2qKjyLohBO-EhD-Ndr4-G7fyHns-JMJTmwoJ8UFUpbdkr6uBqqt8uQns7n8UzaISItejlHLpLcmNrcZMAkq5liwhAhG9_odzmcD7GoE1I5x0Wz9SR2Iyy18qJvi3D8d83Mk_pLtb-rNbVAmtuBsVdDU3gQeJCmAsIu-vfLD3dQITc5_LyzzEE4gTjK8JAkcnu-vdy0HDYCQGy8QCLpknG5dwLldqvguL89Lj5WIw319XeBveh21FroNOXCEsa56JVVhbqJ5qd0HSgrS-e6x7guQRIsbFXoPQvS6hm8_46RkdUD8_zZy0
 
 image::databases/company_db_diagram.png[]
@@ -74,3 +76,100 @@ CREATE TABLE employee_projects (
     PRIMARY KEY (employee_id, project_id)
 );
 ----
+
+É importante notar a cardinalidade de alguns elementos. Um funcionário trabalha para um departamento que possui um gerente. Cada funcionário também possui um gerente, que pode não ser o mesmo do departamento. Cada funcionátrio trabalha em vários projetos, possuindo papeis diferentes. Os projetos não são ligados aos departamentos, podendo ter funcionários de diversos departamentos.
+
+O modelo é propositadamente complexo para possibilitar a elaborações de _queries_ com junções e _subqueires_. A pessoa que deseja escrever queries tem que estar ciente da cardinalidade das relações para que não sejam extraídas informações inverídicas. 
+
+Já que conhecemos o modelo de dados, podemos partir para a interação com ele.
+
+=== Como conectar com uma base de dados?
+
+Todo desenvolvedor comumente se refere aos *Sistemas de Gerenciamento de Banco de Dados* (SGDB, ou DBMS de _Database Management System_) como base de dados ou databases, mas uma instância do PostgreSQL, ou de qualquer outra base de dados, pode gerenciar diversas base de dados em paralelo.
+
+Normalmente quando nossa aplicação conecta com um banco de dados, precisamos saber o _hostname_, a porta e o banco de dados que queremos nos conectar. Mas como vamos conectar localmente usando as ferramentas de linha de comando, não precisamos dessas informações. Mas precisamos selecionar, dentro do programa, qual base de dados queremos usar.
+
+Todo SGDB pode conter mais de uma base de dados e cada base de dados pode conter mais de uma tabela, tanto que existe uma série de comandos para criar a apagar bases de dados, que são comuns na linguagem SQL. Mas a forma como selecionamos qual base estamos usando varia de acordo com a base em uso. Para PostgreSQL, se usa `\c company_db`, já no https://dev.mysql.com/doc/refman/8.4/en/database-use.html[MySQL] e no https://learn.microsoft.com/en-us/sql/t-sql/language-elements/use-transact-sql?view=sql-server-ver17[SQL Server] se usa `USE company_db`.
+
+.Comando SQL para criar uma base de dados
+[source,sql]
+----
+CREATE DATABASE company_db; -- Cria um banco de dados chamado 'company_db'
+----
+
+.Comando SQL para destruir uma base de dados
+[source,sql]
+----
+DROP DATABASE company_db; -- Destruir um banco de dados chamado 'company_db'
+----
+
+.Comando SQL para usar uma base de dados no PostgreSQL
+[source,sql]
+----
+\c company_db -- Acessando um banco de dados chamado 'company_db'
+----
+
+Então agora que conectamos a nossa base de dados dentro do SGDB, vamos criar _queries_?
+
+=== Como escrever consultas (_queries_)?
+
+É preciso lembrar que qualquer consulta a uma base de dados SQL envolve o conceito de Algébra Relacional já discutido anteriormente. Consultas são feitas usando o comando `SELECT` que sempre é construído através do padrão `SELECT <atributos> FROM <relação>`, onde *atributos* é o conjunto de colunas que desejamos selecionar e *relação* é as tabelas ou qualquer outra consulta. Dessa forma a consulta mais simples que podemos fazer é listar todos as linhas e todas as colunas de uma tabela, conforme feito abaixo com a tabela `departments`.
+
+[source,sql]
+----
+SELECT * FROM departments; -- '*' significa a seleção de todos os atributos presentes na relação
+----
+
+Uma consulta, em muitas situações, pode não ser eficiente, porque é bom lembrar que ao enviar uma consulta para um SGDB, este terá que consultar o disco para encontrar todas as linhas e todos os atributos e enviar de volta para o cliente. Essa operação pode ser bastante demorada devido ao tempo de acesso ao disco, e ao tempo de envio dessa informação entre os processos. Por isso é muito incomum fazer esse tipo de requisição em sistemas.
+
+==== Consultas com Seleção e Projeção
+
+Em sistemas, praticamente todas as consultas passam pelas operações de seleção e projeção para se evitar o acesso desncessário ao dados. Isso é feito para que não se adicione latência a operação sendo realizada e para que o sistema não use memória desnecessária.
+
+Vamos supor que eu precise saber o identificador e a cidades em que está localizado um determinado departamento, ignorando o budget e o gerente do mesmo. Ao invés de selecionar todos os departamentos, posso fazer uma consulta específica como a consulta abaixo.
+
+[source,sql]
+----
+SELECT department_id, location FROM departments WHERE department_name = 'Sales'; 
+----
+
+Na consulta acima, extendemos nossa consulta inicial para fazer a projeção através do conjunto de atributos 'department_id, location' da relação que contêm todos os elementos da tabela `departments` com o nome Sales, ou seja, pegamos a tabela `departments` e aplicamos uma seleção.
+
+Em toda consulta, podemos adicionar a declaração `WHERE` para filtrar, durante a leitura, as linhas que serão consideradas parte da relação. A declaração `WHERE` será composta por um predicado booleano que ao ser aplicado em cada linha define se a mesma pode ser adicionada ou não na relação. Esse predicado pode ter outras consultas, como no caso abaixo.
+
+.Consulta que lista todos os departamentos que não possuem funcionários alocados.
+[source,sql]
+----
+SELECT department_id, 
+       location 
+
+FROM departments 
+
+WHERE department_id NOT IN (SELECT DISTINCT department_id 
+                            FROM employees
+                            WHERE department_id IS NOT NULL
+                           );
+----
+
+==== Consultas com Junção
+
+Outra funcionalidade importantíssima do SQL é a possibilidade de fazer junções entre tabelas. No nosso modelo podemos identificar diversas tabelas com relacionamentos e todos esses relacionamentos podem ser escritos na forma de junções. Por exemplo, se desejarmos saber qual é o custo de um departamento e o valor alocado para mesmo, podem ser tentado a fazer esse calculo usando as tabelas `departments`, `employees`, `employee_projects` e `projects`.
+
+.Consulta que faz uma agregação por departamento do gasto pessoal. O valor calculado está incorreto.
+[source,sql]
+----
+SELECT 
+    dep.department_id, 
+    dep.department_name, 
+    dep.budget, 
+    SUM(prj.budget) as project_budget, 
+    SUM(emp.salary) as employee_salaries
+FROM departments dep 
+LEFT JOIN employees emp ON emp.department_id = dep.department_id 
+LEFT JOIN employee_projects emp_prj ON emp_prj.employee_id = emp.employee_id 
+LEFT JOIN projects prj ON prj.project_id = emp_prj.project_id 
+GROUP BY dep.department_id
+ORDER BY dep.department_name ASC;
+----
+
+Na consulta acima foi utilizado três novas declarações que quero explicar aqui. `JOIN`, `GROUP BY` e `ORDER BY`.
