@@ -250,3 +250,101 @@ Talvez você tenha imaginado que essa consulta é mais lenta do que a anterior, 
 Outra vantagem das subconsultas é a sua capacidade de tornar as consultas mais legíveis e fáceis de entender, especialmente quando lidamos com consultas complexas que envolvem várias tabelas e condições.
 
 Nessa consulta, também usamos a função `COALESCE`, que retorna o primeiro valor não nulo em uma lista de argumentos. Isso é útil para garantir que, se não houver projetos ou funcionários em um departamento, o valor retornado seja 0 em vez de nulo.
+
+==== Common Table Expressions (CTEs)
+
+Uma outra forma de estruturar consultas complexas em SQL é através do uso de Common Table Expressions (CTEs), que são definidas usando a cláusula `WITH`. CTEs permitem que você defina consultas temporárias que podem ser referenciadas dentro da consulta principal, tornando o código mais organizado e legível.
+
+A consulta abaixo reescreve a consulta anterior usando CTEs para calcular o orçamento dos projetos e o total de salários dos funcionários para cada departamento.
+
+.Consulta que usa CTEs para organizar a consulta principal
+[source,sql]
+----
+WITH department_employees AS (
+    SELECT 
+        department_id,
+        SUM(salary) as total_salary
+    FROM employees
+    GROUP BY department_id
+),
+department_projects AS (
+    SELECT 
+        emp.department_id,
+        SUM(DISTINCT prj.budget) as total_project_budget
+    FROM projects prj
+    JOIN employee_projects emp_prj ON prj.project_id = emp_prj.project_id
+    JOIN employees emp ON emp_prj.employee_id = emp.employee_id
+    GROUP BY emp.department_id
+)
+SELECT 
+    dep.department_id,
+    dep.department_name,
+    dep.budget,
+    COALESCE(dp.total_project_budget, 0) as project_budget,
+    COALESCE(de.total_salary, 0) as employee_salaries
+FROM departments dep
+LEFT JOIN department_employees de ON dep.department_id = de.department_id
+LEFT JOIN department_projects dp ON dep.department_id = dp.department_id
+ORDER BY dep.department_name ASC;
+----
+
+Essa consulta usa duas CTEs: `department_employees` e `department_projects`, que calculam o total de salários dos funcionários e o orçamento dos projetos para cada departamento, respectivamente. A consulta principal então junta essas CTEs com a tabela `departments` para obter os resultados finais. Usar CTEs pode tornar consultas complexas mais fáceis de entender e manter, além de permitir a reutilização de consultas temporárias dentro da consulta principal.
+
+=== Como inserir dados?
+
+Agora que sabemos como consultar dados, precisamos saber como inserir novos dados na base. Para isso usamos o comando `INSERT INTO`, que permite adicionar novas linhas a uma tabela existente.
+
+.Consulta que insere um novo departamento na tabela `departments`
+[source,sql]
+----
+INSERT INTO departments (department_name, location, budget)
+VALUES ('Research & Development', 'Austin', 950000.00)
+----
+
+Essa consulta insere um novo departamento chamado "Research & Development" localizado em "Austin" com um orçamento de 950.000,00 na tabela `departments`. É importante garantir que os valores inseridos estejam de acordo com as restrições definidas na tabela, como tipos de dados e chaves primárias.
+
+Uma insersão sempre terá o formato `INSERT INTO <tabela> (<atributos>) VALUES (<valores>)`, onde *tabela* é a tabela onde os dados serão inseridos, *atributos* é o conjunto de colunas que receberão os valores e *valores* é o conjunto de valores a serem inseridos. 
+
+Os valores inseridos podem ser constantes, como no exemplo acima, ou podem ser o resultado de uma consulta. Nesse caso, a consulta deve retornar um conjunto de resultados que corresponde ao número e tipo de atributos especificados na cláusula `INSERT INTO`.
+
+.Consulta que insere novos funcionários na tabela `employees` a partir de uma consulta
+[source,sql]
+----
+INSERT INTO employees (first_name, last_name, email, hire_date, job_title, department_id, salary)
+SELECT first_name, last_name, email, hire_date, job_title, department_id, salary
+FROM temp_employees
+WHERE hire_date >= '2025-01-01';
+----
+
+=== Como atualizar dados?
+
+Para atualizar dados existentes em uma tabela, usamos o comando `UPDATE`, que permite modificar os valores de uma ou mais colunas para linhas que satisfazem uma determinada condição. O comando `UPDATE` é estruturado da seguinte forma: `UPDATE <tabela> SET <atributo>=<valor> WHERE <condição>`.
+
+É sempre importante usar a cláusula `WHERE` para evitar atualizar todas as linhas da tabela, a menos que essa seja a intenção.
+
+.Consulta que atualiza o orçamento de um departamento na tabela `departments`
+[source,sql]
+----
+-- Aumenta o salário dos funcionários do departamento 1 em 10%
+UPDATE employees
+SET salary = salary * 1.10
+WHERE department_id = 1;
+
+-- Atualiza o orçamento dos departamentos com base no total de 
+-- salários dos funcionários usando um overhead de 20%
+UPDATE departments dep
+SET budget = (
+    SELECT SUM(salary) * 12 * 1.20  -- 20% overhead
+    FROM employees emp
+    WHERE emp.department_id = dep.department_id
+)
+WHERE budget IS NULL;
+----
+
+== Explorando a sintaxe SQL
+
+
+
+== Conclusão
+
+Agora sabemos fazer operações básicas de consulta, inserção e atualização de dados em uma base de dados SQL. Também aprendemos sobre junções, agregações, subconsultas e CTEs, que são ferramentas poderosas para trabalhar com dados relacionais. Esse conhecimento é essencial para qualquer desenvolvedor que trabalhe com bancos de dados relacionais e nos prepara para explorar funcionalidades mais avançadas do SQL em futuras imersões.
