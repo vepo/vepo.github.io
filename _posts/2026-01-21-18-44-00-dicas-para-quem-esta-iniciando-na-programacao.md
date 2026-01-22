@@ -85,6 +85,6 @@ Livros são excelentes, mas é preciso ter calma para escolher um livro bom. Em 
 
 Prefira baixar o livro, quem sabe você não encontra ele por aí.
 
-## 7. Curso é bom?
+## 8. Curso é bom?
 
 Também vá com calma! Escolha bem o curso antes de comprar. Existe muito picareta no mercado. Escolha muito bem o curso e a dica que eu te dou é evitar promessas miraculosas e escolher aquele que dá um bom acompanhamento. Se o material do curso só for liberado depois do sétimo dia, cancela!!!! Isso acontece porque não existe material, o vendendor do curso está esperando vencer o prazo de cancelamento do curso para te mostrar que você foi engando.
