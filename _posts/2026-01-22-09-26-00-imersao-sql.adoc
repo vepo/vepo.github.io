@@ -172,4 +172,81 @@ GROUP BY dep.department_id
 ORDER BY dep.department_name ASC;
 ----
 
-Na consulta acima foi utilizado três novas declarações que quero explicar aqui. `JOIN`, `GROUP BY` e `ORDER BY`.
+.Porque o valor calculado está incorreto?
+[sidebar]
+O valor calculado na consulta acima está incorreto porque a junção entre as tabelas `employees`, `employee_projects` e `projects` cria uma relação com cardinalidade maior do que a original. Isso acontece porque um funcionário pode trabalhar em vários projetos, então ao fazer a junção, cada linha do funcionário é replicada para cada projeto que ele trabalha. Isso faz com que o salário do funcionário seja somado várias vezes, uma para cada projeto, resultando em um valor total incorreto.
+
+Na consulta acima foi utilizado três novas declarações que quero explicar aqui. `JOIN`, `GROUP BY` e `ORDER BY`. 
+
+Os `JOIN` são usados para fazer junções entre tabelas, ou seja, criar uma nova relação a partir de duas outras. No exemplo acima, foi usado o `LEFT JOIN` que cria uma nova relação com todas as linhas da tabela da esquerda e as linhas da tabela da direita que satisfazem a condição dada. Caso não existam linhas na tabela da direita que satisfaçam a condição, então os atributos dessas linhas serão nulos. Existem outros tipos de `JOIN`, que veremos a seguir.
+
+O `GROUP BY` é usado para agrupar linhas que possuem o mesmo valor em determinados atributos. No exemplo acima, todas as linhas que possuem o mesmo `department_id` são agrupadas em uma única linha. Isso é útil quando queremos fazer agregações, como somas ou médias, sobre grupos de linhas. `GROUP BY` não é obrigatório em todas as consultas, mas é necessário quando a cardinalidade da relação resulta em múltiplas linhas para o mesmo valor de um atributo que está sendo selecionado e podemos já requerer uma agregação dos dados, evitando processamento desnecessário no cliente.
+
+O `ORDER BY` é usado para ordenar as linhas da relação resultante de acordo com os valores de um ou mais atributos. No exemplo acima, as linhas são ordenadas pelo atributo `department_name` em ordem crescente (`ASC`). Também é possível ordenar em ordem decrescente usando a palavra-chave `DESC`. Importante lembrar que o `ORDER BY` pode ser aplicado mesmo quando o `JOIN` ou o `GROUP BY` não são usados, foi usado aqui como demonstrativo apenas, ele pode ser usando em qualquer consulta.
+
+===== Tipos de Junção
+
+Existem diversos tipos de junção que podem ser usados em SQL, cada um com suas características e usos específicos. Os principais tipos de junção são:
+
+* `INNER JOIN`: Retorna apenas as linhas que possuem correspondência em ambas as tabelas. Ou seja, somente as linhas que satisfazem a condição de junção são incluídas na relação resultante.
+* `LEFT JOIN` (ou `LEFT OUTER JOIN`): Retorna todas as linhas da tabela da esquerda e as linhas correspondentes da tabela da direita. Se não houver correspondência, os atributos da tabela da direita serão nulos.
+* `RIGHT JOIN` (ou `RIGHT OUTER JOIN`): Retorna todas as linhas da tabela da direita e as linhas correspondentes da tabela da esquerda. Se não houver correspondência, os atributos da tabela da esquerda serão nulos.
+* `FULL JOIN` (ou `FULL OUTER JOIN`): Retorna todas as linhas de ambas as tabelas. Se não houver correspondência, os atributos da tabela que não possui correspondência serão nulos.
+* `CROSS JOIN`: Retorna o produto cartesiano das duas tabelas, ou seja, todas as combinações possíveis entre as linhas das duas tabelas. É o único tipo de `JOIN` que não requer uma condição de junção.
+
+Uma junção sempre é feita entre duas tabelas e baseada em uma condição que define como as linhas das duas tabelas devem ser combinadas. A condição é definida após a palavra-chave `ON` e geralmente envolve a comparação de atributos que possuem algum tipo de relacionamento entre as tabelas. Por exemplo, na consulta abaixo, estamos fazendo um `INNER JOIN` entre as tabelas `employees` e `departments` com base no atributo `department_id`, que é comum a ambas as tabelas.
+
+[source,sql]
+----
+SELECT emp.first_name, 
+       emp.last_name, 
+       dep.department_name
+FROM employees emp
+LEFT JOIN departments dep 
+ON emp.department_id = dep.department_id;
+----
+
+===== Funções de Agregação
+
+Na consulta que fizemos anteriormente, usamos a função de agregação `SUM` para calcular o total de salários dos funcionários em cada departamento. Funções de agregação são usadas para realizar cálculos em um conjunto de valores e retornar um único valor. As principais funções de agregação em SQL são:
+
+* `COUNT()`: Conta o número de linhas em um conjunto de resultados.
+* `SUM()`: Calcula a soma dos valores em um conjunto de resultados.
+* `AVG()`: Calcula a média dos valores em um conjunto de resultados.
+* `MIN()`: Retorna o valor mínimo em um conjunto de resultados.
+* `MAX()`: Retorna o valor máximo em um conjunto de resultados.
+
+Funções de agregação são frequentemente usadas em conjunto com a cláusula `GROUP BY` para agrupar linhas e calcular valores agregados para cada grupo.
+
+==== Subconsultas
+
+Outra funcionalidade poderosa do SQL é a capacidade de usar subconsultas, que são consultas aninhadas dentro de outras consultas. Subconsultas podem ser usadas em várias partes de uma consulta, como na cláusula `SELECT`, `FROM` ou `WHERE`. Elas permitem que você realize consultas mais complexas e dinâmicas.
+
+.Consulta que usa uma subconsulta na cláusula `WHERE`
+[source,sql]
+----
+SELECT 
+    dep.department_id, 
+    dep.department_name, 
+    dep.budget,
+    -- Calcula o orçamento dos projetos separadamente
+    (SELECT COALESCE(SUM(DISTINCT prj.budget), 0)
+     FROM projects prj
+     JOIN employee_projects emp_prj ON prj.project_id = emp_prj.project_id
+     JOIN employees emp ON emp_prj.employee_id = emp.employee_id
+     WHERE emp.department_id = dep.department_id) as project_budget,
+    -- Calcula o total de salários dos funcionários separadamente
+    (SELECT COALESCE(SUM(emp.salary), 0)
+     FROM employees emp
+     WHERE emp.department_id = dep.department_id) as employee_salaries
+FROM departments dep
+ORDER BY dep.department_name ASC;
+----
+
+A subconsulta acima calcula o orçamento dos projetos e o total de salários dos funcionários para cada departamento separadamente, evitando o problema de duplicação de linhas que ocorreu na consulta anterior. A subconsulta é executada para cada linha do resultado da consulta principal, permitindo que você obtenha valores dinâmicos com base nos dados atuais.
+
+Talvez você tenha imaginado que essa consulta é mais lenta do que a anterior, mas na verdade, dependendo do otimizador de consultas do SGDB, essa consulta pode ser mais eficiente, pois evita a criação de relações intermediárias com cardinalidade maior do que o necessário.
+
+Outra vantagem das subconsultas é a sua capacidade de tornar as consultas mais legíveis e fáceis de entender, especialmente quando lidamos com consultas complexas que envolvem várias tabelas e condições.
+
+Nessa consulta, também usamos a função `COALESCE`, que retorna o primeiro valor não nulo em uma lista de argumentos. Isso é útil para garantir que, se não houver projetos ou funcionários em um departamento, o valor retornado seja 0 em vez de nulo.
