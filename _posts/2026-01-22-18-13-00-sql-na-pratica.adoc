@@ -35,17 +35,17 @@ image::databases/company_db_diagram.png[]
 [source,sql]
 ----
 CREATE TABLE employees (
-    employee_id SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    phone VARCHAR(20),
-    hire_date DATE NOT NULL,
-    job_title VARCHAR(100) NOT NULL,
+    employee_id   SERIAL PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) UNIQUE NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
     department_id INT,
-    salary DECIMAL(10,2) CHECK (salary >= 0),
-    manager_id INT REFERENCES employees(employee_id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    salary        DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id    INT REFERENCES employees(employee_id),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Departments table

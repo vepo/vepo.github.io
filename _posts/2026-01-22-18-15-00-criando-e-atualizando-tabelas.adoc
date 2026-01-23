@@ -25,3 +25,29 @@ No modelo relacional, os dados são organizados em relações compostas por atri
 3. Como as relações se relacionam entre si;
 4. Quais restrições de integridade se aplicam a cada atributo;
 5. Qual o tipo de dados armazenado em cada atributo.
+
+Nesse post vamos ver como criar e atualizar tabelas, ou seja, como definir e modificar o esquema do banco de dados.
+
+== Criando tabelas
+
+Para criar uma tabela em SQL, usamos o comando `CREATE TABLE`. Vamos o exemplo de criação usado anteriormente para ilustrar:
+
+.Criando a tabela "employees"
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id   SERIAL PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) UNIQUE NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary        DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id    INT REFERENCES employees(employee_id),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+----
+
+No exemplo acima, criamos a tabela `employees` com vários atributos, cada um com seu tipo de dado e restrições específicas. Podemos ver, por exemplo, o atributo `phone`, que é do tipo `VARCHAR(20)` e não possui nenhuma restrição de integrridade. `VARCHAR` significa que o 
