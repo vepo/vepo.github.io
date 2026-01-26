@@ -10,7 +10,7 @@ permalink: /posts/sql-na-pratica
 publish_date: 2026-01-22 18:13:00 +0300
 ---
 
-No post anterior, aprendemos como consultar e modificar dados. Agora vamos dar um passo atrás: como criar e atualizar as próprias tabelas.
+No post anterior, aprendemos como consultar e modificar dados. Talvez você não tenha tido a curiosidade de se perguntar como as tabelas foram criadas, apesar do script ter sido fornecido, mas agora é o momento de dar um passo atrás e explicar: como criar e atualizar as próprias tabelas.
 
 == O que é o esquema de uma tabela?
 
@@ -28,7 +28,7 @@ No modelo relacional, os dados são organizados em relações compostas por atri
 
 Nesse post vamos ver como criar e atualizar tabelas, ou seja, como definir e modificar o esquema do banco de dados.
 
-== Criando tabelas
+== Como faço para criar uma tabela?
 
 Para criar uma tabela em SQL, usamos o comando `CREATE TABLE`. Vamos o exemplo de criação usado anteriormente para ilustrar:
 
@@ -50,4 +50,70 @@ CREATE TABLE employees (
 );
 ----
 
-No exemplo acima, criamos a tabela `employees` com vários atributos, cada um com seu tipo de dado e restrições específicas. Podemos ver, por exemplo, o atributo `phone`, que é do tipo `VARCHAR(20)` e não possui nenhuma restrição de integrridade. `VARCHAR` significa que o 
+=== Como definir os tipos de dados dos atributos?
+
+No exemplo acima, criamos a tabela `employees` com vários atributos, cada um com seu tipo de dado e restrições específicas. Podemos ver, por exemplo, o atributo `phone`, que é do tipo `VARCHAR(20)` e não possui nenhuma restrição de integrridade. `VARCHAR` significa que campo armazenará uma cadeia de caracteres (texto) com tamanho variável, mesmo tendo definido que o tamanho máximo é 20 caracteres. Alguns dos possíveis tipos de dados em PostgreSQL são listados na tabela abaixo: 
+
+.Tipos de dados comuns em PostgreSQL, para referência acesse https://www.postgresql.org/docs/current/datatype.html
+[cols="1,1,1", options="header"]
+|=== 
+| PostgreSQL
+| MySQL
+| Descrição
+
+| `INT` ou `INTEGER`
+| `INT`
+| Números inteiros (sem casas decimais).
+
+| `BIGINT`
+| `BIGINT`
+| Números inteiros grandes (64 bits), usados para armazenar valores maiores que os inteiros normais.
+
+| `DECIMAL(p,s)` ou `NUMERIC(p,s)`
+| `DECIMAL(p,s)`
+| Números decimais com precisão definida. `p` é a precisão total (número total de dígitos) e `s` é a escala (número de dígitos à direita da vírgula).
+
+| `FLOAT` ou `REAL`
+| `FLOAT`
+| Números de ponto flutuante (números com casas decimais).
+
+| `SERIAL`
+| N/A
+| Números inteiros auto-incrementáveis, geralmente usados para chaves primárias.
+
+| `BIGSERIAL`
+| N/A
+| Números inteiros grandes auto-incrementáveis, usados para chaves primárias quando se espera um grande volume de dados.
+
+| `VARCHAR`
+| `VARCHAR`
+| Cadeia de caracteres (texto) com tamanho variável. O número entre parênteses indica o tamanho máximo permitido.
+
+| `CHAR`
+| `CHAR`
+| Cadeia de caracteres (texto) com tamanho fixo. O número entre parênteses indica o tamanho exato.
+
+| `TEXT`
+| `TEXT`
+| Cadeia de caracteres (texto) de tamanho ilimitado.
+
+| `DATE`
+| `DATE`
+| Data no formato AAAA-MM-DD.
+
+| `TIME`
+| `TIME`
+| Hora no formato HH:MM:SS.
+
+
+| `TIMESTAMP`
+| `TIMESTAMP`
+| Data e hora no formato AAAA-MM-DD HH:MM:SS.
+
+| `BOOLEAN`
+| N/A
+| Valores lógicos: `TRUE` ou `FALSE`.
+
+|===
+
+No nosso exemplo, também usamos os seguintes tipos: `SERIAL`, `VARCHAR`, `DATE`, `DECIMAL` e `TIMESTAMP`.
