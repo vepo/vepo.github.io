@@ -1,0 +1,340 @@
+---
+title: "SQL na Prática: Criando e Atualizando tabelas"
+published: true
+description: "Aprenda a criar e modificar tabelas em SQL com exemplos práticos em PostgreSQL. Descubra a diferença entre constraints em nível de coluna e tabela, chaves primárias compostas, e como nomear constraints para facilitar a manutenção do banco de dados."
+tags: [SQL, PostgreSQL, Banco de Dados, Modelagem de Dados, Backend, Desenvolvimento Web]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/criando-tabelas-com-sql
+publish_date: 2026-02-20 16:31:00 +0300
+---
+
+No post anterior, aprendemos como consultar e modificar dados. Talvez você não tenha tido a curiosidade de se perguntar como as tabelas foram criadas, apesar do script ter sido fornecido, mas agora é o momento de dar um passo atrás e explicar: como criar e atualizar as próprias tabelas.
+
+== O que é o esquema de uma tabela?
+
+Uma das principais vantagens dos bancos de dados relacionais é que o sistema gerencia e garante a consistência dos dados, e isso é feito por meio do esquema do banco de dados.
+
+Como já definimos antes, o esquema (ou *schema*) é a descrição de uma coleção de dados que estabelece a estrutura de armazenamento.
+
+No modelo relacional, os dados são organizados em relações compostas por atributos, em que cada linha de uma tabela representa uma entidade em si. Dessa forma, o esquema de um banco tem a responsabilidade de definir:
+
+1. Quais são as relações (tabelas) e seus nomes;
+2. Quais atributos cada relação contém;
+3. Como as relações se relacionam entre si;
+4. Quais restrições de integridade se aplicam a cada atributo;
+5. Qual o tipo de dados armazenado em cada atributo.
+
+Nesse post vamos ver como criar e atualizar tabelas, ou seja, como definir e modificar o esquema do banco de dados.
+
+== Como faço para criar uma tabela?
+
+Para criar uma tabela em SQL, usamos o comando `CREATE TABLE`. Vamos usar o exemplo de criação mencionado anteriormente para ilustrar:
+
+.Criando a tabela "employees"
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id   SERIAL PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) UNIQUE NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary        DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id    INT REFERENCES employees(employee_id),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+----
+
+=== Como definir os tipos de dados dos atributos?
+
+No exemplo acima, criamos a tabela `employees` com vários atributos, cada um com seu tipo de dado e restrições específicas. Podemos ver, por exemplo, o atributo `phone`, que é do tipo `VARCHAR(20)` e não possui nenhuma restrição de integridade. `VARCHAR` significa que o campo armazenará uma cadeia de caracteres (texto) com tamanho variável, mesmo tendo definido que o tamanho máximo é 20 caracteres. Alguns dos possíveis tipos de dados em PostgreSQL são listados na tabela abaixo: 
+
+.Tipos de dados comuns em PostgreSQL e MySQL, para referência acesse https://www.postgresql.org/docs/current/datatype.html ou https://dev.mysql.com/doc/refman/8.4/en/data-types.html
+[cols="1,1,1", options="header"]
+|=== 
+| PostgreSQL
+| MySQL
+| Descrição
+
+| `INT` ou `INTEGER`
+| `INT`
+| Números inteiros (sem casas decimais).
+
+| `BIGINT`
+| `BIGINT`
+| Números inteiros grandes (64 bits), usados para armazenar valores maiores que os inteiros normais.
+
+| `DECIMAL(p,s)` ou `NUMERIC(p,s)`
+| `DECIMAL(p,s)`
+| Números decimais com precisão definida. `p` é a precisão total (número total de dígitos) e `s` é a escala (número de dígitos à direita da vírgula).
+
+| `FLOAT` ou `REAL`
+| `FLOAT`
+| Números de ponto flutuante (números com casas decimais).
+
+| `SERIAL`
+| N/A
+| Números inteiros auto-incrementáveis, geralmente usados para chaves primárias.
+
+| `BIGSERIAL`
+| N/A
+| Números inteiros grandes auto-incrementáveis, usados para chaves primárias quando se espera um grande volume de dados.
+
+| `VARCHAR(n)`
+| `VARCHAR(n)`
+| Cadeia de caracteres (texto) com tamanho variável. O número entre parênteses indica o tamanho máximo permitido.
+
+| `CHAR(n)`
+| `CHAR(n)`
+| Cadeia de caracteres (texto) com tamanho fixo. O número entre parênteses indica o tamanho exato.
+
+| `TEXT`
+| `TEXT`
+| Cadeia de caracteres (texto) de tamanho ilimitado.
+
+| `DATE`
+| `DATE`
+| Data no formato AAAA-MM-DD.
+
+| `TIME`
+| `TIME`
+| Hora no formato HH:MM:SS.
+
+| `TIMESTAMP`
+| `TIMESTAMP`
+| Data e hora no formato AAAA-MM-DD HH:MM:SS.
+
+| `BOOLEAN`
+| N/A
+| Valores lógicos: `TRUE` ou `FALSE`.
+
+|===
+
+No nosso exemplo, também usamos os seguintes tipos: `SERIAL`, `VARCHAR`, `DATE`, `DECIMAL` e `TIMESTAMP`.
+
+=== Como garantir a integridade do dado?
+
+Além dos tipos de dados, as restrições de integridade (conhecidas como *constraints*) são fundamentais para garantir que os dados armazenados estejam sempre consistentes e válidos. No exemplo da tabela `employees`, utilizamos diversas restrições:
+
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id   SERIAL PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) UNIQUE NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary        DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id    INT REFERENCES employees(employee_id),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+----
+
+==== Constraints em nível de coluna vs. nível de tabela
+
+No exemplo acima, todas as constraints foram definidas **diretamente na coluna**, o que chamamos de *constraints em nível de coluna*. Porém, o SQL também permite definir constraints **separadamente, ao final da criação da tabela** - são as *constraints em nível de tabela*. Esta sintaxe é especialmente útil quando:
+
+- A constraint envolve múltiplas colunas (como uma chave primária composta)
+- Queremos dar um nome significativo à constraint para facilitar manutenção futura
+- Precisamos de mais clareza na definição das regras de negócio
+
+Vamos refatorar a criação da tabela `employees` usando constraints em nível de tabela:
+
+.Criando a tabela "employees" com constraints em nível de tabela
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id   SERIAL,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary        DECIMAL(10,2),
+    manager_id    INT,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Constraints em nível de tabela
+    CONSTRAINT employees_pk PRIMARY KEY (employee_id),
+    CONSTRAINT employees_email_unique UNIQUE (email),
+    CONSTRAINT employees_salary_check CHECK (salary >= 0),
+    CONSTRAINT employees_manager_fk FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
+);
+----
+
+Observe as diferenças:
+- A `PRIMARY KEY` agora é definida como uma constraint nomeada `employees_pk`
+- O `UNIQUE` para email também ganhou um nome descritivo
+- O `CHECK` do salário foi nomeado
+- A chave estrangeira `manager_id` agora é explicitamente definida com `FOREIGN KEY`
+
+==== Vantagens de nomear constraints
+
+Dar nomes às constraints traz benefícios importantes:
+- **Mensagens de erro mais claras**: Quando uma violação ocorre, o nome da constraint aparece na mensagem de erro
+- **Manutenção mais fácil**: Para remover ou modificar uma constraint, precisamos referenciá-la pelo nome
+- **Documentação**: Os nomes podem descrever a regra de negócio implementada
+
+=== Constraints com múltiplas colunas
+
+Um dos casos mais comuns onde precisamos de constraints em nível de tabela é quando a restrição envolve mais de uma coluna. Vamos criar uma tabela `project_assignments` para alocar funcionários em projetos:
+
+.Criando uma tabela com chave primária composta
+[source,sql]
+----
+CREATE TABLE project_assignments (
+    employee_id   INT NOT NULL,
+    project_id    INT NOT NULL,
+    assigned_date DATE NOT NULL,
+    role          VARCHAR(50),
+    hours_weekly  INT CHECK (hours_weekly BETWEEN 1 AND 40),
+    
+    -- Chave primária composta: um funcionário só pode ser alocado uma vez no mesmo projeto
+    CONSTRAINT project_assignments_pk PRIMARY KEY (employee_id, project_id),
+    
+    -- Chaves estrangeiras
+    CONSTRAINT project_assignments_employee_fk 
+        FOREIGN KEY (employee_id) REFERENCES employees(employee_id),
+    CONSTRAINT project_assignments_project_fk 
+        FOREIGN KEY (project_id) REFERENCES projects(project_id),
+    
+    -- Garantir que a data de atribuição não seja futura
+    CONSTRAINT project_assignments_date_check 
+        CHECK (assigned_date <= CURRENT_DATE)
+);
+----
+
+Neste exemplo, a chave primária é **composta** por `employee_id` e `project_id`, garantindo que um funcionário não possa ser alocado duas vezes no mesmo projeto. Observe como a sintaxe em nível de tabela torna isso claro e explícito.
+
+=== Outros exemplos com tabelas existentes
+
+Vamos recriar as tabelas `departments` e `projects` usando a sintaxe de constraints em nível de tabela:
+
+.Recriando a tabela "departments"
+[source,sql]
+----
+CREATE TABLE departments (
+    department_id   SERIAL,
+    department_name VARCHAR(100) NOT NULL,
+    budget          DECIMAL(12,2),
+    manager_id      INT,
+    
+    CONSTRAINT departments_pk PRIMARY KEY (department_id),
+    CONSTRAINT departments_name_unique UNIQUE (department_name),
+    CONSTRAINT departments_budget_check CHECK (budget > 0),
+    CONSTRAINT departments_manager_fk 
+        FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
+);
+----
+
+.Recriando a tabela "projects"
+[source,sql]
+----
+CREATE TABLE projects (
+    project_id    SERIAL,
+    project_name  VARCHAR(200) NOT NULL,
+    start_date    DATE NOT NULL,
+    end_date      DATE,
+    department_id INT,
+    
+    CONSTRAINT projects_pk PRIMARY KEY (project_id),
+    CONSTRAINT projects_dates_check CHECK (end_date > start_date),
+    CONSTRAINT projects_department_fk 
+        FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+----
+
+==== Constraints de verificação com múltiplas colunas
+
+Podemos criar constraints `CHECK` que envolvem múltiplas colunas. Por exemplo, vamos adicionar uma regra que impede um funcionário de ser gerente de si mesmo:
+
+.Adicionando constraint para evitar auto-gerenciamento
+[source,sql]
+----
+ALTER TABLE employees 
+ADD CONSTRAINT employees_no_self_management 
+CHECK (employee_id != manager_id);
+----
+
+=== E se eu precisar modificar uma tabela existente?
+
+Após criar uma tabela, podemos precisar alterá-la. O comando `ALTER TABLE` permite modificar a estrutura existente:
+
+.Adicionando uma nova coluna
+[source,sql]
+----
+ALTER TABLE employees ADD COLUMN birth_date DATE;
+----
+
+.Modificando o tipo de uma coluna
+[source,sql]
+----
+ALTER TABLE employees ALTER COLUMN phone TYPE VARCHAR(30);
+----
+
+.Adicionando uma constraint (com nome)
+[source,sql]
+----
+ALTER TABLE employees 
+ADD CONSTRAINT employees_phone_unique UNIQUE (phone);
+----
+
+.Removendo uma constraint (precisamos do nome!)
+[source,sql]
+----
+ALTER TABLE employees DROP CONSTRAINT employees_phone_unique;
+----
+
+.Removendo uma coluna
+[source,sql]
+----
+ALTER TABLE employees DROP COLUMN birth_date;
+----
+
+Note que para remover uma constraint, **precisamos saber seu nome**. É por isso que nomear constraints é uma boa prática!
+
+=== Como remover uma tabela?
+
+Para remover uma tabela completamente, usamos o comando `DROP TABLE`:
+
+[source,sql]
+----
+DROP TABLE project_assignments;
+----
+
+**Cuidado!** Este comando remove a tabela e todos os seus dados permanentemente.
+
+Se a tabela for referenciada por uma chave estrangeira, você precisará usar `CASCADE`:
+
+[source,sql]
+----
+DROP TABLE departments CASCADE;
+----
+
+Isso removerá a tabela `departments` e todas as dependências (como a chave estrangeira em `projects` e `project_assignments`).
+
+== Conclusão
+
+Neste post, aprendemos a criar e gerenciar o esquema de um banco de dados relacional. Vimos que:
+
+1. O comando `CREATE TABLE` define a estrutura inicial das tabelas
+2. Os tipos de dados determinam que tipo de informação cada coluna pode armazenar
+3. As restrições de integridade (*constraints*) garantem a consistência dos dados
+4. **Constraints podem ser definidas em nível de coluna ou nível de tabela**
+5. **Constraints em nível de tabela são obrigatórias para chaves primárias compostas**
+6. **Nomear constraints facilita a manutenção e fornece mensagens de erro mais claras**
+7. O comando `ALTER TABLE` permite modificar tabelas existentes
+8. O comando `DROP TABLE` remove tabelas (com cuidado!)
+
+Dominar a criação e modificação de tabelas é fundamental para qualquer profissional que trabalhe com bancos de dados. Uma boa modelagem inicial, com restrições bem definidas, evita problemas de inconsistência e facilita a manutenção do sistema no longo prazo.
+
+No próximo post, veremos como consultar dados de múltiplas tabelas usando `JOINs` para explorar os relacionamentos que definimos aqui. Até lá!
