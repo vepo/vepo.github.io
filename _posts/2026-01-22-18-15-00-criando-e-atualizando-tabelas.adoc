@@ -119,3 +119,197 @@ No exemplo acima, criamos a tabela `employees` com vários atributos, cada um co
 No nosso exemplo, também usamos os seguintes tipos: `SERIAL`, `VARCHAR`, `DATE`, `DECIMAL` e `TIMESTAMP`.
 
 === Como garantir a integridade do dado?
+
+Além dos tipos de dados, as restrições de integridade são fundamentais para garantir que os dados armazenados estejam sempre consistentes e válidos. No exemplo da tabela `employees`, utilizamos diversas restrições:
+
+.Criando a tabela "employees" com restrições
+[source,sql]
+----
+CREATE TABLE employees (
+    employee_id   SERIAL PRIMARY KEY,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    email         VARCHAR(100) UNIQUE NOT NULL,
+    phone         VARCHAR(20),
+    hire_date     DATE NOT NULL,
+    job_title     VARCHAR(100) NOT NULL,
+    department_id INT,
+    salary        DECIMAL(10,2) CHECK (salary >= 0),
+    manager_id    INT REFERENCES employees(employee_id),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+----
+
+Vamos detalhar cada uma dessas restrições:
+
+==== `PRIMARY KEY` (Chave Primária)
+
+A chave primária é um dos conceitos mais importantes em bancos de dados relacionais. Ela identifica unicamente cada linha da tabela. No nosso exemplo:
+
+[source,sql]
+----
+employee_id SERIAL PRIMARY KEY
+----
+
+Isso significa que:
+- `employee_id` será único para cada funcionário
+- Não poderá ser nulo (`NULL`)
+- Automaticamente será criado um índice para buscas rápidas
+- O valor é gerado automaticamente usando `SERIAL` (auto-incremento)
+
+==== `NOT NULL`
+
+A restrição `NOT NULL` garante que um campo não pode ficar vazio. Por exemplo:
+
+[source,sql]
+----
+first_name VARCHAR(50) NOT NULL
+----
+
+Isso impede que um funcionário seja cadastrado sem primeiro nome.
+
+==== `UNIQUE`
+
+A restrição `UNIQUE` garante que todos os valores em uma coluna sejam diferentes entre si:
+
+[source,sql]
+----
+email VARCHAR(100) UNIQUE NOT NULL
+----
+
+Isso assegura que não teremos dois funcionários com o mesmo e-mail.
+
+==== `CHECK`
+
+A restrição `CHECK` permite definir uma condição que deve ser verdadeira para todos os registros:
+
+[source,sql]
+----
+salary DECIMAL(10,2) CHECK (salary >= 0)
+----
+
+Aqui garantimos que nenhum funcionário terá um salário negativo.
+
+==== `DEFAULT`
+
+A cláusula `DEFAULT` define um valor padrão para a coluna quando nenhum valor é fornecido:
+
+[source,sql]
+----
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+----
+
+Assim, quando um novo funcionário for inserido sem especificar o `created_at`, o banco automaticamente preencherá com a data e hora atuais.
+
+==== `REFERENCES` (Chave Estrangeira)
+
+A chave estrangeira estabelece um relacionamento entre tabelas:
+
+[source,sql]
+----
+manager_id INT REFERENCES employees(employee_id)
+----
+
+Isso indica que `manager_id` deve corresponder a um `employee_id` válido na mesma tabela (auto-relacionamento). Isso garante a **integridade referencial** - não podemos atribuir um gerente que não existe.
+
+=== Como criar tabelas relacionadas?
+
+Vamos criar agora as tabelas `departments` e `projects` para completar nosso esquema:
+
+.Criando a tabela "departments"
+[source,sql]
+----
+CREATE TABLE departments (
+    department_id   SERIAL PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL UNIQUE,
+    budget          DECIMAL(12,2) CHECK (budget > 0),
+    manager_id      INT REFERENCES employees(employee_id)
+);
+----
+
+.Criando a tabela "projects"
+[source,sql]
+----
+CREATE TABLE projects (
+    project_id    SERIAL PRIMARY KEY,
+    project_name  VARCHAR(200) NOT NULL,
+    start_date    DATE NOT NULL,
+    end_date      DATE CHECK (end_date > start_date),
+    department_id INT REFERENCES departments(department_id)
+);
+----
+
+Observe como as restrições garantem a consistência:
+- O orçamento (`budget`) deve ser positivo
+- A data de término (`end_date`) deve ser posterior à data de início
+- As chaves estrangeiras ligam as tabelas corretamente
+
+=== E se eu precisar modificar uma tabela existente?
+
+Após criar uma tabela, podemos precisar alterá-la. O comando `ALTER TABLE` permite modificar a estrutura existente:
+
+.Adicionando uma nova coluna
+[source,sql]
+----
+ALTER TABLE employees ADD COLUMN birth_date DATE;
+----
+
+.Modificando o tipo de uma coluna
+[source,sql]
+----
+ALTER TABLE employees ALTER COLUMN phone TYPE VARCHAR(30);
+----
+
+.Adicionando uma restrição
+[source,sql]
+----
+ALTER TABLE employees ADD CONSTRAINT unique_phone UNIQUE (phone);
+----
+
+.Removendo uma coluna
+[source,sql]
+----
+ALTER TABLE employees DROP COLUMN birth_date;
+----
+
+.Adicionando uma chave estrangeira
+[source,sql]
+----
+ALTER TABLE projects 
+ADD CONSTRAINT fk_projects_department 
+FOREIGN KEY (department_id) REFERENCES departments(department_id);
+----
+
+=== Como remover uma tabela?
+
+Para remover uma tabela completamente, usamos o comando `DROP TABLE`:
+
+[source,sql]
+----
+DROP TABLE projects;
+----
+
+**Cuidado!** Este comando remove a tabela e todos os seus dados permanentemente.
+
+Se a tabela for referenciada por uma chave estrangeira, você precisará usar `CASCADE`:
+
+[source,sql]
+----
+DROP TABLE departments CASCADE;
+----
+
+Isso removerá a tabela `departments` e todas as dependências (como a chave estrangeira em `projects`).
+
+== Conclusão
+
+Neste post, aprendemos a criar e gerenciar o esquema de um banco de dados relacional. Vimos que:
+
+1. O comando `CREATE TABLE` define a estrutura inicial das tabelas
+2. Os tipos de dados determinam que tipo de informação cada coluna pode armazenar
+3. As restrições de integridade (`PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE`, `CHECK`, `NOT NULL`, `DEFAULT`) garantem a consistência dos dados
+4. O comando `ALTER TABLE` permite modificar tabelas existentes
+5. O comando `DROP TABLE` remove tabelas (com cuidado!)
+
+Dominar a criação e modificação de tabelas é fundamental para qualquer profissional que trabalhe com bancos de dados. Uma boa modelagem inicial, com restrições bem definidas, evita problemas de inconsistência e facilita a manutenção do sistema no longo prazo.
+
+No próximo post, veremos como consultar dados de múltiplas tabelas usando `JOINs` para explorar os relacionamentos que definimos aqui. Até lá!
