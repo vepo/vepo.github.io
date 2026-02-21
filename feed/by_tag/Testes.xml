@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Testes.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Testes.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Testes 101 - Testando aplicações Java</title><link href="https://blog.vepo.dev/posts/testes-101-testando-aplicacoes-java" rel="alternate" type="text/html" title="Testes 101 - Testando aplicações Java" /><published>2020-09-01T00:00:00+00:00</published><updated>2020-09-01T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/21-16-00-testes-101-testando-aplicacoes-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/testes-101-testando-aplicacoes-java"><![CDATA[<p>Testes são fundamentais. Se você deseja ser desenvolvedor Java lhe recomendo pelo menos conhecer o que são TDD, Maven e JUnit. E vou te apresentar o porque.</p>
+
+<h1 id="tdd">TDD</h1>
+
+<p>TDD significa Test-Driven-Development. Se você imagina que é criar o testes e depois o código, você está um pouco enganado. TDD é uma disciplina um pouco diferente.</p>
+
+<p>TDD é uma disciplina, não é algo que pode ser explicado. É uma cultura que você tem que aprender, e treinar. Depois de anos você vai ver já melhorou bastante, mas tem muito mais a aprender.</p>
+
+<h2 id="ciclos-do-tdd">Ciclos do TDD</h2>
+
+<p>Pra explicar o TDD facilmente, temos que falar dos ciclos. Nem todos os testes criados serão usados e eles não devem refletir o requisito final. Você tem que usar <strong>Baby Steps</strong>, passos de bebê, em cara ciclo. Imagine um ciclo como um rodada de desenvolvimento de 10 a 30 minutos:</p>
+
+<ul>
+  <li><strong>[R]</strong> Você cria um Test, ele deve falhar.</li>
+  <li><strong>[G]</strong> Você implementa o código para o teste funcionar</li>
+  <li><strong>[R]</strong> Você Refatora o código</li>
+</ul>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/pfjgroqac0hnojyt7vmj.png" alt="Ciclo RGR" /></p>
+
+<p>Ao final de um tempo de desenvolvimento você terá vários testes. Alguns podem ser descartados, outros vão ficar. Eu recomento ficar apenas os que representem a funcionalidades do código. E recomendo também que cubram o máximo possível o seu código.</p>
+
+<h1 id="maven">Maven</h1>
+
+<p>Se estamos falando de testes, estamos falando de Processo de Build. Se você cria os seus testes e não os colocar para serem executados automaticamente, você não fez praticamente nada.</p>
+
+<p>O Maven abstrai cada build criando um ciclo com fases. Então os testes sempre serão executados se você deseja executar ou empacotar o seu projeto.</p>
+
+<p>Para criar um projeto usando Maven, instale o Maven e execute:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn archetype:generate <span class="nt">-DgroupId</span><span class="o">=</span>io.vepo.tests <span class="nt">-DartifactId</span><span class="o">=</span>testsExample <span class="nt">-DarchetypeArtifactId</span><span class="o">=</span>maven-archetype-quickstart <span class="nt">-DinteractiveMode</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>Você vai observar duas coisas:</p>
+<ul>
+  <li>o Maven criou um arquivo pom.xml colocando como dependência o JUnit, e que versão antiga! 🙄</li>
+  <li>o Maven criou duas pastas de código: <code class="language-plaintext highlighter-rouge">src/main/java</code> e <code class="language-plaintext highlighter-rouge">src/test/java</code>.</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.vepo.tests<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>testsExample<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>testsExample<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/g21r9j3qm38eh6eh95cd.png" alt="Estrutura de diretório" /></p>
+
+<p>Mas onde o Maven configura que os testes devem ser executados durante a build ou como ele descobre os testes? O Maven se baseia na ideia convention-over-configuration, ou seja, Convenção acima de Configuração. Para realizar certas configurações basta apenas usar a convenção apropriada.</p>
+
+<p>O projeto criado já vem com alguns testes JUnit configurado, porém é usado a versão <code class="language-plaintext highlighter-rouge">3.8.1</code>… Alguém por favor atualiza o <a href="https://github.com/apache/maven-archetypes">github.com/apache/maven-archetypes</a>, por favor!</p>
+
+<h1 id="junit-5">JUnit 5</h1>
+
+<p>O JUnit é o framework que irá gerenciar o ciclo de vida de seus testes. Cara classe dentro de <code class="language-plaintext highlighter-rouge">src/test/java</code> contendo um método com a annotation <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/Test.html"><code class="language-plaintext highlighter-rouge">org.junit.jupiter.api.Test</code></a> será executado como testes. Assim para migrarmos o arquivo gerado automaticamente, basta mudar o seguinte conteúdo:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.vepo.tests<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>testsExample<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>testsExample<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.junit.jupiter<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit-jupiter-engine<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>5.5.2<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+  <span class="nt">&lt;build&gt;</span>
+    <span class="nt">&lt;plugins&gt;</span>
+        <span class="c">&lt;!-- Need at least 2.22.0 to support JUnit 5 --&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>maven-surefire-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>3.0.0-M3<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;configuration&gt;</span>
+                <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+                <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+            <span class="nt">&lt;/configuration&gt;</span>
+        <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">io.vepo.tests</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.DisplayName</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppTest</span> 
+<span class="o">{</span>   
+    <span class="nd">@Test</span>
+    <span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Test if it works"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">simpleTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"OK"</span><span class="o">,</span> <span class="s">"OK"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Observe que com o JUnit 5 eu consigo dar nomes aos testes, isso facilita em muito a identificação de um erro. Eu costumo usar frases que definem as features testadas. Isso facilita quando preciso fazer manutenção em código escrito meses, ou anos, antes.</p>
+
+<h2 id="ciclo-de-vida">Ciclo de Vida</h2>
+
+<p>O ciclo de vida de um teste passa pela execução métodos antes/depois da classe ser criada e métodos antes/depois da execução de cada teste. Dê uma olhada na <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-classes-and-methods">documentação</a>. Há vários exemplos de como usar <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html">@BeforeAll</a>, <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeEach.html">@BeforeEach</a>, <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/AfterEach.html">@AfterEach</a> e <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html">@AfterAll</a>.</p>
+
+<p>Se eu for detalhar cada feature do JUnit 5, esse post não terá fim. São muitas, conheça elas, assim você pode construir bons testes.</p>
+
+<h2 id="asserções">Asserções</h2>
+
+<p>O mais importante do JUnit não é apenas a execução dos testes, mas a validação dos resultados.</p>
+
+<p>O JUnit provê uma classe com métodos estáticos para realizar isso. Na <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-assertions">documentação oficial</a> há vários exemplos.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="kt">void</span> <span class="nf">standardAssertions</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">calculator</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="n">calculator</span><span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">),</span>
+            <span class="s">"The optional failure message is now the last parameter"</span><span class="o">);</span>
+    <span class="n">assertTrue</span><span class="o">(</span><span class="sc">'a'</span> <span class="o">&lt;</span> <span class="sc">'b'</span><span class="o">,</span> <span class="o">()</span> <span class="o">-&gt;</span> <span class="s">"Assertion messages can be lazily evaluated -- "</span>
+            <span class="o">+</span> <span class="s">"to avoid constructing complex messages unnecessarily."</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="tests-dsl">Tests DSL</h1>
+
+<p>DSL significa <em>Domain-Specific Language</em>. Você cria uma DSL seu código pode ser lido como uma linguagem. Em testes é comum se construir uma DSL usando os termos <a href="https://www.agilealliance.org/glossary/gwt">Given-When-Then</a>. Você pode fazer isso em português Dado-Quando-Então:</p>
+
+<ul>
+  <li>(<strong>Dado</strong>) Qual o contexto que o teste é executado?</li>
+  <li>(<strong>Quando</strong>) Qual ação vai ser testada?</li>
+  <li>(<strong>Então</strong>) O que deve ser validado?</li>
+</ul>
+
+<p>Um bom exemplo pode ser:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dadoNovoUsuário</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">executaChecking</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">validaReserva</span><span class="o">();</span>
+</code></pre></div></div>
+
+<p>Aí fica de você implementar cada método e reutilizar ele quando possível.</p>
+
+<h2 id="assertj">AssertJ</h2>
+
+<p>Há algumas bibliotecas que auxiliam na construção dessa DSL. Eu gosto muito da <a href="https://assertj.github.io/doc/">AssertJ</a>. Com ela é possível usar uma DSL para validação de resultados complexos.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// extracting multiple values at once grouped in tuples</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">fellowshipOfTheRing</span><span class="o">).</span><span class="na">extracting</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="s">"age"</span><span class="o">,</span> <span class="s">"race.name"</span><span class="o">)</span>
+                               <span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">tuple</span><span class="o">(</span><span class="s">"Boromir"</span><span class="o">,</span> <span class="mi">37</span><span class="o">,</span> <span class="s">"Man"</span><span class="o">),</span>
+                                         <span class="n">tuple</span><span class="o">(</span><span class="s">"Sam"</span><span class="o">,</span> <span class="mi">38</span><span class="o">,</span> <span class="s">"Hobbit"</span><span class="o">),</span>
+                                         <span class="n">tuple</span><span class="o">(</span><span class="s">"Legolas"</span><span class="o">,</span> <span class="mi">1000</span><span class="o">,</span> <span class="s">"Elf"</span><span class="o">));</span>
+</code></pre></div></div>
+
+<h1 id="mocks">Mocks</h1>
+
+<p>Mock significa Imitação. Imagina no caso de estarmos acessando uma base de dados. Você tem duas opções, ou liga a base de dados e testa diretamente nela, ou você mocka o acesso a base. O problema da primeira abordagem é que ela torna o teste mais abrangente. Não estaremos fazendo um Teste Unitário, mas um Teste de Integração.</p>
+
+<p>Não há problema em fazer Testes de Integração, mas eles serão muito mais lentos. Outro problema é que muitas vezes você não precisa testar uma base de dados. Mas as vezes é bom testar a integração, sempre evita um NullPointerException! ☠️</p>
+
+<p>Há algumas boas bibliotecas para Mock, vou falar um pouco do <a href="https://site.mockito.org/">Mockito</a> e <a href="https://github.com/powermock/powermock">PowerMock</a></p>
+
+<h1 id="mockito">Mockito</h1>
+
+<p>Mockito serve para criar classes onde o código original pode ou não ser executado.</p>
+
+<p>Quando você quer executar o código orignal, estamos falando de um spy. O código é executado e você pode validar o que foi feito.</p>
+
+<p>Um Spy pode ser criado usando <a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#spy"><code class="language-plaintext highlighter-rouge">Mockito.spy</code></a> ou usando o Jupiter Extension para o JUnit 5.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Testa o exemplo de Mock para UserRepository"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUserInMemoryTest</span><span class="o">()</span> <span class="o">{</span>
+
+    <span class="nc">User</span> <span class="n">userWithoutId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+
+    <span class="n">assertThat</span><span class="o">(</span><span class="n">userRepositoryInMemory</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">hasFieldOrPropertyWithValue</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span>
+
+    <span class="n">verify</span><span class="o">(</span><span class="n">userRepositoryInMemory</span><span class="o">).</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Observe que um Spy serve para verificar se o método foi chamado com um valor especifico. Ou seja, precisamos ter uma implementação concreta da classe.</p>
+
+<p>Agora quando falamos de Mocks não precisamos de implementações concretas. Podemos usar em interfaces. Quando é criado um mock, o código real não é chamado, são sempre retornados valores vazios ou nulls. Então é preciso definir o que será retornado e quando.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Testa o exemplo de Mock para UserRepository"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUserTest</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nc">User</span> <span class="n">userWithoutId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+
+    <span class="nc">User</span> <span class="n">userWithId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+    
+    <span class="n">when</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">userWithId</span><span class="o">);</span>
+    
+    <span class="n">assertThat</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">hasFieldOrPropertyWithValue</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="cobertura-de-testes">Cobertura de Testes</h1>
+
+<p>As coisas não andam se não tivermos estatisticas! Então para testes, precisamos saber com exatidão qual é a cobertura de testes do nosso projeto. Se não colocarmos isso em prática, muito rapidamente a cobertura irá cair e nem perceberemos.</p>
+
+<p>Uma ferramenta para gerar um relatório de cobertura é o <a href="https://www.jacoco.org/jacoco/">JaCoCo</a></p>
+
+<p>Para configurar o JaCoCo no Maven, basta adicionar ele como um plugin e configurar quando será executado.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.jacoco<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jacoco-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.8.1<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>prepare-agent<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>prepare-agent<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>report<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>test<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>report<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>Depois para executar:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean <span class="nb">test </span>jacoco:report
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/tlsl5nnyppc2ikfbzr6v.png" alt="Relatório de Tests" /></p>
+
+<p>No caso será gerado um relatório. Esse relatório pode ser armazenado no Jenkins ou mesmo usado pela próxima ferramenta que vamos ver.</p>
+
+<h1 id="code-smells">Code Smells</h1>
+
+<p>Antes de partir para última ferramenta, vamos definir uma coisa.</p>
+
+<p><strong>Code Smells</strong> são construções que podem trazer má qualidade ao código. Eliminando eles, você pode melhorar a qualidade do seu código.</p>
+
+<h1 id="análise-estática-de-código">Análise Estática de Código</h1>
+
+<p>Como última ferramenta, vamos falar de Análise Estática de Código. Imagina se você pudesse analisar o seu código e encontrar bugs ou Code Smells. Seria bom, não?</p>
+
+<p>Mas temos isso e de graça. Você pode usar o <a href="https://www.sonarqube.org/">SonarQube</a>. Com esse plugin para o Maven você pode criar um servidor para armazenar a qualidade atual do seu código e construir uma timeline dele. Assim você pode desafiar o time a reduzir o número de Code Smells em 50%. Ou em aumentar a covertura de testes até um determinado patamar.</p>
+
+<p>Para integrar no Maven, basta colocar:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.sonarsource.scanner.maven<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>sonar-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>3.7.0.1746<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>sonar<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>Ao adicionar o plugin, crie o projeto no Github e já inicialize ele no <a href="https://sonarcloud.io">SonarCloud</a>. Ao iniciar um projeto, você pode pegar um Token que deve ser usado na build.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nt">-Dsonar</span>.login<span class="o">=</span>&lt;SONAR_TOKEN&gt; verify sonar:sonar
+</code></pre></div></div>
+
+<p>Caso queira rodar o <a href="https://www.sonarqube.org/downloads/">Sonar</a> em projetos internos da sua empresa, você só precisa de um servidor e uma instalação do Sonar. É simples de configurar.</p>
+
+<h1 id="tudo-junto">Tudo Junto</h1>
+
+<p>Agora vamos responder a última pergunta. Quem vai rodar tudo isso? Você pode configurar algumas ferramentas. Entre elas podemos citar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Ferramenta</th>
+      <th>Contexto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jenkins</td>
+      <td>Para rodar projetos internos. Não é um serviço cloud.</td>
+    </tr>
+    <tr>
+      <td>Github Actions</td>
+      <td>Excelentes para projetos Github.</td>
+    </tr>
+    <tr>
+      <td>TravisCI</td>
+      <td>Could e facilmente integrado com o Github.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Testes são fundamentais e você não precisa saber fazer antes de começar a desenvolver. MAS… Se você souber criar testes, seu código terá muita estabilidade.</p>
+
+<p>Treine fazer testes. Treine TDD. Conheça as ferramentas e boa sorte!</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/36whvqvlgpj79iy7lzmc.jpg" alt="Alt Text" /></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Testes" /><category term="TDD" /><category term="JaCoCo" /><summary type="html"><![CDATA[Um guia rápido para tudo o que você precisa saber para fazer testes em aplicações Java]]></summary></entry></feed>

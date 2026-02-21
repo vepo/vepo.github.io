@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Framework.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Framework.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Jakarta EE e Microprofile.io</title><link href="https://blog.vepo.dev/posts/jakarta-ee-e-microprofile-io" rel="alternate" type="text/html" title="Jakarta EE e Microprofile.io" /><published>2019-09-30T00:00:00+00:00</published><updated>2019-09-30T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-44-36-jakarta-ee-e-microprofile-io</id><content type="html" xml:base="https://blog.vepo.dev/posts/jakarta-ee-e-microprofile-io"><![CDATA[<p>Talvez você como desenvolvedor Java não conheça esses dois nomes. Talvez quando você vai pensar em desenvolver Java já pensa em Spring. Caso você esteja nesses dois grupos, essa série é para você!</p>
+
+<!--more-->
+
+<p>Para quem não conhece, o mundo Java é direcionados por especificações. Especificações são coisas as vezes um pouco chatas, mas que nos dão uma segurança enorme de desenvolvimento. Para quem desenvolve Java faz mais de 15 anos, nunca vi uma <em>breaking feature</em>, algo que tornou meu código antigo não compilável! Isso se deve as especificações Java, cada feature nova deve ser compatível com especificações antigas e devem ser especificadas.</p>
+
+<p>Especificações não existem somente para a linguagem Java, existem também para a comunidade Java.</p>
+
+<h2 id="java-ee">Java EE</h2>
+
+<p>Até 2018 existia algo que chamavamos de Java EE.</p>
+
+<p>RIP! ☠️☠️☠️</p>
+
+<p>Long live to Jakarta EE! 👑👑👑</p>
+
+<p>Java EE não era um framework. Era um conjunto de especificações que serviam de base para implementação de Frameworks. O intuido dessas especificações era tornar qualquer aplicação Java EE livre de implementações. Assim qualquer projeto Java EE, poderia ser facilmente migrável para qualquer uma das implementações compatíveis. Evitando assim o que podemos chamar de <a href="https://en.wikipedia.org/wiki/Vendor_lock-in">Vendor Lock-in</a>.</p>
+
+<p>Java EE tinha um sério problema. O <em>timing</em> das especificações era mais lento que o passo da comunidade. Isso se devia ao processo imposto pela Oracle ao desenvolvimento, que ao ser <em><a href="https://www.oracle.com/java/technologies/java-ee-glance.html">Specification First</a></em> já impunha um passo lento às inovações.</p>
+
+<p>Mas….</p>
+
+<h2 id="microprofileio">Microprofile.io</h2>
+
+<p>Por volta de 2017, alguns nomes da comunidade perceberam que o Java EE não estava acompanhando o desenvolvimento de aplicações <a href="https://12factor.net/pt_br/">Cloud Native</a>, suas especificações englobavam tudo que havia de novo em 2007, mas estavamos em 2017! Era preciso fazer algo!</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/eidzpplis9ehe42q46z6.png" alt="Microprofile.io" /></p>
+
+<p>Para isso foi proposto um novo conjunto de especificações o <a href="https://microprofile.io/">Microprofile.io</a>. Este seria focado em implementar os padrões de projetos para Cloud Native e <a href="https://microservices.io/">Microsserviços</a>. Mas em termos de gerenciamento, estas especificações não seriam <em>Specification First</em>, mas <em>Coding First</em>. Assim os padrões que já era implementados por um ou mais framework seriam homogeinizados e quiça melhorados. O projeto não seria coordenado pela Oracle, mas pela <a href="https://twitter.com/EclipseFdn">Eclipse Foundation</a>. Com o padrão de governança da Eclise Fdn, haveria mais agilidade no desenvolvimento de novas especificações.</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/yzjn0p8qop27l9n5ff2s.png" alt="Especificações" /></p>
+
+<h2 id="jakarta-ee">Jakarta EE</h2>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/3m3hhtorm5c8kdgc2nvs.jpg" alt="Jakarta EE" /></p>
+
+<p>Com o crescimento do Microprofile.io, houve uma pressão da comunidade para Oracle agilizar o processo de desenvolvimento de especificações. Isso levou a empresa a abrir mão e entregar o gerenciamento do projeto Java EE para Eclipse Foundation. Assim, o Java EE se tornou Jakarta EE. Java é um nome registrado da Oracle. Todas as especificações <strong>Java EE 8.0</strong> seria automaticamente transformadas em especificações <strong>Jakarta EE 8.0</strong>.</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/r7qdl78m7mz01hyrc9vp.png" alt="Especificações" /></p>
+
+<h2 id="modelo-de-programação">Modelo de Programação</h2>
+
+<p>No fundo Jakarta EE é um modelo de programação voltado a especificações. Uma aplicação Jakarta EE não depende de implementação, todas as dependências são declaradas como providades e estas devem ser implementadas e providas pelo Container Jakarta EE.</p>
+
+<h3 id="vantagens">Vantagens</h3>
+<p>Usando o modelo puramente Jakarta EE, nos dá certas vantagens ao desenvolvimento:</p>
+<ul>
+  <li>Velocidade de Desenvolvimento</li>
+  <li>Padronização do código</li>
+  <li>Baixo acoplamento e alta coesão</li>
+  <li>Foco na Lógica de Negócio</li>
+</ul>
+
+<p>As especificações normalmente são de funcionalidades comuns a várias projetos. São requisitos não funcionais que liberam o desenvolvedor de se preocupar com coisas que já estão muito bem implementadas e testadas.</p>
+
+<p>Exemplo:</p>
+<ul>
+  <li><em>Porque o desenvolvedor precisaria implementar um servidor HTTP?</em></li>
+  <li><em>Porque o desenvolvedor precisaria implementar um framework de DI?</em></li>
+  <li><em>Porque o desenvolvedor precisaria implementar um framework de Validação?</em></li>
+  <li><em>Porque o desenvolvedor precisaria implementar um framework de Persistência?</em></li>
+</ul>
+
+<p>Na verdade não há necessidade de re-implementar nenhum desses requisitos, os frameworks devem prover meios de integrar um código a todas as funcionalidades propostar por ele. Jakarta EE padroniza esses meios. Assim qualquer aplicação desenvolvida poderá ser deployada em qualquer servidor de aplicação compatível.</p>
+
+<h3 id="container-jakarta-ee">Container Jakarta EE</h3>
+
+<p>Quando falamos de Containers no mundo Jakarta EE, não estamos se referindo ao Container Docker! Não! Esse conceito é mais antigo.</p>
+
+<p>Container Jakarta EE seria qualquer <a href="https://pt.wikipedia.org/wiki/Servidor_de_aplica%C3%A7%C3%A3o">Servidor de Aplicação</a> responsável pela administração e configuração das aplicações Jakarta EE.</p>
+
+<h3 id="especificações">Especificações</h3>
+
+<p>Esse post é uma introdução a uma série que iniciarei detalhando as especificações Jakarta EE e Microprofile.io. Com isso gostaria de compartilhar como é fácil desenvolver Microsserviços Java robustos! Segue a lista de Especificações que planejo abranger:</p>
+<ul>
+  <li>JSR 365 – Contexts and Dependency Injection (CDI) 2.0</li>
+  <li>JSR 370 – Java API for RESTful Web Services (JAX-RS) 2.1</li>
+  <li>JSR 380 – Bean Validation 2.0</li>
+  <li>MicroProfile Configuration</li>
+  <li>MicroProfile Health</li>
+</ul>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/1aed10d6upbh2rmvhdo8.jpg" alt="Just use-it!" /></p>
+
+<p>Caso você não conheça as especificações Jakarta EE, esse é um bom ponto de inicio para você.</p>
+
+<p>Caso você já conheça as especificações Jakarta EE, esse é um bom inicio para aprender um pouco mais.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Jakarta-EE" /><category term="Java-EE" /><category term="Java" /><category term="Framework" /><summary type="html"><![CDATA[Introdução as especificações Jakarta EE e Microprofile.io]]></summary></entry><entry><title type="html">Escolhendo uma implementação Jakarta EE &amp;amp; Microprofile.io</title><link href="https://blog.vepo.dev/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io" rel="alternate" type="text/html" title="Escolhendo uma implementação Jakarta EE &amp;amp; Microprofile.io" /><published>2019-09-30T00:00:00+00:00</published><updated>2019-09-30T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/10-28-52-escolhendo-uma-implementacao-jakarta-ee-microprofile-io</id><content type="html" xml:base="https://blog.vepo.dev/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io"><![CDATA[<p>O primeiro passo ao se desenvolver uma aplicação Jakarta EE ou Microprofile.io é escolher qual será a implementação que você irá utilizar. Ou o mais conhecido Servidor de Aplicação.</p>
+
+<p>As implementações de Microprofile.io são mais leves que as implementações de Jakarta EE. Isso acontece porque o número de especificações implementadas por um servidor Jakarta EE é muito maior do que o de Microprofile.io. Logo, se você deseja implementar um simples Microsserviços, escolher um <a href="https://wildfly.org/">WildFly</a> seria como escolher um canhão pra matar uma mosca.</p>
+
+<h1 id="starters">Starters</h1>
+
+<p>Um bom ponto para iniciar é por um Starter. O Microprofile.io tem seu próprio <a href="https://start.microprofile.io/">Starter</a>, com ele é possível escolher qual versão da especificação e qual plataforma deverá ser usada.</p>
+
+<p>Não encotrei um Starter para Jakarta EE oficial, mas há muitos tutoriais na internet. Nessa série nosso foco será em projetos Microprofile.io, logo este starter é suficiente.</p>
+
+<p>Caso queira um Starter Jakarta EE, há alguns:</p>
+
+<ul>
+  <li><a href="http://generjee.inetseite.de/">generjee</a></li>
+</ul>
+
+<h1 id="servidores-de-aplicação">Servidores de Aplicação</h1>
+
+<p>Segue abaixo uma lista não exaustiva dos servidores de aplicação existente. Nesse tutorial usaremos o Thorntail.io para nossas implementações.</p>
+
+<p>Todos os servidores 100% compatíveis podem ser encontrados nas paginas de cada projeto:</p>
+
+<ul>
+  <li><a href="https://jakarta.ee/compatibility/">Jakarta EE</a></li>
+  <li><a href="https://wiki.eclipse.org/MicroProfile/Implementation">Microprofile.io</a></li>
+</ul>
+
+<h2 id="glassfish">GlassFish</h2>
+
+<p>O <a href="https://javaee.github.io/glassfish/download">GlassFish</a> é a implementação oficial do Jakarta EE. O mesmo será 100% compatível com as especificações.</p>
+
+<h2 id="payara">Payara</h2>
+
+<p>Compatível com Jakarta EE e Microprofile.io. <a href="https://www.payara.fish/documentation/getting-started-with-payara/">Getting started with Payara…</a></p>
+
+<h2 id="wildfly">WildFly</h2>
+
+<p><a href="https://wildfly.org/">Um dos mais conhecidos no mercado</a>. Anteriormente conhecido como JBoss. Compatível com Jakarta EE.</p>
+
+<h2 id="tomee">TomEE</h2>
+
+<p><a href="https://tomee.apache.org/">Compatível</a> com Jakarta EE e Microprofile.io.</p>
+
+<h2 id="openliberty">OpenLiberty</h2>
+
+<p><a href="https://openliberty.io/">Compatível</a> com Jakarta EE e Microprofile.io.</p>
+
+<h2 id="quakusio">Quakus.io</h2>
+
+<p>O <a href="https://quarkus.io/">Quarkus.io</a> não é 100% compatível com nenhuma das duas especificações! Mas ele está caminhando nesse caminho. Sua ideia principal é prover um servidor de aplicação mais leve que os outros e de fácil desenvolvimento. Ainda é possível usar a <a href="https://www.graalvm.org/">GraalVM</a>.</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/o9mpk38fl4yl4tp0t32t.png" alt="Quarkus.io" /></p>
+
+<h2 id="thorntailio">Thorntail.io</h2>
+
+<p>Fork do WildFly, o <a href="https://thorntail.io/generator/">Thorntail</a> é voltado para implementação. Para o deploy não é necessário configurar um servidor de aplicação. O mesmo, junto com suas dependências, é configurado automaticamente pela build Maven. Assim é gerado ou um Fat-Jar ou um War + Hollow Jar.</p>
+
+<p>No Fat-Jar temos todas as dependências prontas para serem executadas.</p>
+
+<p>No Hollow-Jar temos todas as dependências empacotadas separadamente.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Jakarta-EE" /><category term="Java-EE" /><category term="Java" /><category term="Framework" /><summary type="html"><![CDATA[Tutorial de como escolher uma implementação para Microprofile.io ou Jakarta EE. Será atualizado sempre com novas informações.]]></summary></entry></feed>

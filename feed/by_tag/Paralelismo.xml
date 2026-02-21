@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Paralelismo.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Paralelismo.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Concorrência e Paralelismo</title><link href="https://blog.vepo.dev/posts/java-101-threads" rel="alternate" type="text/html" title="Concorrência e Paralelismo" /><published>2022-09-03T00:00:00+00:00</published><updated>2022-09-03T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/18-00-00-java-101-threads</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-101-threads"><![CDATA[<div class="paragraph">
+<p>Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections, como Java faz Orientação a Objetos e o que é a biblioteca I/O, esses tópicos são necessários para o que vamos falar agora: <strong>Concorrência e Paralelismo</strong>.</p>
+</div>
+<div class="sect1">
+<h2 id="cap-06-o-que-e-concorrencia-e-paralelismo">O que é Concorrência e Paralelismo?!?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nos frameworks modernos é muito raro lidarmos com paralelismo, apesar que podemos lidar com concorrência o tempo inteiro. Para entender isso precisamos primeiro compreender a diferença entre esses dois conceitos. Para isso vamos imaginar que estamos em uma biblioteca, nessa biblioteca tem dois tipos de livros: os comuns e os raros. Os livros comuns estão acessíveis na estantes para que todos possam ler e pegar emprestado, mas os livros raros estão disponíveis em uma sala especifica em que você precisa pedir para um bibliotecário pegar ele e deve ler somente na sala.</p>
+</div>
+<div class="paragraph">
+<p>Vamos imaginar que surgiu um estranho interesse por se ler livros raros na cidade e isso gerou uma procura inesperada que surpreendeu até mesmo a direção da biblioteca.</p>
+</div>
+<div class="paragraph">
+<p><em>— Todos estão disponíveis na internet! Só acessar o <a href="https://www.gutenberg.org/browse/languages/pt">Projeto Gutenberg</a>!!!</em></p>
+</div>
+<div class="paragraph">
+<p>Isso gerou uma fila enorme na sessão de livros raros pois só tinha um bibliotecário para encontrar o livro, registrar a saída e ele ainda precisava observar se o livro estava sendo manipulado corretamente. Logo surgiram várias opções de como melhorar o atendimento da biblioteca, mas só poderiam ser consideradas as opções que mantivessem o cuidado para com as obras.</p>
+</div>
+<div id="cap-06-biblioteca-antiga" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-06/biblioteca-antiga.jpg" alt="biblioteca antiga">
+</div>
+<div class="title">Figura 1. Biblioteca da Escola Sá de Miranda</div>
+</div>
+<div class="paragraph">
+<p>A primeira opção foi contratar mais um bibliotecário. Feita a contratação ele começou a dividir as tarefas com o mais antigo. Enquanto o primeiro cuidava de encontrar as obras e registrar as saídas, o segundo fiscalizava se todos os usuários da biblioteca estavam manuseando corretamente o livro.</p>
+</div>
+<div class="paragraph">
+<p>A direção da biblioteca achou a opção boa, mas eles perceberam que o aumento da eficiência foi de apenas 30% enquanto se esperava 100% de eficiência com a contratação de um novo funcionário. Isso aconteceu porque as atividades foram distribuídas, mas nenhuma atividade era feita em paralelo. A atividade que mais demandava tempo era encontrar a obra e registrar a sua saída com cerca de 90% do tempo, logo essa atividade deveria ser feita em paralelo. <strong>Paralelismo</strong> acontece quando a mesma tarefa é realizada simultaneamente por mais de um bibliotecário. Assim os dois bibliotecários decidiram que iriam trabalhar em todo o conjunto de atividades aumentando a eficiência de 30% para 50%.</p>
+</div>
+<div class="paragraph">
+<p>Mas eles encontraram um pequeno problema, só havia um computador na bancada e por isso eles precisavam se revesar para usar o computador. No começo eles replicavam a atividade que faziam quando havia apenas 1 bibliotecário: atendiam o cliente, encontravam o livro e registravam a saída. Mas perceberam que o tempo de registrar o livro também era demorado, ele demorava cerca de 3 vezes o tempo de pegar o livro, pois o software era bem lento e implementado em Javascript. Logo eles foram procurar solução para o problema deles e descobriram que estavam enfrentando um problema de concorrência. <strong>Concorrência</strong> acontece quando dois ou mais bibliotecários desejam acessar recursos limitados.</p>
+</div>
+<div class="paragraph">
+<p>Eles perceberam que o mais demorado era entrar no sistema, logo resolveram atender 3 clientes por vez. Assim cada bibliotecário pegava o pedido de 3 clientes e depois registravam no sistema. Essa abordagem fez com que o atendimento se tornasse 70% mais eficiente do que era quando se tinha apenas um funcionário.</p>
+</div>
+<div class="paragraph">
+<p>Por fim a biblioteca decidiu contratar uma bibliotecária para fiscalizar o manuseio dos livros porque percebeu que só tinha homens nessa história. E o aumento de eficiência passou para 150% pois ela conseguia fiscalizar e atender na bancada quando possível.</p>
+</div>
+<div class="paragraph">
+<p>Eu espero que com essa história você tenha compreendido que esse processo acontece com qualquer servidor web. É EXATAMENTE ASSIM! Pense que a biblioteca é o servidor, os bibliotecários são <em>threads</em>, os livros são os recursos que o servidor usa e os clientes são os clientes que estão acessando a API do servidor. Eu não sei se os conceitos de concorrência e paralelismo são usado na bibliotecas, eles são conceitos da computação que foram usado nesse texto para descrever e diferenciar eles. Logo podemos redefinir <strong>Paralelismo</strong> quando a mesma tarefa é realizada simultaneamente por mais de uma <em>thread</em> ou processo e <strong>Concorrência</strong> quando acontece duas ou mais <em>threads</em>, ou processos desejam acessar recursos limitados.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-06-thread-e-processo">O que é Thread e Processo?!?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Falar de Paralelismo e Concorrência não é uma tarefa fácil porque envolve vários conceitos de vários níveis. Até agora nós falamos de conceitos abstratos, mas agora vamos falar de algo bem mais concreto. Eu citei Thread e Processo e esses são conceitos sobre o sistema operacional.</p>
+</div>
+<div class="paragraph">
+<p>Um processo é um programa rodando na memória. Ele é instanciado pelo sistema operacional e terá seu ciclo de vida até ser encerrado por si mesmo ou pelo próprio sistema operacional. Cada processo tem um identificador único e compartilha os recursos da máquina com outros processo. No trecho abaixo vemos a listagem dos 9 primeiros processos iniciados pelo Linux que ainda estão em execução, observe que o <code>PID</code> é o identificado único de cada processo, se eu quiser finalizar um processo preciso enviar um comando <code>kill -15 &lt;PID&gt;</code> onde <strong>-15</strong> é o sinal que o programa deve ser encerrado, se eu usar <strong>-9</strong> ele será encerrado imediatamente.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>ps <span class="nt">-aux</span> | <span class="nb">head
+</span>USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0 202552  5172 ?        Ss   Jul01  70:40 /usr/lib/systemd/systemd <span class="nt">--switched-root</span> <span class="nt">--system</span> <span class="nt">--deserialize</span> 22
+root           2  0.0  0.0      0     0 ?        S    Jul01   0:05 <span class="o">[</span>kthreadd]
+root           4  0.0  0.0      0     0 ?        S&lt;   Jul01   0:00 <span class="o">[</span>kworker/0:0H]
+root           6  0.0  0.0      0     0 ?        S    Jul01   0:35 <span class="o">[</span>ksoftirqd/0]
+root           7  0.0  0.0      0     0 ?        S    Jul01   0:07 <span class="o">[</span>migration/0]
+root           8  0.0  0.0      0     0 ?        S    Jul01   0:00 <span class="o">[</span>rcu_bh]
+root           9  0.0  0.0      0     0 ?        S    Jul01  37:47 <span class="o">[</span>rcu_sched]
+root          10  0.0  0.0      0     0 ?        S&lt;   Jul01   0:00 <span class="o">[</span>lru-add-drain]
+root          11  0.0  0.0      0     0 ?        S    Jul01   0:22 <span class="o">[</span>watchdog/0]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Se fossemos falar em processos no nosso exemplo da biblioteca, teríamos que criar uma biblioteca nova. Como eu disse, dois processo compartilham recursos mas isso não significa que eles podem acessar o mesmo recurso ao mesmo tempo. Por exemplo, se eu tenho um servidor rodando na porta 80, não posso iniciar outro processo na porta 80. Um processo não tem acesso a memória de outro processo, isso significa que para um mesmo objeto não pode existir em dois processos diferentes. (<em>Até pode, mas não vamos falar de RMI porque é complicado e já foi removido da biblioteca padrão do Java</em>.)</p>
+</div>
+<div class="paragraph">
+<p><em>—  E se eu quiser que as requisições que cheguem na porta 80 sejam processadas em paralelo, como faço?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Lembra da nossa biblioteca? Pois é, cada biblioteca é um processo, mas cada bibliotecário é uma <em>Thread</em>. <em>Thread</em> são dois fluxos que compartilham o mesmo espaço de memória, ou seja, é quando um processo tem dois fluxos de execução em paralelo compartilhando recursos. Threads podem acessar a mesma porta, assim como podem acessar os mesmo objetos. Mas ele não podem ser feitas ao mesmo momento. Lembra do computador do balcão da biblioteca? A metáfora da biblioteca foi construída para similar exatamente o que acontece em um computador.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-06-thread-e-processo-em-java">Thread e Processo em Java</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Vamos agora mostrar algumas classes que podemos usar para manipular processos e threads usando Java. Uma das preocupações da plataforma Java foi criar uma abstração para que o mesmo código possa ser usado em qualquer sistema operacional, logo todo o código demonstrado pode ser executando tando em Linux quando Windows e sistemas derivados do Unix como o MacOS.</p>
+</div>
+<div class="sect2">
+<h3 id="_processos">Processos</h3>
+<div class="paragraph">
+<p>Para que possamos acessar as informações de todos os processos em execução podemos usar a classe <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html">ProcessHandle</a> (<em>adicionada no Java 9</em>). Navegue pela documentação dela para perceber que processos podem ter uma relação de parentescos como podemos perceber através dos métodos <code>children()</code>, <code>descendants​()</code> e <code>parent​()</code>. Na execução abaixo vemos as informações do processo atual e a listagem de todos os processos em execução.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="err">$</span> <span class="n">jshell</span>
+<span class="o">|</span>  <span class="nc">Welcome</span> <span class="n">to</span> <span class="nc">JShell</span> <span class="o">--</span> <span class="nc">Version</span> <span class="mi">18</span>
+<span class="o">|</span>  <span class="nc">For</span> <span class="n">an</span> <span class="n">introduction</span> <span class="nl">type:</span> <span class="o">/</span><span class="n">help</span> <span class="n">intro</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">current</span><span class="o">().</span><span class="na">pid</span><span class="o">());</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">current</span>  <span class="o">.</span><span class="na">pid</span><span class="o">()</span>  <span class="o">);</span>
+<span class="mi">20092</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">current</span><span class="o">().</span><span class="na">info</span><span class="o">());</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">current</span>  <span class="o">.</span><span class="na">info</span>  <span class="o">);</span>
+<span class="o">[</span><span class="nl">user:</span> <span class="nc">Optional</span><span class="o">[</span><span class="no">VEPO</span><span class="o">],</span> <span class="nl">cmd:</span> <span class="nl">C:</span><span class="err">\</span><span class="nc">Users</span><span class="err">\</span><span class="n">vepo</span><span class="err">\</span><span class="o">.</span><span class="na">sdkman</span><span class="err">\</span><span class="n">candidates</span><span class="err">\</span><span class="n">java</span><span class="err">\</span><span class="mi">18</span><span class="o">-</span><span class="n">open</span><span class="err">\</span><span class="n">bin</span><span class="err">\</span><span class="n">java</span><span class="o">.</span><span class="na">exe</span><span class="o">,</span> <span class="nl">startTime:</span> <span class="nc">Optional</span><span class="o">[</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mo">02</span><span class="nl">T18:</span><span class="mi">49</span><span class="o">:</span><span class="mf">28.093</span><span class="no">Z</span><span class="o">],</span> <span class="nl">totalTime:</span> <span class="nc">Optional</span><span class="o">[</span><span class="no">PT0</span><span class="o">.</span><span class="mi">328125</span><span class="no">S</span><span class="o">]]</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">allProcesses</span><span class="o">().</span><span class="na">forEach</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">::</span><span class="n">println</span><span class="o">);</span>
+<span class="nc">ProcessHandle</span><span class="o">.</span><span class="na">allProcesses</span>  <span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">::</span><span class="n">println</span><span class="o">);</span>
+<span class="mi">0</span>
+<span class="mi">4</span>
+<span class="mi">72</span>
+<span class="o">[...]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Caso você deseje criar um novo processo, é preciso fazer uma chamada de sistema usando a classe <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Runtime.html">Runtime</a>. No trecho de código abaixo usamos o método <code>exec</code> para criar um novo processo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span><span class="o">().</span><span class="na">exec</span><span class="o">(</span><span class="s">"pwd"</span><span class="o">)</span>
+<span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span>  <span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">"pwd"</span><span class="o">)</span>
+<span class="err">$</span><span class="mi">4</span> <span class="o">==&gt;</span> <span class="nc">Process</span><span class="o">[</span><span class="n">pid</span><span class="o">=</span><span class="mi">19628</span><span class="o">,</span> <span class="n">exitValue</span><span class="o">=</span><span class="s">"not exited"</span><span class="o">]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Na resposta da execução podemos ver que o método <code>exec</code> retorna o novo processo, mas não espera por ele terminar, retornando apenas um objeto <a href="https://docs.oracle.com/javase/9/docs/api/java/lang/Process.html">Process</a> para poder ser manipulado. Em posse desse objeto, podemos esperar por ele terminar e ver se a execução foi um sucesso.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span><span class="o">().</span><span class="na">exec</span><span class="o">(</span><span class="s">"pwd"</span><span class="o">).</span><span class="na">waitFor</span><span class="o">()</span>
+<span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span>  <span class="o">.</span><span class="na">exec</span><span class="o">(</span><span class="s">"pwd"</span><span class="o">).</span><span class="na">waitFor</span>
+<span class="err">$</span><span class="mi">5</span> <span class="o">==&gt;</span> <span class="mi">0</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Percebeu que o método <code>waitFor</code> retornou <strong>0</strong>? Todo processo precisa finalizar com um número e zero significa sucesso. Qualquer número diferente de zero significa que o programa foi finalizado com erro. O programa que eu executei acima é o <code>pwd</code> que retorna o diretório corrente em Linux, apesar de usar Windows uso o Git Bash que é um porte do MinGW que simula um bash Linux.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_threads">Threads</h3>
+<div class="paragraph">
+<p><em>Threads</em> também são criadas pelo sistemas operacional, mas o Java dá suporte a duas bibliotecas bem interessantes que precisamos demonstrar. A primeira é a classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Thread.html">Threads</a> que deve ser usada com muita parcimônia essa classe, o livro <a href="https://www.amazon.com.br/Java-Efetivo-Melhores-Pr%C3%A1ticas-Plataforma/dp/8550804622?crid=6C287ENLSDOW&amp;keywords=java+efetivo&amp;qid=1662253615&amp;sprefix=java+ef%2Caps%2C363&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=092f42dffa52d29c336aacab87c58558&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Java Efetivo</a> nos diz no <strong>Item 80: Dê preferência aos executores, às tarefas e às streams em vez de threads</strong>. Os <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Executors.html">Executors</a> são a proxima classe que vamos ver que podem entregar as mesmas funcionalidades.</p>
+</div>
+<div class="paragraph">
+<p><em>— Então porque entender Threads?!?!</em></p>
+</div>
+<div class="paragraph">
+<p><em>Threads</em> são importantes porque são um conceito do sistema operacional. Um executor não elimina uma thread, ele apenas facilita a implementação delas e otimiza o seu uso. Threads são gerenciadas pelo Sistema Operacional. O tempo de CPU será dividido entre os processos e as threads. Isso significa que se seu computador tem 4 CPUs e seu programa tem ao menos 2 threads, é provável que em algum momento seu programa esteja rodando em 2 CPUs ao mesmo tempo, mas quem define isso é o sistema operacional.</p>
+</div>
+<div class="paragraph">
+<p>Threads são um recurso do sistema operacional limitado e caro. No Windows isso não é transparente, mas no Linux é possível acessar essas informações facilmente através do arquivo <code>/proc/sys/kernel/threads-max</code>. Na execução abaixo vemos que essa instância do Linux só pode rodar 32.768 processos concorrentes e 100.435 threads concorrentes, o que dá em média 3 threads por processo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span><span class="nb">cat</span> /proc/sys/kernel/threads-max
+100435
+
+<span class="nv">$ </span><span class="nb">cat</span> /proc/sys/kernel/pid_max
+32768</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>— Mas 3 threads por processo não é muito pouco?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Não! Porque é praticamente impossível rodar 32.768 processos concorrentes e a grande maioria dos processos tem apenas uma thread rodando.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas o que acontece quando o Java pede uma thread nova?</em></p>
+</div>
+<div class="paragraph">
+<p>Para entender isso, precisamos compreender outro conceito importante de Sistemas Operacionais o espaço do usuário e o espaço do kernel (<a href="https://pt.wikipedia.org/wiki/Espa%C3%A7o_de_usu%C3%A1rio"><em>user space</em> e <em>kernel space</em></a>). Espaço do usuário é todo o código dos nossos programas, já o espaço do kernel é o código do sistema operacional que nossos programas usam para realizar algumas operações. Toda operação que sai do espaço do usuário e vai para o espaço do kernel é custosa porque pode envolver recursos compartilhados como sockets, arquivos ou threads. Logo, criar uma nova thread é custoso porque tem que criar uma nova thread no sistema operacional que não é apenas alocar um espaço na memória.</p>
+</div>
+<div class="paragraph">
+<p>No código abaixo uma thread é criada que sua única função é pegar o instante em que é iniciada, dormir por 500ms e armazenar o instante em que ela é finalizada. Os tempos deve ser armazenados no array tempos porque nenhuma variável pode ser alterada diretamente entre duas threads que não seja uma variável <code>final</code>, pois estamos falando de duas pilhas de execução diferentes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">long</span><span class="o">[]</span> <span class="n">tempos</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">long</span><span class="o">[</span><span class="mi">4</span><span class="o">];</span>
+<span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+<span class="nc">Thread</span> <span class="n">t</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Thread</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">tempos</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">};</span>
+<span class="n">t</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">t</span><span class="o">.</span><span class="na">join</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+<span class="o">}</span>
+<span class="n">tempos</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo de inicialização: %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo de execução     : %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo total           : %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O resultado da execução é o visto abaixo, observe que demora quase meio milissegundo para que a thread seja iniciada. Esse tempo pode parecer pouco, mas se houver um uso abusivo dessa classe pode impactar a performance, pois esse tempo é latência adicionada ao processamento.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>Tempo de inicialização: 436µs
+Tempo de execução     : 510061µs
+Tempo total           : 510643µs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe também que usamos os métodos <code>start</code> e <code>join</code>, eles servem para controlar a thread. Uma thread não inicia sua execução imediatamente, é preciso que o código que a instanciou dispare a execução. Mas quando a execução se inicia os dois códigos começam a ser executados em paralelo, para que se aguarde a finalização da thread é preciso usar o método <code>join</code> que fará com que a thread corrente seja bloqueada até que a outra seja finalizada.</p>
+</div>
+<div class="paragraph">
+<p>Outro ponto importante é o uso da exceção <code>InterruptedException</code>, ela é lançada pela JVM toda vez que a thread é interrompida pelo sistema operacional.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas o que significa a thread ser interrompida pelo sistema operacional?</em></p>
+</div>
+<div class="paragraph">
+<p>Ora, já teve vezes em que uma janelinha do Windows ficou não responsiva e você foi lá forçou ela a ser fechada? Ou você executou um comando no bash e não quis esperar a resposta e pressionou <strong>CRTL + C</strong>. Nessa hora o sistema operacional envia um sinal ao programa que ele deve finalizar, o <a href="https://pt.wikipedia.org/wiki/SIGTERM">SIGTERM</a>. Quando esse sinal é recebido pela thread, ela deve liberar todos os recursos e se finalizar, por isso quanto tempos uma <code>InterruptedException</code> é hora de limpar a casa e fechar tudo.</p>
+</div>
+<div class="paragraph">
+<p>Se você ignorar essa exception, o seu processo pode virar um <a href="https://pt.wikipedia.org/wiki/Processo_zombie">processo zumbi</a>, pois outras threads podem ter obedecido o sinal e já ter finalizada criando instabilidade para a execução. Então, recebeu um <code>InterruptedException</code>, fecha tudo e chama <code>Thread.currentThread().interrupt()</code>.</p>
+</div>
+<div class="paragraph">
+<p>Há um outro sinal que não fornece essa informação, o <a href="https://pt.wikipedia.org/wiki/SIGKILL">SIGKILL</a>, o sistema operacional simplesmente mata a execução sem nenhuma educação e protocolo.</p>
+</div>
+<div class="paragraph">
+<p>Por fim, você deve ter reparado que implementamos o método <code>run</code> na thread. Esse método é definido na classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/lang/Runnable.html">Runnable</a>, essa classe é muito importante porque nem sempre precisamos definir uma thread nova, podemos estender essa classe e criar quantas threads forem necessária com o mesmo código.</p>
+</div>
+<div class="paragraph">
+<p>Existe a possibilidade de se criar grupos de threads com a classe <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ThreadGroup.html">ThreadGroup</a>, mas não vamos abordar ela porque todas as funcionalidades delas podem ser endereçadas com Executors.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_executors">Executors</h3>
+<div class="paragraph">
+<p>Executors são a nova, <em>em relação a Thread</em>, biblioteca adicionada no Java 5 que permite um controle melhor sobre Threads e grupos de threads. A vantagem do uso da classe Executors é que temos uma interface bem mais interessante, como veremos a diante. Primeiro vamos focar em performance.</p>
+</div>
+<div class="paragraph">
+<p>Como falamos, criar thread pode ser uma operação cara, com executors podemos criar pool de threads ou reutilizar threads já existentes sem a necessidade de se criar novas threads. Se compararmos a execução vemos que o uso de pools de thread diminuem o tempo gasto com a inicialização dessas threads. Nos teste que executamos, vemos que o tempo de inicialização e o tempo médio total são menores, somente o tempo médio de execução é maior, mas isso é devido a fatores externos ao código já que executamos o mesmo código em ambos o caso.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>Usando Threads
+Tempo de inicialização: 402µs
+Tempo de execução     : 511415µs
+Tempo total           : 511939µs
+
+Tempo médio de inicialização: 77370µs
+Tempo médio de execução     : 50792817µs
+Tempo médio total           : 50880048µs
+
+Usando Executors
+Tempo de inicialização: 2829µs    (+2.427µs)
+Tempo de execução     : 509877µs  (-1.538µs)
+Tempo total           : 513237µs  (+1.298µs)
+
+Tempo médio de inicialização: 19708µs    (-57.662µs)
+Tempo médio de execução     : 50806122µs (+13.305µs)
+Tempo médio total           : 50839674µs (-40.374µs)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para se criar um <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/ExecutorService.html"><code>ExecutorService</code></a> deve se usar a classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Executors.html"><code>Executors</code></a>. Nessa classe tempos vários tipos de ExecutorServices, mas os mais importantes são os <strong>FixedThreadPool</strong>, <strong>CachedThreadPool</strong> e <strong>ScheduledThreadPool</strong>. Cada um desses tem suas peculiaridades que não vamos abordar aqui, apenas vamos ressaltar que <strong>ScheduledThreadPool</strong> deve ser usado quando precisamos criar threads que executam em intervalos pré definidos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">long</span><span class="o">[]</span> <span class="n">tempos</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">long</span><span class="o">[</span><span class="mi">4</span><span class="o">];</span>
+<span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+<span class="nc">ExecutorService</span> <span class="n">executor</span> <span class="o">=</span> <span class="nc">Executors</span><span class="o">.</span><span class="na">newSingleThreadExecutor</span><span class="o">();</span>
+<span class="nc">Future</span><span class="o">&lt;?&gt;</span> <span class="n">ft</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="na">submit</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+        <span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">tempos</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+    <span class="o">});</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">ft</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+<span class="o">}</span>
+<span class="n">tempos</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo de inicialização: %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo de execução     : %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">1</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Tempo total           : %dµs"</span><span class="o">,</span> <span class="o">(</span><span class="n">tempos</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span> <span class="o">-</span> <span class="n">tempos</span><span class="o">[</span><span class="mi">0</span><span class="o">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">));</span>
+<span class="n">executor</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A grande diferença é que quando criamos uma nova execução o ExecutorService retorna um <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Future.html"><code>Future</code></a> que irá prover informações sobre a execução e o retorno da execução. Um executor não aceita apenas um <code>Runnable</code>, mas também <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/Callable.html"><code>Callable</code></a> que retorna valores. A opção por usar <code>Callable</code> irá tornar seu código mais legível.</p>
+</div>
+<div class="paragraph">
+<p>Outro ponto importante do uso de <code>ExecutorService</code> é que assim que uma nova atividade é submetida, ela entrará na fila de execução. É preciso ressaltar que ela só será executada quando houver thread disponível. Isso significa que um <code>ExecutorService</code> deve ser usado para atividades rápidas e não com longa duração. Se você precisar executar algo que dure toda execução crie um ExecutorService de tamanho pré-definido, usando <code>newFixedThreadPool</code> ou cria a thread manualmente.</p>
+</div>
+<div class="paragraph">
+<p>Por fim um ExecutorService não finaliza automaticamente, ele deve ser finalizado através do método <code>shutdown</code>. Caso você não chame esse método o seu programa vai virar um processo zumbi.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-06-controle-concorrencia">Controle de Concorrência</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Como vimos concorrência é um problema diferente de paralelismo, ela é a solução para garantir que apenas uma thread está executando um trecho de código. As soluções de concorrência da JVM são propostas para que seja usadas dentro de uma mesma instância da JVM, ou seja, não é possível pela biblioteca padrão garantir concorrência entre dois processos distintos.</p>
+</div>
+<div class="paragraph">
+<p>Vamos começar a ver pelos modos mais antigos, mesmo que eles já não sejam os mais utilizados. O primeiro dele é o mais simples de todos, usar o modificado <code>synchronized</code>. No trecho de código abaixo, o <code>synchronized</code> permite que o de counter seja impresso na linha de comando sequencialmente, caso seja removido valores repetidos e fora de ordem aparecerão. O <code>synchronized</code> vai garantir que quando uma thread está executando o método <code>printAndIncrement</code> as outras serão bloqueadas até que a execução seja finalizada. Quando usamos o <code>synchronized</code> em um método de instância, o efeito do bloqueio só acontece quando método de um mesmo objeto são executados concorrentemente, caso o controle de concorrência deva ser feito globalmente o <code>synchronized</code> pode ser usado em métodos estáticos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Sync</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">counter</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Sync</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">printAndIncrement</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">counter</span><span class="o">++;</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">err</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"Thread [%s] valor:%d"</span><span class="o">,</span> <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">(),</span> <span class="n">counter</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usar o modificador <code>synchronized</code> ainda é uma prática bem comum apesar que existem soluções melhores. Ele deve ser usado quando é realmente necessário bloquear todo o bloco de execução. Se você precisa usar em uma das classes da biblioteca Collection (vista na sessão 3) a melhor solução é usar uma das classes da biblioteca padrão do Java. A classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/Collections.html"><code>Collections</code></a> tem alguns métodos que criam um envolucro para objetos, por exemplo, se eu tenho uma lista e desejo usar ela em várias threads, eu posso usar <code>Collections.synchronizedList(minhaLista)</code>.</p>
+</div>
+<div class="paragraph">
+<p>Observe no trecho de código abaixo que temos duas listas mas apenas a segunda pode ser usada em várias threads. Qualquer operação na segunda lista reflete na primeira. Usar uma lista não sincronizada pode ser que não faça o programa apresentar uma exceção, mas com certeza vai criar estados inconsistentes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="err">$</span> <span class="n">jshell</span>
+<span class="o">|</span>  <span class="nc">Welcome</span> <span class="n">to</span> <span class="nc">JShell</span> <span class="o">--</span> <span class="nc">Version</span> <span class="mi">18</span>
+<span class="o">|</span>  <span class="nc">For</span> <span class="n">an</span> <span class="n">introduction</span> <span class="nl">type:</span> <span class="o">/</span><span class="n">help</span> <span class="n">intro</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">minhaLista</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">minhaLista</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;</span>  <span class="o">;</span>
+<span class="n">minhaLista</span> <span class="o">==&gt;</span> <span class="o">[]</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">minhaListaSync</span> <span class="o">=</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="n">minhaLista</span><span class="o">);</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">minhaListaSync</span> <span class="o">=</span> <span class="nc">Collections</span><span class="o">.</span><span class="na">synchronizedList</span><span class="o">(</span><span class="n">minhaLista</span><span class="o">);</span>
+<span class="n">minhaListaSync</span> <span class="o">==&gt;</span> <span class="o">[]</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="n">minhaLista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"String 1"</span><span class="o">)</span>
+<span class="n">minhaLista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"String 1"</span><span class="o">)</span>
+<span class="err">$</span><span class="mi">3</span> <span class="o">==&gt;</span> <span class="kc">true</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="n">minhaListaSync</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"String 2"</span><span class="o">)</span>
+<span class="n">minhaListaSync</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"String 2"</span><span class="o">)</span>
+<span class="err">$</span><span class="mi">4</span> <span class="o">==&gt;</span> <span class="kc">true</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="n">minhaLista</span>
+<span class="n">minhaLista</span>
+<span class="n">minhaLista</span> <span class="o">==&gt;</span> <span class="o">[</span><span class="nc">String</span> <span class="mi">1</span><span class="o">,</span> <span class="nc">String</span> <span class="mi">2</span><span class="o">]</span>
+
+<span class="n">jshell</span><span class="o">&gt;</span> <span class="n">minhaListaSync</span>
+<span class="n">minhaListaSync</span>
+<span class="n">minhaListaSync</span> <span class="o">==&gt;</span> <span class="o">[</span><span class="nc">String</span> <span class="mi">1</span><span class="o">,</span> <span class="nc">String</span> <span class="mi">2</span><span class="o">]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O <code>synchronized</code> também pode ser usado como bloco de código, mas essa é uma forma um pouco arcaica como veremos. Vamos imagina que temos duas threads, uma produzindo valores e a outra consumindo. A thread que consome valores deve sempre retornar um valor, não importa se não existe valores no momento. Normalmente isso é o que acontece quando temos um buffer em quem uma thread está produzindo e outra consumindo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Buffer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">Object</span> <span class="n">lock</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Object</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">[]&gt;</span> <span class="n">_buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">valores</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">synchronized</span><span class="o">(</span><span class="n">lock</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">_buffer</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">valores</span><span class="o">);</span>
+            <span class="n">lock</span><span class="o">.</span><span class="na">notifyAll</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">consume</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">int</span><span class="o">[]</span> <span class="n">nextValue</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="kd">synchronized</span><span class="o">(</span><span class="n">lock</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">while</span><span class="o">(</span><span class="n">_buffer</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">lock</span><span class="o">.</span><span class="na">wait</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="n">nextValue</span> <span class="o">=</span> <span class="n">_buffer</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">nextValue</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A classe acima está implementada usando técnicas que não devem mais ser usadas. O primeiro problema é que toda chamada ao bloco sincronizado será feita por apenas uma thread por vez, existe técnicas mais recentes que permitem que mais de uma thread acessem um bloco sincronizado que veremos a seguir. O bloco sincronizado deve ser feito usando um objeto em comum, no caso esse objeto pode ser compartilhado em mais de um objeto, caso a thread deseje esperar por alguma condição, deve se usar o método <code>wait</code> que será despertado por uma chamada ao método <code>notify</code> ou <code>notifyAll</code>. No exemplo acima, se não há valores a serem consumidos, eles devem esperar por um valor.</p>
+</div>
+<div class="paragraph">
+<p>Uma alternativa ao bloco sincronizado é o uso da classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/locks/ReadWriteLock.html">ReadWriteLock</a>. A necessidade dessa classe surgem quando se percebe que apenas as threads que escrevem devem ter acesso exclusivo, as threads de leitura podem acessar os métodos livremente. No exemplo acima não é possível usar ela porque ambos os métodos escrevem ao adicionar e remover valores na lista por isso serão necessárias algumas alterações.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Buffer</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ReadWriteLock</span> <span class="n">readWriteLock</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReentrantReadWriteLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Lock</span> <span class="n">readLock</span> <span class="o">=</span> <span class="n">readWriteLock</span><span class="o">.</span><span class="na">readLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Lock</span> <span class="n">writeLock</span> <span class="o">=</span> <span class="n">readWriteLock</span><span class="o">.</span><span class="na">writeLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Condition</span> <span class="n">newItem</span> <span class="o">=</span> <span class="n">writeLock</span><span class="o">.</span><span class="na">newCondition</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">[]&gt;</span> <span class="n">_buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">valores</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">writeLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">_buffer</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">valores</span><span class="o">);</span>
+            <span class="n">newItem</span><span class="o">.</span><span class="na">signalAll</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">writeLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">available</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">readLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">_buffer</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">readLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">consume</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">readLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">while</span> <span class="o">(</span><span class="n">_buffer</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&lt;=</span> <span class="n">position</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">newItem</span><span class="o">.</span><span class="na">await</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">_buffer</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">readLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Na nossa nova classe <code>Buffer</code>, quem é responsável por saber a posição no buffer é a thread que consome que pode ser mais de uma. Cada chamada ao método <code>consome</code> e <code>available</code> poderão ser feitas sem nenhum bloqueio. Mas se uma chamada ao método <code>add</code> for feita, ela deverá esperar pela finalização de todas as chamadas aos locks de leitura e todos os locks de leitura deverão esperar pela finalização do lock de escrita. Os locks de leitura podem ser executados concorrentemente, mas o lock de escrita só pode acontecer quando nenhum outro lock estiver ativo.</p>
+</div>
+<div class="paragraph">
+<p>No código acima podemos ver também o uso da classe <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/locks/Condition.html"><code>Condition</code></a>. Essa classe deve ser usada quando esperamos alguma condição especifica, no nosso caso é a lista ter o item desejado ou não. O uso dessa classe é bem similar ao dos métodos <code>wait</code>, <code>notify</code> e <code>notifyAll</code>, mas é adicionada uma melhor semântica pode podemos criar mais que uma condição e usar elas para dar uma boa legibilidade ao código.</p>
+</div>
+<div class="paragraph">
+<p>Por fim a biblioteca padrão do Java tem uma série de classes atômicas que são extremamente úteis. Elas estão no pacote <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/concurrent/atomic/package-summary.html"><code>java.util.concurrent.atomic</code></a> e todas elas tem comportamento similar, vão permitir você realizar operações atômicas sem se preocupar com a concorrência. Para demonstrar o uso delas vou mostrar o caso mais comum que é criar um contador sincronizado.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">ExecutorService</span> <span class="n">executor</span> <span class="o">=</span> <span class="nc">Executors</span><span class="o">.</span><span class="na">newFixedThreadPool</span><span class="o">(</span><span class="mi">15</span><span class="o">);</span>
+<span class="nc">AtomicInteger</span> <span class="n">counter</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AtomicInteger</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Future</span><span class="o">&lt;?&gt;&gt;</span> <span class="n">allFuture</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1_000</span><span class="o">;</span> <span class="o">++</span><span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">allFuture</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">executor</span><span class="o">.</span><span class="na">submit</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Contador: "</span> <span class="o">+</span> <span class="n">counter</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">())));</span>
+<span class="o">}</span>
+<span class="n">executor</span><span class="o">.</span><span class="na">shutdown</span><span class="o">();</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">executor</span><span class="o">.</span><span class="na">awaitTermination</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="nc">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">interrupt</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No código acima não podemos garantir que os valores impressos estarão em ordem, mas podemos garantir que todos os valores de 1 a 1000 serão impressos. A classe <code>AtomicInteger</code> garante que a operação <code>incrementAndGet</code> seja feita atomicamente, isso significa que ela não será interrompida por outra chamada a outro método desse mesmo objeto. Todas as classes desse pacote merecem nossa atenção pois elas são bem importantes, principalmente se você está desenvolvendo um aplicativo Desktop que irá lidar com várias threads.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Tutorial" /><category term="Threads" /><category term="Concorrência" /><category term="Paralelismo" /><summary type="html"><![CDATA[O que eu preciso saber de concorrência e paralelismo para desenvolver usando Java? A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.]]></summary></entry></feed>

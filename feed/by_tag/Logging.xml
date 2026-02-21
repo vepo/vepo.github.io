@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Logging.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Logging.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Log não é auditoria!</title><link href="https://blog.vepo.dev/posts/log-nao-e-auditoria" rel="alternate" type="text/html" title="Log não é auditoria!" /><published>2021-11-02T00:00:00+00:00</published><updated>2021-11-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/10-37-00-log-nao-e-auditoria</id><content type="html" xml:base="https://blog.vepo.dev/posts/log-nao-e-auditoria"><![CDATA[<p>Esse post é uma resposta as inúmeras mensagens que recebi por um tweet.</p>
+
+<p>No dia 02/11/2021 uma empresa de entrega de comida sofreu um ataque interno de um colaborador. Os nomes dos restaurantes foram alterados para nomes ofensivos. Foi um ataque politico, direcionado e baixo. Tentavam macular a imagem da vereadora Marielle Franco em ataques infantil. Na minha opinião era melhor a policia investigar e não a empresa. Foi uma ofensa a família da Marielle, aos restaurantes envolvidos e aos usuários.</p>
+
+<p>Foi aí que comecei a ler minha timeline e percebi que muito se falava de investigar. E levantei a questão…. seu sistema tem auditoria como uma funcionalidade?</p>
+
+<p><img src="/assets/images/auditoria/auditoria.png" alt="Meu tweet" /></p>
+
+<p>Era tarde e pela manhã já havia várias interações, muitas delas falando de log. É confuso, mas vamos definir o que é um log e o que é uma auditoria?</p>
+
+<h1 id="o-que-é-log">O que é log?</h1>
+
+<p>Muitos confundem log por log de aplicação. Log é um formato de armazenamento. É quando uma aplicação sempre escreve em um fluxo de dados. Esse fluxo pode ser qualquer coisa, um arquivo, um socket ou quem sabe uma impressora.</p>
+
+<p>Logs são usados desde o inicio da computação pois são extremamente úteis. Se você pensa que é usado somente com um proposito, está errado! Existem bancos de dados que usam logs para armazenar as informações. O Apache Kafka armazena as mensagem em arquivos de logs.</p>
+
+<p>Para simplificar, qualquer dado imutável pode, e deve, ser armazenado usando logs. O que vai diferenciar é o framework. Já vi sistema que usava o SLF4J para enviar mensagens para o Apache Kafka, pode parecer fora de proposito, mas isso facilitava em muito a implementação e o Kafka poderia ser substituído pelo log de arquivo.</p>
+
+<p>O log de sistema é um método para resolução de problemas (o famoso troubleshooting). Toda aplicação deve ter log usando níveis, mensagens mais importantes deve ser associadas a níveis mais elevados. Como o log é uma atividade cara, em termos de performance, certos níveis podem ser desabilitados. Eu não vou definir os níveis, porque eles são abertos e muitas vezes definido pelo framework.</p>
+
+<p>No momento em que escrevo esse post estou trabalhando em um sistema legado que tem três níveis de debug! Se eu ativer o nível máximo consigo até ler como as mensagens socket estão sendo lidas pela aplicação. Esse nível máximo só deve ser usando quando há algum problema no protocolo de comunicação e não na aplicação.</p>
+
+<p>O log de sistema deve ter mensagens úteis para a resolução de problema, assim como avisos e erros de execução. Ele é um fluxo de dados volátil, pode ser descartado se não houver nada a se investigar. Ou em sistemas estáveis, pode até ser desabilitado, registrando apenas mensagens de erros.</p>
+
+<h1 id="o-que-é-auditoria">O que é auditoria?</h1>
+
+<p>Auditoria é um processo. Você com certeza já ouviu o termo “auditoria externa”. Qualquer empresa pode passar por auditoria, é quando um auditor vem observar se os processos estão condizentes com a norma. Se não ficou óbvio vou ressaltar: auditoria pressupõe a existência de processos e normas.</p>
+
+<p>Qualquer empresa que trabalha com dados precisa de processos bem definidos. Usar dados envolve armazenar, transformar e usar dados. Dados são ativos regulados por leis, inclusive pela LGPD que define que os dados não pertencem a empresa, mas ao usuário que originou ele. O usuário cede a empresa seus dados e deve autorizar o seu uso (não sou advogado e posso estar confundindo a LGPD brasileira com a europeia).</p>
+
+<p>É papel de um CTO e do arquiteto da empresa ter um mapeamento de quais dados a empresa possui e como eles são usados internamente. Sei que é praticamente impossível ter essa informação atualizada por causa da agilidade do desenvolvimento.</p>
+
+<p>Computação ainda é um campo sem processos bem definidos, assim como a indústria do petróleo era no passado. Mas vazamentos e acidentes começaram a ocorrer com frequência o que ocasionou uma intensa regulamentação. A computação está prestes a chegar a maturidade, você pode ver no noticiário um CEO de uma Big Tech depondo (mentindo) para o congresso americano. Eu acompanhei o depoimento dele de 2018, ele se recusou a responder o que fazia com os dados de usuário da plataforma dele. Ele poderia ser preso por não responder ou responder de forma genérica, mas ele preferiu desconversar do que falar a verdade. Isso significa que a resposta dele poderia ocasionar sua imediata prisão e o fechamento da plataforma.</p>
+
+<p>Porque eu estou falando isso? Fugi ao tema do post? Não! Processos de auditoria vão ficar cada vez mais comuns! Essa discussão do senado americano no fim vai provar como o uso de dados pessoais foram uma ameaça a democracia americana, democracia brasileira e a economia do Reino Unido. Quando eles provarem isso virá uma severa legislação. Muitas empresas vão reclamar, mas será culpa deles pode não terem se auto regulado!</p>
+
+<p>Empresas vão precisar gerar dados para auditoria, frameworks vão ser padronizados e terceirizados, surgirão normas para gestão de dados, modelos de ML serão auditados. Já há uma literatura sobre o assunto, tente ler o livro <a href="https://www.amazon.com.br/Algoritmos-Destrui%C3%A7%C3%A3o-Massa-Cathy-ONeil/dp/6586460026/">Algoritmos de Destruição em Massa</a> da Cathy O’Neil. Qualquer empresa que mexe com dados vai precisar construir sistemas de auditoria.</p>
+
+<p>Mas esses sistemas já deveriam existir internamente. Sei que eles existem em bancos, porque são entidades muito regulamentadas. AINDA BEM!!! Se acha isso chato, é melhor do que você acordar pobre porque o banco não tem dinheiro. Isso já aconteceu no Brasil.</p>
+
+<h1 id="porque-não-usar-o-log-para-auditoria">Porque não usar o log para Auditoria</h1>
+
+<p>No fundo auditoria é um log, mas a diferença é quem o consulta e quando. Mas usar uma funcionalidade de log vai fazer com que a auditoria seja especifica de um serviço e não uma empresa.</p>
+
+<p>Quando falamos de microsserviços e computação distribuída, alguns sistemas não tem a informação completa. Já implementei um sistema que certos serviços não tinha a informação de usuário, só o identificador. Uma auditoria precisa de dados correlacionados, significado.</p>
+
+<p>Auditoria precisa de interface de usuário também. Porque não criar uma interface simples que permite ver que dados foram alterados. Essa interface tem que proteger a integridade do dados, se um usuário alterar o número do cartão de crédito esse dado tem que estar ilegível, mas tem que existir esse dados. Na verdade é recomendável que informações sensíveis não estejam visíveis na base de dados. NINGUÉM DA EMPRESA PODE TER ACESSO A DADOS DE USUÁRIO!</p>
+
+<h1 id="frameworks-para-auditoria">Frameworks para auditoria</h1>
+
+<p>Se você é desenvolvedor Java como eu e usa bases relacionais. Recomendo fortemente o uso do Hibernate com Envers. É uma framework de mercado, estável, bem documentado e que entrega auditória. Não conheço outros frameworks para bases não relacionais, se tiver algum me manda pelo twitter.</p>
+
+<p>Mas isso não significa que o trabalho terminou. Você apenas armazenou os dados, o que é relevante para o sistema. Mas esses dados são signficativos?</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Logging" /><category term="Auditoria" /><category term="Produto" /><summary type="html"><![CDATA[Log e Auditoria são duas funcionalidades diferentes. Objetivos de negócio diferentres, vamos ver?]]></summary></entry><entry><title type="html">Debugando ou Troubleshooting</title><link href="https://blog.vepo.dev/posts/debugando-ou-troubleshooting" rel="alternate" type="text/html" title="Debugando ou Troubleshooting" /><published>2020-05-29T00:00:00+00:00</published><updated>2020-05-29T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-02-56-debugando-ou-troubleshooting</id><content type="html" xml:base="https://blog.vepo.dev/posts/debugando-ou-troubleshooting"><![CDATA[<p>Uma das funções de um desenvolvedor Sênior é fazer o time andar. Além dele ser melhorar a comunicação interna do time, será responsável também por não deixar o time parar. É aí que entra o <em>Debug</em>, <em>Troubleshooting</em>… ou em bom português Resolução de Problemas.</p>
+
+<p>Fazer troubleshooting é quase como investigar um crime. Você precisa tem muito conhecimento do que estava acontecendo, muito conhecimento do local e ir seguindo rastros.</p>
+
+<p>Então vamos lá em dicas de como encontrar e resolver problemas.</p>
+
+<h1 id="não-se-contente-com-a-aparência">Não se contente com a aparência</h1>
+
+<p>Muito tempo atrás, um um mundo onde <em>git</em> e <em>agile</em> ainda eram palavras exóticas, existia o <em>Waterfall</em>. <em>Waterfall</em> é o famoso processo de desenvolvimento que cada fase dura ao menos 3 meses. Você passa 3 semanas planejando, 2 meses desenvolvendo e uma semana testando. É uma loucura, literalmente. Mas tem uma coisa que o <em>Waterfall</em> me ensinou que eu nunca esqueço: <em>Root Cause Analysis</em>.</p>
+
+<p>Recebíamos um <strong>CR</strong> (<em>Change Request</em>) e antes de receber um branch pra desenvolver precisávamos fazer uma análise minuciosa da causa do problema em uma ferramenta web rudimentar.</p>
+
+<p>Vamos propor um problema: um simples <em>NullPointerException</em>.</p>
+
+<p>Na hora um júnior falaria pra colocar uma verificação de <code class="language-plaintext highlighter-rouge">null</code> e pronto.</p>
+
+<p>Mas uma boa Análise de Causa Raiz, pelo nome já diz que essa solução é inválida. Para fazer essa análise, você tem que fazer perguntas ao sistema:</p>
+
+<ol>
+  <li>De onde vem esse valor <code class="language-plaintext highlighter-rouge">null</code>?</li>
+  <li>Ele pode ser <code class="language-plaintext highlighter-rouge">null</code>? Ou deve sempre vir com algum valor?</li>
+  <li>Caso seja <code class="language-plaintext highlighter-rouge">null</code>, qual o comportamento do sistema?</li>
+</ol>
+
+<p>Dependendo das respostas acima, é bem provável que a solução proposta mude. Até porque você pode se perguntar: <em>Porque o cara que desenvolveu isso não o fez?</em> Óbvio?</p>
+
+<p>Pois bem, um Sênior não se contenta com análises superficiais. Vai investigar.</p>
+
+<h1 id="análise-de-logs">Análise de logs</h1>
+
+<p>Um Sênior sabe ler logs, mesmo que não seja de aplicações dele. Logs são o registro factual e uma execução. O passo a passo para um bug. Um log, em si, já diz muita coisa, mas se associarmos um log com o código temos tudo!</p>
+
+<p>Mas como ler um log? Vamos lá….</p>
+
+<ol>
+  <li>Encontre onde deu o problema</li>
+  <li>Analise a código levante algumas suposições</li>
+  <li>Retroceda no log, acompanhando com os trechos de código e validando suas suposições</li>
+  <li>Caso consiga uma suposição valida, crie um teste unitário que recria o estado da execução</li>
+</ol>
+
+<p>Fazer esses quatro passos exige muito treino. A principio é difícil analisar log, mas com o tempo vai se pegando o jeito e só de olhar o código é possível supor alguns possíveis problemas.</p>
+
+<h1 id="deixe-rastros">Deixe Rastros</h1>
+
+<p>Pior do que analisar logs é não ter logs para analisar. <a href="https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg">Nesse post expliquei como usar Log em Java</a>.</p>
+
+<p>Log consome performance, caso você não use log por causa disso, você não sabe usar log!</p>
+
+<p>Antes vamos entender os níveis de log…</p>
+
+<h2 id="níveis-de-log">Níveis de log</h2>
+
+<p>Em Java temos uma biblioteca padrão de log, a <a href="http://www.slf4j.org/">SLF4J</a>, eu recomendo que você a use, escolha uma implementação, mas pode olhar um benchmark.</p>
+
+<p>Cada mensagem de log tem um nível associado. No SLF4J há os seguintes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nivel</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TRACE</td>
+      <td>O mais interno. Use-o quando você quer marcar trechos de código executados. Por exemplo: “Iniciando getUsers”</td>
+    </tr>
+    <tr>
+      <td>DEBUG</td>
+      <td>Use-o para imprimir valores de variáveis durante a execução.</td>
+    </tr>
+    <tr>
+      <td>INFO</td>
+      <td>Use-o para imprimir informações uteis para a execução de informações. Em casos excepcionais, esse nível de log pode ser usado em produção.</td>
+    </tr>
+    <tr>
+      <td>WARN</td>
+      <td>Opa! Alguma coisa não devia ter acontecido. Porque? É bom investigar! Use esse nível para marcar comportamento inesperado, mas que não deram erro. Normalmente é aquela situação que pode ser contornada.</td>
+    </tr>
+    <tr>
+      <td>ERROR</td>
+      <td>Opa! Erro inesperado! Não fique logando com log erros esperados. Um ERROR já é sinal de um Bug…. Ou é um erro na lógica, ou algum serviço falhou!</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Use esses serviços sem cerimonia, para garantir a performance você deve configurar o nível de log de acordo com os ambientes. E, por favor, faça a <a href="https://12factor.net/pt_br/config">configuração ser por variável de ambiente</a>, <a href="https://12factor.net/pt_br/dev-prod-parity">nada de uma build pra cada ambiente!</a>.</p>
+
+<p>O que eu costumo fazer:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nivel</th>
+      <th>Ambiente</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TRACE</td>
+      <td>Desenvolvimento em debugging</td>
+    </tr>
+    <tr>
+      <td>DEBUG</td>
+      <td>Desenvolvimento, Staging</td>
+    </tr>
+    <tr>
+      <td>INFO</td>
+      <td>Testes, Staging, UAT</td>
+    </tr>
+    <tr>
+      <td>WARN</td>
+      <td>Produção</td>
+    </tr>
+    <tr>
+      <td>ERROR</td>
+      <td>Oi? Vai ignorar os warnings?</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Os Níveis de log da produção eu baixo esporadicamente para determinados modulos somente quando há um Bug em Produção que não consigo reproduzir localmente. Mas é somente até conseguir encontrar registro do erro. Depois volta para WARN.</p>
+
+<h1 id="conheça-o-código">Conheça o Código</h1>
+
+<p>Muitos desenvolvedores consideram um produto/biblioteca/framework uma caixa preta. Trabalham na base do input/output. Essa abordagem é necessária quando se tem muito conhecimento a reter. Quando eu inicio o uso de um produto/biblioteca/framework eu tomo essa abordagem, mas com o andamento do projeto precisamos de mais informações.</p>
+
+<p>O conhecimento do funcionamento interno de todo o projeto é necessário para entender possíveis erros. Quando há um erro em produção, 1h é bastante tempo, logo tem que se ter uma boa ideia de tudo. O que pode tá errado?</p>
+
+<p>Um dica é aos poucos ir lendo os códigos que você usa como caixa preta. Mesmo que você não entenda, vá lendo e vendo o que ele faz com seus inputs.</p>
+
+<p>Quando estava desenvolvendo a Engine de Processos de Negócios de uma antiga empresa que trabalhei, enfretamos um grande problema de Memory Leak. Em resumo, toda intergração de negócio era escrita em XML e associado código Java. Assim um cara do comercial podia entender as integrações bizarras que existiam.</p>
+
+<p>Para fazer com que <code class="language-plaintext highlighter-rouge">if</code>, <code class="language-plaintext highlighter-rouge">case</code>, <code class="language-plaintext highlighter-rouge">switch</code>, <code class="language-plaintext highlighter-rouge">for</code>, etc… fosse colocados em XML, usamos o <a href="http://commons.apache.org/proper/commons-jexl/"><strong>Java Expression Language (JEXL)</strong></a> da Apache.</p>
+
+<p>Estava tudo indo certo até ir para Produção. Mas o negócio não ficava de pé por alguns dias. Estourava a memória. Depois de uma analise bem detalhada, percebi que não era no nosso código. Até encontrar que na limpesza do cache do JEXL, eles não limpavam as referências as classes utilizadas. Assim, se usassemos ClassLoaders dinamicos, como era uma escolha arquitetural nossa, ficavamos com muito lixo na Heap. Entendeu? Se não depois falo sobre Gerenciamento de Memória no Java.</p>
+
+<p>E agora, como resolver? Bom, tive que abrir os objetos pro Reflection, violando todos os principios de OOP para limpar o cache. E funcionou!</p>
+
+<p>Não dá pra garantir que exista um software sem erros, conhecer as suas dependências é um requisito.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Um Sênior deve saber resolver os problemas do time. Deve ser um guia para criar meios de deixar rastros e entender o que está acontecendo. Troubleshooting é difícil, mas é uma prática.</p>
+
+<p>Leia código, tente executar eles na sua mente. Simule execuções baseada em logs.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Troubleshooting" /><category term="Debugging" /><category term="Logging" /><summary type="html"><![CDATA[Um Sênior deve saber fazer troubleshooting. Aqui vão algumas dicas.]]></summary></entry></feed>

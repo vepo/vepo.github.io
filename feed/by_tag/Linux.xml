@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Linux.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Linux.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Criando um serviço Linux</title><link href="https://blog.vepo.dev/posts/criando-um-servico-linux" rel="alternate" type="text/html" title="Criando um serviço Linux" /><published>2021-08-17T00:00:00+00:00</published><updated>2021-08-17T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/16-54-00-criando-servico-linux</id><content type="html" xml:base="https://blog.vepo.dev/posts/criando-um-servico-linux"><![CDATA[<p>Antes de criar um serviço, precisamos preparar o ambiente. Vamos instalar todas as dependências. No caso que estou trabalhando é um bot simples em Java, por isso preciso instalar o git, Java 11 e Maven. Farei a build na própria máquina, esse ambiente é para validação de um conceito, uma PoC que provavelmente vai virar ambiente de produção. MAS… como é um bot, posso transformar ele em uma imagem docker.</p>
+
+<p>Então o primeiro passo é deixar o ambiente redondo para a execução. Instalei o GIT, Java 11, Maven. Coloquei todas as variáveis de ambiente necessárias configuradas pelo <code class="language-plaintext highlighter-rouge">/etc/bashrc</code>.</p>
+
+<p>Então eu descubro que a versão do Quarkus.io do bot estava completamente desatualizada! 😳</p>
+
+<p>Mas consegui criar executável Java para meu bot, sua tarefa é executar a cada 10s uma operação de atualização. Para isso usei Quakus.</p>
+
+<h2 id="serviços-linux">Serviços Linux</h2>
+
+<p>Através do comando <code class="language-plaintext highlighter-rouge">systemctl</code> o Linux expõe uma série de serviços. Para criar um, basta criar um arquivo texto, mas antes vamos explorar um pouco o próprio comando.</p>
+
+<p>Vamos listar todos os serviços disponiveis?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>systemctl list-unit-files
+UNIT FILE                                     STATE
+proc-sys-fs-binfmt_misc.automount             static
+acpid.service                                 enabled
+arp-ethers.service                            disable
+grub-boot-indeterminate.service               static
+grub2-systemd-integration.service             static
+sshd-keygen.service                           static
+sshd.service                                  enabled
+sshd@.service                                 static
+network.target                                static
+nfs-client.target                             enabled
+</code></pre></div></div>
+
+<p>Ora vemos alguns serviços interessantes como o <code class="language-plaintext highlighter-rouge">sshd</code>, <code class="language-plaintext highlighter-rouge">network</code> e o <code class="language-plaintext highlighter-rouge">nfs-client</code>. <code class="language-plaintext highlighter-rouge">sshd</code> é o daemon do servidor SSH, pelo qual estou conectado. Se eu quiser saber o status do <code class="language-plaintext highlighter-rouge">sshd</code>?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>systemctl status sshd
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded <span class="o">(</span>/usr/lib/systemd/system/sshd.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Tue 2021-08-17 19:32:20 UTC<span class="p">;</span> 3h 27min ago
+     Docs: man:sshd<span class="o">(</span>8<span class="o">)</span>
+           man:sshd_config<span class="o">(</span>5<span class="o">)</span>
+ Main PID: 3152 <span class="o">(</span>sshd<span class="o">)</span>
+   CGroup: /system.slice/sshd.service
+           └─3152 /usr/sbin/sshd <span class="nt">-D</span>
+
+Aug 17 22:46:33 ip-172-31-44-73.us-east-2.compute.internal sshd[9447]: Received disconnect from 134.122.63.163 port 34174:11: Normal Shutdown, Thank you <span class="k">for </span>playing <span class="o">[</span>preauth]
+Aug 17 22:46:33 ip-172-31-44-73.us-east-2.compute.internal sshd[9447]: Disconnected from 134.122.63.163 port 34174 <span class="o">[</span>preauth]
+Aug 17 22:47:45 ip-172-31-44-73.us-east-2.compute.internal sshd[9475]: Invalid user user from 134.122.63.163 port 42936
+Aug 17 22:47:45 ip-172-31-44-73.us-east-2.compute.internal sshd[9475]: input_userauth_request: invalid user user <span class="o">[</span>preauth]
+Aug 17 22:47:45 ip-172-31-44-73.us-east-2.compute.internal sshd[9475]: Received disconnect from 134.122.63.163 port 42936:11: Normal Shutdown, Thank you <span class="k">for </span>playing <span class="o">[</span>preauth]
+Aug 17 22:47:45 ip-172-31-44-73.us-east-2.compute.internal sshd[9475]: Disconnected from 134.122.63.163 port 42936 <span class="o">[</span>preauth]
+Aug 17 22:48:55 ip-172-31-44-73.us-east-2.compute.internal sshd[9547]: Invalid user user from 134.122.63.163 port 51822
+Aug 17 22:48:55 ip-172-31-44-73.us-east-2.compute.internal sshd[9547]: input_userauth_request: invalid user user <span class="o">[</span>preauth]
+Aug 17 22:48:55 ip-172-31-44-73.us-east-2.compute.internal sshd[9547]: Received disconnect from 134.122.63.163 port 51822:11: Normal Shutdown, Thank you <span class="k">for </span>playing <span class="o">[</span>preauth]
+Aug 17 22:48:55 ip-172-31-44-73.us-east-2.compute.internal sshd[9547]: Disconnected from 134.122.63.163 port 51822 <span class="o">[</span>preauth]
+</code></pre></div></div>
+
+<p>Eu poderia até reiniciar o sshd com o comando abaixo. MAS não seria uma boa ideia…</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl status sshd
+</code></pre></div></div>
+
+<p>Para controlar um serviço, podemos usar os seguintes comandos <code class="language-plaintext highlighter-rouge">status</code>, <code class="language-plaintext highlighter-rouge">start</code>, <code class="language-plaintext highlighter-rouge">stop</code>, <code class="language-plaintext highlighter-rouge">reload</code>, <code class="language-plaintext highlighter-rouge">restart</code>, <code class="language-plaintext highlighter-rouge">try-restart</code> e <code class="language-plaintext highlighter-rouge">kill</code>. Caso queria saber mais sobre essas funcionalidades, execute:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl <span class="nt">--help</span>
+</code></pre></div></div>
+
+<h2 id="criando-um-serviço-para-um-processo-java">Criando um serviço para um processo Java</h2>
+
+<p>Para criar um serviço tempos que escrever um arquivo Unit. Uma documentação detalhada pode ser encontrada em <em><a href="https://linuxconfig.org/how-to-create-systemd-service-unit-in-linux">How to create systemd service unit in Linux</a></em>.</p>
+
+<p>Para nosso arquivo vamos colocar todos os binários compilados pelo quarkus em <code class="language-plaintext highlighter-rouge">/opt/meu-bot</code>, para que eu nunca erre na atualização, criei um script bem simples.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash -e</span>
+mvn clean package
+
+<span class="nb">mkdir</span> <span class="nt">-p</span> /opt/meu-bot
+<span class="nb">sudo rm</span> <span class="nt">-R</span> /opt/meu-bot/<span class="k">*</span>
+
+<span class="nb">sudo cp</span> <span class="nt">-R</span> target/quarkus-app/<span class="k">*</span> /opt/meu-bot/
+<span class="nb">sudo cp </span>tools/meu-bot.service /etc/systemd/system/
+<span class="nb">sudo chown</span> <span class="nt">-R</span> ec2-user:ec2-user /opt/meu-bot/
+
+<span class="nb">sudo </span>systemctl daemon-reload
+<span class="nb">sudo </span>systemctl restart meu-bot
+</code></pre></div></div>
+
+<p>Quem define o serviço é o arquivo <code class="language-plaintext highlighter-rouge">meu-bot.service</code> que deve ficar na pasta <code class="language-plaintext highlighter-rouge">/etc/systemd/system</code>. Depois de atualizado o arquivo, precisamos rodar o comando <code class="language-plaintext highlighter-rouge">systemctl daemon-reload</code> e então é só iniciar o serviço <code class="language-plaintext highlighter-rouge">systemctl restart meu-bot</code>.</p>
+
+<p>Assim o conteúdo do serviço será:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
+Description=Meu Bot Service
+Requires=network.target
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+User=ec2-user
+ExecStart=/usr/lib/jvm/java-11-openjdk-11.0.11.0.9-1.amzn2.0.1.x86_64/bin/java -jar /opt/meu-bot/quarkus-run.jar
+WorkingDirectory=/opt/meu-bot/
+
+[Install]
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<p>Observe que preciso definir alguns parâmetros obrigatórios como <code class="language-plaintext highlighter-rouge">User</code>, <code class="language-plaintext highlighter-rouge">ExecStart</code> e <code class="language-plaintext highlighter-rouge">Requires</code>. Outros são opcionais como <code class="language-plaintext highlighter-rouge">WorkingDirectory</code>. Para os outros, eu não validei a necessidade, mas é bom sempre usar. Um detalhe importante nesse arquivo é que todos os executáveis devem ser referênciados pelo caminho absolutor, por isso não usei apenas <code class="language-plaintext highlighter-rouge">java</code>. Foi necessário buscar o caminho real do executável Java no sistema, nada que usando <code class="language-plaintext highlighter-rouge">whereis java</code> não resolva.</p>
+
+<p>Agora é só verificar se o serviço está de pé:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>systemctl status meu-bot
+● meu-bot.service - Meu Bot Service
+   Loaded: loaded <span class="o">(</span>/etc/systemd/system/meu-bot.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: disabled<span class="o">)</span>
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Tue 2021-08-17 22:49:26 UTC<span class="p">;</span> 22min ago
+ Main PID: 9565 <span class="o">(</span>java<span class="o">)</span>
+   CGroup: /system.slice/meu-bot.service
+           └─9565 /usr/lib/jvm/java-11-openjdk-11.0.11.0.9-1.amzn2.0.1.x86_64/bin/java <span class="nt">-jar</span> /opt/meu-bot/quarkus-run.jar
+</code></pre></div></div>
+
+<h2 id="acessando-o-log-do-serviço">Acessando o log do serviço</h2>
+
+<p>Observe que não falamos de log!</p>
+
+<p>Quando fazemos um serviço, existe várias formas de log. Você pode direcionar o log para um arquivo, ou pode deixar que o sistema operacional cuide dele. Caso deixe para o sistema, pode acessar usando</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>journalctl -f -u meu-bot.service
+</code></pre></div></div>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Criar um serviço é fácil usando Linux. Precisa só de um arquivo texto e seu programa compilado. É a melhor abordagem se você precisa de um programa sempre em execução. Caso seu programa termine a execução ao encontrar qualquer erro, você terá o próprio sistema reinicializando ele.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Linux" /><category term="Java" /><category term="Serviços" /><summary type="html"><![CDATA[Linux tem um excelente suporte a serviço. Vamos tentar demonstrar rapidamente como criar um serviço.]]></summary></entry><entry><title type="html">Tudo é um Arquivo</title><link href="https://blog.vepo.dev/posts/linux-tudo-e-um-arquivo" rel="alternate" type="text/html" title="Tudo é um Arquivo" /><published>2021-03-03T00:00:00+00:00</published><updated>2021-03-03T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/13-00-00-linux-tudo-e-um-arquivo</id><content type="html" xml:base="https://blog.vepo.dev/posts/linux-tudo-e-um-arquivo"><![CDATA[<h2 id="primeira-lição">Primeira Lição</h2>
+
+<p>Para aprender sobre o Kernel do Linux, a primeira lição é saber que tudo é um arquivo. Por exemplo, se você quiser ver quais são os processos rodando, ao invés de abrir o Gerenciador de Processos, você pode simplesmente abrir a pasta <code class="language-plaintext highlighter-rouge">/proc</code>. Você pode controlar tudo que está rodando apenas lendo e escrevendo em arquivos.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls /proc/
+1    145  151  1589  1615  191   2110  222   2640  472  7    cgroups  cpuinfo      interrupts  meminfo  net   stat  tty     version
+144  146  153  1600  184   1932  217   2596  2664  6    bus  cmdline  filesystems  loadavg     mounts   self  sys   uptime  version_signature
+</code></pre></div></div>
+
+<p>Por exemplo:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Diretório</th>
+      <th>Conteúdo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/proc</code></td>
+      <td>Todas as informações dos processos em execução</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/dev</code></td>
+      <td>Todos os dispositivos disponíveis</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/sys</code></td>
+      <td>O sysfs é usado por programas como o udev para acessar informações do dispositivo e do driver do dispositivo.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/var</code></td>
+      <td>A pasta padrão onde o sistema escreve dados durante o curso de sua operação.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/usr</code></td>
+      <td>Este é um dos diretórios mais importantes do sistema, pois contém todos os binários do usuário, sua documentação, bibliotecas, arquivos de cabeçalho, etc…</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/bin</code></td>
+      <td>Esta pasta contém comandos ou scripts ou executáveis que podem ser executados para realizar uma tarefa.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Um bom ponto de inicio é explocar a pasta <code class="language-plaintext highlighter-rouge">/proc</code>. Esta pasta contém todas as informações de todos os processos em execução. Cada processo tem um identificador único chamado <strong>PID</strong>, que significa <strong>Process IDentification</strong>. Vamos supor que temos um processo com PID <code class="language-plaintext highlighter-rouge">472</code>, podemos saber dele:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span>  /proc/472
+attr  auxv  cgroup  cmdline  <span class="nb">comm  </span>cwd  environ  exe  fd  gid_map  limits  maps  mountinfo  mounts  mountstats  net  ns  oom_adj  oom_score_adj  root  schedstat  setgroups  smaps  <span class="nb">stat  </span>statm  status  task  uid_map
+<span class="nv">$ </span><span class="nb">cat</span>  /proc/472/cmdline 
+java-classpath/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-3.8.0/lib/languagetool-languageserver/build/install/languagetool-languageserver/lib/<span class="k">*</span>:/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-pt-3.8.0/lib/<span class="k">*</span>App54469
+<span class="nb">ls</span> <span class="nt">-l</span> /proc/472/cwd
+lrwxrwxrwx 1 vepo vepo 0 Mar  1 08:20 /proc/184/cwd -&gt; <span class="s1">'/mnt/c/Users/victoro/AppData/Local/Programs/Microsoft VS Code'</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><img src="/assets/images/pexels-dick-hoskins-6969512.jpg" alt="Pinguins" />
+Foto de Dick Hoskins no Pexels</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Linux" /><summary type="html"><![CDATA[No Linux, tudo é um arquivo. Esse é o primeiro ensinamento para você entender o funcionamento do Linux]]></summary></entry><entry><title type="html">Docker 101 - Tecnologias e Conceitos</title><link href="https://blog.vepo.dev/posts/docker-101-tecnologias-e-conceitos" rel="alternate" type="text/html" title="Docker 101 - Tecnologias e Conceitos" /><published>2020-10-20T00:00:00+00:00</published><updated>2023-09-25T20:01:00+00:00</updated><id>https://blog.vepo.dev/posts/00-00-00-docker-101</id><content type="html" xml:base="https://blog.vepo.dev/posts/docker-101-tecnologias-e-conceitos"><![CDATA[<p><em>Este material era para ser um curso de Docker. Mas eu não tenho skills para gravação/edição de vídeo. Minha intenção aqui é apresentar alguns conceitos básicos de Docker.</em></p>
+
+<h1 id="o-que-é-docker">O que é Docker?</h1>
+
+<h2 id="introdução">Introdução</h2>
+
+<p>Antes de iniciar qualquer curso sobre Docker, precisamos primeiro entender o que é Docker? Essa pergunta pode não ter uma resposta muito simples, visto que você pode ouvir esse termo em vários contextos diferentes.</p>
+
+<p>Para responder vamos levantar as seguintes perguntas?</p>
+<ol>
+  <li>Seria Docker uma empresa?</li>
+  <li>Seria Docker um software?</li>
+  <li>Seria Docker uma plataforma?</li>
+  <li>Seria Docker uma tecnologia?</li>
+</ol>
+
+<h3 id="seria-docker-uma-empresa">Seria Docker uma empresa?</h3>
+
+<p>SIM!</p>
+
+<p>Sim Docker é a empresa que criou o Docker. A <strong>Docker, Inc.</strong> provê soluções Enterprise e o Docker Hub.</p>
+
+<h3 id="seria-docker-um-software">Seria Docker um Software?</h3>
+
+<p>SIM!</p>
+
+<p>Sim, você pode executar um <code class="language-plaintext highlighter-rouge">docker --version</code> em qualquer máquina com Docker instalado. Ele é desenvolvido pela <strong>Docker, Inc.</strong> e pode ser instalado em qualquer dos mais comuns SOs do mercado.</p>
+
+<h3 id="seria-docker-uma-plataforma">Seria Docker uma Plataforma?</h3>
+
+<p>Podemos dizer que SIM!</p>
+
+<p>Não sou tão assertivo nessa resposta porque o termo plataforma é genérico. Mas há uma série de componentes no Docker que nos permite chamar ele de plataforma. Você usa docker para criar imagens, que pode ser armazenadas em um Docker Registry, que serão carregadas por um Gerenciador de Containers. Há inúmeros nós nessa teia.</p>
+
+<h3 id="seria-docker-uma-tecnologia">Seria Docker uma Tecnologia?</h3>
+
+<p>Com certeza SIM!</p>
+
+<p>O que a <strong>Docker, Inc.</strong> criou foi muito além de um software. Ela utilizou vários recursos já existente para criar um conceito a <em>containerização</em>. Com isso se gerou uma Explosão Cambriana na industria. Novos conceitos e padrões surgirão depois dele.</p>
+
+<p>Assim podemos dizer que a maneira de se gerenciar uma infra-estrutura em 2019 é completamente diferente da maneira que se gerenciava em 2005. <strong>COMPLETAMENTE DIFERENTE!</strong></p>
+
+<p>Depois do advento do Docker, a <strong>Docker, Inc.</strong> cedeu sua <em>core engine</em> para <a href="https://www.cncf.io/">Cloud Native Computing Foundation</a> sob o nome de <a href="https://github.com/containerd/containerd">containerd</a>. Você pode ver pela <a href="https://landscape.cncf.io/">CNCF Landscape</a> que o containerd é uma caixinha em Container Runtime. A evolução da tecnologia não é mais controlada pela <strong>Docker, Inc.</strong>, mas por essa organização que faz parte da Linux Foundation.</p>
+
+<h2 id="a-tecnologia-docker">A tecnologia Docker</h2>
+
+<p><em>“Na natureza nada se cria, nada se perde, tudo se transforma”</em> Antoine-Laurent de Lavoisier</p>
+
+<p>Essa frase de Lavoisier se adequa perfeitamente a projetos Open Source! Na verdade Docker não criou nada novo e nem utilizou nenhuma tecnologia nova, mas a partir do que existia uma nova tecnologia foi criada.</p>
+
+<h3 id="tecnologias-bases">Tecnologias Bases</h3>
+
+<p>Docker se baseia em algumas tecnologias já existentes no Linux.</p>
+<ul>
+  <li><a href="https://pt.wikipedia.org/wiki/C%C3%B3pia_em_grava%C3%A7%C3%A3o">COW - Copy On Write</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Cgroups">cgroups</a></li>
+  <li><a href="https://pt.wikipedia.org/wiki/Iptables">iptables</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Linux_namespaces">Linux Namespaces</a></li>
+</ul>
+
+<h4 id="cow">COW</h4>
+
+<p><em>Copy On Write</em> é uma técnica que permite a criação de uma estrutura de arquivos por camada. Cada camada altera a anterior e camadas podem ser compartilhadas com processos diferentes.</p>
+
+<h4 id="cgroups">cgroups</h4>
+
+<p><em>cgroups</em> é uma feature do Linux que permite controlar o tanto de recurso (CPU, Memória, I/O) que um processo pode utilizar.</p>
+
+<h4 id="iptables">iptables</h4>
+
+<p><em>iptables</em> é um programa Linux que permite criar regras de redirecionamento de portas dentro do Linux.</p>
+
+<h4 id="linux-namespaces">Linux Namespaces</h4>
+
+<p><em>Linux Namespaces</em> permite o compartilhamento, e o isolamento, de recursos do SO dentro do Linux. Similar ao <em>cgroups</em>, mas se refere a outros tipos de recursos. Por exemplos: PIDs, nomes de arquivos, hostnames, etc…</p>
+
+<h2 id="infraestrutura-imutável">Infraestrutura Imutável</h2>
+
+<p>O termo <strong>Immutable Infrastructure</strong> vem em contraste ao que tinhamos antes do Docker, que é a <strong>Mutable Infraestructure</strong>.</p>
+
+<p>Em uma Infraestrutura mutável, para fazer qualquer alteração em ambientes, deve-se alterar as configurações existente. Cada atualização há um risco muito grande que deve ser minimizado por técnicas como rollback, dry-run e backups. Cada update é um risco, pois o novo deploy vem alterar o antigo.</p>
+
+<p>Com a infraestrutura imutável, o novo deploy vem em paralelo ao antigo. É criado uma nova estrutura e o mesmo substitui o antigo. Assim, caso o novo apresente falhas, o antigo pode ser reutilizado.</p>
+
+<h3 id="antes-do-docker">Antes do Docker</h3>
+
+<p>Antes do Docker existir, para fazer a configuração de um serviço era preciso alguns passos:</p>
+
+<ol>
+  <li>Configurar um Servidor (Instalar Linux, Unix ou Windows)</li>
+  <li>Instalar dependências (Apacha httpd, Java, Python, etc…)</li>
+  <li>Configurar o Servidor de Aplicação (JBoss, IIS)</li>
+  <li>Fazer deploy da Aplicação</li>
+  <li>Monitorar o estado da Aplicação (<a href="https://mmonit.com/monit/">monit</a>)</li>
+</ol>
+
+<p>Configurar um servidor era a tarefa mais fácil, o difícil era fazer atualizações ou gerenciar projetos legados. Muitas vezes duas aplicações precisam de diferentes dependências para rodar. Ou tinha problema com o compartilhamento de recursos, duas aplicações tentando escutar na mesma porta TCP.</p>
+
+<p>Atualizar um servidor de produção, envolvia criar scripts para fazer diversas alterações que nem sempre funcionavam na produção. Quando um erro acontecia na implementação…. ROLLBACK! O que também era uma atividade complexa!</p>
+
+<h3 id="possível-solução">Possível solução</h3>
+
+<p>Uma boa e possível solução era a criação de <strong>fotos</strong> (ou <em>snapshots</em>) do servidor. E se pudéssemos a partir de uma foto rodar um servidor? Ou voltar para uma versão anterior a partir de uma foto? E se esse servidor fosse totalmente isolado? Posso executar duas versões dele em paralelo?</p>
+
+<h3 id="depois-do-docker">Depois do Docker</h3>
+
+<p>Para executar um servidor:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull my-application:1.0.1
+docker stop my-app
+docker <span class="nb">rm </span>my-app
+docker run <span class="nt">-name</span> my-app <span class="nt">-p</span> 8080:80 my-application:1.0.1
+</code></pre></div></div>
+
+<p>Com as 4 linhas acima, podemos atualizar uma aplicação chamada <code class="language-plaintext highlighter-rouge">my-application</code> para versão 1.0.1. Deu erro?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker stop my-app
+docker <span class="nb">rm </span>my-app
+docker run <span class="nt">-name</span> my-app <span class="nt">-p</span> 8080:80 my-application:1.0.0
+</code></pre></div></div>
+
+<p>Mais 3 linhas para fazer o rollback seguro!</p>
+
+<h2 id="conceitos-básicos">Conceitos Básicos</h2>
+
+<p>Um pouco antes do Docker, uma das tecnologias da moda era a virtualização. Mas em que consistia a virtualização e porque a necessidade de containerização</p>
+
+<h3 id="virtualização">Virtualização</h3>
+
+<p>Talvez você já tenha criado uma Máquina Virtual. Se não criou, gaste algum tempo baixando o VirtualBox e rodando algumas versões de SOs diferentes dentro da sua máquina.</p>
+
+<p>Quando falamos de virtualização, estamos dividindo os recursos físicos da máquina com outras máquinas, que são chamadas máquinas virtuais. Assim, podemos alocar 1 CPU, 2GB de memória, etc… Nessa máquina rodará um Sistema Operacional completo que não compartilhará nenhum recurso com nenhum outro. Se esse SO não utilizar todo o recurso alocado, este não poderá ser compartilhado.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/q40xfw2qlei05qihud6m.png" alt="Virtual Machine" /></p>
+
+<h3 id="containerização">Containerização</h3>
+
+<p>Com containers todas as aplicações compartilham o mesmo SO. O SO rodará a aplicação isoladamente, criando e alocando qualquer recurso que o container necessitar.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/fj02eotpgiggs4mqfrgo.png" alt="Containers" /></p>
+
+<h4 id="vantagens">Vantagens</h4>
+
+<p>Como a containerização acontece no nível do Sistema Operacional, há uma série de vantagens:</p>
+<ol>
+  <li>Inicialização imediata. Não é necessário se inicializar o Sistema Operacional</li>
+  <li>Compartilhamento de Recursos. Caso o container não utilize Memoria ou CPU, esta fica disponível para outro.</li>
+  <li>É possível criar mais uma instância do mesmo container imediatamente.</li>
+</ol>
+
+<h2 id="docker-building-blocks">Docker Building Blocks</h2>
+
+<p>Gosto do conceito de Building Blocks, quando me refiro a ele estou definindo elementos básicos para algo. Assim em Docker podemos definir alguns building blocks.</p>
+
+<p>Para o desenvolvimento de qualquer aplicação Docker, é necessário entender o que são cada um desses elementos.</p>
+
+<ul>
+  <li>Imagem
+    <ul>
+      <li>TAGs</li>
+    </ul>
+  </li>
+  <li>Container
+    <ul>
+      <li>Volume</li>
+      <li>Network</li>
+    </ul>
+  </li>
+  <li>Registry</li>
+  <li>Dockerfile</li>
+</ul>
+
+<h3 id="imagem">Imagem</h3>
+
+<p>Uma Imagem é uma foto do Container em seu momento inicial. Se formos comparar com os conceitos de máquinas virtuais, a Imagem seria um SNAPSHOT.</p>
+
+<p>Uma Imagem é usada para gerar um Container. Uma Imagem pode ser gerada a partir de um Container. Uma Imagem tem algumas propriedades que estendem o conceito de Snapshot, podemos definir qual comando a Imagem irá executar assim que ela iniciar.</p>
+
+<p>Uma Imagem é preferencialmente construida a partir de um Dockerfile.</p>
+
+<h3 id="tags">TAGs</h3>
+
+<p>Uma Imagem pode ter uma ou mais TAG associada. Cada imagem possui um nome, este nome pode estar associado a várias TAGs.</p>
+
+<p>Por exemplo, se formos criar um container do MariaDB, sabemos que o nome dele é <code class="language-plaintext highlighter-rouge">mariadb</code>. Mas se referenciarmos apenas esse nome, será baixada a image <code class="language-plaintext highlighter-rouge">mariadb:latest</code>, o que não é tão bom, visto que não sabemos exatamente qual versão será executada. No caso do MariaDB, temos as seguintes TAGs:</p>
+<ul>
+  <li>10.4.10-bionic, 10.4-bionic, 10-bionic, bionic, 10.4.10, 10.4, 10, latest</li>
+  <li>10.3.20-bionic, 10.3-bionic, 10.3.20, 10.3</li>
+  <li>10.2.29-bionic, 10.2-bionic, 10.2.29, 10.2</li>
+  <li>10.1.43-bionic, 10.1-bionic, 10.1.43, 10.1</li>
+</ul>
+
+<p>Uma boa opção, seria utilizar <code class="language-plaintext highlighter-rouge">mariadb:10.4</code> para escolher a versão <strong>10.4.10</strong> ou qualquer versão futura com bug fixes.</p>
+
+<h3 id="container">Container</h3>
+
+<p>Um Container é uma instância de uma aplicação. Pode haver vários Containers rodando com a partir da mesma Imagem. Ao se executar um Container é preciso uma Imagem e um conjunto de informações:</p>
+<ul>
+  <li>Volumes</li>
+  <li>Variáveis de Ambiente</li>
+  <li>Portas</li>
+  <li>etc…</li>
+</ul>
+
+<h3 id="volume">Volume</h3>
+
+<p>O Sistema de Arquivo de um Container é descartável. Assim, ao se remover o container, todos os arquivos dele são removidos. Um Volume é um mapeamento entre um diretório da máquina hospedeira para o container. Usando COW, o diretório, ou arquivo, dentro container é sobrescrito.</p>
+
+<h3 id="network">Network</h3>
+
+<p>Quando um container é executado, pode pertencer a uma ou várias Networks. Por padrão, ele pertence a Network Default. Para cada Network associada, ele terá um IP NAT associado.</p>
+
+<p>Uma Network serve para criar uma VPC. Dois containers só podem se comunicar se pertencerem a mesma Network. Uma Network contém DNS que resolve o IP através do nome do container. Assim, se um container tentar acessar <code class="language-plaintext highlighter-rouge">container-1:8080</code> estará tentando acessar a porta <strong>8080</strong> do container com nome <strong>container-1</strong>.</p>
+
+<h3 id="registry">Registry</h3>
+
+<p>Um Registry é um servidor web para armazenar uma Imagem. No ciclo de vida de uma Imagem, ela pode ser gerada ou baixada de um Registry.</p>
+
+<p>O padrão é o <a href="https://hub.docker.com/">Docker Hub</a>, sempre que possível procure imagens lá. No Docker Hub há imagens verificadas e não verificadas. Procure usar as imagens verificadas, caso contrário você pode estar correndo o risco de expor seus dados.</p>
+
+<h3 id="dockerfile">Dockerfile</h3>
+
+<p>Dockerfile é o script de criação de uma Imagem. Uma Imagem deve ser construida através de um script, e pode ser reconstruida em qualquer máquina.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Docker pode parecer uma mágica, mas é só o uso inteligente de tecnologias há muito tempo já existiam no Sistema Operacional Linux. Com o uso dessas tecnologias, podemos agora criar deploys completamente independentes dentro de um mesmo sistema operacional, usando a mesma infraestrutura.</p>
+
+<p>Com Docker não há o desperdício de recursos que existia com a Virtualização. Agora os recursos podem ser alocados de forma mais inteligente.</p>
+
+<hr />
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/vpwhp0r7ampxf1jywqv8.jpg" alt="Navio carregado de Containers" /></p>
+
+<p><a href="https://www.pexels.com/pt-br/foto/panorama-vista-paisagem-agua-3057963/">Foto de <em>Tom Fisk</em> no <em>Pexels</em>.</a></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Docker," /><category term="Containers," /><category term="DevOps," /><category term="Linux" /><summary type="html"><![CDATA[Quais são os conceitos por trás do Docker? Como o Docker consegue cria a mágica dos container no Linux?]]></summary></entry></feed>

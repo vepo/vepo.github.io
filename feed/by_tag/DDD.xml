@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/DDD.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/DDD.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Elementos do Design de Software</title><link href="https://blog.vepo.dev/posts/ddd-02-elementos-do-design-de-software" rel="alternate" type="text/html" title="Elementos do Design de Software" /><published>2022-09-28T00:00:00+00:00</published><updated>2022-09-28T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/00-00-00-elementos-do-design-de-software</id><content type="html" xml:base="https://blog.vepo.dev/posts/ddd-02-elementos-do-design-de-software"><![CDATA[<div class="paragraph">
+<p>Esse post faz parte de uma série sobre Domain-Driven Design, se você não leu os posts anteriores, recomendo ler antes de seguir com a leitura. Nesse vamos expandir o nosso vocabulário de Design de Software detalhando alguns elementos (<em>building blocks</em>) de design.</p>
+</div>
+<div class="sect1">
+<h2 id="experiencia-e-vivencia">Experiência e Vivência</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando começamos a escrever software enfrentamos um grande desafio que é não saber dar nomes as coisas. Estamos muito focados em aprender estruturas de dados, sintaxes e bibliotecas. Nosso repertório é formado por tudo aquilo que vimos e em muitos casos foram apenas alguns exemplos que demonstram funcionalidades da linguagem. Falamos de listas, arrays, Strings, inteiros, float e booleans, mas não sabemos como abstrair a partir desse ponto.</p>
+</div>
+<div class="paragraph">
+<p><em>— É mesmo! Eu vejo o trabalho de pessoa mais velhas e acho que nunca vou conseguir fazer algo igual!</em></p>
+</div>
+<div class="paragraph">
+<p>Mas sabe qual é a diferença entre alguém mais velho na área e alguém que entrou agora? Experiência. Experiência traz vocabulário, vocabulário expande nossas capacidades de ver e compreender o mundo. Quanto mais projetos nós trabalhamos mais capacidade temos de compreender o que está acontecendo ao nosso redor.</p>
+</div>
+<div class="paragraph">
+<p>E essa lição não deve se limita ao <strong>ofício</strong> de desenvolvimento de software, ela deve ser holística, isso é, deve englobar o todo da sua vida. Sabe porque eu grifei a palavra <strong>ofício</strong>? Porque o desenvolvimento de software é apenas um trabalho como todos os outros, mas ele deve intercambiar conhecimento com os outros trabalhos. Devemos aprender a perguntar e dar nomes a trabalhos e ofícios, pois no final estamos codificando experiências do mundo real.</p>
+</div>
+<div class="paragraph">
+<p>Podemos definir que todo o trabalho do desenvolvimento de software é automatizar corretamente atividades que existem hoje e estão em plena operação. Antes de existir aplicativos de entrega de comida, já existia entrega de comida e vai continuar existindo se um dia os aplicativos deixarem de existir. O trabalho é sempre o mesmo, um cliente entra em contato com alguém que vende comida, a pessoa que vende comida contrata um entregador e esse deve traçar uma rota para otimizar a entrega.</p>
+</div>
+<div class="paragraph">
+<p>(<em>Não pense que isso é algo moderno. Na cidade da minha avó tinha um senhor que a vida toda entregou pão de casa em casa até quando existia uma ÚNICA CENTRAL TELEFÔNICA na cidade. SIM! Lá nos anos 80 nas pequenas cidades do nordeste se precisássemos ligar pra capital precisava ir na central telefônica que era em uma praça. NÃO! Não foi a privatização do sistema de telefonia que popularizou o telefone, isso aconteceu um pouco antes de privatizar.</em>)</p>
+</div>
+<div class="paragraph">
+<p>Logo, modelar software envolve conhecimento do mundo real e esse conhecimento deve ser destilado usando estruturas e tipos de dados do mundo do software. Para ajudar nessa modelagem vamos ver algumas categorias de elementos que podemos usar em nosso software. Um software sempre será composto por elementos que podem ser categorizados como Entidades, Objetos de Valor, Serviços e Módulos.</p>
+</div>
+<div class="paragraph">
+<p>Essa atividade de caracterizar algo é o que a filosofia chama de Ontologia, ou seja, a busca pela natureza do ser, da existência e da realidade. Não precisamos ser filósofos e conhecer toda a história da filosofia, mas é sempre bom treinar o modo de fazer filosofia pois modelar software é um processo filosófico. No momento que começamos a pensar e questionar o que são e o que fazem estruturas reais para modelar elas em uma forma de conhecimento, estamos praticando filosofia.</p>
+</div>
+<div id="filosofia" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/filosofia.avif" alt="filosofia">
+</div>
+<div class="title">Figura 1. A Escola de Atenas (Scuola di Atenas, no original) de Rafael. Contém uma representação dos grandes filósofos clássicos e dicas sobre seu discurso.</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="definindo-categorias">Definindo Categorias</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Já que vamos criar nosso modelo usando 4 categorias de elementos precisamos entender o que são essas categorias e como identificar elas na linguagem que estamos usando no nosso software. Para começar vamos jogar várias sentenças que poderiam fazer parte dos requisitos de um projeto de software para clínica médica e depois vamos trabalhar com esse domínio para tentar o modelar. Isso é um exercício de imaginação, não foi feito nenhum levantamento de requisitos, logo são apenas requisitos hipotéticos.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"Durante a consulta o médico/médica fará a anamnese do paciente"</p>
+</li>
+<li>
+<p>"A anamnese consiste de uma série de perguntas que o médico/médica faz para tentar chegar a um diagnóstico"</p>
+</li>
+<li>
+<p>"O médico/médica pode pedir exames para chegar a um diagnóstico"</p>
+</li>
+<li>
+<p>"A anamnese é usada para avaliar a evolução do paciente"</p>
+</li>
+<li>
+<p>"O diagnóstico pode levar várias consultas para ser feito"</p>
+</li>
+<li>
+<p>"O prontuário de um paciente é composto de todas as informações coletadas"</p>
+</li>
+<li>
+<p>"Um médico/médica pode compartilha um prontuário de um paciente, mas deve escolher quais informações vão ser compartilhadas"</p>
+</li>
+<li>
+<p>"O prontuário é estritamente sigiloso. Somente o médico/médica pode ter acesso e só pode ser compartilhada para outro médico/médica que atende ao mesmo paciente."</p>
+</li>
+<li>
+<p>"A consulta pode ser marcada pelo paciente diretamente pelo site"</p>
+</li>
+<li>
+<p>"Se o paciente não comparecer a consulta, deve ser cobrada uma taxa dele, mesmo que seja por plano"</p>
+</li>
+<li>
+<p>"O reagendamento de consulta pode ser feito pelo médico/médica ou secretário/secretária e deve ser aprovado pelo paciente"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A primeira atividade que precisamos fazer é identificar todos os substantivos e verbos que fazem parte do nosso modelo. Todo substantivo pode executar uma atividade ativamente ou fazer parte de uma atividade passivamente, a atividade será definida pelo verbo. Então vamos rever a lista de requisitos marcando todo substantivo?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"Durante a <strong>consulta</strong> o <strong>médico/médica</strong> fará a <strong>anamnese</strong> do <strong>paciente</strong>"</p>
+</li>
+<li>
+<p>"A <strong>anamnese</strong> consiste de uma série de <strong>perguntas</strong> que o <strong>médico/médica</strong> faz para tentar chegar a um <strong>diagnóstico</strong>"</p>
+</li>
+<li>
+<p>"O <strong>médico/médica</strong> pode pedir <strong>exames</strong> para chegar a um <strong>diagnóstico</strong>"</p>
+</li>
+<li>
+<p>"A <strong>anamnese</strong> é usada para avaliar a <strong>evolução</strong> do <strong>paciente</strong>"</p>
+</li>
+<li>
+<p>"O <strong>diagnóstico</strong> pode levar várias <strong>consultas</strong> para ser feito"</p>
+</li>
+<li>
+<p>"O <strong>prontuário</strong> de um paciente é composto de todas as <strong>informações</strong> coletadas"</p>
+</li>
+<li>
+<p>"Um <strong>médico/médica</strong> pode compartilha um <strong>prontuário</strong> de um <strong>paciente</strong>, mas deve escolher quais <strong>informações</strong> vão ser compartilhadas"</p>
+</li>
+<li>
+<p>"O <strong>prontuário</strong> é estritamente sigiloso. Somente o <strong>médico/médica</strong> pode ter acesso e só pode ser compartilhada para outro <strong>médico/médica</strong> que atende ao mesmo <strong>paciente</strong>."</p>
+</li>
+<li>
+<p>"A <strong>consulta</strong> pode ser marcada pelo <strong>paciente</strong> diretamente pelo site"</p>
+</li>
+<li>
+<p>"Se o <strong>paciente</strong> não comparecer a <strong>consulta</strong>, deve ser cobrada uma <strong>taxa</strong> dele, mesmo que seja por <strong>plano</strong>"</p>
+</li>
+<li>
+<p>"O reagendamento de <strong>consulta</strong> pode ser feito pelo <strong>médico/médica</strong> ou <strong>secretário/secretária</strong> e deve ser aprovado pelo <strong>paciente</strong>"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Os substantivos selecionados acima vão nos ajudar a entender os dois primeiros elementos de um modelo de negócios usando DDD: Entidades e Objetos de Valor. Então vamos ver a definição de cada um? Primeiro vamos ver o que o livro do Eric Evans fala sobre eles.</p>
+</div>
+<div id="pexels-medico-paciente" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/pexels-medico-paciente.jpg" alt="pexels medico paciente">
+</div>
+<div class="title">Figura 2. Uma médica conversando com um Paciente, imagem do Pexels.com.</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Entidades</div>
+Alguns objetos não são definidos principalmente por seus atributos. Eles representam uma linha de identidade que atravessa o tempo e geralmente representações distintas. Às vezes, um objeto como esse pode ser combinado com outros objetos, embora os atributos possam diferir. Um objeto deve ser distinguido de outros objetos, embora eles possam ter os mesmos atributos. Um erro de identidade pode levar à dados corrompidos.
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Objetos de Valor</div>
+Quando você só se preocupa com os atributos de um elemento do modelo, classifique-o como um OBJETO DE VALOR. Faça com que ele expresse o significado dos atributos que ele transmite e dê a ele uma funcionalidade relacionada. Trate o OBJETO DE VALOR como imutável. Não dê a ele nenhuma identidade e evite complexidades de design desnecessárias para manter ENTIDADES.
+</div>
+</div>
+<div class="paragraph">
+<p>Pode parecer confuso, e realmente é, por isso vou tentar reescrever o que ele quer dizer com minhas próprias palavras.</p>
+</div>
+<div class="paragraph">
+<p>Uma <strong>Entidade</strong> é um objeto do modelo de negócios que tem sua identidade própria definida apesar valores definido nela. Os valores podem e vão mudar com o tempo pois o objeto tem uma identidade própria.</p>
+</div>
+<div class="paragraph">
+<p>Um <strong>Objeto de Valor</strong> é um objeto do modelo de negócios que não tem identidade própria, mas ela é definida pelos valores definido nela. Os valores não mudam pois eles são a identidade do objeto.</p>
+</div>
+<div class="paragraph">
+<p><em>— E como podemos correlacionar esses conceitos nos substantivos acima?</em></p>
+</div>
+<div class="paragraph">
+<p>Ora, qual dos substantivos tem uma identidade própria apesar dos valores? Vou citar os que acredito ter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Paciente</strong></p>
+</li>
+<li>
+<p><strong>Médico/Médica</strong></p>
+</li>
+<li>
+<p><strong>Consulta</strong></p>
+</li>
+<li>
+<p><strong>Exames</strong></p>
+</li>
+<li>
+<p><strong>Prontuário</strong></p>
+</li>
+<li>
+<p><strong>Plano</strong></p>
+</li>
+<li>
+<p><strong>Secretário/Secretária</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>— Tem algum meio fácil de identificar esses objetos?</em></p>
+</div>
+<div class="paragraph">
+<p>Tem sim! Tenta imagina o que aconteceria se eu reusasse um objetos desse pra outro valor. Imagina que pegar um <strong>Paciente</strong> e mudar todos os valores para ser outro paciente, o que você imagina dessa possibilidade? Parece meio improvável porque o paciente é uma pessoa, ela existe e não dá pra mudar os valores dele, confere? Exato! Por isso <strong>Paciente</strong> é uma Entidade.</p>
+</div>
+<div class="paragraph">
+<p>Já os objetos de valores tem entidade caracterizadas por seus atributos, então para saber se um objeto de valor podemos fazer uma pergunta. Posso mudar os valores dos atributos? Se a resposta para a primeira pergunta for <strong>não</strong>, temos um objeto de valor que é imutável. Na verdade todo objeto de valor pode ser considerado imutável, pois não faz sentido alterar um valor dele, apenas o substituir por completo.</p>
+</div>
+<div class="paragraph">
+<p>Do nosso exemplo podemos considerar a <strong>Anamnese</strong> como um objeto de valor. Ela é o registro das perguntas que o médica fez durante a consulta, mas ela não existe sem a consulta e nem pode ser reutilizada em outra consulta. Do mesmo modo podemos definir <strong>Diagnóstico</strong> como um objeto de valor.</p>
+</div>
+<div class="paragraph">
+<p>Existe outros objetos de valores que são inerentes ao nosso modelo mas não estão citados porque são tão básicos que nem seriam citados em uma lista de requisitos. Vamos pensar em um <strong>Paciente</strong>, o que o paciente tem que é útil para a administração do relacionamento dele com o consultório? A resposta deve contar <strong>Endereço</strong>, <strong>Contatos</strong>, <strong>Forma de Pagamentos</strong>, etc&#8230;&#8203; A lista vai depender de um levantamento de requisitos real, quem vai modelar esse negócio precisa conversar, não só com a médica, mas, PRINCIPALMENTE, com a secretária.</p>
+</div>
+<div class="paragraph">
+<p><em>— E os outros dois elementos do modelo? Serviço e Módulo?</em></p>
+</div>
+<div class="paragraph">
+<p>Bom, esse deixamos por final propositadamente! Vamos ver como Eric Evans define eles?</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Serviços</div>
+Quando um processo significativo ou uma transformação no domínio não é responsabilidade natural de uma ENTIDADE ou OBJETO DE VALOR, acrescente uma operação no modelo como uma interface autônoma declara como SERVIÇO. Defina a interface em termos da linguagem do modelo e certifique-se de que o nome da operação faça parte da LINGUAGEM ONIPRESENTE. Faça com que o SERVIÇO não tenha um estado.
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Módulos</div>
+Todo mundo utiliza MÓDULOS, mas poucas pessoas os tratam como partes do modelo já completamente desenvolvidas. O código é dividido em vários tipos de categorias, desde aspectos da arquitetura técnica até as atribuições de trabalho dos desenvolvedores. Mesmo os desenvolvedores que refatoram muito tendem a se contentar com MÓDULOS concebidos na fase inicial do projeto.
+</div>
+</div>
+<div class="paragraph">
+<p>O livro se torna complicado porque não traz definições coesas, mas as definições são trabalhadas na discussão que o capitulo faz. Mas ele quer dizer que <strong>Serviços</strong> são operações que não são responsabilidades de um objeto especifico. E <strong>Módulo</strong> são formas de agrupar o código pelo modelo e não pelas características arquiteturais.</p>
+</div>
+<div class="paragraph">
+<p>Sobre serviços podemos chegar a primeira conclusão que existem operações que DEVEM ser efetuadas pelas Entidades ou Objetos de Valor e existem operações que DEVEM ser efetuadas por Serviços. Como definir quem vai implementar essa operação?</p>
+</div>
+<div class="paragraph">
+<p>É nessa hora que surge o grande responsável por implementar toda atividade que não tem dono: o MANAGER (ou gerente em tradução livre). Esse na minha opinião é o maior anti-pattern na modelagem de domínios que existe. Toda vez que definimos uma classe como Manager, estamos criando uma classe sem personalidade e que provavelmente terá pouca coesão. O correto seria fazer mais perguntas a classe, ou mesmo criar classes mais especificas.</p>
+</div>
+<div class="paragraph">
+<p>Vamos a um exemplo prático? Quem faz o agendamento das consultas? Se você pensou em responder quem tem o papel de secretária está errado. Essa é uma função desse papel, mas ele também tem nome e é mais comum do que imaginamos. Podemos chamar essa classe de <code>AgendadorDeConsultas</code>. Agora coloca ao lado os dois nomes <code>GerenciadorDeConsultas</code> e <code>AgendadorDeConsultas</code>, você consegue ver o ganho semântico que a escolha do papel correto trás? Consegue ver como nomes podem até ser mais óbvios do que eles podemos imaginar? Porque as respostas são obvias, quem faz o agendamento de consultas é o agendador, não há segredos em dar nomes. E quais operações esse serviço pode fazer? Todas relacionadas ao agendamento de consultas. No caso do não comparecimento a consultas, deve ser outro serviço que vai executar a cobrança da taxa.</p>
+</div>
+<div class="paragraph">
+<p><em>— E os Módulos?</em></p>
+</div>
+<div class="paragraph">
+<p>Os Módulos são divisões lógicas dentro do código. Vamos olhar para os nossos requisitos e procurar alguma divisão lógica ali? Será que eu conseguiria dividir eles em ao menos 3 módulos?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Consulta</p>
+<div class="ulist">
+<ul>
+<li>
+<p>"Durante a <strong>consulta</strong> o <strong>médico/médica</strong> fará a <strong>anamnese</strong> do <strong>paciente</strong>"</p>
+</li>
+<li>
+<p>"A <strong>anamnese</strong> consiste de uma série de <strong>perguntas</strong> que o <strong>médico/médica</strong> faz para tentar chegar a um <strong>diagnóstico</strong>"</p>
+</li>
+<li>
+<p>"A <strong>anamnese</strong> é usada para avaliar a <strong>evolução</strong> do <strong>paciente</strong>"</p>
+</li>
+<li>
+<p>"O <strong>diagnóstico</strong> pode levar várias <strong>consultas</strong> para ser feito"</p>
+</li>
+<li>
+<p>"O <strong>prontuário</strong> de um paciente é composto de todas as <strong>informações</strong> coletadas"</p>
+</li>
+<li>
+<p>"Um <strong>médico/médica</strong> pode compartilha um <strong>prontuário</strong> de um <strong>paciente</strong>, mas deve escolher quais <strong>informações</strong> vão ser compartilhadas"</p>
+</li>
+<li>
+<p>"O <strong>prontuário</strong> é estritamente sigiloso. Somente o <strong>médico/médica</strong> pode ter acesso e só pode ser compartilhada para outro <strong>médico/médica</strong> que atende ao mesmo <strong>paciente</strong>."</p>
+</li>
+<li>
+<p>"A <strong>consulta</strong> pode ser marcada pelo <strong>paciente</strong> diretamente pelo site"</p>
+</li>
+<li>
+<p>"O reagendamento de <strong>consulta</strong> pode ser feito pelo <strong>médico/médica</strong> ou <strong>secretário/secretária</strong> e deve ser aprovado pelo <strong>paciente</strong>"</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Exame</p>
+<div class="ulist">
+<ul>
+<li>
+<p>"O <strong>médico/médica</strong> pode pedir <strong>exames</strong> para chegar a um <strong>diagnóstico</strong>"</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Cobrança</p>
+<div class="ulist">
+<ul>
+<li>
+<p>"Se o <strong>paciente</strong> não comparecer a <strong>consulta</strong>, deve ser cobrada uma <strong>taxa</strong> dele, mesmo que seja por <strong>plano</strong>"</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Eu fiz o exercício de separar esses requisitos em 3 módulos distintos: Consulta, Exame e Cobrança. Essa divisão não é ótima e não deveria ser final. Dependendo da evolução das funcionalidades, ou do entendimento do modelo, os módulos podem ser quebrados ou unidos. Um módulo deve contar uma unidade dentro do modelo.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="criando-interfaces">Criando Interfaces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O grande ganho que temos quando dividimos um software em módulos é encapsular complexidades. Um módulo para acessar outro deve acessar uma funcionalidade ou um serviço e não o código diretamente.</p>
+</div>
+<div class="paragraph">
+<p>Quando temos todo o código sendo implementado no mesmo projeto, processo ou time, temos a tentação de acessar diretamente o código de módulos distintos. Mas esse é um pecado capital em desenvolvimento de software pois vamos diminuir a coesão e aumentar o acoplamento. Módulos diferentes devem ser comunicar através de interfaces bem definidas e comuns aos dois contextos.</p>
+</div>
+<div class="paragraph">
+<p><em>— O que isso significa na prática?!?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Devemos olhar os módulos como caixas pretas e não precisamos de todas as informações contidas em um determinado módulo, somente a que é necessária no contexto requerido. Vamos ver isso no contexto das consultas?</p>
+</div>
+<div class="paragraph">
+<p>Para cada <strong>Paciente</strong> existe a informação de qual <strong>Plano</strong> ele possui. Ora um plano de saúde é importante se uma cobrança é realizada ou se um exame é pedido, mas em nada influência quando estamos falando da consulta. Será que essa informação é relevante durante a consulta? Eticamente ela deveria ser omitida. E papel de um módulo omitir as informações não relevantes aos outros módulos.</p>
+</div>
+<div class="paragraph">
+<p>Se olharmos agora para o módulo de Exame, como é feito o pedido de Exame? Será que os vários laboratórios tem APIs distintas? Será que o formato retornado pelo laboratório é único? Tudo isso não importa para o módulo de Consulta, a médica na proxima consulta deve ter como informação apenas o resultado dos exames em um formato padronizado.</p>
+</div>
+<div class="paragraph">
+<p>Se a divisão de módulos for respeitada e uma API for utilizada, a divisão de módulos entre processos distintos será feita sem grandes complexidades. Antigamente, em Java, era comum criar interfaces e implementações em objetos pois um serviço pode ser implementado por um servidor distinto e chamado remotamente usando Java RMI. O mesmo ainda pode acontecer hoje quando usamos APIs, ao invés de usarmos o protocolo RMI, que tem uma série de limitações, inclusive isso foi pontuado por Eric Evans ao se referir ao "estado" de um serviço, podemos usar a API como uma interface comum entre cliente e servidor.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusao">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Esses quatro elementos da modelagem de software vai possibilitar você a construir um modelo rico e detalhado. É sempre bom relembrar que dar o nome correto as coisas é muito importante e para isso é importante fazer as perguntas corretas, construindo assim a Linguagem Onipresente que falamos no post anterior.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="DDD" /><category term="Documentação" /><category term="Modelagem de Software" /><summary type="html"><![CDATA[Quais são os elementos básicos de um modelo de software? Existem tipos de elementos que podemos usar para construir qualquer modelo?]]></summary></entry><entry><title type="html">Modelos e Domínio em Software</title><link href="https://blog.vepo.dev/posts/ddd-01-modelos-e-dominio" rel="alternate" type="text/html" title="Modelos e Domínio em Software" /><published>2022-09-27T00:00:00+00:00</published><updated>2022-09-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/13-45-00-ddd</id><content type="html" xml:base="https://blog.vepo.dev/posts/ddd-01-modelos-e-dominio"><![CDATA[<div class="paragraph">
+<p>Todo software existe para resolver um problema real. Não há sentido um software existir sem um problema, se isso acontecer, ele será apenas um trecho de código que demonstra alguma coisa da linguagem em que foi escrito, mas não terá nenhuma utilidade. A computação moderna surgiu como uma ferramenta, pela tentativa de descriptografar mensagens do Eixo, depois foi usada para tratar registros bancários ou processar arquivos de telefonia. Hoje a computação é usada ubiquamente.</p>
+</div>
+<div class="sect1">
+<h2 id="linguagem-commum-a-computacao">Linguagem Comum a computação</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A linguagem que usamos no dia a dia da computação carrega muito dessa história. Da segunda guerra ainda carregamos muitas das definições que criaram a computação moderna, Turing teve um papel importante tanto na guerra quanto no desenvolvimento da computação. Mas foi o desenvolvimento civil da computação que nos deixou termos como "processamento", "batch" (<em>lote</em> em tradução livre), "transações", "record", etc&#8230;&#8203; Todos esses termos podem parecer apenas termos comuns da computação para você, mas eles vem de outras areas.</p>
+</div>
+<div class="paragraph">
+<p>Para demonstrar isso, vamos olhar para a <a href="https://openjdk.org/jeps/395">JEP 395</a> que definiu Records na linguagem Java. Segundo a JEP, <em>Records</em> são classes que atuam como transportadoras de dados imutáveis. Mas você sabe de onde vem o nome record? No primeiro livro de programação que eu li, o <a href="https://www.amazon.com.br/Programming-Language-Brian-W-Kernighan/dp/0131103628?crid=1A3BSP1DGUS6&amp;keywords=brian+kernighan&amp;qid=1664196696&amp;qu=eyJxc2MiOiIyLjU4IiwicXNhIjoiMi42MyIsInFzcCI6IjEuNTAifQ%3D%3D&amp;sprefix=kernig%2Caps%2C674&amp;sr=8-1&amp;ufe=app_do%3Aamzn1.fos.e05b01e0-91a7-477e-a514-15a32325a6d6&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=5aa1a41b364fcf7183af4ea312f6da63&amp;language=pt_BR&amp;ref_=as_li_ss_tl">C Programming Language</a>, muito se falava de leitura e transformação de arquivos. Da mesma forma, o livro <a href="https://www.amazon.com.br/Programming-Pearls-English-Jon-Bentley-ebook/dp/B01EAW7XXU?crid=21SOLHJO18RTV&amp;keywords=programming+pearls&amp;qid=1664196835&amp;qu=eyJxc2MiOiIxLjcyIiwicXNhIjoiMS4yOSIsInFzcCI6IjAuMDAifQ%3D%3D&amp;sprefix=programmi%2Caps%2C650&amp;sr=8-1&amp;ufe=app_do%3Aamzn1.fos.fcd6d665-32ba-4479-9f21-b774e276a678&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=ad008d7ae4b16daf4822ad4ce0197288&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Programming Pearls</a>, trás vários desafios de leitura e ordenação de registro em arquivos. Não é por acaso que se fala de arquivo e não de comunicação de redes, pois nessa época o grande desafio da computação não era interconectar pessoas e computadores, mas processar registros (<em>Records</em>) gerados por outros sistemas.</p>
+</div>
+<div class="paragraph">
+<p>Esses dois livros citados foram escritos nas décadas de 70 e 80, nessa época já existia algo chamado <em>Call Detail Records</em> (<strong>Registro de Detalhes da Chamada</strong> em tradução livre), ou CDRs para os mais íntimos. Esses eram registros imutáveis gerados pelos sistemas de telefonia para posterior processamento, eles são a fonte de verdade quando queremos saber como está o uso da rede ou quanto deve ser cobrado de um cliente.</p>
+</div>
+<div class="paragraph">
+<p>Apesar de muito antigos, CDRs ainda existem hoje e são gerados a cada interação do seu celular com a rede de telefonia, ainda existem softwares que processam esses registros e eu trabalho no desenvolvimento de um deles. E até hoje Record é usado como sinônimo de registro imutável. Eu fiz uma busca rápida para encontrar a primeira referência a CDR na literatura e encontrei e na revista <a href="https://www.computer.org/csdl/magazine/co/1979/06/01658776/13rRUwInv9r">Computer da IEEE de junho 1979</a>, já se vão 43 anos.</p>
+</div>
+<div id="cdrs" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/CDRs.png" alt="CDRs">
+</div>
+<div class="title">Figura 1. Trecho da revista Computer da IEEE de 1979 citando CDRs.</div>
+</div>
+<div class="paragraph">
+<p>Outro uso da computação que marcou época foi o famoso software de video locadora. Creio que muitos que me leem são nativos de uma era posterior a esse dinossauro chamado <strong>Video Locadora</strong> e não conseguem nem imaginar o que era a vida sem Netflix e afins. As mais famosas tinham sempre sistemas super simples que se limitavam a um CRUD de Usuário, um CRUD de filme, um sistema de registro de aluguel, busca por filmes e relatórios gerenciais. Eu comecei a ver o surgimento desses softwares por volta do meio dos anos 1990 quando começamos a perguntar se <strong>Exterminador do Futuro 2</strong> estava locado ou não e o atendente ia olhar no computador. Antes disso não existia um meio de responder a essa pergunta que não fosse procurar o filme na prateleira.</p>
+</div>
+<div class="paragraph">
+<p>Muitos desses sistemas eram implementados em Clipper e mantidos pelo nerd cabeludo da cidade, Lá nos longínquos anos 1990 eu conheci alguém que fazia a manutenção do sistema da video locadora que eu alugava filme e até ganhei o livro <a href="https://linguagemclipper.com.br/clipper-summer%C2%B487">Clipper Summer 87</a> que foi meu primeiro contato com programação, apesar de nunca ter escrito uma linha em Clipper.</p>
+</div>
+<div class="paragraph">
+<p>Esses sistemas antigos criaram uma linguagem comum para a computação e essa linguagem, que usamos até hoje, que contém termos que só são entendidos por quem é da área. Quer ver? Vamos supor que eu esteja criando um sistema médico e precise reportar o que estou fazendo no momento, se eu disser que <em>"estou finalizando o CRUD de Anamnese mas estou com problemas para salvar a entidade no Postgres"</em>. Um médico não vai entender absolutamente nada porque ele não sabe o que é CRUD, nem entidade e muito menos Postgres. Tudo que ele vai entender é que a atividade é relacionada a Anamnese, sua principal atividade em uma consulta médica.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="linguagem-ubiqua">Linguagem Ubíqua</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Ao modelar um sistema, o primeiro passo que precisamos fazer é capturar termos. Todo sistema já tem um domínio e uma linguagem própria (não estou falando de linguagem de programação), ela precisa ser mapeada, definida e compreendida por todos os times envolvidos no desenvolvimento do produto, que em muitos casos podem ter pessoas que não são desenvolvedoras. Essa linguagem não é criada, ela existe, mas precisa ser definida. Cada software tem um domínio especifico e ele ainda pode ser composto de outros subdomínios que vem ou das tecnologias escolhidas ou dos pontos de contato que o software possui.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas o que é <strong>domínio</strong>?!?!?</em></p>
+</div>
+<div class="paragraph">
+<p>Bom, <strong>domínio</strong> é a área de interesse que o software busca mapear. Vamos voltar ao exemplo do software para consulta médica para tentar entender melhor. Ele deverá ser focado na <strong>Anamnese</strong> do <strong>Paciente</strong> realizada pelo <strong>Médico</strong>, mas também será responsável por realizar agendamentos de <strong>Consultas</strong> e <strong>Retornos</strong> e receber <strong>Resultados de Exames</strong>. Somente na sentença anterior podemos encontrar alguns termos que serão comuns a todo o domínio de um software de atendimento médico, mas que não fazem nenhum sentido fora dele. Faz todo sentido diferenciar o usuário que tem a função Médica, do usuário que tem a função Secretária e o Paciente, mas em outros sistemas só existem Usuário. Esses termos e as suas definições devem ser usados para se construir o modelo do software, tanto de dados como dos sistemas.</p>
+</div>
+<div class="paragraph">
+<p>Para ser enfático, o modelo é o coração do design de software e ele deve gerar uma linguagem que deve ser usada por todos os times envolvidos no desenvolvimento para se comunicarem entre si. O modelo é o conhecimento do domínio destilado e organizado com o intuito de todos terem uma melhor compreensão do que está sendo desenvolvido. Eric Evans, em seu livro <a href="https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=1ZIEQ6223BW12&amp;dchild=1&amp;keywords=domain+driven+design&amp;qid=1595274795&amp;s=books&amp;sprefix=domai%2Caps%2C293&amp;sr=1-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=3dc19604b1199d2af32211ccd49eb11f&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Domain Driven Design</a>, descreve essa linguagem como Linguagem Onipresente, ou Linguagem Ubíqua, pois ela deve estar presente em todas as interações do desenvolvimento, mas ela existe só para o contexto do software em questão. (<em>Aliás, grande parte desse texto é composto por citações do livro de Evans.</em>)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="codigo-conceito-linguagem">Código, Conceitos e Linguagem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando vamos escrever software temos que colocar no código as regras negócio, mas um erro comum que fazemos é escrever o código como um elemento a parte do negócio. Em muitos casos o desenvolvedor pensa em termos computacionais e esquecem que o software tem que mapear um domínio, inclusive usando a nomenclatura da linguagem onipresente. A atividade de modelar um software consiste na atividade de capturar um modelo, identificar substantivos, verbos, relações e transformar esse modelo em código.</p>
+</div>
+<div class="paragraph">
+<p>Para que essa atividade de modelagem seja bem feita é preciso treinar algumas habilidades, que não são técnicas, como leitura e atenção. Não podemos só pensar em termos computacionais, precisamos pensar no domínio, no negócio, e na relação do negócio com o código. Devemos aprender a ler o domínio e fazer perguntas certas para conseguir modelar o que está acontecendo. Um código será expressivo se ele reflete o modelo, para isso é preciso.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Ligar o modelo a implementação</strong>: A implementação deve usar os mesmo termos e verbos do modelo</p>
+</li>
+<li>
+<p><strong>Cultivar uma linguagem baseada no modelo</strong>: Toda a comunicação nas equipes deve usar os termos do modelo.</p>
+</li>
+<li>
+<p><strong>Desenvolver um modelo rico em conhecimento</strong>: O modelo não contém só substantivos, mas verbos e relações. Isso pode ser expresso através de sentenças como "O Médico é responsável por fazer a Anamnese" ou "O Laboratório envia o Exame através de uma API" ou "O Paciente pode acessar os resultados do Exame, mas não pode acessar a Anamnese".</p>
+</li>
+<li>
+<p><strong>Destilar o modelo</strong>: O modelo irá obrigatoriamente evoluindo com o software. Novos conceitos e relações são adicionadas durante o desenvolvimento.</p>
+</li>
+<li>
+<p><strong>Colher e experimentar ideias</strong>: Com o modelo, novas ideas podem ser validadas usando a linguagem onipresente. Seriam as ideias válidas ou elas não podem ser usadas. Por exemplo, eu não sei se é ético um médico expor a Anamnese dele ao paciente, mas sei que é completamente anti-ético expor a terceiros. Mas quando dois médicos de especialidades diferentes acompanham o mesmo paciente, eles normalmente compartilham certas informações. As validações de ideias relacionadas a esse domínio só poderão ser feitas se existir uma linguagem onipresente bem trabalhada.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><em>— Cara, você tá sendo muito subjetivo. Vamos ser mais prático!</em></p>
+</div>
+<div class="paragraph">
+<p>Então vamos lá. Em muitas discussões no Twitter vamos pessoal discutindo sobre <a href="https://martinfowler.com/eaaCatalog/dataTransferObject.html">DTO</a> (<em>Data Transfer Object</em> ou Objeto de Transferência de Dados em tradução livre). O objetivo de se ter um DTO é ser capaz de serializar e deserializar objetos em sistemas distintos facilmente, são objetos sem lógica de negócio e completamente focados no dado a ser transferido, ou seja, fazem parte da <strong>API pública</strong>. Na definição anterior eu fiz um grifo proposital em API pública porque na grande maioria dos casos usamos o nome DTO como parte do modelo, como se ele fosse parte do vocabulário do domínio.</p>
+</div>
+<div class="paragraph">
+<p>Se voltarmos ao nosso sistema de consultas médicas, é capaz que alguém comece a modela um <code>AnamneseDTO</code>, o que na minha opinião é errado e eu posso provar.</p>
+</div>
+<div class="paragraph">
+<p><em>— COMO ASSIM!!! ERRADO!?!?!?! Todo mundo faz isso!</em></p>
+</div>
+<div class="paragraph">
+<p>Sim e muitas das regras de negócio não podem ser modeladas facilmente tornando o código difícil de ser compreendido. Além de deixar a documentação mais pobre. Vamos pensar nos DTOs da Anamnese, para que eu vou usar ele? Eu posso pensar em três condições obvias: &#169;riar, (E)ditar e (L)er. Só ficou faltando o D do CRUD porque normalmente não precisa de um DTO para ele. Nessas operações, se estivermos falando de uma API REST, sempre teremos os DTOs de Request e Response. LOGO, porque não termos os DTOs: <code>CriarAnamneseRequest</code>, <code>CriarAnamneseResponse</code>, <code>AtualizarAnamneseRequest</code>, <code>AtualizarAnamneseResponse</code>, <code>LerAnamneseResponse</code>. Usar essa nomenclatura agrega valor ao nosso código ao contrário de usar somente DTO, que é um termo que deveria ficar restrito aos livros de modelagem de software visto que é um tipo de objeto e não o nome que se deve usar para o objeto. Ao meu ver, é como se eu desse um nome a um cachorro de Cachorro. (<em>Aliás, meu filho de 4 anos faz isso quando pedimos para ele escolher um nome para algum boneco que ele ganha. Esses dias ele ganhou um polvo que se chama Polvo</em>)</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas, usar Request e Response no nome?! Eu nunca vi isso!</em></p>
+</div>
+<div class="paragraph">
+<p>Talvez nós não vemos isso sendo comumente usado porque pouco se fala de modelagem de software back-end. Muito se debate de modelagem front-end e se tem até modelos pre-implementados nos frameworks da moda, mas é comum usar memes mostrando o back-end como um monstro. Eu recomendo você procurar em APIs públicas para ver como é feito. Se interessar a API do 5G é pública e foi modelada por um consórcio, olha como é o serviço de <a href="https://jdegre.github.io/editor/?url=https://raw.githubusercontent.com/jdegre/5GC_APIs/master/TS32291_Nchf_ConvergedCharging.yaml">Nchf_ConvergedCharging</a> (<em>basicamente o serviço que controla a cobrança do seu celular</em>).</p>
+</div>
+<div class="paragraph">
+<p>Usando essa forma de nomenclatura você consegue trazer mais intencionalidade ao seu código, assim como a sua API e consegue facilitar a validação das requisições pela API. Vamos supor que ao criar uma Anamnese todos os campos sejam obrigatórios, mas para se editar nenhum campo seja obrigatório, se você usa Jakarta EE com <a href="https://blog.vepo.dev/posts/using-bean-Validation-on-quarkus">Bean Validation</a>, você pode fazer isso facilmente usando algumas anotações nos DTOs e a anotação <code>@Valid</code> no método exposto pela API. Se usarmos classes diferentes, vamos poder criar anotações diferentes.</p>
+</div>
+<div class="paragraph">
+<p><em>— Ahhhh&#8230;&#8203; MAS AÍ EU TENHO CÓDIGO DUPLICADO!!!!</em></p>
+</div>
+<div class="paragraph">
+<p>Sim e não. Código duplicado é ruim quando ele não é óbvio e quando ele define comportamento. Quando estamos falando de modelagem de dados, o código duplicado é bem vindo pois estamos representando uma entidade do mundo real. Então vai com calma e pode duplicar código sim pois cada classe representa um objeto e uma operação distinta. Fica atento somente se ao usar uma classe abstrata a geração da documentação OpenAPI vai ficar interessante, pois essas classes também podem gerar uma documentação viva que pode ser até distribuída se você usar o <a href="https://microprofile.io/project/eclipse/microprofile-open-api">MicroProfile.io OpenAPI</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_modelos-diagramas-e-documentação">Modelos, Diagramas e Documentação</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Já discutimos como a linguagem influi no código, mas ela tem alguma importância para os diagramas que normalmente construímos?</p>
+</div>
+<div class="paragraph">
+<p>A função de um diagrama é representar uma arquitetura, e em muitos casos construímos diagramas que não tem nenhuma significância. Por exemplo, se eu colocar dois servidores conversando por HTTP, eles podem representar a gigantesca maioria dos software em produções hoje em dia. Podem ser que seja um Blog ou um Sistema de Gerenciamento de Linhas de Ônibus. Um diagrama só tem significância se é acompanhado por um modelo e isso implica um domínio e uma linguagem.</p>
+</div>
+<div class="paragraph">
+<p>Vamos supor que no CRUD de Anamnese que estamos desenvolvendo, a Anamnese só possa ser visualizada quando digitada uma senha. Todo o conteúdo dela é criptografada para que, mesmo que haja um vazamento de dados, a informação seja mantida em sigilo. A forma como descrevemos essa atividade tem que ser acompanhada de conceitos porque ela pode parecer com outras atividades, mas existe um requisito especifico e só acessível ao negócio.</p>
+</div>
+<div class="paragraph">
+<p>Um diagrama representa uma pequena parte do modelo e nunca pode ser compreendido sem o seu contexto. Ele servirá para capturar informações sobre comportamento, mas nunca definições de conceitos ou substantivos. Conceitos e substantivos devem ser expressos através de uma documentação textual (WIKI ou Markdown). Um documento não deve fazer aquilo que o código já faz, ela deve conter conceitos que são ortogonais ao código. Por exemplo, falamos que é anti-ético que alguém que não seja o médico de um paciente ver a Anamnese dele, essa informação deve estar em uma documentação externa ao código. O código só irá implementar a lógica de visualização da Anamnese (observe como eu posso usar a palavra e ela tem significância), mas a documentação pode trazer referências, implicações éticas e legais. Essa é uma informação que deve estar documentada textualmente. Já o diagrama vai usar a linguagem desenvolvida para contextualizar o comportamento com os componentes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-escreve-a-documentação">Como escreve a documentação</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora para finalizar temos que desmistificar a documentação. Sendo sincero é muito difícil encontrar um desenvolvedor que goste de documentar. Não se sinta culpado por ter dificuldades, pois é realmente difícil se expressar em Português, as vezes preferimos em código. Mas temos que lembrar que toda atividade é um treino e escrever uma boa documentação é uma habilidade que também pode ser desenvolvida.</p>
+</div>
+<div class="paragraph">
+<p>Quando eu comecei a colocar meus pensamos em forma de texto, eu tinha uma dificuldade enorme para elaborar as frases. Isso porque o pensamento não é linear como as linhas de um caderno, ou no caso, as linhas de um editor de texto (<em>VS Code</em> no caso). Foram com os anos de blog e depois com a escrita de livros (<em>confere lá na <a href="https://www.casadocodigo.com.br/products/livro-roadmap-backend">Casa do Código</a></em>) que eu comecei a ganhar habilidades de escrever uma boa documentação. Quem trabalha em grandes corporações deve ser habituado a escrever e-mails&#8230;&#8203; É quase parecido, mas tem outro objetivo. Eu escrevi sobre o que eu acho que uma boa documentação tem em <a href="https://blog.vepo.dev/posts/inicie-um-projeto-pelo-readme"><em>Inicie um projeto pelo README.md</em></a>.</p>
+</div>
+<div class="paragraph">
+<p>Se você leu o post citado, vai perceber que eu defendo que um projeto deve ser começado pelo arquivo README.md. Eu escrevi isso antes de conhecer o livro <a href="https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?crid=30GBZ1Z0JMLTU&amp;keywords=domain+driven+design&amp;qid=1664294472&amp;qu=eyJxc2MiOiIyLjYzIiwicXNhIjoiMS43OSIsInFzcCI6IjEuODMifQ%3D%3D&amp;sprefix=domain%2Caps%2C1017&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=0a0ce38de23f9a56a15c0229763a7688&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Domain-Driven Design: Atacando as complexidades no coração do software</a>, mas eu continua acreditando que essa abordagem ainda é essencial, mas com uma pequena diferença. Quando falamos de DDD, ou modelagem de domínio, estamos falando de softwares completos e não apenas um projeto. Para contextualizar, esse post acima foi escrito quando eu estava implementando um framework em uma empresa anterior e precisei me preparar para documentar ele de forma que pudesse tanto ser usado para desenvolvimento de funcionalidades para o cliente quanto para manutenção. Logo o enfoque o post é um framework em que o domínio é o próprio trabalho de desenvolver software. Você vai perceber que quando estamos falando de frameworks, bibliotecas e plataformas o foco da documentação é a atividade de desenvolvimento, pois esse é o domínio desse software.</p>
+</div>
+<div class="paragraph">
+<p>Mas, como já falamos, modelagem de software é onipresente hoje em dia. Podemos escrever software para usuários que nunca se imaginaram desenvolvendo software. Você imagina que quem trabalha com medicina tem algum intuito de escrever algum código algum dia? Pode até escrever, mas será uma exceção.</p>
+</div>
+<div class="paragraph">
+<p>Mas voltando a documentação, primeiro é se definir que tipo de documentação precisamos fazer e quem é o público alvo dessa documentação. Se for o desenvolvedor do projeto, ela pode ser escrita o mais próximo do código possível e isso implica que é possível se usar Markdown ou <a href="https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/">AsciiDoc</a>. Eu recomendaria o uso do AsciiDoc porque com esse formato podemos gerar tanto páginas simples, documentações robustas ou, quem sabe, até um livro. Se o público for mais amplo, incluído desenvolvedores de outros projetos ou pessoas de negócio, é preferível que se use uma wiki. O importante ao se usar uma wiki é definir um padrão para que o conhecimento não se perca.</p>
+</div>
+<div class="paragraph">
+<p>Não importando qual são nossas escolhas, o importante é tratar a documentação como um entregável, como ela realmente é. Documentação é parte de um projeto e ela vai detalhar o que o nosso software faz. A ausência de documentação pode resultar em retrabalho ou implementações incorretas.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="DDD" /><category term="Documentação" /><category term="Modelagem de Software" /><summary type="html"><![CDATA[Todo software existe para resolver um problema real. E para resolver esse problema precisa ser bem modelado. Nesse post vou navegar um pouco pela introdução do livro Domain-Driven Design para explicar o que é modelo e o que é domínio e como podemos modelar nosso software.]]></summary></entry><entry><title type="html">Linguagem Onipresente</title><link href="https://blog.vepo.dev/posts/linguagem-onipresente" rel="alternate" type="text/html" title="Linguagem Onipresente" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-15-12-linguagem-onipresente</id><content type="html" xml:base="https://blog.vepo.dev/posts/linguagem-onipresente"><![CDATA[<p>Faz alguns meses comprei o livro “Domain-Driven Desing: Atacando as Complexidades no Coração do Software” e comecei a ler somente agora. Ao iniciar a leitura já topo com um termo muito interessante e bem pertinente. O autor nos apresenta a necessidade de se construir uma Linguagem Onipresente (<em>ubiquitous language</em>).</p>
+
+<p>Nesse post vou apresentar o que é uma Linguagem Onipresente e como podemos contrui-lá. Fica uma aviso que eu ainda estou começando a ler o livro. 😉</p>
+
+<h1 id="porque-desenvolver-programas">Porque desenvolver programas?</h1>
+
+<p>Antes de entrar na faculdade, gostava muito de matemática e achava ela em si um fim. Pra mim, a matemática existia simplesmente por existir. Foi grande a minha decepção quando descobri que a matemática é uma linguagem com um proposito. Calculo existe para explicar o movimentos dos Corpos e foi criada por Newton. Se Newton não tivesse interesse de estudar o movimento dos corpos, provavelmente o Calculo não existiria e o mundo seria completamente diferente.</p>
+
+<p>Porque eu fui falar de matemática? Porque com computação acontece a mesma coisa. A computação em si não existiria se ela não ajudasse a resolver problemas do mundo real. Pra que programar? No fundo você está resolvendo um problema ou automatizando uma atividade que já estava aí. Logo existe um usuário que está aí já lidando com o problema que você quer resolver. Este pode ser um operador de caixa, um advogado, uma médica, uma farmacêutica, um chefe de cozinha ou você desenvolvendo software.</p>
+
+<p>Esse usuário já lida com o problema pelo qual você vai resolver e já tem muitos conceitos criados. Chamamos de <strong>Domínio</strong> (<em>Domain</em>) a Área de Atuação desse problema.</p>
+
+<h1 id="a-necessidade-de-modelos">A Necessidade de Modelos</h1>
+
+<p>Qualquer desenvolvedor sabe que precisa de Modelos. Os mais inexperientes não conseguem abstrair o que é um modelo, ficando presos a conceitos da linguagem.</p>
+
+<p><em>—  “Eu tenho um array aqui com o nome dos meus funcionários”</em></p>
+
+<p>A criação de um modelo é um passo importante para se resolver o problema satisfatoriamente. No caso da frase acima, eu considero que existe a entidade <strong>Funcionário</strong>. Este passa a ser um conceito abstrato no contexto do seu projeto. A <strong>Funcionário</strong> serão dados atribuições relacionamentos.</p>
+
+<p><em>—  “Tenho 500 <strong>Funcionários</strong> na Base de Dados, e consigo fazer um relatório por departamento.”</em></p>
+
+<p>Modelos podem ser representados em diagramas, gráficos e textos. Porém eles existem no código, estão amarrados ao código. Uma vez mudando o código o diagrama não é atualizado, o que pode gerar confusão.</p>
+
+<h1 id="de-modelos-a-domínio">De Modelos a Domínio</h1>
+
+<p>Como já foi dito, Domínio é algo que já existe antes da criação de um software. Antes que você escreva um programa para o RH da empresa, já existirão funcionários lá. Ao contrário de Modelos, o Domínio ele é inerente ao negócio. Este pode não estar mapeado, ou nomeado, mas já existe lá.</p>
+
+<p>Podemos afirmar que o conhecimento do Domínio, ou o Modelo do Domínio é o coração do software. Sem o conhecimento dela, o software pode desempenhar um papel não desejado e assim não ser utilizado.</p>
+
+<p>Vale aqui resaltar que Modelo pode se aplicado em vários contextos. Podemos falar em Modelo de Dados ou Modelo de Domínio. Aqui vamos tratar de Modelo de Domínio.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/88dcrwupiimcho95whsm.png" alt="Vai um vinho?" /></p>
+
+<h1 id="construindo-o-modelo-do-domínio">Construindo o Modelo do Domínio</h1>
+
+<p>O Domínio é algo prexistente, porém cada usuário tem uma visão do mesmo. Um cliente do supermercado não precisa saber o horário de entrega do fornecedor de verduras, porém o estoquista precisa dessa informação. Porém, mesmo já existindo, pode ser que este não esteja mapeado ou modelado.</p>
+
+<p>A atividade de se Modelar um Domínio é um processo em várias etapas. Ela involve questionamos e perguntas e deve ser feita em voz alta.</p>
+
+<p><em>—  “Um <strong>Funcionário</strong> tem apenas um supervisor?”</em>
+<em>—  “Não, há <strong>Funcionários</strong> que respondem para seu gerente e para o cliente.</em>
+<em>—  “E quais são as responsabilidades do <strong>Gerente</strong> para com o <strong>Funcionário</strong>? E quando esse responde também ao <strong>Cliente</strong>, qual o papel do mesmo?</em></p>
+
+<p>Observe que no dialogo acima, há palavras que aparecem em negrito. Quando coloco elas em negrito, estou afirmando que a mesma foi incorporada ao Modelo de Domínio. Assim nesse pegqueno dialogo, o desenvolvedor acabou de descobrir que na modelagem de um software para RH, deve levar em consideração tanto o <strong>Gerente</strong> do <strong>Funcionário</strong> quanto o <strong>Cliente</strong>, porém o <strong>Cliente</strong> não é um <strong>Funcionário</strong>.</p>
+
+<p>Esses termos quando identificados e devidamente adicionados ao Modelo, começam a fazer parte da <strong>Linguagem Onipresente</strong> do mesmo. <strong>Linguagem Onipresente</strong> é o conjunto de nomes de entidades e operações que a mesma podem fazer associadas ao Domínio do Software. Essa linguagem deve ser construida e cultivada em todo o ciclo de vida do projeto de software, não sendo considerada acabada enquanto o software ainda estiver em desenvolvimento.</p>
+
+<h2 id="como-extrair-o-modelo">Como extrair o Modelo</h2>
+
+<h3 id="1-ligando-o-modelo-e-a-implementação">1. Ligando o modelo e a implementação</h3>
+
+<p>O modelo do Domínio é o coração do software e ele deve refletir em todos os os contextos, por isso se chama Onipresente. Assim ele deve estar presente no Código, na Base de Dados, na Documentação e na comunicação de todos envolvidos no projeto. Tanto os desenvolvedores quandos os usuários do programa.</p>
+
+<p>Se, por algum motivo, o modelo não estiver atualizado em algum desses contextos, teremos um problema em potencial.</p>
+
+<h3 id="2-cultivando-uma-linguagem-baseada-no-modelo">2. Cultivando uma Linguagem baseada no Modelo</h3>
+
+<p>Extrair termos do Domínio e começar a usa-los corretamente no dia a dia é um hábito muito útil no desenvolvimento de software. Ele habilitará os usuários a terem ciência de certas atividades que já desenvolvem. E também ajudará os desenvolvedores a conhecerem as atividades que o usuário desenvolvem.</p>
+
+<p>O desenvolvedor não precisa saber exatamente como a atividade é desenvolvida, assim como o usuário não precisa saber de detalhes da implementação. Mas habilitará uma comunicação com os dois “<em>extremos</em>”.</p>
+
+<h3 id="3-desenvolvendo-um-modelo-rico-em-conhecimentos">3. Desenvolvendo um modelo rico em conhecimentos</h3>
+
+<p>O modelo vai muito além do que está implementado. E ele pode ser enriquecido sempre que possível. Construir o modelo é uma atividade que não tem fim.</p>
+
+<h3 id="4-destilando-o-modelo">4. Destilando o modelo</h3>
+
+<p>Apesar de a construção do modelo não acabar, enquanto o projeto não acabar. Não significa que ele não possa ser simplificado. Sou muito fã do princípio <a href="https://pt.wikipedia.org/wiki/Princ%C3%ADpio_KISS"><em><strong>KISS</strong>: Keep It Simple, Stupid</em></a>.</p>
+
+<p>Em qualquer estudo, ao se adicionar novas informações aumenta-se a complexidade do sistemas. <a href="https://pt.wikipedia.org/wiki/Leis_de_Newton#Primeira_lei_de_Newton">Isso é uma lei da natureza, se não gastarmos esforço para compreender a relação entre os novos conceitos e os antigos tentando simplificar</a>… <a href="https://www.significados.com.br/entropia/">a entropia do sistema vai aumentar</a>.</p>
+
+<h3 id="5-colhendo-ideias-e-experimentando">5. Colhendo ideias e experimentando</h3>
+
+<p>A construção de inteções, cenários, pressupostos e afirmações é um exercicio que enriquece muito o modelo. Simples perguntas podem criar novas entidades, podem fundir duas entidades que poderiam ser consideradas distintas ou simplesmente alterar relações entre entidades. Nesse ponto não há pergunta boba.</p>
+
+<h2 id="como-não-extrair-o-modelo">Como <strong>NÃO</strong> extrair o Modelo</h2>
+
+<h3 id="1-importar-modelos">1. Importar modelos</h3>
+
+<p>É comum, em projetos de software, a importação de modelos já prontos. Ao se iniciar um projeto já se define algumas classes e objetos com nomes padrão. Quem nunca viu <strong>UserService</strong>? Pra que serve um UserService? Essa pergunta pode ter uma resposta completamente genérica que em muitos casos não se aplica ao atual projeto.</p>
+
+<h3 id="2-importar-uma-nomenclatura">2. Importar uma nomenclatura</h3>
+
+<p>É comum, em projetos de software, nomear objetos com o nome dos seus tipos. Muitas vezes o desenvolvedor cria um <strong>UserDTO</strong> logo ao se iniciar um projeto, sem ao menos se perguntar qual seria a melhor nomenclatura.</p>
+
+<p><a href="https://pt.wikipedia.org/wiki/Objeto_de_Transfer%C3%AAncia_de_Dados">DTO</a> significa <strong>Data Transfer Object</strong> e é um objeto usado para transfêrencia de Dados. Eu uso muitos DTOs, mas nunca uso esse sufixo, até porque ele não tem sentido dentro de um software. Quando os uso posso chamar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Descrição</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>UserResponse</strong></td>
+      <td>Resposta a chamada REST que retorna os dados do Usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserCreatedEvent</strong></td>
+      <td>Evento de criação de um Usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserChangedEvent</strong></td>
+      <td>Evento de alteração dos dados de um usuário</td>
+    </tr>
+    <tr>
+      <td><strong>UserPayload</strong></td>
+      <td>Dados do Usuário usado para criação em serviços REST</td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td>…</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Observe que para cada Nome existe uma funcionalidade associada.</p>
+
+<h3 id="3-desenvolvimento-orientado-a-design-patterns">3. Desenvolvimento Orientado a Design Patterns</h3>
+
+<p>Design Patterns são extremamente uteis, porém devem não devem ser usados apenas por usar. Eles devem fazer sentido. Pode se usar uma adaptação ou mesmo uma mescla de dois sentidos, vai depender do problema. Entre um Desing Pattern e o Domínio, prefira o Domínio. Não que ele tenha que existir um conflito entre os dois, mas o Pattern tem que se adaptar ao modelo.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Modela um software é uma atividade muito importante. Cada software tem o seu Domínio e este deve ser modela de acordo com o problema a ser resolvido. O Domínio é muito mais extenso que a implementação do software e quando desenvolvedores limitam sua linguagem a apenas a implementação isso pode ser um fator gerador de problemas.</p>
+
+<h1 id="livros-recomendados">Livros Recomendados</h1>
+
+<ol>
+  <li><a href="https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=1ZIEQ6223BW12&amp;dchild=1&amp;keywords=domain+driven+design&amp;qid=1595274795&amp;s=books&amp;sprefix=domai%2Caps%2C293&amp;sr=1-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=8f0de1abfc56f235286a41828f4019fc&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Domain-Driven Design: Atacando as Complexidades no Coração do Software</a> de Eric Evans</li>
+  <li><a href="https://www.amazon.com.br/Como-Ser-Um-Programador-Melhor/dp/8575224158?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2WIBH8YTQLN6C&amp;dchild=1&amp;keywords=como+ser+um+programador+melhor&amp;qid=1595274941&amp;s=books&amp;sprefix=como+ser+um%2Cstripbooks%2C287&amp;sr=1-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=98a599ceadf5e966cf2675305e638090&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Como ser um Programador Melhor: um Manual Para Programadores que se Importam com Código</a> de Pete Goodliffe</li>
+  <li><a href="https://www.amazon.com.br/C%C3%B3digo-limpo-Robert-C-Martin/dp/8576082675?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;keywords=clean+code&amp;qid=1588968796&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=936ea100df5aa63c041438ac166948ed&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Código Limpo: Habilidades Práticas do Agile Software</a> de Robert C. Martin</li>
+</ol>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Domain-Driven Design" /><category term="DDD" /><category term="Arquitetura de Software" /><category term="Desenvolvimento de Software" /><summary type="html"><![CDATA[Uma introdução ao termo Linguagem Onipresente baseada no livro Domain-Driven Design.]]></summary></entry></feed>

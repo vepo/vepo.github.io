@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Backend.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Backend.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">SQL na Prática: Criando e Atualizando tabelas</title><link href="https://blog.vepo.dev/posts/criando-tabelas-com-sql" rel="alternate" type="text/html" title="SQL na Prática: Criando e Atualizando tabelas" /><published>2026-02-20T00:00:00+00:00</published><updated>2026-02-20T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/16-35-00-criando-e-atualizando-tabelas</id><content type="html" xml:base="https://blog.vepo.dev/posts/criando-tabelas-com-sql"><![CDATA[<div class="paragraph">
+<p>No post anterior, aprendemos como consultar e modificar dados. Talvez você não tenha tido a curiosidade de se perguntar como as tabelas foram criadas, apesar do script ter sido fornecido, mas agora é o momento de dar um passo atrás e explicar: como criar e atualizar as próprias tabelas.</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-é-o-esquema-de-uma-tabela">O que é o esquema de uma tabela?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Uma das principais vantagens dos bancos de dados relacionais é que o sistema gerencia e garante a consistência dos dados, e isso é feito por meio do esquema do banco de dados.</p>
+</div>
+<div class="paragraph">
+<p>Como já definimos antes, o esquema (ou <strong>schema</strong>) é a descrição de uma coleção de dados que estabelece a estrutura de armazenamento.</p>
+</div>
+<div class="paragraph">
+<p>No modelo relacional, os dados são organizados em relações compostas por atributos, em que cada linha de uma tabela representa uma entidade em si. Dessa forma, o esquema de um banco tem a responsabilidade de definir:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Quais são as relações (tabelas) e seus nomes;</p>
+</li>
+<li>
+<p>Quais atributos cada relação contém;</p>
+</li>
+<li>
+<p>Como as relações se relacionam entre si;</p>
+</li>
+<li>
+<p>Quais restrições de integridade se aplicam a cada atributo;</p>
+</li>
+<li>
+<p>Qual o tipo de dados armazenado em cada atributo.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Nesse post vamos ver como criar e atualizar tabelas, ou seja, como definir e modificar o esquema do banco de dados.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-faço-para-criar-uma-tabela">Como faço para criar uma tabela?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para criar uma tabela em SQL, usamos o comando <code>CREATE TABLE</code>. Vamos usar o exemplo de criação mencionado anteriormente para ilustrar:</p>
+</div>
+<div class="listingblock">
+<div class="title">Criando a tabela "employees"</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="p">(</span>
+    <span class="n">employee_id</span>   <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">first_name</span>    <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">last_name</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">email</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">UNIQUE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">phone</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+    <span class="n">hire_date</span>     <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">job_title</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">department_id</span> <span class="nb">INT</span><span class="p">,</span>
+    <span class="n">salary</span>        <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">salary</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">manager_id</span>    <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="n">created_at</span>    <span class="nb">TIMESTAMP</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-definir-os-tipos-de-dados-dos-atributos">Como definir os tipos de dados dos atributos?</h3>
+<div class="paragraph">
+<p>No exemplo acima, criamos a tabela <code>employees</code> com vários atributos, cada um com seu tipo de dado e restrições específicas. Podemos ver, por exemplo, o atributo <code>phone</code>, que é do tipo <code>VARCHAR(20)</code> e não possui nenhuma restrição de integridade. <code>VARCHAR</code> significa que o campo armazenará uma cadeia de caracteres (texto) com tamanho variável, mesmo tendo definido que o tamanho máximo é 20 caracteres. Alguns dos possíveis tipos de dados em PostgreSQL são listados na tabela abaixo:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Tipos de dados comuns em PostgreSQL e MySQL, para referência acesse <a href="https://www.postgresql.org/docs/current/datatype.html" class="bare">https://www.postgresql.org/docs/current/datatype.html</a> ou <a href="https://dev.mysql.com/doc/refman/8.4/en/data-types.html" class="bare">https://dev.mysql.com/doc/refman/8.4/en/data-types.html</a></caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">PostgreSQL</th>
+<th class="tableblock halign-center valign-top">MySQL</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>INT</code> ou <code>INTEGER</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>INT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números inteiros (sem casas decimais).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>BIGINT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números inteiros grandes (64 bits), usados para armazenar valores maiores que os inteiros normais.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DECIMAL(p,s)</code> ou <code>NUMERIC(p,s)</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DECIMAL(p,s)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números decimais com precisão definida. <code>p</code> é a precisão total (número total de dígitos) e <code>s</code> é a escala (número de dígitos à direita da vírgula).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>FLOAT</code> ou <code>REAL</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>FLOAT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números de ponto flutuante (números com casas decimais).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>SERIAL</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números inteiros auto-incrementáveis, geralmente usados para chaves primárias.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>BIGSERIAL</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Números inteiros grandes auto-incrementáveis, usados para chaves primárias quando se espera um grande volume de dados.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>VARCHAR(n)</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>VARCHAR(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cadeia de caracteres (texto) com tamanho variável. O número entre parênteses indica o tamanho máximo permitido.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CHAR(n)</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>CHAR(n)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cadeia de caracteres (texto) com tamanho fixo. O número entre parênteses indica o tamanho exato.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TEXT</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TEXT</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cadeia de caracteres (texto) de tamanho ilimitado.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DATE</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DATE</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data no formato AAAA-MM-DD.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TIME</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TIME</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hora no formato HH:MM:SS.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TIMESTAMP</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>TIMESTAMP</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Data e hora no formato AAAA-MM-DD HH:MM:SS.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>BOOLEAN</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">N/A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Valores lógicos: <code>TRUE</code> ou <code>FALSE</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>No nosso exemplo, também usamos os seguintes tipos: <code>SERIAL</code>, <code>VARCHAR</code>, <code>DATE</code>, <code>DECIMAL</code> e <code>TIMESTAMP</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-garantir-a-integridade-do-dado">Como garantir a integridade do dado?</h3>
+<div class="paragraph">
+<p>Além dos tipos de dados, as restrições de integridade (conhecidas como <strong>constraints</strong>) são fundamentais para garantir que os dados armazenados estejam sempre consistentes e válidos. No exemplo da tabela <code>employees</code>, utilizamos diversas restrições:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="p">(</span>
+    <span class="n">employee_id</span>   <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">first_name</span>    <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">last_name</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">email</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">UNIQUE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">phone</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+    <span class="n">hire_date</span>     <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">job_title</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">department_id</span> <span class="nb">INT</span><span class="p">,</span>
+    <span class="n">salary</span>        <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">salary</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">manager_id</span>    <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="n">created_at</span>    <span class="nb">TIMESTAMP</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constraints-em-nível-de-coluna-vs-nível-de-tabela">Constraints em nível de coluna vs. nível de tabela</h4>
+<div class="paragraph">
+<p>No exemplo acima, todas as constraints foram definidas <strong>diretamente na coluna</strong>, o que chamamos de <strong>constraints em nível de coluna</strong>. Porém, o SQL também permite definir constraints <strong>separadamente, ao final da criação da tabela</strong> - são as <strong>constraints em nível de tabela</strong>. Esta sintaxe é especialmente útil quando:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A constraint envolve múltiplas colunas (como uma chave primária composta)</p>
+</li>
+<li>
+<p>Queremos dar um nome significativo à constraint para facilitar manutenção futura</p>
+</li>
+<li>
+<p>Precisamos de mais clareza na definição das regras de negócio</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Vamos refatorar a criação da tabela <code>employees</code> usando constraints em nível de tabela:</p>
+</div>
+<div class="listingblock">
+<div class="title">Criando a tabela "employees" com constraints em nível de tabela</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="p">(</span>
+    <span class="n">employee_id</span>   <span class="nb">SERIAL</span><span class="p">,</span>
+    <span class="n">first_name</span>    <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">last_name</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">email</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">phone</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+    <span class="n">hire_date</span>     <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">job_title</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">department_id</span> <span class="nb">INT</span><span class="p">,</span>
+    <span class="n">salary</span>        <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">manager_id</span>    <span class="nb">INT</span><span class="p">,</span>
+    <span class="n">created_at</span>    <span class="nb">TIMESTAMP</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
+
+    <span class="c1">-- Constraints em nível de tabela</span>
+    <span class="k">CONSTRAINT</span> <span class="n">employees_pk</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">employees_email_unique</span> <span class="k">UNIQUE</span> <span class="p">(</span><span class="n">email</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">employees_salary_check</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">salary</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">employees_manager_fk</span> <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">manager_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe as diferenças:
+- A <code>PRIMARY KEY</code> agora é definida como uma constraint nomeada <code>employees_pk</code>
+- O <code>UNIQUE</code> para email também ganhou um nome descritivo
+- O <code>CHECK</code> do salário foi nomeado
+- A chave estrangeira <code>manager_id</code> agora é explicitamente definida com <code>FOREIGN KEY</code></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vantagens-de-nomear-constraints">Vantagens de nomear constraints</h4>
+<div class="paragraph">
+<p>Dar nomes às constraints traz benefícios importantes:
+- <strong>Mensagens de erro mais claras</strong>: Quando uma violação ocorre, o nome da constraint aparece na mensagem de erro
+- <strong>Manutenção mais fácil</strong>: Para remover ou modificar uma constraint, precisamos referenciá-la pelo nome
+- <strong>Documentação</strong>: Os nomes podem descrever a regra de negócio implementada</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constraints-com-múltiplas-colunas">Constraints com múltiplas colunas</h3>
+<div class="paragraph">
+<p>Um dos casos mais comuns onde precisamos de constraints em nível de tabela é quando a restrição envolve mais de uma coluna. Vamos criar uma tabela <code>project_assignments</code> para alocar funcionários em projetos:</p>
+</div>
+<div class="listingblock">
+<div class="title">Criando uma tabela com chave primária composta</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">project_assignments</span> <span class="p">(</span>
+    <span class="n">employee_id</span>   <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">project_id</span>    <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">assigned_date</span> <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="k">role</span>          <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+    <span class="n">hours_weekly</span>  <span class="nb">INT</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">hours_weekly</span> <span class="k">BETWEEN</span> <span class="mi">1</span> <span class="k">AND</span> <span class="mi">40</span><span class="p">),</span>
+
+    <span class="c1">-- Chave primária composta: um funcionário só pode ser alocado uma vez no mesmo projeto</span>
+    <span class="k">CONSTRAINT</span> <span class="n">project_assignments_pk</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">employee_id</span><span class="p">,</span> <span class="n">project_id</span><span class="p">),</span>
+
+    <span class="c1">-- Chaves estrangeiras</span>
+    <span class="k">CONSTRAINT</span> <span class="n">project_assignments_employee_fk</span>
+        <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">employee_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">project_assignments_project_fk</span>
+        <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">project_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">projects</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span>
+
+    <span class="c1">-- Garantir que a data de atribuição não seja futura</span>
+    <span class="k">CONSTRAINT</span> <span class="n">project_assignments_date_check</span>
+        <span class="k">CHECK</span> <span class="p">(</span><span class="n">assigned_date</span> <span class="o">&lt;=</span> <span class="k">CURRENT_DATE</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Neste exemplo, a chave primária é <strong>composta</strong> por <code>employee_id</code> e <code>project_id</code>, garantindo que um funcionário não possa ser alocado duas vezes no mesmo projeto. Observe como a sintaxe em nível de tabela torna isso claro e explícito.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_outros-exemplos-com-tabelas-existentes">Outros exemplos com tabelas existentes</h3>
+<div class="paragraph">
+<p>Vamos recriar as tabelas <code>departments</code> e <code>projects</code> usando a sintaxe de constraints em nível de tabela:</p>
+</div>
+<div class="listingblock">
+<div class="title">Recriando a tabela "departments"</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">departments</span> <span class="p">(</span>
+    <span class="n">department_id</span>   <span class="nb">SERIAL</span><span class="p">,</span>
+    <span class="n">department_name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">budget</span>          <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">manager_id</span>      <span class="nb">INT</span><span class="p">,</span>
+
+    <span class="k">CONSTRAINT</span> <span class="n">departments_pk</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">department_id</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">departments_name_unique</span> <span class="k">UNIQUE</span> <span class="p">(</span><span class="n">department_name</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">departments_budget_check</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">budget</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">departments_manager_fk</span>
+        <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">manager_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Recriando a tabela "projects"</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">projects</span> <span class="p">(</span>
+    <span class="n">project_id</span>    <span class="nb">SERIAL</span><span class="p">,</span>
+    <span class="n">project_name</span>  <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">start_date</span>    <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">end_date</span>      <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">department_id</span> <span class="nb">INT</span><span class="p">,</span>
+
+    <span class="k">CONSTRAINT</span> <span class="n">projects_pk</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">project_id</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">projects_dates_check</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">end_date</span> <span class="o">&gt;</span> <span class="n">start_date</span><span class="p">),</span>
+    <span class="k">CONSTRAINT</span> <span class="n">projects_department_fk</span>
+        <span class="k">FOREIGN</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">department_id</span><span class="p">)</span> <span class="k">REFERENCES</span> <span class="n">departments</span><span class="p">(</span><span class="n">department_id</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_constraints-de-verificação-com-múltiplas-colunas">Constraints de verificação com múltiplas colunas</h4>
+<div class="paragraph">
+<p>Podemos criar constraints <code>CHECK</code> que envolvem múltiplas colunas. Por exemplo, vamos adicionar uma regra que impede um funcionário de ser gerente de si mesmo:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adicionando constraint para evitar auto-gerenciamento</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span>
+<span class="k">ADD</span> <span class="k">CONSTRAINT</span> <span class="n">employees_no_self_management</span>
+<span class="k">CHECK</span> <span class="p">(</span><span class="n">employee_id</span> <span class="o">!=</span> <span class="n">manager_id</span><span class="p">);</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_e-se-eu-precisar-modificar-uma-tabela-existente">E se eu precisar modificar uma tabela existente?</h3>
+<div class="paragraph">
+<p>Após criar uma tabela, podemos precisar alterá-la. O comando <code>ALTER TABLE</code> permite modificar a estrutura existente:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adicionando uma nova coluna</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="k">ADD</span> <span class="k">COLUMN</span> <span class="n">birth_date</span> <span class="nb">DATE</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Modificando o tipo de uma coluna</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="k">ALTER</span> <span class="k">COLUMN</span> <span class="n">phone</span> <span class="k">TYPE</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Adicionando uma constraint (com nome)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span>
+<span class="k">ADD</span> <span class="k">CONSTRAINT</span> <span class="n">employees_phone_unique</span> <span class="k">UNIQUE</span> <span class="p">(</span><span class="n">phone</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Removendo uma constraint (precisamos do nome!)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="k">DROP</span> <span class="k">CONSTRAINT</span> <span class="n">employees_phone_unique</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Removendo uma coluna</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="k">DROP</span> <span class="k">COLUMN</span> <span class="n">birth_date</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note que para remover uma constraint, <strong>precisamos saber seu nome</strong>. É por isso que nomear constraints é uma boa prática!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-remover-uma-tabela">Como remover uma tabela?</h3>
+<div class="paragraph">
+<p>Para remover uma tabela completamente, usamos o comando <code>DROP TABLE</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">DROP</span> <span class="k">TABLE</span> <span class="n">project_assignments</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Cuidado!</strong> Este comando remove a tabela e todos os seus dados permanentemente.</p>
+</div>
+<div class="paragraph">
+<p>Se a tabela for referenciada por uma chave estrangeira, você precisará usar <code>CASCADE</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">DROP</span> <span class="k">TABLE</span> <span class="n">departments</span> <span class="k">CASCADE</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Isso removerá a tabela <code>departments</code> e todas as dependências (como a chave estrangeira em <code>projects</code> e <code>project_assignments</code>).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Neste post, aprendemos a criar e gerenciar o esquema de um banco de dados relacional. Vimos que:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>O comando <code>CREATE TABLE</code> define a estrutura inicial das tabelas</p>
+</li>
+<li>
+<p>Os tipos de dados determinam que tipo de informação cada coluna pode armazenar</p>
+</li>
+<li>
+<p>As restrições de integridade (<strong>constraints</strong>) garantem a consistência dos dados</p>
+</li>
+<li>
+<p><strong>Constraints podem ser definidas em nível de coluna ou nível de tabela</strong></p>
+</li>
+<li>
+<p><strong>Constraints em nível de tabela são obrigatórias para chaves primárias compostas</strong></p>
+</li>
+<li>
+<p><strong>Nomear constraints facilita a manutenção e fornece mensagens de erro mais claras</strong></p>
+</li>
+<li>
+<p>O comando <code>ALTER TABLE</code> permite modificar tabelas existentes</p>
+</li>
+<li>
+<p>O comando <code>DROP TABLE</code> remove tabelas (com cuidado!)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Dominar a criação e modificação de tabelas é fundamental para qualquer profissional que trabalhe com bancos de dados. Uma boa modelagem inicial, com restrições bem definidas, evita problemas de inconsistência e facilita a manutenção do sistema no longo prazo.</p>
+</div>
+<div class="paragraph">
+<p>No próximo post, veremos como consultar dados de múltiplas tabelas usando <code>JOINs</code> para explorar os relacionamentos que definimos aqui. Até lá!</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="SQL" /><category term="PostgreSQL" /><category term="Banco de Dados" /><category term="Modelagem de Dados" /><category term="Backend" /><category term="Desenvolvimento Web" /><summary type="html"><![CDATA[Aprenda a criar e modificar tabelas em SQL com exemplos práticos em PostgreSQL. Descubra a diferença entre constraints em nível de coluna e tabela, chaves primárias compostas, e como nomear constraints para facilitar a manutenção do banco de dados.]]></summary></entry><entry><title type="html">SQL na Prática: Consultas, Inserções e Atualizações de dados com PostgreSQL</title><link href="https://blog.vepo.dev/posts/sql-na-pratica" rel="alternate" type="text/html" title="SQL na Prática: Consultas, Inserções e Atualizações de dados com PostgreSQL" /><published>2026-01-22T00:00:00+00:00</published><updated>2026-01-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/18-13-00-sql-na-pratica</id><content type="html" xml:base="https://blog.vepo.dev/posts/sql-na-pratica"><![CDATA[<div class="paragraph">
+<p>Agora que sabemos o que são bancos de dados, como são estruturados internamentes e como modelar um banco de dados, vamos entrar a fundo na linguagem SQL, mostrando toda a potencialidade dela.</p>
+</div>
+<div class="sect1">
+<h2 id="_como-e-quando-usar-sql">Como e quando usar SQL?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>SQL é a linguagem de comunicação com bases de dados relacionais. Quando vamos usar um banco de dados relacional, é quase certo que podemos usar uma linguagem em comum com ele para consultar, adicionar ou remover dados, mas o SQL possui outras funcionalidades além do acesso ao dados. Através do SQL é possível gerenciar transações e permissões, assuntos ainda não cobertos.</p>
+</div>
+<div class="sect2">
+<h3 id="_então-todo-banco-relacional-implementa-sql">Então todo banco relacional implementa SQL?</h3>
+<div class="paragraph">
+<p>Sim e não. Na verdade quase todo banco considerado relacional dá algum suporte a linguagem SQL, mas isso não significa que ele implementa todas as funcionalidade. É preciso lembrar que SQL é um padrão em constante evolução e que nem todas as funcionalidades fazem sentido para todos os bancos.</p>
+</div>
+<div class="paragraph">
+<p>Alguns bancos também podem optar por fazer adaptações, ou extensões, da linguagem, por isso é importante conhecer a documentação do banco que se está usando. Aqui usaremos o PostgreSQL como exemplo, então, caso queira um tutorial, recomendo seguir o do <a href="https://www.w3schools.com/sql/default.asp">W3Schools</a> ou a <a href="https://www.postgresql.org/docs/18/index.html">documentação oficial do PostgreSQL</a>.</p>
+</div>
+<div class="paragraph">
+<p>Para melhor didática vamos começar a configurar o ambiente do zero criando e configurando uma base de dados. Então acessa o repositório <a href="https://github.com/vepo/sql-database-tutorial">github.com/vepo/sql-database-tutorial</a> e segue pelo tópico <a href="https://github.com/vepo/sql-database-tutorial/blob/main/docs/03-sql-tutorial.md">3. SQL Tutorial: Database Navigation and Querying</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-é-o-modelo-de-dados-que-estamos-trabalhando">Como é o modelo de dados que estamos trabalhando?</h3>
+<div class="paragraph">
+<p>Antes de começarmos, precisamos brevemente entender o modelo de dados que vamos usar. Vamos usar uma base de dados que mapeia a estrutura de uma empresa. Quais funcionários existem, quais departamentos eles estão alocados, quais são os orçamentos alocados e quais projetos existem. Na imagem abaixo, está o diagrama de entidades e mais abaixo o script usando para criação das tabelas.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/company_db_diagram.png" alt="company db diagram">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">employees</span> <span class="p">(</span>
+    <span class="n">employee_id</span>   <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">first_name</span>    <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">last_name</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">email</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">UNIQUE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">phone</span>         <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+    <span class="n">hire_date</span>     <span class="nb">DATE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">job_title</span>     <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">department_id</span> <span class="nb">INT</span><span class="p">,</span>
+    <span class="n">salary</span>        <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">salary</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">manager_id</span>    <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="n">created_at</span>    <span class="nb">TIMESTAMP</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span>
+<span class="p">);</span>
+
+<span class="c1">-- Departments table</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">departments</span> <span class="p">(</span>
+    <span class="n">department_id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">department_name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="k">location</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+    <span class="n">budget</span> <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">manager_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Projects table</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">projects</span> <span class="p">(</span>
+    <span class="n">project_id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">project_name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">start_date</span> <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">end_date</span> <span class="nb">DATE</span><span class="p">,</span>
+    <span class="n">budget</span> <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">status</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span> <span class="k">CHECK</span> <span class="p">(</span><span class="n">status</span> <span class="k">IN</span> <span class="p">(</span><span class="s1">'Planning'</span><span class="p">,</span> <span class="s1">'Active'</span><span class="p">,</span> <span class="s1">'On Hold'</span><span class="p">,</span> <span class="s1">'Completed'</span><span class="p">,</span> <span class="s1">'Cancelled'</span><span class="p">))</span>
+<span class="p">);</span>
+
+<span class="c1">-- Employee projects (junction table)</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">employee_projects</span> <span class="p">(</span>
+    <span class="n">employee_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">employees</span><span class="p">(</span><span class="n">employee_id</span><span class="p">),</span>
+    <span class="n">project_id</span> <span class="nb">INT</span> <span class="k">REFERENCES</span> <span class="n">projects</span><span class="p">(</span><span class="n">project_id</span><span class="p">),</span>
+    <span class="k">role</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+    <span class="n">hours_worked</span> <span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+    <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">employee_id</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>É importante notar a cardinalidade de alguns elementos. Um funcionário trabalha para um departamento que possui um gerente. Cada funcionário também possui um gerente, que pode não ser o mesmo do departamento. Cada funcionátrio trabalha em vários projetos, possuindo papeis diferentes. Os projetos não são ligados aos departamentos, podendo ter funcionários de diversos departamentos.</p>
+</div>
+<div class="paragraph">
+<p>O modelo é propositadamente complexo para possibilitar a elaborações de <em>queries</em> com junções e <em>subqueires</em>. A pessoa que deseja escrever queries tem que estar ciente da cardinalidade das relações para que não sejam extraídas informações inverídicas.</p>
+</div>
+<div class="paragraph">
+<p>Já que conhecemos o modelo de dados, podemos partir para a interação com ele.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-conectar-com-uma-base-de-dados">Como conectar com uma base de dados?</h3>
+<div class="paragraph">
+<p>Todo desenvolvedor comumente se refere aos <strong>Sistemas de Gerenciamento de Banco de Dados</strong> (SGDB, ou DBMS de <em>Database Management System</em>) como base de dados ou databases, mas uma instância do PostgreSQL, ou de qualquer outra base de dados, pode gerenciar diversas base de dados em paralelo.</p>
+</div>
+<div class="paragraph">
+<p>Normalmente quando nossa aplicação conecta com um banco de dados, precisamos saber o <em>hostname</em>, a porta e o banco de dados que queremos nos conectar. Mas como vamos conectar localmente usando as ferramentas de linha de comando, não precisamos dessas informações. Mas precisamos selecionar, dentro do programa, qual base de dados queremos usar.</p>
+</div>
+<div class="paragraph">
+<p>Todo SGDB pode conter mais de uma base de dados e cada base de dados pode conter mais de uma tabela, tanto que existe uma série de comandos para criar a apagar bases de dados, que são comuns na linguagem SQL. Mas a forma como selecionamos qual base estamos usando varia de acordo com a base em uso. Para PostgreSQL, se usa <code>\c company_db</code>, já no <a href="https://dev.mysql.com/doc/refman/8.4/en/database-use.html">MySQL</a> e no <a href="https://learn.microsoft.com/en-us/sql/t-sql/language-elements/use-transact-sql?view=sql-server-ver17">SQL Server</a> se usa <code>USE company_db</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Comando SQL para criar uma base de dados</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">company_db</span><span class="p">;</span> <span class="c1">-- Cria um banco de dados chamado 'company_db'</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Comando SQL para destruir uma base de dados</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">DROP</span> <span class="k">DATABASE</span> <span class="n">company_db</span><span class="p">;</span> <span class="c1">-- Destruir um banco de dados chamado 'company_db'</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Comando SQL para usar uma base de dados no PostgreSQL</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="err">\</span><span class="k">c</span> <span class="n">company_db</span> <span class="c1">-- Acessando um banco de dados chamado 'company_db'</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Então agora que conectamos a nossa base de dados dentro do SGDB, vamos criar <em>queries</em>?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-escrever-consultas-queries">Como escrever consultas (<em>queries</em>)?</h3>
+<div class="paragraph">
+<p>É preciso lembrar que qualquer consulta a uma base de dados SQL envolve o conceito de Algébra Relacional já discutido anteriormente. Consultas são feitas usando o comando <code>SELECT</code> que sempre é construído através do padrão <code>SELECT &lt;atributos&gt; FROM &lt;relação&gt;</code>, onde <strong>atributos</strong> é o conjunto de colunas que desejamos selecionar e <strong>relação</strong> é as tabelas ou qualquer outra consulta. Dessa forma a consulta mais simples que podemos fazer é listar todos as linhas e todas as colunas de uma tabela, conforme feito abaixo com a tabela <code>departments</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">departments</span><span class="p">;</span> <span class="c1">-- '*' significa a seleção de todos os atributos presentes na relação</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Uma consulta, em muitas situações, pode não ser eficiente, porque é bom lembrar que ao enviar uma consulta para um SGDB, este terá que consultar o disco para encontrar todas as linhas e todos os atributos e enviar de volta para o cliente. Essa operação pode ser bastante demorada devido ao tempo de acesso ao disco, e ao tempo de envio dessa informação entre os processos. Por isso é muito incomum fazer esse tipo de requisição em sistemas.</p>
+</div>
+<div class="sect3">
+<h4 id="_consultas-com-seleção-e-projeção">Consultas com Seleção e Projeção</h4>
+<div class="paragraph">
+<p>Em sistemas, praticamente todas as consultas passam pelas operações de seleção e projeção para se evitar o acesso desncessário ao dados. Isso é feito para que não se adicione latência a operação sendo realizada e para que o sistema não use memória desnecessária.</p>
+</div>
+<div class="paragraph">
+<p>Vamos supor que eu precise saber o identificador e a cidades em que está localizado um determinado departamento, ignorando o budget e o gerente do mesmo. Ao invés de selecionar todos os departamentos, posso fazer uma consulta específica como a consulta abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span> <span class="n">department_id</span><span class="p">,</span> <span class="k">location</span> <span class="k">FROM</span> <span class="n">departments</span> <span class="k">WHERE</span> <span class="n">department_name</span> <span class="o">=</span> <span class="s1">'Sales'</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Na consulta acima, extendemos nossa consulta inicial para fazer a projeção através do conjunto de atributos 'department_id, location' da relação que contêm todos os elementos da tabela <code>departments</code> com o nome Sales, ou seja, pegamos a tabela <code>departments</code> e aplicamos uma seleção.</p>
+</div>
+<div class="paragraph">
+<p>Em toda consulta, podemos adicionar a declaração <code>WHERE</code> para filtrar, durante a leitura, as linhas que serão consideradas parte da relação. A declaração <code>WHERE</code> será composta por um predicado booleano que ao ser aplicado em cada linha define se a mesma pode ser adicionada ou não na relação. Esse predicado pode ter outras consultas, como no caso abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que lista todos os departamentos que não possuem funcionários alocados.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span> <span class="n">department_id</span><span class="p">,</span>
+       <span class="k">location</span>
+
+<span class="k">FROM</span> <span class="n">departments</span>
+
+<span class="k">WHERE</span> <span class="n">department_id</span> <span class="k">NOT</span> <span class="k">IN</span> <span class="p">(</span><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">department_id</span>
+                            <span class="k">FROM</span> <span class="n">employees</span>
+                            <span class="k">WHERE</span> <span class="n">department_id</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+                           <span class="p">);</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_consultas-com-junção">Consultas com Junção</h4>
+<div class="paragraph">
+<p>Outra funcionalidade importantíssima do SQL é a possibilidade de fazer junções entre tabelas. No nosso modelo podemos identificar diversas tabelas com relacionamentos e todos esses relacionamentos podem ser escritos na forma de junções. Por exemplo, se desejarmos saber qual é o custo de um departamento e o valor alocado para mesmo, podem ser tentado a fazer esse calculo usando as tabelas <code>departments</code>, <code>employees</code>, <code>employee_projects</code> e <code>projects</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que faz uma agregação por departamento do gasto pessoal. O valor calculado está incorreto.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">budget</span><span class="p">,</span>
+    <span class="k">SUM</span><span class="p">(</span><span class="n">prj</span><span class="p">.</span><span class="n">budget</span><span class="p">)</span> <span class="k">as</span> <span class="n">project_budget</span><span class="p">,</span>
+    <span class="k">SUM</span><span class="p">(</span><span class="n">emp</span><span class="p">.</span><span class="n">salary</span><span class="p">)</span> <span class="k">as</span> <span class="n">employee_salaries</span>
+<span class="k">FROM</span> <span class="n">departments</span> <span class="n">dep</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">employees</span> <span class="n">emp</span> <span class="k">ON</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">employee_projects</span> <span class="n">emp_prj</span> <span class="k">ON</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">employee_id</span> <span class="o">=</span> <span class="n">emp</span><span class="p">.</span><span class="n">employee_id</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">projects</span> <span class="n">prj</span> <span class="k">ON</span> <span class="n">prj</span><span class="p">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">project_id</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span> <span class="k">ASC</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Porque o valor calculado está incorreto?</div>
+O valor calculado na consulta acima está incorreto porque a junção entre as tabelas <code>employees</code>, <code>employee_projects</code> e <code>projects</code> cria uma relação com cardinalidade maior do que a original. Isso acontece porque um funcionário pode trabalhar em vários projetos, então ao fazer a junção, cada linha do funcionário é replicada para cada projeto que ele trabalha. Isso faz com que o salário do funcionário seja somado várias vezes, uma para cada projeto, resultando em um valor total incorreto.
+</div>
+</div>
+<div class="paragraph">
+<p>Na consulta acima foi utilizado três novas declarações que quero explicar aqui. <code>JOIN</code>, <code>GROUP BY</code> e <code>ORDER BY</code>.</p>
+</div>
+<div class="paragraph">
+<p>Os <code>JOIN</code> são usados para fazer junções entre tabelas, ou seja, criar uma nova relação a partir de duas outras. No exemplo acima, foi usado o <code>LEFT JOIN</code> que cria uma nova relação com todas as linhas da tabela da esquerda e as linhas da tabela da direita que satisfazem a condição dada. Caso não existam linhas na tabela da direita que satisfaçam a condição, então os atributos dessas linhas serão nulos. Existem outros tipos de <code>JOIN</code>, que veremos a seguir.</p>
+</div>
+<div class="paragraph">
+<p>O <code>GROUP BY</code> é usado para agrupar linhas que possuem o mesmo valor em determinados atributos. No exemplo acima, todas as linhas que possuem o mesmo <code>department_id</code> são agrupadas em uma única linha. Isso é útil quando queremos fazer agregações, como somas ou médias, sobre grupos de linhas. <code>GROUP BY</code> não é obrigatório em todas as consultas, mas é necessário quando a cardinalidade da relação resulta em múltiplas linhas para o mesmo valor de um atributo que está sendo selecionado e podemos já requerer uma agregação dos dados, evitando processamento desnecessário no cliente.</p>
+</div>
+<div class="paragraph">
+<p>O <code>ORDER BY</code> é usado para ordenar as linhas da relação resultante de acordo com os valores de um ou mais atributos. No exemplo acima, as linhas são ordenadas pelo atributo <code>department_name</code> em ordem crescente (<code>ASC</code>). Também é possível ordenar em ordem decrescente usando a palavra-chave <code>DESC</code>. Importante lembrar que o <code>ORDER BY</code> pode ser aplicado mesmo quando o <code>JOIN</code> ou o <code>GROUP BY</code> não são usados, foi usado aqui como demonstrativo apenas, ele pode ser usando em qualquer consulta.</p>
+</div>
+<div class="sect4">
+<h5 id="_tipos-de-junção">Tipos de Junção</h5>
+<div class="paragraph">
+<p>Existem diversos tipos de junção que podem ser usados em SQL, cada um com suas características e usos específicos. Os principais tipos de junção são:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>INNER JOIN</code>: Retorna apenas as linhas que possuem correspondência em ambas as tabelas. Ou seja, somente as linhas que satisfazem a condição de junção são incluídas na relação resultante.</p>
+</li>
+<li>
+<p><code>LEFT JOIN</code> (ou <code>LEFT OUTER JOIN</code>): Retorna todas as linhas da tabela da esquerda e as linhas correspondentes da tabela da direita. Se não houver correspondência, os atributos da tabela da direita serão nulos.</p>
+</li>
+<li>
+<p><code>RIGHT JOIN</code> (ou <code>RIGHT OUTER JOIN</code>): Retorna todas as linhas da tabela da direita e as linhas correspondentes da tabela da esquerda. Se não houver correspondência, os atributos da tabela da esquerda serão nulos.</p>
+</li>
+<li>
+<p><code>FULL JOIN</code> (ou <code>FULL OUTER JOIN</code>): Retorna todas as linhas de ambas as tabelas. Se não houver correspondência, os atributos da tabela que não possui correspondência serão nulos.</p>
+</li>
+<li>
+<p><code>CROSS JOIN</code>: Retorna o produto cartesiano das duas tabelas, ou seja, todas as combinações possíveis entre as linhas das duas tabelas. É o único tipo de <code>JOIN</code> que não requer uma condição de junção.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Uma junção sempre é feita entre duas tabelas e baseada em uma condição que define como as linhas das duas tabelas devem ser combinadas. A condição é definida após a palavra-chave <code>ON</code> e geralmente envolve a comparação de atributos que possuem algum tipo de relacionamento entre as tabelas. Por exemplo, na consulta abaixo, estamos fazendo um <code>INNER JOIN</code> entre as tabelas <code>employees</code> e <code>departments</code> com base no atributo <code>department_id</code>, que é comum a ambas as tabelas.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span> <span class="n">emp</span><span class="p">.</span><span class="n">first_name</span><span class="p">,</span>
+       <span class="n">emp</span><span class="p">.</span><span class="n">last_name</span><span class="p">,</span>
+       <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span>
+<span class="k">FROM</span> <span class="n">employees</span> <span class="n">emp</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">departments</span> <span class="n">dep</span>
+<span class="k">ON</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_funções-de-agregação">Funções de Agregação</h5>
+<div class="paragraph">
+<p>Na consulta que fizemos anteriormente, usamos a função de agregação <code>SUM</code> para calcular o total de salários dos funcionários em cada departamento. Funções de agregação são usadas para realizar cálculos em um conjunto de valores e retornar um único valor. As principais funções de agregação em SQL são:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>COUNT()</code>: Conta o número de linhas em um conjunto de resultados.</p>
+</li>
+<li>
+<p><code>SUM()</code>: Calcula a soma dos valores em um conjunto de resultados.</p>
+</li>
+<li>
+<p><code>AVG()</code>: Calcula a média dos valores em um conjunto de resultados.</p>
+</li>
+<li>
+<p><code>MIN()</code>: Retorna o valor mínimo em um conjunto de resultados.</p>
+</li>
+<li>
+<p><code>MAX()</code>: Retorna o valor máximo em um conjunto de resultados.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Funções de agregação são frequentemente usadas em conjunto com a cláusula <code>GROUP BY</code> para agrupar linhas e calcular valores agregados para cada grupo.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_subconsultas">Subconsultas</h4>
+<div class="paragraph">
+<p>Outra funcionalidade poderosa do SQL é a capacidade de usar subconsultas, que são consultas aninhadas dentro de outras consultas. Subconsultas podem ser usadas em várias partes de uma consulta, como na cláusula <code>SELECT</code>, <code>FROM</code> ou <code>WHERE</code>. Elas permitem que você realize consultas mais complexas e dinâmicas.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que usa uma subconsulta na cláusula <code>WHERE</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">SELECT</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">budget</span><span class="p">,</span>
+    <span class="c1">-- Calcula o orçamento dos projetos separadamente</span>
+    <span class="p">(</span><span class="k">SELECT</span> <span class="n">COALESCE</span><span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">prj</span><span class="p">.</span><span class="n">budget</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+     <span class="k">FROM</span> <span class="n">projects</span> <span class="n">prj</span>
+     <span class="k">JOIN</span> <span class="n">employee_projects</span> <span class="n">emp_prj</span> <span class="k">ON</span> <span class="n">prj</span><span class="p">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">project_id</span>
+     <span class="k">JOIN</span> <span class="n">employees</span> <span class="n">emp</span> <span class="k">ON</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">employee_id</span> <span class="o">=</span> <span class="n">emp</span><span class="p">.</span><span class="n">employee_id</span>
+     <span class="k">WHERE</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">project_budget</span><span class="p">,</span>
+    <span class="c1">-- Calcula o total de salários dos funcionários separadamente</span>
+    <span class="p">(</span><span class="k">SELECT</span> <span class="n">COALESCE</span><span class="p">(</span><span class="k">SUM</span><span class="p">(</span><span class="n">emp</span><span class="p">.</span><span class="n">salary</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+     <span class="k">FROM</span> <span class="n">employees</span> <span class="n">emp</span>
+     <span class="k">WHERE</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">)</span> <span class="k">as</span> <span class="n">employee_salaries</span>
+<span class="k">FROM</span> <span class="n">departments</span> <span class="n">dep</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span> <span class="k">ASC</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A subconsulta acima calcula o orçamento dos projetos e o total de salários dos funcionários para cada departamento separadamente, evitando o problema de duplicação de linhas que ocorreu na consulta anterior. A subconsulta é executada para cada linha do resultado da consulta principal, permitindo que você obtenha valores dinâmicos com base nos dados atuais.</p>
+</div>
+<div class="paragraph">
+<p>Talvez você tenha imaginado que essa consulta é mais lenta do que a anterior, mas na verdade, dependendo do otimizador de consultas do SGDB, essa consulta pode ser mais eficiente, pois evita a criação de relações intermediárias com cardinalidade maior do que o necessário.</p>
+</div>
+<div class="paragraph">
+<p>Outra vantagem das subconsultas é a sua capacidade de tornar as consultas mais legíveis e fáceis de entender, especialmente quando lidamos com consultas complexas que envolvem várias tabelas e condições.</p>
+</div>
+<div class="paragraph">
+<p>Nessa consulta, também usamos a função <code>COALESCE</code>, que retorna o primeiro valor não nulo em uma lista de argumentos. Isso é útil para garantir que, se não houver projetos ou funcionários em um departamento, o valor retornado seja 0 em vez de nulo.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_common-table-expressions-ctes">Common Table Expressions (CTEs)</h4>
+<div class="paragraph">
+<p>Uma outra forma de estruturar consultas complexas em SQL é através do uso de Common Table Expressions (CTEs), que são definidas usando a cláusula <code>WITH</code>. CTEs permitem que você defina consultas temporárias que podem ser referenciadas dentro da consulta principal, tornando o código mais organizado e legível.</p>
+</div>
+<div class="paragraph">
+<p>A consulta abaixo reescreve a consulta anterior usando CTEs para calcular o orçamento dos projetos e o total de salários dos funcionários para cada departamento.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que usa CTEs para organizar a consulta principal</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">WITH</span> <span class="n">department_employees</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">department_id</span><span class="p">,</span>
+        <span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_salary</span>
+    <span class="k">FROM</span> <span class="n">employees</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">department_id</span>
+<span class="p">),</span>
+<span class="n">department_projects</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span><span class="p">,</span>
+        <span class="k">SUM</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">prj</span><span class="p">.</span><span class="n">budget</span><span class="p">)</span> <span class="k">as</span> <span class="n">total_project_budget</span>
+    <span class="k">FROM</span> <span class="n">projects</span> <span class="n">prj</span>
+    <span class="k">JOIN</span> <span class="n">employee_projects</span> <span class="n">emp_prj</span> <span class="k">ON</span> <span class="n">prj</span><span class="p">.</span><span class="n">project_id</span> <span class="o">=</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">project_id</span>
+    <span class="k">JOIN</span> <span class="n">employees</span> <span class="n">emp</span> <span class="k">ON</span> <span class="n">emp_prj</span><span class="p">.</span><span class="n">employee_id</span> <span class="o">=</span> <span class="n">emp</span><span class="p">.</span><span class="n">employee_id</span>
+    <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span>
+<span class="p">)</span>
+<span class="k">SELECT</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span><span class="p">,</span>
+    <span class="n">dep</span><span class="p">.</span><span class="n">budget</span><span class="p">,</span>
+    <span class="n">COALESCE</span><span class="p">(</span><span class="n">dp</span><span class="p">.</span><span class="n">total_project_budget</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">project_budget</span><span class="p">,</span>
+    <span class="n">COALESCE</span><span class="p">(</span><span class="n">de</span><span class="p">.</span><span class="n">total_salary</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">as</span> <span class="n">employee_salaries</span>
+<span class="k">FROM</span> <span class="n">departments</span> <span class="n">dep</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">department_employees</span> <span class="n">de</span> <span class="k">ON</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">de</span><span class="p">.</span><span class="n">department_id</span>
+<span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">department_projects</span> <span class="n">dp</span> <span class="k">ON</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dp</span><span class="p">.</span><span class="n">department_id</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_name</span> <span class="k">ASC</span><span class="p">;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Essa consulta usa duas CTEs: <code>department_employees</code> e <code>department_projects</code>, que calculam o total de salários dos funcionários e o orçamento dos projetos para cada departamento, respectivamente. A consulta principal então junta essas CTEs com a tabela <code>departments</code> para obter os resultados finais. Usar CTEs pode tornar consultas complexas mais fáceis de entender e manter, além de permitir a reutilização de consultas temporárias dentro da consulta principal.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-inserir-dados">Como inserir dados?</h3>
+<div class="paragraph">
+<p>Agora que sabemos como consultar dados, precisamos saber como inserir novos dados na base. Para isso usamos o comando <code>INSERT INTO</code>, que permite adicionar novas linhas a uma tabela existente.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que insere um novo departamento na tabela <code>departments</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">departments</span> <span class="p">(</span><span class="n">department_name</span><span class="p">,</span> <span class="k">location</span><span class="p">,</span> <span class="n">budget</span><span class="p">)</span>
+<span class="k">VALUES</span> <span class="p">(</span><span class="s1">'Research &amp; Development'</span><span class="p">,</span> <span class="s1">'Austin'</span><span class="p">,</span> <span class="mi">950000</span><span class="p">.</span><span class="mi">00</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Essa consulta insere um novo departamento chamado "Research &amp; Development" localizado em "Austin" com um orçamento de 950.000,00 na tabela <code>departments</code>. É importante garantir que os valores inseridos estejam de acordo com as restrições definidas na tabela, como tipos de dados e chaves primárias.</p>
+</div>
+<div class="paragraph">
+<p>Uma insersão sempre terá o formato <code>INSERT INTO &lt;tabela&gt; (&lt;atributos&gt;) VALUES (&lt;valores&gt;)</code>, onde <strong>tabela</strong> é a tabela onde os dados serão inseridos, <strong>atributos</strong> é o conjunto de colunas que receberão os valores e <strong>valores</strong> é o conjunto de valores a serem inseridos.</p>
+</div>
+<div class="paragraph">
+<p>Os valores inseridos podem ser constantes, como no exemplo acima, ou podem ser o resultado de uma consulta. Nesse caso, a consulta deve retornar um conjunto de resultados que corresponde ao número e tipo de atributos especificados na cláusula <code>INSERT INTO</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que insere novos funcionários na tabela <code>employees</code> a partir de uma consulta</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">employees</span> <span class="p">(</span><span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">hire_date</span><span class="p">,</span> <span class="n">job_title</span><span class="p">,</span> <span class="n">department_id</span><span class="p">,</span> <span class="n">salary</span><span class="p">)</span>
+<span class="k">SELECT</span> <span class="n">first_name</span><span class="p">,</span> <span class="n">last_name</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">hire_date</span><span class="p">,</span> <span class="n">job_title</span><span class="p">,</span> <span class="n">department_id</span><span class="p">,</span> <span class="n">salary</span>
+<span class="k">FROM</span> <span class="n">temp_employees</span>
+<span class="k">WHERE</span> <span class="n">hire_date</span> <span class="o">&gt;=</span> <span class="s1">'2025-01-01'</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-atualizar-dados">Como atualizar dados?</h3>
+<div class="paragraph">
+<p>Para atualizar dados existentes em uma tabela, usamos o comando <code>UPDATE</code>, que permite modificar os valores de uma ou mais colunas para linhas que satisfazem uma determinada condição. O comando <code>UPDATE</code> é estruturado da seguinte forma: <code>UPDATE &lt;tabela&gt; SET &lt;atributo&gt;=&lt;valor&gt; WHERE &lt;condição&gt;</code>.</p>
+</div>
+<div class="paragraph">
+<p>É sempre importante usar a cláusula <code>WHERE</code> para evitar atualizar todas as linhas da tabela, a menos que essa seja a intenção.</p>
+</div>
+<div class="listingblock">
+<div class="title">Consulta que atualiza o orçamento de um departamento na tabela <code>departments</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="c1">-- Aumenta o salário dos funcionários do departamento 1 em 10%</span>
+<span class="k">UPDATE</span> <span class="n">employees</span>
+<span class="k">SET</span> <span class="n">salary</span> <span class="o">=</span> <span class="n">salary</span> <span class="o">*</span> <span class="mi">1</span><span class="p">.</span><span class="mi">10</span>
+<span class="k">WHERE</span> <span class="n">department_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="c1">-- Atualiza o orçamento dos departamentos com base no total de</span>
+<span class="c1">-- salários dos funcionários usando um overhead de 20%</span>
+<span class="k">UPDATE</span> <span class="n">departments</span> <span class="n">dep</span>
+<span class="k">SET</span> <span class="n">budget</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="k">SELECT</span> <span class="k">SUM</span><span class="p">(</span><span class="n">salary</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">*</span> <span class="mi">1</span><span class="p">.</span><span class="mi">20</span>  <span class="c1">-- 20% overhead</span>
+    <span class="k">FROM</span> <span class="n">employees</span> <span class="n">emp</span>
+    <span class="k">WHERE</span> <span class="n">emp</span><span class="p">.</span><span class="n">department_id</span> <span class="o">=</span> <span class="n">dep</span><span class="p">.</span><span class="n">department_id</span>
+<span class="p">)</span>
+<span class="k">WHERE</span> <span class="n">budget</span> <span class="k">IS</span> <span class="k">NULL</span><span class="p">;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora sabemos fazer operações básicas de consulta, inserção e atualização de dados em uma base de dados SQL. Também aprendemos sobre junções, agregações, subconsultas e CTEs, que são ferramentas poderosas para trabalhar com dados relacionais. Esse conhecimento é essencial para qualquer desenvolvedor que trabalhe com bancos de dados relacionais e nos prepara para explorar funcionalidades mais avançadas do SQL em futuras imersões.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="SQL" /><category term="PostgreSQL" /><category term="Consultas SQL" /><category term="Banco de Dados Relacional" /><category term="Modelagem de Dados" /><category term="Backend" /><summary type="html"><![CDATA[Dê vida aos seus dados com SQL! Neste tutorial imersivo, você aprenderá a construir consultas eficientes, explorar junções complexas, aplicar funções de agregação e organizar seu código com CTEs e subconsultas — tudo isso usando um modelo realista de banco de dados corporativo. Ideal para desenvolvedores, analistas e estudantes que desejam dominar a linguagem SQL além do básico e escrever queries poderosas e otimizadas.]]></summary></entry><entry><title type="html">A Evolução do Java no Backend: Jakarta EE, Spring e Quarkus</title><link href="https://blog.vepo.dev/posts/java-no-backend" rel="alternate" type="text/html" title="A Evolução do Java no Backend: Jakarta EE, Spring e Quarkus" /><published>2023-10-16T00:00:00+00:00</published><updated>2023-10-16T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-15-52-java-no-backend</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-no-backend"><![CDATA[<p>O ecossistema Java para desenvolvimento backend passou por diversas transformações ao longo dos anos, desde os primórdios da orientação a objetos até as modernas soluções como microsserviços e contêineres. Neste post, exploramos essa jornada, destacando as tecnologias que moldaram o Java no backend e como elas se relacionam hoje.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/uTHZet430rs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="1-as-fases-do-java-no-backend"><strong>1. As Fases do Java no Backend</strong></h2>
+
+<h3 id="orientação-a-objetos-e-servidores-de-aplicação"><strong>Orientação a Objetos e Servidores de Aplicação</strong></h3>
+<ul>
+  <li><strong>Anos 90</strong>: Java surgiu em 1995 incorporando conceitos como CORBA e servlets (1996).</li>
+  <li><strong>J2EE (1999)</strong>: Trouxe soluções como EJB (Enterprise JavaBeans) para objetos distribuídos e JDBC para conexão com bancos de dados.</li>
+  <li><strong>Servidores de Aplicação (2001)</strong>: Como JBoss e WebLogic, permitiam deploy de aplicações em um único processo Java, facilitando a gestão de recursos.</li>
+</ul>
+
+<h3 id="a-revolução-do-docker-2013"><strong>A Revolução do Docker (2013)</strong></h3>
+<ul>
+  <li>A conteinerização mudou a forma como aplicações eram deployadas, eliminando a necessidade de servidores de aplicação monolíticos.</li>
+  <li>Java 8 (2014) e Spring Boot surgiram como respostas ágeis a essa nova era.</li>
+</ul>
+
+<hr />
+
+<h2 id="2-jakarta-ee-o-modelo-baseado-em-especificações"><strong>2. Jakarta EE: O Modelo Baseado em Especificações</strong></h2>
+<p>Jakarta EE (antigo Java EE) é um <strong>modelo de programação baseado em specs</strong>, garantindo compatibilidade e flexibilidade.</p>
+
+<h3 id="principais-especificações"><strong>Principais Especificações</strong></h3>
+<ul>
+  <li><strong>JPA</strong>: Persistência de dados.</li>
+  <li><strong>JAX-RS</strong>: Desenvolvimento de APIs REST.</li>
+  <li><strong>Bean Validation</strong>: Validação de dados com anotações.</li>
+  <li><strong>CDI</strong>: Injeção de dependências.</li>
+</ul>
+
+<h3 id="vantagens"><strong>Vantagens</strong></h3>
+<ul>
+  <li><strong>Estabilidade</strong>: Código escrito há 20 anos ainda roda em servidores modernos.</li>
+  <li><strong>Portabilidade</strong>: Depende de interfaces, não de implementações específicas.</li>
+</ul>
+
+<h3 id="microprofile-jakarta-ee-para-microsserviços"><strong>MicroProfile: Jakarta EE para Microsserviços</strong></h3>
+<ul>
+  <li>Extensão do Jakarta EE com foco em:
+    <ul>
+      <li>Observabilidade (OpenTelemetry).</li>
+      <li>Tolerância a falhas.</li>
+      <li>Autenticação via JWT.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="3-spring-acelerando-o-desenvolvimento"><strong>3. Spring: Acelerando o Desenvolvimento</strong></h2>
+<ul>
+  <li><strong>Contexto</strong>: Surgiu para simplificar o desenvolvimento Java EE, que era lento e burocrático.</li>
+  <li><strong>Spring Boot (2014)</strong>: Revolucionou com:
+    <ul>
+      <li>Executáveis independentes (sem servidor de aplicação).</li>
+      <li>Configuração simplificada (menos XML, mais anotações).</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="comparação-com-jakarta-ee"><strong>Comparação com Jakarta EE</strong></h3>
+<p>| <strong>Spring</strong>          | <strong>Jakarta EE</strong>       |
+|———————-|———————-|
+| <code class="language-plaintext highlighter-rouge">@GetMapping</code>       | <code class="language-plaintext highlighter-rouge">@Path</code> (JAX-RS)    |
+| <code class="language-plaintext highlighter-rouge">@RestController</code>   | <code class="language-plaintext highlighter-rouge">@ApplicationScoped</code> (CDI) |
+| Foco em produtividade | Foco em padrões empresariais |</p>
+
+<hr />
+
+<h2 id="4-quarkus-java-para-a-era-kubernetes"><strong>4. Quarkus: Java para a Era Kubernetes</strong></h2>
+<ul>
+  <li><strong>Origem</strong>: Evolução do JBoss/WildFly, focada em:
+    <ul>
+      <li><strong>Tempo de inicialização rápido</strong> (crucial para microsserviços).</li>
+      <li><strong>Experiência do desenvolvedor</strong> (live coding, integração com Kubernetes).</li>
+    </ul>
+  </li>
+  <li><strong>Relacionamento com Jakarta EE</strong>: Implementa specs como JAX-RS e CDI, mas com abordagem moderna.</li>
+</ul>
+
+<hr />
+
+<h2 id="conclusão-qual-escolher"><strong>Conclusão: Qual Escolher?</strong></h2>
+<ul>
+  <li><strong>Jakarta EE</strong>: Ideal para aplicações empresariais robustas e de longa vida.</li>
+  <li><strong>Spring</strong>: Melhor para produtividade e adoção rápida.</li>
+  <li><strong>Quarkus</strong>: Focado em microsserviços e cloud-native.</li>
+</ul>
+
+<h3 id="dicas-para-aprofundar"><strong>Dicas para Aprofundar</strong></h3>
+<ol>
+  <li>Explore specs como <strong>JAX-RS</strong> e <strong>Bean Validation</strong>.</li>
+  <li>Experimente starters em <a href="https://start.jakarta.ee">start.jakarta.ee</a> e <a href="https://code.quarkus.io">code.quarkus.io</a>.</li>
+  <li>Para Spring, use <a href="https://start.spring.io">start.spring.io</a>.</li>
+</ol>
+
+<p>O Java no backend continua evoluindo, e entender essas tecnologias é essencial para escolher a melhor ferramenta para seu projeto.</p>
+
+<p><strong>#Java #JakartaEE #Spring #Quarkus #Backend</strong></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Backend" /><category term="Quarkus" /><category term="Spring" /><category term="Jakarta EE" /><summary type="html"><![CDATA[O ecossistema Java para desenvolvimento backend passou por diversas transformações ao longo dos anos, desde os primórdios da orientação a objetos até as modernas soluções como microsserviços e contêineres. Neste post, exploramos essa jornada, destacando as tecnologias que moldaram o Java no backend e como elas se relacionam hoje.]]></summary></entry><entry><title type="html">REST &amp;amp; HTTP</title><link href="https://blog.vepo.dev/posts/rest-e-http" rel="alternate" type="text/html" title="REST &amp;amp; HTTP" /><published>2021-09-09T00:00:00+00:00</published><updated>2021-09-09T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-40-00-rest-e-http</id><content type="html" xml:base="https://blog.vepo.dev/posts/rest-e-http"><![CDATA[<p>Ano passado eu me dediquei a escrever sobre HTTP e REST. Estava com alguns objetivos claro em mente, queria mostrar quando usar e como usar o HTTP. Depois me fiz algumas perguntas e fui pesquisar se existem padrões de projeto em REST. Dessa peqquisa saiu dois POST enormes. O primeiro eu decidi tornar um livreto, mas sem muita revisão e sem muita experiência.</p>
+
+<p>Com esse “livreto” eu acabei conseguindo ser aceito como escritor na <a href="https://www.casadocodigo.com.br/">Casa do Código</a>, a ideia é escrever um livro sobre desenvolvimento backend, mas focado nos protocolos e não nos frameworks. A parte HTTP já está pronta, e o tal “livreto” é só um capitulo, tem muito mais.</p>
+
+<p>Esse tal livreto está disponível na Amazon, de graça pra quem gosta de sustentar o Jeff Benzos.</p>
+
+<p><a href="https://www.amazon.com.br/Anatomia-Protocolo-HTTP-protocolos-frameworks-ebook/dp/B08PSDT35Y/?_encoding=UTF8&amp;pd_rd_w=uCTIy&amp;pf_rd_p=4b9652c9-ac45-4535-ac4d-eec51129bb6c&amp;pf_rd_r=15TFWDDHRR59X7MWSBNM&amp;pd_rd_r=57f799bb-5689-4dd4-8b73-f7ba4703b773&amp;pd_rd_wg=1Ar7d&amp;ref_=pd_gw_ci_mcx_mr_hp_d"><img src="/assets/images/Anatomia-do-Protocolo-HTTP-medium.png" alt="Anatomia do Protocolo HTTP" /></a></p>
+
+<p>Se você quiser pegar no Leanpub, também está lá: <a href="https://leanpub.com/anatomiahttp/">leanpub.com/anatomiahttp</a></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="REST" /><category term="HTTP" /><category term="Backend" /><category term="Livros" /><summary type="html"><![CDATA[Mais conteúdo sobre REST e HTTP... Agora um pouco melhor!]]></summary></entry></feed>

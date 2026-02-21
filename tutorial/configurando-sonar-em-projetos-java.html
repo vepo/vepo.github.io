@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>Configurando Sonar em projetos Java</title>
+  <meta property="og:title" content="Configurando Sonar em projetos Java" />
+  
+
+  
+  <meta name="description" content="Nesse tutorial eu vou ensinar como configurar o Sonar em projetos Java." />
+  <meta property="og:description" content="Nesse tutorial eu vou ensinar como configurar o Sonar em projetos Java." />
+  
+
+  
+  <meta name="keywords" content="Java, Sonar">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/tutorial/configurando-sonar-em-projetos-java" />
+  <meta property="og:url" content="https://blog.vepo.dev/tutorial/configurando-sonar-em-projetos-java" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/capas/chaplin-modern-times.webp" />
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2024-07-29T07:00:00+00:00" />
+  <meta property="article:modified_time" content="2024-07-29T07:00:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Java" property="article:tag">
+  
+  <meta content="Sonar" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Configurando Sonar em projetos Java",
+      "datePublished": "2024-07-29T07:00:00+00:00",
+      
+      "description": "Nesse tutorial eu vou ensinar como configurar o Sonar em projetos Java.",
+      
+      
+      "url": "https://blog.vepo.dev/tutorial/configurando-sonar-em-projetos-java"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+<script async src="https://visita.vepo.dev/visita.js" data-token="legacy-token"></script>
+
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+        <header class="site-header">
+            <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+            <nav class="menu-list">
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+        </header>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="article cover-image">
+                    
+                    <img alt="Configurando Sonar em projetos Java" src="/assets/images/capas/chaplin-modern-times.webp" class="img-fluid" />
+                    
+                </div>
+        <div class="title">
+                    
+            <h1 class="serie-title">
+                Configurando Sonar em projetos Java
+            </h1>
+                    
+        </div>
+                
+        
+        <div class="publish_date">
+            <strong>
+                <time datetime="2024-07-29T07:00:00+00:00">
+                    29/julho/2024
+                </time>
+            </strong> 
+        </div>
+        
+        <div class="tag-container">
+            
+                    <a class="label label-default java" href="/tags/#java">
+            <i class="fas fa-tags"></i>
+                        Java
+                    </a>
+            
+                    <a class="label label-default sonar" href="/tags/#sonar">
+            <i class="fas fa-tags"></i>
+                        Sonar
+                    </a>
+            
+        </div>
+                
+                
+                <hr>
+                
+                
+        <article>
+            <h2 id="análise-estática-de-código-e-sonar">Análise Estática de Código e Sonar</h2>
+
+<p>A análise estática de código é uma técnica utilizada para examinar o código-fonte de um programa sem executá-lo. O objetivo principal é identificar possíveis erros, vulnerabilidades de segurança, violações de padrões de codificação e outras questões que possam comprometer a qualidade do software. Essa análise é realizada por ferramentas automatizadas que varrem o código e geram relatórios detalhados sobre os problemas encontrados.</p>
+
+<p>Uma das ferramentas mais populares para análise estática de código é o SonarQube, frequentemente referido apenas como Sonar. O SonarQube é uma plataforma de código aberto que permite a inspeção contínua da qualidade do código. Ele suporta diversas linguagens de programação e oferece uma ampla gama de plugins que podem ser integrados ao processo de desenvolvimento, facilitando a detecção e correção de problemas desde as fases iniciais do projeto.</p>
+
+<p>O SonarQube analisa o código em busca de bugs, vulnerabilidades, code smells (problemas que não são necessariamente erros, mas que indicam uma possível melhoria), duplicações de código e muito mais. Além disso, ele fornece métricas detalhadas sobre a cobertura de testes, complexidade ciclomática, entre outras, ajudando os desenvolvedores a manterem um código limpo, eficiente e seguro.</p>
+
+<p>Integrar o SonarQube ao fluxo de desenvolvimento pode trazer inúmeros benefícios, como a redução de custos com manutenção, aumento da segurança do software e melhoria na qualidade geral do código. Com a análise contínua proporcionada pelo SonarQube, as equipes de desenvolvimento podem identificar e corrigir problemas rapidamente, antes que eles se tornem críticos.</p>
+
+<h2 id="como-configurar">Como configurar</h2>
+
+<p>Para esse tutorial vamos usar o projeto criado em <a href="/tutorial/como-criar-um-projeto-java-usando-maven">Como criar um projeto Java usando Maven</a>.</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/tutorial-java-maven">
+                tutorial-java-maven
+            </a>
+        </span>
+    </h2>
+</div>
+
+<h3 id="1-criando-uma-conta-no-sonar">1. Criando uma conta no Sonar</h3>
+
+<p>Antes de configurar o Sonar, precisamos criar uma conta. Para isso, podemos usar uma instância local ou o <a href="https://sonarcloud.io">SonarCloud</a>, que oferece suporte gratuito para projetos open source. A infraestrutura local pode ser configurada usando o docker-compose. Execute o comando abaixo para iniciar a instância local:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose <span class="nt">-f</span> sonar-docker-compose.yaml up <span class="nt">-d</span>
+</code></pre></div></div>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3"</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">sonarqube</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">sonarqube:community</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">db</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">SONAR_JDBC_URL</span><span class="pi">:</span> <span class="s">jdbc:postgresql://db:5432/sonar</span>
+      <span class="na">SONAR_JDBC_USERNAME</span><span class="pi">:</span> <span class="s">sonar</span>
+      <span class="na">SONAR_JDBC_PASSWORD</span><span class="pi">:</span> <span class="s">sonar</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s2">"</span><span class="s">-Dsonar.search.javaAdditionalOpts=-Dnode.store.allow_mmap=false"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">sonarqube_data:/opt/sonarqube/data</span>
+      <span class="pi">-</span> <span class="s">sonarqube_extensions:/opt/sonarqube/extensions</span>
+      <span class="pi">-</span> <span class="s">sonarqube_logs:/opt/sonarqube/logs</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">9000:9000"</span>
+  <span class="na">db</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">postgres:12</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">POSTGRES_USER</span><span class="pi">:</span> <span class="s">sonar</span>
+      <span class="na">POSTGRES_PASSWORD</span><span class="pi">:</span> <span class="s">sonar</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">postgresql:/var/lib/postgresql</span>
+      <span class="pi">-</span> <span class="s">postgresql_data:/var/lib/postgresql/data</span>
+
+<span class="na">volumes</span><span class="pi">:</span>
+  <span class="na">sonarqube_data</span><span class="pi">:</span>
+  <span class="na">sonarqube_extensions</span><span class="pi">:</span>
+  <span class="na">sonarqube_logs</span><span class="pi">:</span>
+  <span class="na">postgresql</span><span class="pi">:</span>
+  <span class="na">postgresql_data</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<p>No primeiro login, você precisará criar um usuário e senha. Em seguida, será necessário criar um projeto. Recomendo criar um projeto local (“Create a local project”) e definir o nome, a chave do projeto e o branch principal (<em>master</em> ou <em>main</em>). Depois, você deve definir o baseline de qualidade, que servirá para comparar a qualidade do seu projeto. Recomendo usar sempre a versão anterior (<em>Previous version</em>) para acompanhar a evolução a cada release. Depois, você precisará definir como o projeto será analisado. Se você não usa Jenkins ou outra plataforma de CI/CD, pode fazer a análise localmente (<em>locally</em>). Para isso, um token será gerado, e no último passo, um script bash usando Maven será criado.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean verify sonar:sonar <span class="se">\</span>
+  <span class="nt">-Dsonar</span>.projectKey<span class="o">=</span><span class="nb">test</span> <span class="se">\</span>
+  <span class="nt">-Dsonar</span>.projectName<span class="o">=</span><span class="s1">'Teste'</span> <span class="se">\</span>
+  <span class="nt">-Dsonar</span>.host.url<span class="o">=</span>http://localhost:9000 <span class="se">\</span>
+  <span class="nt">-Dsonar</span>.token<span class="o">=</span>token
+</code></pre></div></div>
+
+<p>É recomendável configurar o token como uma variável de ambiente, enquanto as demais propriedades devem ser definidas dentro do arquivo <code class="language-plaintext highlighter-rouge">pom.xml</code>.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;properties&gt;</span>
+  <span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+  <span class="nt">&lt;maven.compiler.target&gt;</span>21<span class="nt">&lt;/maven.compiler.target&gt;</span>
+  <span class="nt">&lt;maven.compiler.source&gt;</span>21<span class="nt">&lt;/maven.compiler.source&gt;</span>
+  <span class="c">&lt;!-- SONAR --&gt;</span>
+  <span class="nt">&lt;sonar.projectKey&gt;</span>test<span class="nt">&lt;/sonar.projectKey&gt;</span>
+  <span class="nt">&lt;sonar.projectName&gt;</span>Test<span class="nt">&lt;/sonar.projectName&gt;</span>
+  <span class="nt">&lt;sonar.host.url&gt;</span>http://localhost:9000<span class="nt">&lt;/sonar.host.url&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">SONAR_TOKEN</span><span class="o">=</span>token
+mvn clean verify sonar:sonar
+</code></pre></div></div>
+
+<p>A qualidade do projeto pode ser verificada. Como o projeto é muito simples não tem muito o que verificar, mas já existe 3 problemas existentes que não são sérios.</p>
+
+<p><img src="/assets/images/sonar/sonar.png" alt="Qualidade geral do projeto" /></p>
+
+<p><img src="/assets/images/sonar/issues.png" alt="Problemas encontrados" /></p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Neste tutorial, abordamos a configuração do SonarQube para análise estática de código em um projeto Maven. Aprendemos a gerar um token de autenticação, configurar as propriedades do projeto no <code class="language-plaintext highlighter-rouge">pom.xml</code> e definir o token como uma variável de ambiente para garantir a segurança. Além disso, vimos como executar a análise de código usando o Maven e verificar a qualidade do projeto através da interface do SonarQube.</p>
+
+<p>A integração do SonarQube no fluxo de desenvolvimento é uma prática recomendada para manter a qualidade do código e identificar problemas de forma proativa. Mesmo em projetos simples, como o exemplo apresentado, a análise contínua pode revelar áreas de melhoria e ajudar a manter um código limpo e eficiente.</p>
+
+<p>O próximo passo é configurar o JaCoCo para medir a cobertura dos testes. O JaCoCo é uma ferramenta que permite gerar relatórios detalhados sobre a cobertura de código pelos testes, ajudando a garantir que todas as partes críticas do código sejam testadas adequadamente.</p>
+
+<p>Esperamos que este tutorial tenha sido útil e que você possa aplicar essas práticas em seus próprios projetos para garantir um desenvolvimento de software mais robusto e seguro.</p>
+
+        </article>
+        
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+                
+        <div class="article-footer">
+            
+            <div class="published">
+                <div>Escrito em 29/julho/2024</div>
+            </div>
+            
+                    
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+         
+     
+ 
+     
+         
+     
+         
+     
+ 
+     
+        
+        
+         
+
+
+    
+<div class="related-posts">
+    <h2>Posts relacionados</h2>
+     
+        
+         
+            
+    <a href="/posts/entendendo-o-kafka">
+                
+                    Entendendo o Kafka — Uma Introdução à Plataforma de Eventos
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+                
+                    Como criar uma linguagem usando ANTLR4 e Java
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/trabalhando-com-dinheiro">
+                
+                    Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/deixando-rastros-ou-como-usar-log">
+                
+                    Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/anatomia-de-um-topico">
+                
+                    Entendendo o Kafka: Anatomia de um Tópico
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+                
+                    Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/devops-como-comecar">
+                
+                    Coisas que todo Sênior deve saber: DevOps! Como começar?
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/testes-101-testando-aplicacoes-java">
+                
+                    Level Up: Testes 101 - Testando aplicações Java
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+             
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/context-and-dependency-injection-cdi-2-0">
+                
+                    Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+                
+    </a>
+                
+                 
+     
+        
+            
+
+</div>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+ </body>

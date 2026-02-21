@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Beginners.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Beginners.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Trabalhando com dinheiro!</title><link href="https://blog.vepo.dev/posts/trabalhando-com-dinheiro" rel="alternate" type="text/html" title="Trabalhando com dinheiro!" /><published>2020-05-05T00:00:00+00:00</published><updated>2020-05-05T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/19-10-09-trabalhando-com-dinheiro</id><content type="html" xml:base="https://blog.vepo.dev/posts/trabalhando-com-dinheiro"><![CDATA[<p>Ninguém nasce Sênior, se torna Sênior!</p>
+
+<p>Se tornar um Sênior é um processo demorado, e requer muito suor. Como o mercado de computação tem se expandido exponencialmente, resolvi começar uma série de posts rápidos sobre tudo que um Sênior deve saber. Vamos ao primeiro….</p>
+
+<h1 id="como-lidar-com-dinheiro">Como lidar com dinheiro?</h1>
+
+<p>Quando vamos modelar um Objeto ou qualquer outro domínio, sempre imaginamos o tipo de dado antes mesmo de começar a escrever o dado.</p>
+
+<p>Sabemos que nome é <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html">String</a>, sobrenome é String, data de nascimento é um <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Date.html">Date</a>, data de ativação será um <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#currentTimeMillis()">long</a>, ou <a href="https://docs.mongodb.com/manual/reference/bson-types/#timestamps">Timestamp</a>. Podemos até, em algumas linguagens ter dúvida se usamos um <a href="https://dev.mysql.com/doc/refman/8.0/en/datetime.html">Date ou Datetime</a>. Mas tudo isso depende da linguagem escolhida, certo?</p>
+
+<p>Errado!</p>
+
+<p>Tudo depende da forma como o valor é armazenado em bytes. Sim! Você acha que existe um valor inteiro? Ou string? Não, existem bytes! Somente bytes! E esses valores são representados em bytes. Um inteiro por exemplo são 4 bytes alinhados. Assim um inteiro 0 é 00000000 00000000 00000000 00000000. Em Java um short 0 é 00000000 00000000. Fácil? Nem tanto…</p>
+
+<p>Lembra dos <a href="hhttps://pt.wikipedia.org/wiki/N%C3%BAmero#Conjuntos_num%C3%A9ricos">conjuntos numéricos da matemática</a>? Pois bem, números inteiros são fáceis, agora e os outros?</p>
+
+<p>Quando eu preciso de um valor não exato, um float por exemplo? Sabe como é armazenado? Usando a notação <em><a href="https://pt.wikipedia.org/wiki/V%C3%ADrgula_flutuante">floating point</a></em>.</p>
+
+<p>Então qualquer valores de dinheiro devem ser guardados em Float, certo?</p>
+
+<p>Errado!</p>
+
+<p>Vamos olhar bem de perto algumas operações do float ou double.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/sf352axsulk7dvwb1lsp.png" alt="Alt Text" /></p>
+
+<p>Entendeu porque <code class="language-plaintext highlighter-rouge">2.01 + 2.01 + 2.01 + 2.01 + 2.001 = 10.040999999999999</code>? E não <code class="language-plaintext highlighter-rouge">‭10.041‬</code>? 🙄🙄🙄</p>
+
+<h2 id="float-point-precision-problem">Float Point precision problem</h2>
+
+<p>Sim, esse é um erro bastante conhecido. Você pode pesquisar por ele na internet. Ele aparece quando são feitas várias operações com Floating Point.</p>
+
+<p>Já vi ocorrer em sistemas em produção. Era um sistema de controle de estoque e compras. Havia várias ordem de compras, mas o valor vendido não batia com o caixa. Esse erro se deu em uma conta simple com 5 valores. Agora e se tivessemos 5.000 valores?</p>
+
+<p>Vamos ver… E se somassemos <code class="language-plaintext highlighter-rouge">5.000</code> vezes <code class="language-plaintext highlighter-rouge">2.01</code>? Deveria dar <code class="language-plaintext highlighter-rouge">10.050</code>.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/hz8c16fl3d4gg0bifxp5.png" alt="Alt Text" /></p>
+
+<p>Opa! Tivemos um erro de <code class="language-plaintext highlighter-rouge">0,676</code>! 😮😮😮😮😮</p>
+
+<h2 id="solução-em-java">Solução em Java</h2>
+
+<p>Mas vamos com calma. Em Java esse problema foi resolvido com a criação da classe <code class="language-plaintext highlighter-rouge">BigDecimal</code>.</p>
+
+<p>Nenhuma operação monetária deve ser feita com <code class="language-plaintext highlighter-rouge">float</code> ou <code class="language-plaintext highlighter-rouge">decimal</code> em hipotese alguma. Esse valores devem ser lidos como <a href="https://docs.oracle.com/javase/7/docs/api/java/math/BigDecimal.html">BigDecimal</a>.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/mqsny7pz70a1tglj2pms.png" alt="Alt Text" /></p>
+
+<h3 id="fique-atento">Fique Atento</h3>
+
+<ol>
+  <li>Se esse valor for instanciado com um <code class="language-plaintext highlighter-rouge">double</code> ou <code class="language-plaintext highlighter-rouge">float</code> irá herdar a imprecisão do valor original.</li>
+  <li>Essa classe é imutável, então fique atento. Se você chamar os metodos, não irá alterar o valor da instância, apenas criar uma nova!</li>
+</ol>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/e7822k278vxr9gdeyc0p.png" alt="Alt Text" /></p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Guarde pra vida toda. Nunca armazene valores monetários em <code class="language-plaintext highlighter-rouge">double</code> ou <code class="language-plaintext highlighter-rouge">float</code>. Não importa a linguagem ou base de dados que você está usando.</p>
+
+<p>Caso não saiba como resolver esse problema. Não se preocupe é normal. Amanhã vai surgir uma linguagem nova ou uma base de dados nova e 99,99999% dos desenvolvedores não sabaerão também. <a href="http://letmegooglethat.com/?q=cobol+floating+point+precision">Pesquise no Google</a>.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Floating Point" /><category term="Money" /><category term="Beginners" /><summary type="html"><![CDATA[Todo sênio deve saber lidar com valores monetários em seu código. Não sabe? Tem ensino! 😀]]></summary></entry></feed>

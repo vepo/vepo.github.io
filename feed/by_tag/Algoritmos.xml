@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Algoritmos.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Algoritmos.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Entendendo equals(), hashCode() e Collections em Java</title><link href="https://blog.vepo.dev/posts/java-collections-equals-hashcode" rel="alternate" type="text/html" title="Entendendo equals(), hashCode() e Collections em Java" /><published>2024-01-09T00:00:00+00:00</published><updated>2024-01-09T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-13-46-java-collections-equals-hashcode</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-collections-equals-hashcode"><![CDATA[<p>Neste post, vamos explorar os conceitos fundamentais de <code class="language-plaintext highlighter-rouge">equals()</code>, <code class="language-plaintext highlighter-rouge">hashCode()</code> e como eles são utilizados em estruturas de dados como <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code> no Java. Além disso, discutiremos a importância da imutabilidade e como implementar esses métodos corretamente.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-ATMYvny-7Y" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="introdução-ao-java-collections">Introdução ao Java Collections</h2>
+
+<p>O pacote <code class="language-plaintext highlighter-rouge">java.util.Collections</code> é uma biblioteca padrão do Java que fornece implementações de estruturas de dados comuns, como listas, conjuntos e mapas. Essas estruturas são essenciais para o desenvolvimento eficiente em Java, pois eliminam a necessidade de implementar soluções personalizadas para problemas recorrentes.</p>
+
+<hr />
+
+<h2 id="contratos-em-java">Contratos em Java</h2>
+
+<p>Em Java, os contratos são regras documentadas que definem como determinados métodos devem se comportar. Diferentemente de outras linguagens, o Java não possui um mecanismo embutido para validação de contratos, mas a documentação é clara sobre as expectativas. Dois dos contratos mais importantes são os métodos <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code>, herdados da classe <code class="language-plaintext highlighter-rouge">Object</code>.</p>
+
+<h3 id="regras-para-equals">Regras para <code class="language-plaintext highlighter-rouge">equals()</code></h3>
+<ol>
+  <li><strong>Reflexividade</strong>: Um objeto deve ser igual a si mesmo.</li>
+  <li><strong>Simetria</strong>: Se <code class="language-plaintext highlighter-rouge">A.equals(B)</code> é <code class="language-plaintext highlighter-rouge">true</code>, então <code class="language-plaintext highlighter-rouge">B.equals(A)</code> também deve ser <code class="language-plaintext highlighter-rouge">true</code>.</li>
+  <li><strong>Transitividade</strong>: Se <code class="language-plaintext highlighter-rouge">A.equals(B)</code> e <code class="language-plaintext highlighter-rouge">B.equals(C)</code> são <code class="language-plaintext highlighter-rouge">true</code>, então <code class="language-plaintext highlighter-rouge">A.equals(C)</code> também deve ser <code class="language-plaintext highlighter-rouge">true</code>.</li>
+  <li><strong>Consistência</strong>: O método deve sempre retornar o mesmo valor, desde que o objeto não seja modificado.</li>
+  <li><strong>Não-nulidade</strong>: Um objeto nunca deve ser igual a <code class="language-plaintext highlighter-rouge">null</code>.</li>
+</ol>
+
+<h3 id="regras-para-hashcode">Regras para <code class="language-plaintext highlighter-rouge">hashCode()</code></h3>
+<ol>
+  <li><strong>Consistência</strong>: Deve retornar o mesmo valor para um objeto não modificado.</li>
+  <li><strong>Correspondência com <code class="language-plaintext highlighter-rouge">equals()</code></strong>: Se dois objetos são iguais (<code class="language-plaintext highlighter-rouge">equals()</code> retorna <code class="language-plaintext highlighter-rouge">true</code>), seus <code class="language-plaintext highlighter-rouge">hashCode()</code> devem ser iguais. O inverso não é necessariamente verdadeiro.</li>
+</ol>
+
+<hr />
+
+<h2 id="hashset-e-hashmap">HashSet e HashMap</h2>
+
+<h3 id="hashset">HashSet</h3>
+<ul>
+  <li>É uma implementação de <code class="language-plaintext highlighter-rouge">Set</code> que não permite elementos duplicados.</li>
+  <li>Utiliza <code class="language-plaintext highlighter-rouge">hashCode()</code> para determinar a posição do elemento em uma tabela interna.</li>
+  <li>Em caso de colisões (dois objetos com o mesmo <code class="language-plaintext highlighter-rouge">hashCode()</code>), o <code class="language-plaintext highlighter-rouge">equals()</code> é usado para verificar a igualdade.</li>
+</ul>
+
+<h3 id="hashmap">HashMap</h3>
+<ul>
+  <li>É uma implementação de <code class="language-plaintext highlighter-rouge">Map</code> que armazena pares chave-valor.</li>
+  <li>A chave é usada para calcular o <code class="language-plaintext highlighter-rouge">hashCode()</code> e determinar a posição na tabela.</li>
+  <li>Assim como no <code class="language-plaintext highlighter-rouge">HashSet</code>, colisões são resolvidas usando <code class="language-plaintext highlighter-rouge">equals()</code>.</li>
+</ul>
+
+<h4 id="exemplo-de-colisão">Exemplo de Colisão</h4>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">HashSet</span><span class="o">&lt;</span><span class="nc">Objeto</span><span class="o">&gt;</span> <span class="n">set</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;();</span>
+<span class="nc">Objeto</span> <span class="n">obj1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Objeto</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="nc">Objeto</span> <span class="n">obj2</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Objeto</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// Mesmo hashCode que obj1</span>
+<span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">obj1</span><span class="o">);</span>
+<span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">obj2</span><span class="o">);</span> <span class="c1">// Só será adicionado se obj1.equals(obj2) for false</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="imutabilidade">Imutabilidade</h2>
+
+<p>Objetos imutáveis são aqueles cujo estado não pode ser alterado após a criação. Eles são ideais para uso em <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code> porque:</p>
+
+<ol>
+  <li><strong>Consistência</strong>: O <code class="language-plaintext highlighter-rouge">hashCode()</code> não muda, evitando comportamentos inesperados.</li>
+  <li><strong>Segurança</strong>: Não há risco de modificar uma chave após inserção, o que poderia tornar o valor inacessível.</li>
+</ol>
+
+<h3 id="como-criar-uma-classe-imutável">Como criar uma classe imutável</h3>
+<ul>
+  <li>Declare todos os campos como <code class="language-plaintext highlighter-rouge">final</code>.</li>
+  <li>Não forneça métodos modificadores (setters).</li>
+  <li>Para campos que requerem inicialização tardia (lazy initialization), use campos não <code class="language-plaintext highlighter-rouge">final</code> com cuidado.</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Pessoa</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">idade</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Pessoa</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">,</span> <span class="kt">int</span> <span class="n">idade</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">nome</span> <span class="o">=</span> <span class="n">nome</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">idade</span> <span class="o">=</span> <span class="n">idade</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// Getters, mas sem setters!</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="implementando-equals-e-hashcode">Implementando <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code></h2>
+
+<h3 id="usando-a-ide">Usando a IDE</h3>
+<p>A maioria das IDEs (como IntelliJ ou Eclipse) pode gerar automaticamente esses métodos. Basta selecionar os campos relevantes.</p>
+
+<h3 id="implementação-manual">Implementação manual</h3>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">o</span><span class="o">)</span> <span class="k">return</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// Reflexividade</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">o</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="nc">Pessoa</span> <span class="n">pessoa</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Pessoa</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">idade</span> <span class="o">==</span> <span class="n">pessoa</span><span class="o">.</span><span class="na">idade</span> <span class="o">&amp;&amp;</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">nome</span><span class="o">,</span> <span class="n">pessoa</span><span class="o">.</span><span class="na">nome</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">nome</span><span class="o">,</span> <span class="n">idade</span><span class="o">);</span> <span class="c1">// Usa a classe utilitária Objects</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="conclusão">Conclusão</h2>
+
+<ol>
+  <li><strong>Siga os contratos</strong>: Implemente <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code> corretamente para evitar bugs.</li>
+  <li><strong>Prefira imutabilidade</strong>: Objetos imutáveis simplificam o uso em <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code>.</li>
+  <li><strong>Use ferramentas</strong>: Aproveite as IDEs para gerar código, mas entenda o que está sendo gerado.</li>
+</ol>
+
+<p>Dominar esses conceitos é essencial para escrever código Java eficiente e livre de erros. Se tiver dúvidas, consulte a documentação oficial ou livros como <em>“Java Efetivo”</em> de Joshua Bloch.</p>
+
+<p><strong>Palavras-chave</strong>: Java, equals, hashCode, HashSet, HashMap, imutabilidade, collections.
+```</p>
+
+<p>Este post resume os principais pontos da transcrição, organizando-os em um formato claro e fácil de seguir, com exemplos práticos e dicas úteis.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Collections" /><category term="Algoritmos" /><summary type="html"><![CDATA[Neste post, vamos explorar os conceitos fundamentais de equals(), hashCode() e como eles são utilizados em estruturas de dados como HashSet e HashMap no Java. Além disso, discutiremos a importância da imutabilidade e como implementar esses métodos corretamente.]]></summary></entry><entry><title type="html">Java Collections e Algoritmos: Entendendo LinkedList vs. ArrayList</title><link href="https://blog.vepo.dev/posts/java-collections-e-algoritmos" rel="alternate" type="text/html" title="Java Collections e Algoritmos: Entendendo LinkedList vs. ArrayList" /><published>2024-01-02T00:00:00+00:00</published><updated>2024-01-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-08-39-java-collections-e-algoritmos</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-collections-e-algoritmos"><![CDATA[<p>Neste post, vamos explorar o pacote <strong>Java Collections</strong>, suas principais classes e interfaces, e focar em um comparativo detalhado entre <strong>LinkedList</strong> e <strong>ArrayList</strong>. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/xGCeneJ7kNo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="introdução-ao-java-collections">Introdução ao Java Collections</h2>
+
+<p>O <strong>Java Collections</strong> é um pacote da API base do Java que oferece um conjunto de classes e interfaces para implementar estruturas de dados comuns, como listas, conjuntos, filas e mapas. Ele é essencial para qualquer desenvolvedor Java, pois simplifica o trabalho com estruturas de dados sem a necessidade de implementá-las do zero.</p>
+
+<h3 id="principais-interfaces-e-classes">Principais Interfaces e Classes:</h3>
+<ul>
+  <li><strong>List</strong>: Implementada por <code class="language-plaintext highlighter-rouge">ArrayList</code> e <code class="language-plaintext highlighter-rouge">LinkedList</code>.</li>
+  <li><strong>Queue</strong>: Implementada por <code class="language-plaintext highlighter-rouge">LinkedList</code> e <code class="language-plaintext highlighter-rouge">PriorityQueue</code>.</li>
+  <li><strong>Set</strong>: Implementada por <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">TreeSet</code>.</li>
+  <li><strong>Map</strong>: Implementada por <code class="language-plaintext highlighter-rouge">HashMap</code> e <code class="language-plaintext highlighter-rouge">TreeMap</code>.</li>
+</ul>
+
+<p>Cada uma dessas estruturas tem características específicas. Por exemplo:</p>
+<ul>
+  <li><strong>Listas</strong> permitem elementos duplicados e mantêm a ordem de inserção.</li>
+  <li><strong>Conjuntos (Set)</strong> não permitem elementos duplicados.</li>
+  <li><strong>Mapas (Map)</strong> armazenam pares chave-valor, onde as chaves são únicas.</li>
+</ul>
+
+<hr />
+
+<h2 id="algoritmos-e-estruturas-de-dados">Algoritmos e Estruturas de Dados</h2>
+
+<p>Embora não seja necessário implementar estruturas de dados manualmente, é crucial <strong>entender como elas funcionam</strong> para usá-las eficientemente. Um algoritmo é um conjunto finito de passos bem definidos que resolvem um problema específico, com características como:</p>
+<ul>
+  <li><strong>Entrada e saída</strong>: Dados de entrada são processados para produzir um resultado.</li>
+  <li><strong>Efetividade</strong>: O algoritmo deve resolver o problema de forma eficiente.</li>
+</ul>
+
+<h3 id="crescimento-assintótico-e-notação-big-o">Crescimento Assintótico e Notação Big O</h3>
+
+<p>O desempenho de um algoritmo é frequentemente analisado usando a <strong>notação Big O</strong>, que descreve como o tempo de execução ou o uso de memória cresce em relação ao tamanho da entrada. Algumas classes comuns de complexidade são:</p>
+<ul>
+  <li><strong>O(1)</strong>: Tempo constante (excelente).</li>
+  <li><strong>O(n)</strong>: Tempo linear (justo).</li>
+  <li><strong>O(n²)</strong>: Tempo quadrático (ruim).</li>
+  <li><strong>O(2ⁿ)</strong>: Tempo exponencial (horrível).</li>
+</ul>
+
+<p>Essa análise é especialmente importante em cenários extremos, como processar milhões de elementos, onde a escolha da estrutura de dados pode impactar significativamente o desempenho.</p>
+
+<hr />
+
+<h2 id="comparativo-linkedlist-vs-arraylist">Comparativo: LinkedList vs. ArrayList</h2>
+
+<h3 id="arraylist">ArrayList</h3>
+<ul>
+  <li><strong>Implementação</strong>: Baseada em um vetor dinâmico.</li>
+  <li><strong>Vantagens</strong>:
+    <ul>
+      <li>Acesso aleatório rápido (<strong>O(1)</strong>).</li>
+      <li>Ideal para buscas e operações que envolvem índices.</li>
+    </ul>
+  </li>
+  <li><strong>Desvantagens</strong>:
+    <ul>
+      <li>Inserções e remoções no início ou meio podem ser custosas (<strong>O(n)</strong>), pois podem exigir redimensionamento do vetor.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="linkedlist">LinkedList</h3>
+<ul>
+  <li><strong>Implementação</strong>: Baseada em uma lista encadeada, onde cada elemento (nó) aponta para o próximo e o anterior.</li>
+  <li><strong>Vantagens</strong>:
+    <ul>
+      <li>Inserções e remoções nas extremidades são rápidas (<strong>O(1)</strong>).</li>
+      <li>Ideal para operações sequenciais.</li>
+    </ul>
+  </li>
+  <li><strong>Desvantagens</strong>:
+    <ul>
+      <li>Acesso aleatório é lento (<strong>O(n)</strong>), pois requer percorrer a lista desde o início.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="quando-usar-cada-uma">Quando Usar Cada Uma?</h3>
+<ul>
+  <li><strong>ArrayList</strong>:
+    <ul>
+      <li>Quando o acesso aleatório é frequente.</li>
+      <li>Quando o tamanho da lista é conhecido antecipadamente (para evitar redimensionamentos).</li>
+    </ul>
+  </li>
+  <li><strong>LinkedList</strong>:
+    <ul>
+      <li>Quando há muitas inserções/remoções no início ou fim da lista.</li>
+      <li>Quando a ordem de inserção é importante e operações sequenciais são predominantes.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="dicas-práticas">Dicas Práticas</h2>
+<ol>
+  <li><strong>Inicialize o <code class="language-plaintext highlighter-rouge">ArrayList</code> com um tamanho inicial</strong> se souber o número aproximado de elementos, para evitar redimensionamentos.</li>
+  <li><strong>Prefira <code class="language-plaintext highlighter-rouge">LinkedList</code></strong> para filas ou pilhas onde inserções/remoções são frequentes.</li>
+  <li><strong>Use <code class="language-plaintext highlighter-rouge">ArrayList</code></strong> para cenários com muitas buscas ou acessos aleatórios.</li>
+</ol>
+
+<hr />
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Entender as diferenças entre <strong>LinkedList</strong> e <strong>ArrayList</strong> é essencial para escrever código eficiente em Java. A escolha entre elas depende do contexto de uso e das operações mais frequentes. Além disso, conhecer algoritmos e o crescimento assintótico ajuda a tomar decisões informadas sobre desempenho.</p>
+
+<p>Para se aprofundar, recomendo o livro <strong>“Entendendo Algoritmos”</strong> (Aditya Bhargava), que explica conceitos complexos de forma didática.</p>
+
+<hr />
+
+<p><strong>Palavras-chave</strong>: Java Collections, LinkedList, ArrayList, Algoritmos, Big O, Estruturas de Dados.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Collections" /><category term="LinkedList" /><category term="ArrayList" /><category term="Algoritmos" /><summary type="html"><![CDATA[Neste post, vamos explorar o pacote Java Collections, suas principais classes e interfaces, e focar em um comparativo detalhado entre LinkedList e ArrayList. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.]]></summary></entry><entry><title type="html">Existe “Viés Algorítmico”?</title><link href="https://blog.vepo.dev/posts/existe-vies-algoritmico" rel="alternate" type="text/html" title="Existe “Viés Algorítmico”?" /><published>2023-02-22T00:00:00+00:00</published><updated>2023-02-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/21-54-00-existe-vies-algoritmico</id><content type="html" xml:base="https://blog.vepo.dev/posts/existe-vies-algoritmico"><![CDATA[<p>Em pleno carnaval de 2023 surge um tema polemico no Twitter. E como a comunidade do Twitter é muito madura sabendo discutir com argumentos embasados, os especialistas de Viés Algorítmico e Deep Learning foram consultaados para emitirem opiniões e explanarem sobre os estudos no tema.</p>
+
+<p>Se você não percebeu a ironia no parágrafo anterior é bom treinar um modelo de Deep Learning para detecção de ironia, porque seu modelo interno está péssimo.</p>
+
+<p>Voltando ao tema, realmente surgiu uma polemica se Inteligência Artificial, ou sendo mais especifico Algoritmos de Machine Learning tem ou não vieses. Eu acabei omitindo a minha opinião e nesse artigo vou me alongar mais sobre o porque eu creio que Machine Learning é por design baseado em viés.</p>
+
+<h2 id="definindo-viés">Definindo Viés</h2>
+
+<p>Não podemos discutir viés algorítmico sem antes entender o que é viés. Ao tentar procurar alguma publicação sobre o tema, encontrei no site do Núcleo de Estudos da Violência da USP (NEV-USP) um levantamento bibliográfico <a href="https://nev.prp.usp.br/publicacao/vies-algoritmico-um-balanco-provisorio/">Viés algorítmico – um balanço provisório</a>.</p>
+
+<p>Nesse levantamento tive uma grande surpresa ao perceber que esse tema é mais falado na Sociologia (12,3%) e no Direito (27,9%) do que na Computação (7,4%). Dessas publicações, a grande maioria são ensaios (74,4%) tendo pouca pesquisa empirica e pouco embasamento teorico.</p>
+
+<p>A busca por uma definição do que é um “viés algorítmico” também é neglicenciada pois nenhum dos artigos encontrados propõe uma definição. Uma das definições de víes é encontrada em <a href="https://arxiv.org/abs/1910.13122">Algorithmic decision-making in AVs: Understanding ethical and technical concerns for smart cities</a> “<em>Um sistema é considerado enviesado quando contém características ‘intencionais’ ou ‘não intencionais’ que discriminam injustamente certos indivíduos ou grupos de indivíduos na sociedade</em>”</p>
+
+<p>Já outros autores vão defender que o viés algorítmico é quando há uma distorção de dados, algoritmos e resultados de acordo com uma realidade social pré-existente. O que isso significa? Que já existe um problema social e através da construção de modelos eles são ressaltados.</p>
+
+<p>No levantamento, as causas apontadas para o viés algorítmico são a estrutura social, os dados enviesados, a construção da ferramenta/modelo e a interpretação dos resultados.</p>
+
+<h2 id="entendendo-machine-learning">Entendendo <em>Machine Learning</em></h2>
+
+<p>Agora que compreendemos o que é viés e o que é viés algorítmico, vou tentar explicar como funciona um modelo de Machine Learning e como ele se relaciona com o algoritmo em si.</p>
+
+<p>Inteligência Artificial é um campo da computação muito rico, ela via tentar emular a inteligência humana em sistemas que apresentam uma forma de raciocínio ou buscam soluções de forma eficiente. Os algoritmos de IA podem ser classificados em vários tipos, chamarei aqui de IA Clássica todo algoritmo que racionaliza a estrutura do problema para buscar uma solução. Por exemplo, quando implementamos uma IA para jogar xadres, podemos implementar o <a href="https://pt.wikipedia.org/wiki/Minimax">algoritmo Minimax</a> que é uma busca em uma árvore de possibilidades tentando maximizar a pontuação de um jogador pressuponto que o outro jogador vai também tentar maximizar a sua pontuação.</p>
+
+<p><img src="/assets/images/minimax.gif" alt="Desenho de uma árvore gerada pelo algoritmo Minimax" /></p>
+
+<p>Quer ver uma implementação do Minimax? Tenta jogar a <a href="https://github.com/vepo/tic-tac-toe/">minha versão do jogo da velha em Scala</a>.</p>
+
+<p>Já os algoritmos de Machine Learning em sua grande maioria vão tentar resolver problemas taxonômicos. São algoritmos que vão tentar fazer identificações baseados em features. Uma feature é uma caracteristica do objeto desejado. O exemplo mais clássico é a classificação de um algoritmo para identificação da flor Iris entre Iris Setosa, Iris Versicolour ou Iris Virginica. Já existe um <a href="https://archive.ics.uci.edu/ml/datasets/iris">dataset composto com a largura e tamanho da pétala e da sépala e a respectiva classificação</a> e baseado nele é possível construir um sistema para identificação de qualquer flor desse tipo.</p>
+
+<p>Durante alguns anos da minha vida eu construi sistemas de reconhecimento de fala e sintese de voz baseado em algoritmos de Machine Learning usando <a href="https://cmusphinx.github.io/wiki/tutorialconcepts/">Hidden Markov Models</a>. Esses algoritmos são um pouco diferentes dos de identificação, mas ainda são algoritmos de identificação, pois reconhecer um trecho de fala é identificar fonemas e transcrever esses fonemas nas palavras corretas.</p>
+
+<p>Por fim temos os algoritmos de Deep Learning que são baseados em Redes Neurais. Uma rede neural é baseada na ideia do Perceptron. O perceptron é uma estrutura que permite a criação de uma função para transformação de dados inpirado no neuronio. Um neuronio recebe vários sinais eletricos de suas sinapses e produz um novo sinal que é uma função de todas as entradas. Um perceptron seria composto por um conjunto de entradas, uma função de transformação e um conjunto de parâmetros.</p>
+
+<p><img src="/assets/images/perceptron.webp" alt="Desenho esquemático do Perceptron" /></p>
+
+<p>Para que o perceptron tenha uma utilidade, ele precisa ser treinado para que os parâmetros sejam escolhidos. Por muitos anos esse treinamento não era fácil pela ausência de um bom método, mas em 1986 foi proposto o algoritmo <em>Backpropagation</em> que possibilitou o treinamento de uma rede neural composta de várias camadas de perceptrons alinhados.</p>
+
+<p><img src="/assets/images/backpropagation.webp" alt="Desenho esquemático do Backpropagation" /></p>
+
+<p>Então quando falamos de <em>Deep Laerning</em> temos uma base de dados que alimentará uma rede neural complexa e será treinada para que se encontre uma função de transformação com um erro mínimo. Esse treinamento é a escolha dos coeficientes afim de se reduzir o erro usando Gradiente Descendente e Backpropagation. Caso tenha interesse em ver um código que implementa tudo isso, em 2020, durante um periodo de tédio e ócio e com a necessidade de relembrar como é programar em C++ <a href="https://github.com/vepo/cerebro">eu fiz uma POC de implementar um NN em C++</a>.</p>
+
+<p>Podems então resumir que os algoritmos de <em>Deep Learning</em> são um subconjunto dos algoritmos de <em>Machine Learning</em> que por sua vez é um subconjunto dos algoritmos de Inteligência Artificial. Estamos falando na construção de programas que emulem as carateristicas da inteligência humana, mas esses programas nunca vão ser inteligentes como os humanos.</p>
+
+<p><img src="/assets/images/tipos-de-nn.png" alt="Tipos de Redes Neurais" /></p>
+
+<h2 id="pressupostos-do-deep-learning">Pressupostos do <em>Deep Learning</em></h2>
+
+<p>O primeiro pressuposto quando vamos falar de qualquer algoritmo de inteligência artificial é que ele emula a inteligência.</p>
+
+<p>Vamos criar uma situação hipotetica que queremos construir uma rede neural para que se identifique se o canídeo em uma foto é um cachorro ou um lobo. O programa não terá uma ideia do que é um lobo, ou do que é um lobo. O programa não terá medo ao ver um lobo ou não se sentirá feliz quando vê a foto de um cachorro brincando. Isso não acontecerá porque programas não tem subjetividade, o programa será apenas um conjunto de parametros que alimentará uma rede neural para construção de uma função que identifica se na foto existe um cachorro ou um lobo.</p>
+
+<p>Ainda no caso do cachorro e do lobo, é possível que o programa faça uma identificação completamente enviesada porque existe uma caracteristica comum aos lobos que é incomum aos cachorros. Lobo é um animal não domesticado, logo é bastante improvavel que um lobo seja fotografado em um ambiente domestico. Já cachorros, em sua maioria, são fotografados em ambientes domesticos ou areas externas, muito raramente em uma floresta.</p>
+
+<p>Quando treinamos uma Rede Neural, não temos o controle de quais parâmetros estão sendo usados fazer a identificação. O ambiente é levado em consideração? Como podemos identificar isso?</p>
+
+<p>Para fazer essa identificação é preciso falsear um resultado, ou seja, eu preciso provar se essa minha ideia é falsa ou verdadeira. Assim, preciso de fotos de cachorros em ambientes selvagens e fotos de lobos em ambientes domésticos. Quais são as taxas de assertividades nessas fotos?</p>
+
+<p>O segundo pressuposto é que todo algoritmo de <em>Deep Learning</em> é uma função de transformação com um erro embutido. Nos estamos sempre falando de dadas sendo transformados e a criação de uma função que capturará a essência dessa transformação mas nunca será realmente fiel.</p>
+
+<p>Quando nós vamos identificar um cachorro, nós sabemos o que é um cachorro. Mas o algoritmo não sabe, ele terá que calcular os parâmetros para minimizar o erro, mas o erro ainda existirá! Logo erro é inerente a qualquer algoritmo de <em>Deep Learning</em>. Quando tentamos minimizar demais o erro, encontramos o que é chamado de <em>overfitting</em> o que significa que dentro do teste o erro foi minimizado ao extremo, mas para dados fora do testo o modelo não terá uma taxa de assertividade alta. Já quando o erro não é tão minimizado temos o <em>underfitting</em> que é quando o modelo tem uma alta taxa de erro mesmo durante o treinamento.</p>
+
+<p>O terceiro pressuposto é que estamos falando de identificação de padrões. Qualquer atividade de identificação de padrões será enviesada porque no mundo real não existem padrões. Quando eu falo pra você que tenho um modelo de indentificação de cachorros ou lobos você já conseguiu imagina o que é um cachorro ou um lobo. Seu cachorro será ou um pastor alemão, ou  um labrador, ou um golden retriever ou um vira-lata caramelo. Idependente da imagem que você tem na sua cabeça você acessou o seu <a href="https://pt.wikipedia.org/wiki/Universal_(filosofia)">universal</a> de cachorro, mas quando você vê um pincher de 3 patar, você continua acreditando que aquilo é um cachorro, mesmo que esse particular seja completamente diferente do universal.</p>
+
+<p>Ao se tentar identificar universais, você está construindo um modelo que intrisecamente tem uma ideia do que é esse universal. Se eu aceito que esse modelo tem um erro estatistico, eu devo aceitar que esse modelo ou aceitará particulares externos ao universal ou não aceitará particulares internos ao universal.</p>
+
+<p>Se voltarmos ao modelo do lobo e do cachorro, pode ser que o modelo identifique um gato domestico como cachorro e um Puli seja ignorado, quem sabe confundido com farrapos.</p>
+
+<p>O quarto pressuposto é que esse modelo fará uma escolha baseada em probabilidade condicional, o que implica que vises sociais podem ser codificados no modelo. Por probabilidade condicional entenda que é uma conclusão logica que pode estar falsa.</p>
+
+<p>Vamos ver o exemplo do lobo e cachorro, se 99% das fotos de lobos eles estão em uma floresta, se eu tenho uma foto de um canídeo em uma floresta eu posso supor que ela seja um lobo? Não! Para que essa carateristica seja minimizada precisamos ter base de dados balanceadas, ou seja, o número de fotos de cachorro dentro de casa, cachorro na floresta, lobo dentro de casa e lobo na floresta devem ser semelhante. Mas é factível ter uma base assim?</p>
+
+<h2 id="víes-por-design">Víes por design</h2>
+
+<p>Algoritmos de <em>Deep Laerning</em> são extremamente úteis, mas eles estão codificando padrões usando variáveis que muitas vezes não tem relação com o universal desejado.</p>
+
+<p>Se nós formos nos questionar o que é um ser humano, a resposta não será em forma de uma descrição matemática, mas uma uma descrição repleta de subjetividade.</p>
+
+<p>Os algoritmos de <em>Deep Learning</em> vão tentar encontrar um padrão que não existe e mesmo assim serão sucestível ao erro. É a forma como essa tecnologia foi pensada.</p>
+
+<h2 id="o-que-é-chatgpt">O que é ChatGPT?</h2>
+
+<p>Seundo sua própria documentação, o ChatGPT é <a href="https://openai.com/blog/chatgpt/">um “Modelo de Linguagem otimizado para o dialogo”</a>. Reparou que na descrição não há nenhuma menção a “conhecimento” ou “informação”? Porque a tecnologia GPT não tem uma gestão da informação.</p>
+
+<p>Um modelo de linguagem é definido no paper <a href="https://openai.com/blog/better-language-models/">Better Language Models and Their Implications</a> como um modelo que tem como objetivo prever a próxima palavra, dado o conjunto de palavras anteriores. O que isso quer dizer? Voltamos a proabilidade condicional! Se escrevemos uma pergunta, o ChatGPT vai propor uma resposta usando uma função que era qual será a resposta mais provavel.</p>
+
+<p>Nisso temos que levantar as questões:</p>
+<ol>
+  <li>O texto mais provavél é correto?</li>
+  <li>A base de dados usada para o treinamento é balanceada?</li>
+  <li>Existe a possibilidade de ponderação nas respostas?</li>
+</ol>
+
+<p>Quando falamos em ponderação é algo que está se tornando raro nas discussões da internet. Não temos mais a habilidade de levantar pontos possitivos e pontos negativos de uma ideia e ponderar se a ideia é boa ou ruim.</p>
+
+<p>O exemplo mais comum foi quando perguntaram qual foi o papel da URSS na segunda guerra mundial. Nos documentos e filmes sabemos que a URSS foi crucial para destruir a Alemanha. Hitler tinha odiava comunistas e socialistas e esse era um ponto tão crucial na sua ideologia que investiu por meses tentando destruir Stalingrado. Foi a URSS que chegou com as tropas em Berlin para tomar o poder, mas circulou vários prints em que essa informação hora era apresentada como verdadeira e hora era apresentada a versão que os EUA tinham tomado Berlin.</p>
+
+<p>Essa versão que os EUA tomaram Berlin é tão comum nos EUA que foi até ironizada pelo Clint Eastwood no filme <a href="https://www.papodecinema.com.br/filmes/15h17-trem-para-paris/">15h17 - Trem para Paris</a></p>
+
+<p>Podemos então concluir que o ChatGPT tem o compromisso de tentar soar como um texto fluido em que as ideias sejam realmente apresentadas e verossímeis, mas ele não tem compromisso que essas ideias sejam verdadeiras. Ele não foi desenhado pra isso e isso está na documentação e nos papers apresentados no site da OpenIA.</p>
+
+<h2 id="ia-como-commodity">IA como commodity</h2>
+
+<p>Qualquer algoritmo de IA é um algoritmo que pode ser reimplementado, mas as Big Techs tentam vender IA como uma commiditie. Apesar de ser muito dificil de replicar esses algoritmos, eles são frutos de anos de investimento em pesquisa e inovação e muito dos estudos que poossibilitaram a contrução deles estão aí a nossa disposição.</p>
+
+<p>Pode não ser fácil entender como funciona um algoritmo complexo, mas vale a pena ler o artigo que descreve esse algoritmo. Ele trará luz ao metodo de funcionamento e as limitações do algoritmo. Toda publicação academica faz uma analise completa levantando inclusive os defeitos encontrados para que sejam endereçado em pesquisas futuras.</p>
+
+<p>Treine a sua capacidade de leitura e investigação.</p>
+
+<h2 id="qual-deve-ser-nossa-postura-quando-vemos-uma-nova-tecnologia">Qual deve ser nossa postura quando vemos uma nova tecnologia?</h2>
+
+<p>Para concluir eu os clamo a se questionarem qual é a nossa postura quando vemos uma nova tecnologia. Somos um fã de tecnologia sempre ansiando pelo que tem de novo e acreditando que aquela é a solução de todos os nossos problemas? Ou somos céticos fazendo questionamentos criticos e validando a documentação existente?</p>
+
+<p>Tecnologias promente resolver problemas, mas elas também podem criar problemas. Hoje nós temos uma possibilidade infinita de coisas que podem ser feitas a ponto de não podermo acreditar na própria realidade. Podemos construir vídeos com <em>Deep Fake</em> que nunca foram gravados. Quais são as implicações éticas disso?</p>
+
+<p>A culpa dessa postura está no jornalismo tecnológico que se presta a ser uma assessoria de impresa das grandes empresas de tecnologia e não usam o sua capacidade de criticar aquilo que é óbvio.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Algoritmos" /><category term="Tecnologia" /><category term="Jacques Ellul" /><category term="Sociedade" /><summary type="html"><![CDATA[Existe viés algoritmico na Inteligência Articial? Nesse post eu vou descrever como funcionam as modernas inteligências artficiais e responder que não há como fugir do viés algorítimico!]]></summary></entry></feed>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Complexidade.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Complexidade.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Sobre Design de Código: Referências, Filosofias e Práticas para Código de Qualidade</title><link href="https://blog.vepo.dev/posts/sobre-design-de-codigo" rel="alternate" type="text/html" title="Sobre Design de Código: Referências, Filosofias e Práticas para Código de Qualidade" /><published>2023-09-26T00:00:00+00:00</published><updated>2023-09-26T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-39-23-design-de-codigo</id><content type="html" xml:base="https://blog.vepo.dev/posts/sobre-design-de-codigo"><![CDATA[<h2 id="introdução">Introdução</h2>
+<p>Design de código é um tema fundamental para desenvolvedores que buscam criar software sustentável, legível e eficiente. Neste post, exploramos referências críticas, filosofias úteis e práticas para evitar armadilhas comuns, baseado em uma discussão aprofundada sobre o assunto. Se você já se perguntou por que seu código parece complexo demais ou como melhorar sua abordagem de design, este conteúdo é para você.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Ih1SoBpAvFs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="referências-o-que-ler-e-o-que-evitar">Referências: O Que Ler (e o Que Evitar)</h2>
+<p>O vídeo discute várias referências sobre design de código, destacando:</p>
+<ul>
+  <li><strong>Clean Code</strong>: Apesar de popular, o livro é criticado por ser “passional demais” e promover regras absolutas que podem limitar o pensamento crítico. O autor alerta para o perigo de tratar o livro como um dogma, já que ele está vinculado a uma empresa de consultoria.</li>
+  <li><strong>A Philosophy of Software Design</strong>: Um livro menos conhecido, mas elogiado por oferecer respostas complexas e contextualizadas para problemas de design, em vez de soluções simplistas.</li>
+  <li><strong>Working Effectively with Legacy Code</strong> e <strong>Domain-Driven Design (DDD)</strong>: Ambos são recomendados, mas com ressalvas—o primeiro foca em código legado, e o segundo em design mais amplo, não apenas em código.</li>
+</ul>
+
+<p><strong>Dica:</strong> Evite seguir regras absolutas. Código “perfeito” segundo métricas como SonarQube pode ainda ser complexo e difícil de manter se não houver abstrações adequadas.</p>
+
+<hr />
+
+<h2 id="como-pensar-em-design-de-código">Como Pensar em Design de Código</h2>
+<h3 id="1-complexidade-origem-e-gestão">1. <strong>Complexidade: Origem e Gestão</strong></h3>
+<p>Código ruim geralmente é código complexo. A complexidade surge de:</p>
+<ul>
+  <li><strong>Mudanças custosas</strong>: Quando uma pequena alteração exige modificações em múltiplos lugares.</li>
+  <li><strong>Dificuldade cognitiva</strong>: Código difícil de entender, especialmente sem documentação ou comentários (sim, comentários são válidos!).</li>
+  <li><strong>Desconhecidos</strong>: Suposições não documentadas que parecem óbvias para o autor, mas não para outros.</li>
+</ul>
+
+<h3 id="2-maturidade-do-time">2. <strong>Maturidade do Time</strong></h3>
+<p>Código ruim não é uma falha moral—é fruto de contexto. Times imaturos (por falta de experiência, não de caráter) podem produzir código problemático. A solução?</p>
+<ul>
+  <li>Compartilhamento de conhecimento (palestras rápidas, mentorias).</li>
+  <li>Feedbacks construtivos em code reviews.</li>
+</ul>
+
+<h3 id="3-processos-ruins-geram-código-ruim">3. <strong>Processos Ruins Geram Código Ruim</strong></h3>
+<p>Prazos irreais, decisões arquiteturais precipitadas ou falta de revisão de código são vilões comuns. O vídeo sugere:</p>
+<ul>
+  <li><strong>Procrastinar decisões</strong>: Não implemente soluções “perfeitas” antecipadamente se o problema ainda não existe.</li>
+  <li><strong>Equilíbrio entre tático e estratégico</strong>: Desenvolvedores “táticos” (focados em features rápidas) podem ser úteis em protótipos, mas projetos de longo prazo exigem pensamento estratégico.</li>
+</ul>
+
+<hr />
+
+<h2 id="filosofias-úteis">Filosofias Úteis</h2>
+<ul>
+  <li><strong>KISS (Keep It Simple, Stupid)</strong>: Priorize simplicidade.</li>
+  <li><strong>YAGNI (You Aren’t Gonna Need It)</strong>: Não adicione funcionalidades “por precaução”.</li>
+  <li><strong>DRY (Don’t Repeat Yourself)</strong>: Automatize repetições, mas aplique a “regra dos três” (só generalize após três usos).</li>
+  <li><strong>Filosofia Unix</strong>: Escreva programas modulares, pequenos, e que falhem de forma clara.</li>
+</ul>
+
+<hr />
+
+<h2 id="padrões-de-design-como-vocabulário">Padrões de Design como Vocabulário</h2>
+<p>Padrões (como Factory, Proxy ou Observer) não são soluções mágicas, mas ferramentas para descrever problemas comuns. Use-os para:</p>
+<ul>
+  <li><strong>Criar vocabulário compartilhado</strong>: Exemplo: “Este consumidor Kafka usa Proxy em camadas”.</li>
+  <li><strong>Evitar soluções ruins</strong>: Alguns padrões (como Singleton mal aplicado) geram mais problemas que benefícios.</li>
+</ul>
+
+<p><strong>Dica:</strong> Estude o “idioma” da sua linguagem. Código Python escrito como Java (ou vice-versa) soa estranho e pode ser menos eficiente.</p>
+
+<hr />
+
+<h2 id="conclusão">Conclusão</h2>
+<p>Design de código é uma habilidade que se aprimora com experiência, estudo e colaboração. Não existem “heróis da programação”—apenas pessoas que tiveram oportunidades e souberam aproveitá-las. Para evoluir:</p>
+<ul>
+  <li><strong>Leia código alheio</strong> e discuta designs com seu time.</li>
+  <li><strong>Estude fundamentos</strong>: Programação funcional, matemática ou novos paradigmas podem melhorar seu raciocínio.</li>
+  <li><strong>Pense criticamente</strong>: Regras são guias, não leis.</li>
+</ul>
+
+<blockquote>
+  <p>“Código ruim é fruto de contexto, não de caráter.”</p>
+</blockquote>
+
+<p><strong>Palavras-chave:</strong> design de código, clean code, complexidade, KISS YAGNI DRY, padrões de design, filosofia Unix, code review.</p>
+
+<p>Gostou? Compartilhe suas dúvidas ou experiências nos comentários! 🚀</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Design de Código" /><category term="Complexidade" /><summary type="html"><![CDATA[Design de código é um tema fundamental para desenvolvedores que buscam criar software sustentável, legível e eficiente. Neste post, exploramos referências críticas, filosofias úteis e práticas para evitar armadilhas comuns, baseado em uma discussão aprofundada sobre o assunto. Se você já se perguntou por que seu código parece complexo demais ou como melhorar sua abordagem de design, este conteúdo é para você.]]></summary></entry><entry><title type="html">A Filosofia do Design de Código</title><link href="https://blog.vepo.dev/posts/a-filosofia-do-design-de-codigo" rel="alternate" type="text/html" title="A Filosofia do Design de Código" /><published>2021-07-21T00:00:00+00:00</published><updated>2021-07-21T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-00-00-a-filosofia-do-design-de-codigo</id><content type="html" xml:base="https://blog.vepo.dev/posts/a-filosofia-do-design-de-codigo"><![CDATA[<p>Muitos engenheiros desconhecem as ciências humanas. Acreditam que é perca de tempo esse tipo de estudo. Porque vou estudar o modo com pensamos? Porque vamos estudar o modo como a sociedade é organizada? Ou o modo como os fenômenos sociais acontecem? Ou quem sabe como a língua evolui? Bom, cada área dessa tem muito a ajudar, talvez um engenheiro não saiba disso por puro desconhecimento.
+Desconhecimento só se resolve com conhecimento, e por isso que levanto o seguinte questionamento: <em>como a filosofia pode ajudar no desenvolvimento de software?</em></p>
+
+<hr />
+
+<h1 id="o-que-é-filosofia">O que é filosofia?</h1>
+
+<p>Antes de tudo, precisamos antes entender ao que a filosofia se propõe. Temos no nosso imaginário a ideia do filósofo como alguém depressivo que vive pensando na vida, alguém solitário. Esse estereótipo não é verdadeiro. Para quem lembra do desenho Peanuts (ou Turma do Charlie Brown ou Snoopy), o Charlie Brown é só um cara meio depressivo e inteligente.</p>
+
+<p><img src="/assets/images/filosofia.avif" alt="Essa imagem é o resumo da filosofia clássica." /></p>
+
+<p>Mas nós não estamos aqui para falar de filosofia, mas da filosofia do design de código…</p>
+
+<hr />
+
+<h1 id="o-que-é-design-decódigo">O que é Design de Código?</h1>
+
+<p>Estamos tentando pensar o que é Design de Código, para isso vamos iniciar com uma sugestão:</p>
+
+<blockquote>
+  <p><em>Design de Código são Técnicas que diminuem a complexidade do código.</em></p>
+</blockquote>
+
+<p>Na verdade dessa afirmação é verdadeira, mas ela é vaga. Primeiro porque não sabemos exatamente o que é uma técnica. Depois não sabemos definir exatamente o que é complexidade. E por fim, sabemos o real objetivo de se escrever código?</p>
+
+<h1 id="o-que-é-umatécnica">O que é uma Técnica?</h1>
+
+<p>A definição de Técnica é bem complexa. Na realidade, é um assunto que tenho bastante interesse e por isso, se te interessar, recomendo a leitura o livro “<em>The Technological Society</em>” do Jacques Ellul. Eu estou relendo esse livro e fazendo os resumos da minha leitura.</p>
+
+<p>Se eu precisar resumir o que é Técnica, eu partiria da definição do Ellul de Operação Técnica no primeiro capitulo do seu livro.</p>
+
+<blockquote>
+  <p><em>Técnica pode ser definida como qualquer operação, ou conjunto de operações, executada com um determinado <strong>método</strong> com o <strong>objetivo</strong> a ser atingido.</em></p>
+</blockquote>
+
+<p>Baseado nessa definição podemos concluir que o Design de Código é um método e tem um objetivo claro.</p>
+
+<p>O método não é tão fácil de deduzir, mas quem já estudou engenharia é capaz pensar em um método. Vamos propor um bem simples? Primeiro temos que ter estatísticas, fazer algumas mudanças e verificar o que aconteceu com essas estatísticas. Isso é o que chamamos de iteração, a cada iteração nosso código deve estar mais próximo do seu objetivo que é <strong>não ser complexo</strong>. Quem quiser pensar mais nas estatísticas, recomendo o post do Alberto Souza <a href="https://www.zup.com.br/blog/design-de-codigo-seu-papel-ate-hoje">Design de código: seu papel até hoje</a>.</p>
+
+<p>O objetivo do Design de Código já está na definição diminuir a complexidade. Mas o que é complexidade? Porque ela acontece? Que tipos de complexidade existem?</p>
+
+<h1 id="porque-existe-complexidade">Porque existe complexidade?</h1>
+
+<p>Quando falamos de complexidade de software, muitos desenvolvedores tem em mente bibliotecas e linguagens altamente complexas. Isso acontece porque muitos já nasceram em um mundo onde é possível declarar um objeto e dar ordens ao objeto. Mas isso é muito alto nível. Na verdade isso é extremamente abstrato, computadores não sabem o que são objetos e não sabem o que são ordens. Então vamos nos perguntar o que os computadores entendem?</p>
+
+<p><img src="/assets/images/apollo11.png" alt="Olha o código da ignição da Apolo 11! 😲" /></p>
+
+<p>Todo computador vai compreender bits, um conjunto de instruções básicas e alguns periféricos como monitor, teclado, placa de rede. Isso é um computador, uma máquina burra que apenas pega a próxima instrução da memória e executa ela alterando valores no barramento ou registradores.</p>
+
+<p><strong><em>- Conseguiu entender?</em></strong></p>
+
+<p><img src="/assets/images/opcode.png" alt="Exemplo de Opcode" /></p>
+
+<p>É óbvio que não! Para escrever código era preciso muita compreensão, muita atenção, além de saber decorado que valores estavam nos registradores e todos os comandos que o processador aceita. Era uma atividade extremamente complexa. Quando estudei linguagem de montagens, o professor nos encorajava a construir fluxogramas detalhados sobre a execução do programa. Era preciso antes de colocar o primeiro <em>opcode</em> (entenda como um número para cada operação e alguns parâmetros) ter o desenho completo do que iria acontecer e onde cada informação seria armazenada.</p>
+
+<p>Percebeu que eu não falei variável? Sim, nem esse conceito existia. O que existia era informação na memória: código de execução, sistema operacional, variáveis, constantes, etc… Quem bom que não precisamos mais disso! Só quem trabalha com IoT e drivers.</p>
+
+<p>Mas porque eu fiz esse passeio histórico? <strong>Para dizer que linguagens de programação existem para diminuir a complexidade.</strong> Complexidade já existe em software porque máquinas são complicadas e burras ao mesmo tempo. Reza a lenda que Dennis Ritchie desenvolveu a linguagem C porque queria desenvolver um jogo… Bom era isso que falavam na época que eu estava na faculdade.</p>
+
+<p>A complexidade é acidental em software. Ela sempre vai existir. Sem uma boa linguagem de programação, muito que temos hoje não existiria. Testes de Software não seriam possível de automatizar. Bibliotecas são muito complexas de serem criadas. A compreensão do código é praticamente impossível, leia o código da <a href="https://github.com/chrislgarry/Apollo-11">Apollo 11</a> e observe que há mais comentários do que código. Sem uma boa linguagem de programação a afirmação do Uncle Bob dizendo que comentários são desnecessários é ridícula.</p>
+
+<h1 id="próximos-passos">Próximos passos</h1>
+
+<p>Nesse post eu tratei de tudo aquilo que não vou falar mais. O que é filosofia. De onde vem a complexidade. O que é técnica.</p>
+
+<p>Nos próximos passos vou tentar definir o que é Complexidade.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Complexidade" /><category term="Design de Código" /><category term="Programação" /><summary type="html"><![CDATA[Uma introdução da palestra que farei sobre Filosofia do Design de Código no TheDevConf 2021.]]></summary></entry><entry><title type="html">O que é complexidade?</title><link href="https://blog.vepo.dev/posts/o-que-e-complexidade" rel="alternate" type="text/html" title="O que é complexidade?" /><published>2021-03-04T00:00:00+00:00</published><updated>2021-03-04T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-00-00-o-que-e-complexidade</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-que-e-complexidade"><![CDATA[<h2 id="motivador">Motivador</h2>
+
+<p>Comecei a ler o livro <a href="https://www.amazon.com.br/Philosophy-Software-Design-2nd-English-ebook/dp/B09B8LFKQL?keywords=Philosophy-Software-Design-English&amp;qid=1667927943&amp;sr=8-5&amp;ufe=app_do%3Aamzn1.fos.6121c6c4-c969-43ae-92f7-cc248fc6181d&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=191bf91d38700ad4d84885900b3b695a&amp;language=pt_BR&amp;ref_=as_li_ss_tl">A Philosophy of Software Design</a>, o livro surge das notas de aula de um curso de <a href="https://web.stanford.edu/~ouster/cgi-bin/cs190-winter20/index.php">Software Design na Stanforn University CS-190</a>.</p>
+
+<p>Esse é um curso que eu gostaria de fazer, tendo cursado uma modalidade praticamente industrial de Engenharia de Computação, muito do meu foco na graduação foi desenvolvimento C e Assembler. Ao entrar no mercado tive que aprender a abstrair, e abstração é tudo no mundo de software.</p>
+
+<p>Essas notas serão livres, não se propões a serem um resumo do livro.</p>
+
+<h2 id="software-e-diagramas">Software e Diagramas</h2>
+
+<p>Você pode não ter desenhado nenhum diagram do seu software ou do seu sistema como um todo. Mas esse diagrama existe, ele é virtual, é baseado no conjunto das interações de cada peça do seu sistema, de cada classe do seu software. Você vai começar a racionalizar ele quando começar a colocar “no papel” esses diagramas.</p>
+
+<p>Na Engenharia de Software existem várias ferramentas e linguagens de apresentação que você pode usar, mas eu recomendo uma bem mais simples pra começar: <a href="https://dev.to/vepo/start-a-project-by-the-readme-4c49">README.md</a>.</p>
+
+<p><img src="/assets/images/software-design/notes.jpeg" alt="Notas em um quadro" /></p>
+
+<p>Quando for começar a escrever, pense em quem vai ler. O que é preciso saber? Coloque suas ideias em uma sessão chamada <strong>Racional</strong>. Depois coloque uma sessão (ou um novo documento) com todas as informações necessárias para execução. Por fim vá descrevendo cada conceito que seu software tem, um glossário com os termos usados.</p>
+
+<p>Eric Evans em <a href="https://www.amazon.com.br/Domain-Driven-Design-Eric-Evans/dp/8550800651?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=1Q6E8PM9BGI79&amp;dchild=1&amp;keywords=domain+driven+design&amp;qid=1611780458&amp;sprefix=domain%2Caps%2C870&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=35481008730f03c32f145959755e807a&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Domain-Driven Design</a> afirma que cada projeto tem sua Linguagem Onipresente, está é a definição dos termos que em comum entre o código e o negócio. É muito importante esses termos estarem bem definidos.</p>
+
+<p>Se possível, coloque as decisões arquiteturais também. Crie um diretório de documentação e faça a lista com tudo que foi cogitado e escolhido. <em>Porque não usamos tal biblioteca?</em></p>
+
+<blockquote>
+  <p><em>A grande limitação ao se escrever software, é entender o sistemas que estamos criando.</em></p>
+</blockquote>
+
+<p>Software é complexo, e podemos reduzir essa complexidade documentando as ideias e conceitos que estamos usando. Um simples desenho vai ajudar muito que pode te ajudar a desenvolver.</p>
+
+<h2 id="de-onde-vem-a-complexidade">De onde vem a complexidade?</h2>
+
+<p>A complexidade vem da dificuldade de compreensão. Qualquer dificuldade de compreensão no desenvolvimento/manutenção do software causará dificuldade.</p>
+
+<p>Segundo John Ousterhout, os sintomas da complexidade são:</p>
+
+<ul>
+  <li>
+    <p><strong>Mudança amplificada</strong>: se para fazer uma alteração simples, for necessária alterações em vários locais, seu software é complexo.</p>
+  </li>
+  <li>
+    <p><strong>Carga Cognitica</strong>: o quanto é necessário para um desenvolvedor saber quando for fazer alterações em seu código? A Carga Cognitiva pode ser atacada pela modularização. Se criarmos bons módulos ou componentes, podemos isolar conceitos deixando-os encapsulado. Imagine uma Arquitetura Orientada a Eventos, cada microsserviços terá que implementar seu produtor e consumidor de eventos, cada microsserviços terá que implementar seus módulos de serialização. Mas no fundo isso será um padrão no sistema, e se isso fosse uma biblioteca/framework?</p>
+  </li>
+  <li>
+    <p><strong>Desconhecidos Desconhecidos</strong>: A informação tem que ser evidente. Exemplos de desconhecidos desconhecidos? Uma procedure SQL que altera valores na base e não estão configurada na base de código.</p>
+  </li>
+</ul>
+
+<blockquote>
+  <p><em>Um dos mais importantes objetivos de um bom Desgin é para um sistema ser óbvio.</em></p>
+</blockquote>
+
+<p>A complexidade vem principalmente de dependências e obscuridade. Dependência significa quando uma parte depende de outra, quanto menos dependências entre as partes, menos complexidade seu software terá. E obscuridade significa aquilo que não é obvio, seu software tem comportamentos mágicos ou paranormais? Se for escolher entre fazer algo que pareça mágica, faça uma boa escolha e documente o processo.</p>
+
+<p>Por fim, a complexidade é incremental. Nenhum software é descartável, todos podem ser salvos. Se você encontra muita dificuldade, uma pergunta que se tem que fazer: <em>quanto custaria pra reescrever tudo?</em> Nunca parta para opção de reescrever sem antes ter uma estatística e provavelmente será a opção mais cara.</p>
+
+<p>Caso não queira reescrever, um dica é o livro <a href="https://www.amazon.com.br/Trabalho-Eficaz-com-C%C3%B3digo-Legado/dp/8582600321?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=trabalhando+legado&amp;qid=1611783106&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=ca23ee34596853e70ef5ace4fa0ed96f&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Trabalho Eficaz com Código Legado</a>. Nele o autor vai trabalhar várias abordagens de como trabalhar com seu código. Uma que já validei em uma empresa que trabalhei foi fazer uma fachada em alguns módulos. Criar uma interface e ir reescrevendo os módulos aos poucos. Outra é você ir fazendo mudanças pequenas, melhorando o design.</p>
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Todo design de software evolui. Se hoje pode estar bom, em poucos meses pode estar ruim. Vale pensar em como as funcionalidades devem ser colocadas.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Design de Software" /><category term="Arquitetura de Software" /><category term="Complexidade" /><summary type="html"><![CDATA[O que trás complexidade a um projeto de software?]]></summary></entry></feed>

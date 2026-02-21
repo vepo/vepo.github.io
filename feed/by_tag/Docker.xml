@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Docker.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Docker.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Habilitando HTTPS com Let’s Encrypt!</title><link href="https://blog.vepo.dev/posts/usando-https-com-lets-encrypt" rel="alternate" type="text/html" title="Habilitando HTTPS com Let’s Encrypt!" /><published>2026-01-07T00:00:00+00:00</published><updated>2026-01-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-04-00-usando-https-com-lets-encrypt</id><content type="html" xml:base="https://blog.vepo.dev/posts/usando-https-com-lets-encrypt"><![CDATA[<div class="paragraph">
+<p>Se você tem uma aplicação web rodando em qualquer framework — como Quarkus, Spring Boot ou outro — e quer proteger sua comunicação usando HTTPS, este tutorial é para você.</p>
+</div>
+<div class="paragraph">
+<p>Aqui, vamos configurar o NGINX como um <strong>servidor proxy reverso</strong>, responsável por gerenciar as conexões seguras (TLS/SSL) com os certificados gratuitos da <strong>Let&#8217;s Encrypt</strong>. Sua aplicação continuará rodando normalmente, enquanto o NGINX cuida da criptografia, liberando você para focar no código.</p>
+</div>
+<div class="paragraph">
+<p>A ideia é simples: configuramos um domínio apontando para o nosso servidor, obtemos um certificado digital que valida a propriedade desse domínio e, por fim, ajustamos o NGINX para redirecionar o tráfego criptografado para a sua aplicação, independentemente da tecnologia que você usa.</p>
+</div>
+<div class="paragraph">
+<p>Vamos começar?</p>
+</div>
+<div class="sect1">
+<h2 id="_porque-usar-https">Porque usar HTTPS?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O HTTPS nada mais é que o protocolo HTTP protegido por uma camada de TLS.</p>
+</div>
+<div class="paragraph">
+<p>É importante destacar que não se trata de um protocolo completamente novo — do ponto de vista do servidor da aplicação, a comunicação continua sendo HTTP.</p>
+</div>
+<div class="paragraph">
+<p>A diferença está na conexão entre cliente e servidor, que agora passa por uma etapa adicional de segurança antes de transmitir os dados, conforme ilustrado no diagrama abaixo.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/http/https-osi.png" alt="https osi">
+</div>
+<div class="title">Figura 1. HTTP, HTTPS e o Modelo OSI como comparação</div>
+</div>
+<div class="paragraph">
+<p>Nosso servidor web continua funcionando exatamente como antes. A diferença é que, com o HTTPS, ele pode ser acessado por meio de um <strong>gateway</strong> HTTP — como o NGINX — que fica entre o cliente e a aplicação.</p>
+</div>
+<div class="paragraph">
+<p>O fluxo funciona assim:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>O cliente se conecta na porta 443 (HTTPS padrão).</p>
+</li>
+<li>
+<p>O gateway recebe a requisição criptografada, descriptografa-a e a converte em uma requisição HTTP comum.</p>
+</li>
+<li>
+<p>Em seguida, ele a encaminha ao servidor da aplicação, que responde como de costume.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Além disso, esse mesmo gateway pode ser configurado para redirecionar automaticamente qualquer tentativa de acesso pela porta 80 (HTTP) para a porta 443 (HTTPS), garantindo que toda a comunicação aconteça de forma segura.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/http/arquitetura-http-https.png" alt="arquitetura http https">
+</div>
+<div class="title">Figura 2. Arquitetura de uma comunicação Cliente-Servidor que tenta primeiro acessar a porta 80 mas é redirecionado para 443.</div>
+</div>
+<div class="paragraph">
+<p>A imagem acima ilustra exatamente como nossa arquitetura pode ser implementada usando apenas uma máquina e o Docker, unindo todos os componentes que acabamos de descrever.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_porque-lets-encrypt">Porque Let&#8217;s Encrypt?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Talvez você esteja se perguntando: por que precisamos de algo além do nosso servidor HTTP para usar HTTPS?</p>
+</div>
+<div class="paragraph">
+<p>A resposta está no <strong>TLS</strong> — a camada de segurança que torna o HTTP seguro. Vamos entender como essa comunicação funciona e como ela protege seus dados.</p>
+</div>
+<div class="paragraph">
+<p>O TLS protege a comunicação entre cliente e servidor com dois objetivos principais:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Autenticar o servidor, garantindo que você está se conectando ao destino verdadeiro — por exemplo, ao acessar blog.vepo.dev, ter certeza de que é realmente o meu blog, e não um site impostor.</p>
+</li>
+<li>
+<p>Criptografar os dados trocados, assegurando que apenas você e o servidor possam ler o conteúdo da comunicação.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Para isso, o TLS usa <strong>criptografia assimétrica</strong> durante a fase inicial da conexão, permitindo que cliente e servidor estabeleçam uma chave secreta de forma segura — mesmo em um canal potencialmente inseguro como a internet.</p>
+</div>
+<div class="paragraph">
+<p>A criptografia assimétrica usa um par de chaves: a <strong>chave privada</strong> (que é secreta) e a <strong>chave pública</strong> (que pode ser distribuída).
+Uma mensagem criptografada com a chave privada só pode ser descriptografada usando a chave pública correspondente. Como apenas o dono da chave privada poderia ter criado essa mensagem, ela funciona como uma assinatura digital, provando a identidade de quem a enviou.</p>
+</div>
+<div class="paragraph">
+<p>Na prática, quando seu navegador se conecta a um servidor HTTPS, ele verifica o certificado digital apresentado — que contém a chave pública do site e é assinado por uma autoridade confiável. Isso permite confirmar que você está realmente se comunicando com o domínio correto, e não com um impostor.</p>
+</div>
+<div class="paragraph">
+<p>No entanto, para serviços simples, sem muito riscos, alguns optam por usar certificados autoassinados. Eles ainda criptografam o tráfego, impedindo que ferramentas como o <a href="https://www.wireshark.org">Wireshark</a> leiam os dados da comunicação, mas não fornecem autenticação confiável para o público geral, já que não são validados por uma autoridade externa.</p>
+</div>
+<div class="paragraph">
+<p>É aí que entra o <strong>Let&#8217;s Encrypt</strong>!</p>
+</div>
+<div class="paragraph">
+<p>Esse serviço automatiza a criação e a validação de certificados TLS. Ele gera o par de chaves pública e privada para você e, para confirmar que você realmente controla o domínio, realiza uma verificação simples — normalmente via DNS ou por meio de um arquivo temporário no seu servidor.</p>
+</div>
+<div class="paragraph">
+<p>Uma vez aprovado, o Let&#8217;s Encrypt assina seu certificado digital, permitindo que qualquer navegador reconheça seu site como seguro — tudo de forma gratuita e automatizada.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_1-configurando-o-ambiente">1. Configurando o ambiente</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Antes de começar, vamos preparar o ambiente:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Uma máquina com IP fixo
+Você pode provisioná-la em qualquer provedor de nuvem (Magalu Cloud, AWS, DigitalOcean, Google Cloud, etc.) ou usar um servidor próprio.</p>
+</li>
+<li>
+<p>Linux com Docker instalado
+É o único requisito de software — garantindo que possamos rodar os contêineres de forma isolada e reproduzível.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2-criando-o-serviço-nginx">2. Criando o serviço NGINX</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Com isso pronto, criaremos um arquivo chamado <code>docker-compose.yml</code>. Ele define toda a configuração dos nossos serviços em código, tornando a implantação consistente e fácil de gerenciar.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.29-alpine</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/nginx:/etc/nginx/conf.d</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">app-network</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Com o <code>docker-compose.yml</code> acima configurado, o NGINX já estará escutando nas portas 80 (HTTP) e 443 (HTTPS) da sua máquina. Isso significa que você pode apontar seu domínio no DNS para o IP fixo do servidor.</p>
+</div>
+<div class="paragraph">
+<p>Agora, precisamos definir o conteúdo do arquivo <code>./data/nginx/app.conf</code>. É nele que configuramos o comportamento do servidor — como redirecionamentos, regras de proxy e a associação do certificado SSL.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="nginx"><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://example.org</span><span class="p">;</span> <span class="c1">#for demo purposes</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Neste arquivo, configuramos dois servidores virtuais no NGINX:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Um servidor HTTP comum, que escuta na porta 80.</p>
+</li>
+<li>
+<p>Um servidor HTTPS, que escuta na porta 443 e usa SSL/TLS.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>No entanto, o servidor HTTPS ainda não funcionará, pois falta configurar corretamente os certificados SSL — etapa que faremos em seguida com a ajuda do Let&#8217;s Encrypt.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3-configurando-o-certbot-lets-encrypt">3. Configurando o CertBot Let&#8217;s Encrypt</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O <strong>Let&#8217;s Encrypt</strong> valida o domínio por meio de um desafio HTTP: ele tenta acessar uma URL específica no seu domínio e espera uma resposta conhecida. Se o servidor responder corretamente, fica provado que você controla o domínio — um mecanismo parecido com o usado pelo Google Search Console para verificar a propriedade de um site.</p>
+</div>
+<div class="paragraph">
+<p>Para gerar e responder a esse desafio, usamos o Certbot. Por isso, precisamos configurar o contêiner do NGINX para servir os arquivos temporários que o Certbot cria durante o processo de validação.</p>
+</div>
+<div class="paragraph">
+<p>Primeiro, vamos ajustar o ambiente para incluir o Certbot. Para isso, precisamos:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Declarar o serviço do Certbot no nosso <code>docker-compose.yml</code>.</p>
+</li>
+<li>
+<p>Criar um volume compartilhado entre os containers do NGINX e do Certbot, permitindo que eles troquem os arquivos necessários para a validação do domínio.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>O arquivo <code>docker-compose.yml</code> atualizado é mostrado a seguir:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.29-alpine</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/nginx:/etc/nginx/conf.d</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>    <span class="c1">## Configurações geradas pelo CertBot</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>     <span class="c1">## Chaves geradas pelo CertBot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+  <span class="na">certbot</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">certbot/certbot</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">app-network</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Agora, precisamos configurar o servidor NGINX para responder ao desafio HTTP do <strong>Let&#8217;s Encrypt</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Ele espera que uma URL específica — <code>/.well-known/acme-challenge/</code> — esteja acessível via porta 80 (HTTP). Portanto, vamos direcionar todas as requisições para esse caminho a um local onde o Certbot possa fornecer a resposta correta.</p>
+</div>
+<div class="paragraph">
+<p>Após o desafio ser resolvido com sucesso, o Certbot gerará automaticamente os certificados e chaves necessários para o TLS.</p>
+</div>
+<div class="paragraph">
+<p>Eles serão armazenados nos seguintes caminhos dentro do container:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Certificado público (fullchain):
+<code>/etc/letsencrypt/live/example.org/fullchain.pem</code></p>
+</li>
+<li>
+<p>Chave privada (privkey):
+<code>/etc/letsencrypt/live/example.org/privkey.pem</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Esses arquivos são essenciais para que o NGINX configure a conexão HTTPS corretamente. O CertBot também gera alguns arquivos de configuração que podem ser visto abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="nginx"><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kn">location</span> <span class="n">/.well-known/acme-challenge/</span> <span class="p">{</span>  <span class="c1">## Define o desafio</span>
+        <span class="kn">root</span> <span class="n">/var/www/certbot</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">ssl_certificate</span> <span class="n">/etc/letsencrypt/live/example.org/fullchain.pem</span><span class="p">;</span>    <span class="c1">## Define a chave pública</span>
+    <span class="kn">ssl_certificate_key</span> <span class="n">/etc/letsencrypt/live/example.org/privkey.pem</span><span class="p">;</span>  <span class="c1">## Define a chave privada</span>
+
+    <span class="kn">include</span> <span class="n">/etc/letsencrypt/options-ssl-nginx.conf</span><span class="p">;</span>   <span class="c1">## Configurações geradas pelo CertBot</span>
+    <span class="kn">ssl_dhparam</span> <span class="n">/etc/letsencrypt/ssl-dhparams.pem</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://example.org</span><span class="p">;</span> <span class="c1">#for demo purposes</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_4-inicializando-o-certbot">4. Inicializando o CertBot</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Se você tentar subir o ambiente agora com <code>docker-compose up</code>, ele ainda não funcionará completamente. Isso porque os certificados SSL precisam ser solicitados e configurados pela primeira vez.</p>
+</div>
+<div class="paragraph">
+<p>Para facilitar esse processo inicial, criamos um script de inicialização que automatiza todos os passos. Você só precisa executá-lo após atualizar o seu e-mail na linha onde está definido <code>email=""</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Baixa o script de inicialização oficial do repositório nginx-certbot</span>
+curl <span class="nt">-L</span> https://raw.githubusercontent.com/wmnnd/nginx-certbot/master/init-letsencrypt.sh <span class="o">&gt;</span> init-letsencrypt.sh
+
+<span class="c"># Abre o script no editor vi para personalização</span>
+<span class="c"># IMPORTANTE: Atualize o e-mail na linha que contém 'email=""'</span>
+vi init-letsencrypt.sh
+
+<span class="c"># Torna o script executável (adiciona permissão de execução)</span>
+<span class="nb">chmod</span> +x init-letsencrypt.sh
+
+<span class="c"># Executa o script com privilégios de superusuário</span>
+<span class="c"># O script irá configurar automaticamente os certificados SSL/TLS</span>
+<span class="nb">sudo</span> ./init-letsencrypt.sh</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Após executar o script, todos os arquivos de certificado e configuração necessários serão criados.</p>
+</div>
+<div class="paragraph">
+<p>O próximo passo é reconfigurar o sistema para renovação automática: os certificados da Let&#8217;s Encrypt têm validade limitada, então precisamos garantir que sejam renovados automaticamente antes de expirar.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">services</span><span class="pi">:</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.29-alpine</span>
+    <span class="c1">## Força o NGINX atualizar a cada 6hs</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/bin/sh</span><span class="nv"> </span><span class="s">-c</span><span class="nv"> </span><span class="s">'while</span><span class="nv"> </span><span class="s">:;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">6h</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">wait</span><span class="nv"> </span><span class="s">$${!};</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-s</span><span class="nv"> </span><span class="s">reload;</span><span class="nv"> </span><span class="s">done</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-g</span><span class="nv"> </span><span class="se">\"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;</span><span class="se">\"</span><span class="s">'"</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/nginx:/etc/nginx/conf.d</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>    <span class="c1">## Configurações geradas pelo CertBot</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>     <span class="c1">## Chaves geradas pelo CertBot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+  <span class="na">certbot</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">certbot/certbot</span>
+    <span class="c1">## Força o CertBot atualizar a cada 6hs</span>
+    <span class="na">entrypoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/bin/sh</span><span class="nv"> </span><span class="s">-c</span><span class="nv"> </span><span class="s">'trap</span><span class="nv"> </span><span class="s">exit</span><span class="nv"> </span><span class="s">TERM;</span><span class="nv"> </span><span class="s">while</span><span class="nv"> </span><span class="s">:;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">certbot</span><span class="nv"> </span><span class="s">renew;</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">12h</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">wait</span><span class="nv"> </span><span class="s">$${!};</span><span class="nv"> </span><span class="s">done;'"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">app-network</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_5-configurando-o-banco-e-aplicação">5. Configurando o Banco e Aplicação</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para finalizar, vamos configurar o banco de dados e a aplicação. Como esses passos podem variar conforme o framework ou tecnologia utilizada, apresentaremos uma configuração genérica abaixo, que você poderá adaptar conforme sua necessidade.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">services</span><span class="pi">:</span>
+  <span class="na">postgres</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">postgres:18-alpine</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">app-postgres</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">unless-stopped</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">POSTGRES_DB</span><span class="pi">:</span> <span class="s">app_db</span>
+      <span class="na">POSTGRES_USER</span><span class="pi">:</span> <span class="s">app_user</span>
+      <span class="na">POSTGRES_PASSWORD</span><span class="pi">:</span> <span class="s">${POSTGRES_PASSWORD:-AppPassword1234}</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">/mnt/data/postgres:/var/lib/postgresql/18/docker</span>    <span class="c1">## Salva os dados em um Volume persistente</span>
+      <span class="pi">-</span> <span class="s">./init.sql:/docker-entrypoint-initdb.d/init.sql</span>     <span class="c1">## Inicializa o banco</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">5432:5432"</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+    <span class="na">healthcheck</span><span class="pi">:</span>
+      <span class="na">test</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">CMD-SHELL"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">pg_isready</span><span class="nv"> </span><span class="s">-U</span><span class="nv"> </span><span class="s">app_user</span><span class="nv"> </span><span class="s">-d</span><span class="nv"> </span><span class="s">app_db"</span><span class="pi">]</span>
+      <span class="na">interval</span><span class="pi">:</span> <span class="s">10s</span>
+      <span class="na">timeout</span><span class="pi">:</span> <span class="s">5s</span>
+      <span class="na">retries</span><span class="pi">:</span> <span class="m">5</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="pi">&gt;</span>
+      <span class="s">postgres</span>
+      <span class="s">-c log_statement=all</span>
+      <span class="s">-c log_destination=stderr</span>
+  <span class="na">app</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">my-user/my-app:main</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">app</span>
+    <span class="na">restart</span><span class="pi">:</span> <span class="s">unless-stopped</span>
+    <span class="na">depends_on</span><span class="pi">:</span>
+      <span class="na">postgres</span><span class="pi">:</span>
+        <span class="na">condition</span><span class="pi">:</span> <span class="s">service_healthy</span>
+    <span class="na">environment</span><span class="pi">:</span>
+      <span class="na">QUARKUS_PROFILE</span><span class="pi">:</span> <span class="s">prod</span>
+      <span class="na">QUARKUS_DATASOURCE_USERNAME</span><span class="pi">:</span> <span class="s">app_user</span>
+      <span class="na">QUARKUS_DATASOURCE_PASSWORD</span><span class="pi">:</span> <span class="s">${POSTGRES_PASSWORD:-AppPassword1234}</span>
+      <span class="na">QUARKUS_DATASOURCE_JDBC_URL</span><span class="pi">:</span> <span class="s">jdbc:postgresql://postgres:5432/app_db</span>
+      <span class="na">QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION</span><span class="pi">:</span> <span class="s">update</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">8080:8080"</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+    <span class="na">healthcheck</span><span class="pi">:</span>
+      <span class="na">test</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">CMD"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">curl"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">-f"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">http://localhost:8080/q/health"</span><span class="pi">]</span>
+      <span class="na">interval</span><span class="pi">:</span> <span class="s">30s</span>
+      <span class="na">timeout</span><span class="pi">:</span> <span class="s">10s</span>
+      <span class="na">retries</span><span class="pi">:</span> <span class="m">3</span>
+  <span class="na">nginx</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">nginx:1.29-alpine</span>
+    <span class="c1">## Força o NGINX atualizar a cada 6hs</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/bin/sh</span><span class="nv"> </span><span class="s">-c</span><span class="nv"> </span><span class="s">'while</span><span class="nv"> </span><span class="s">:;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">6h</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">wait</span><span class="nv"> </span><span class="s">$${!};</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-s</span><span class="nv"> </span><span class="s">reload;</span><span class="nv"> </span><span class="s">done</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">nginx</span><span class="nv"> </span><span class="s">-g</span><span class="nv"> </span><span class="se">\"</span><span class="s">daemon</span><span class="nv"> </span><span class="s">off;</span><span class="se">\"</span><span class="s">'"</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">80:80"</span>
+      <span class="pi">-</span> <span class="s2">"</span><span class="s">443:443"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/nginx:/etc/nginx/conf.d</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>    <span class="c1">## Configurações geradas pelo CertBot</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>     <span class="c1">## Chaves geradas pelo CertBot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+  <span class="na">certbot</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">certbot/certbot</span>
+    <span class="c1">## Força o CertBot atualizar a cada 6hs</span>
+    <span class="na">entrypoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/bin/sh</span><span class="nv"> </span><span class="s">-c</span><span class="nv"> </span><span class="s">'trap</span><span class="nv"> </span><span class="s">exit</span><span class="nv"> </span><span class="s">TERM;</span><span class="nv"> </span><span class="s">while</span><span class="nv"> </span><span class="s">:;</span><span class="nv"> </span><span class="s">do</span><span class="nv"> </span><span class="s">certbot</span><span class="nv"> </span><span class="s">renew;</span><span class="nv"> </span><span class="s">sleep</span><span class="nv"> </span><span class="s">12h</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">wait</span><span class="nv"> </span><span class="s">$${!};</span><span class="nv"> </span><span class="s">done;'"</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/conf:/etc/letsencrypt</span>
+      <span class="pi">-</span> <span class="s">./data/certbot/www:/var/www/certbot</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">app-network</span>
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">app-network</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Por fim, precisamos informar ao NGINX onde nossa aplicação está disponível.
+Ela está rodando na porta 8080 e, dentro da rede Docker, pode ser acessada pelo nome do serviço: "app".</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="nginx"><span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kn">location</span> <span class="n">/.well-known/acme-challenge/</span> <span class="p">{</span>  <span class="c1">## Define o desafio</span>
+        <span class="kn">root</span> <span class="n">/var/www/certbot</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">443</span> <span class="s">ssl</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">example.org</span><span class="p">;</span>
+
+    <span class="kn">ssl_certificate</span> <span class="n">/etc/letsencrypt/live/example.org/fullchain.pem</span><span class="p">;</span>    <span class="c1">## Define a chave pública</span>
+    <span class="kn">ssl_certificate_key</span> <span class="n">/etc/letsencrypt/live/example.org/privkey.pem</span><span class="p">;</span>  <span class="c1">## Define a chave privada</span>
+
+    <span class="kn">include</span> <span class="n">/etc/letsencrypt/options-ssl-nginx.conf</span><span class="p">;</span>   <span class="c1">## Configurações geradas pelo CertBot</span>
+    <span class="kn">ssl_dhparam</span> <span class="n">/etc/letsencrypt/ssl-dhparams.pem</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">proxy_pass</span> <span class="s">http://app:8080</span><span class="p">;</span>    <span class="c1">## Aqui finalmente acessamos a aplicação</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Com essa configuração, sua aplicação — independentemente do framework utilizado — agora está acessível via HTTPS, com certificados válidos e renovação automática gerenciada pela Let&#8217;s Encrypt.</p>
+</div>
+<div class="paragraph">
+<p>O NGINX atua como um gateway seguro, descriptografando o tráfego externo e redirecionando-o para sua app interna, enquanto o Docker mantém os serviços isolados e fáceis de atualizar.</p>
+</div>
+<div class="paragraph">
+<p>Se tiver dúvidas ou sugestões, entra em contato comigo pelas redes sociais!</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="HTTPS" /><category term="HTTP" /><category term="Docker" /><category term="NGINX" /><category term="Let's Encrypt" /><category term="DevOps" /><summary type="html"><![CDATA[Nesse post vamos configurar HTTPS com certificados Let's Encrypt para qualquer aplicação web, usando NGINX como proxy reverso e Docker para um ambiente isolado e reproduzível.]]></summary></entry></feed>

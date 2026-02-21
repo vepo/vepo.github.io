@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/ANTLR4.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/ANTLR4.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Como criar uma linguagem usando ANTLR4 e Java</title><link href="https://blog.vepo.dev/posts/como-criar-uma-linguagem-usando-antlr4-e-java" rel="alternate" type="text/html" title="Como criar uma linguagem usando ANTLR4 e Java" /><published>2020-04-13T00:00:00+00:00</published><updated>2020-04-13T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/23-44-31-como-criar-uma-linguagem-usando-antlr4-e-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/como-criar-uma-linguagem-usando-antlr4-e-java"><![CDATA[<p>Ao desenvolver qualquer ferramenta, você topará com a ingrata tarefa de escrever um parser. Usei o termo ingrata porque a principio pode parecer fácil, mas depois você verá que é bem complicado.</p>
+
+<p>O problema na maioria das vezes não é o parser, mas a infinidade de possibilidades que surgem ao se propor uma solução tão aberta a ponto de precisar de uma linguagem.</p>
+
+<h1 id="antes-do-parser">Antes do Parser</h1>
+
+<p>Para se precisar de um parser é primeiro necessário um problema que se precisa de uma linguagem. Temos dois tipos de linguagem em computação: Linguagem Formal e Linguagem Natural.</p>
+
+<p>Parsers resolvem o problema de se compreender uma Linguagem Formal, mas precisamos entender o que é cada uma.</p>
+
+<h2 id="linguagem-natural">Linguagem Natural</h2>
+
+<p>Vamos primeiro iniciar pela que aprendemos primeiro. Linguagem Natural é a que estamos tentando ensinar para o meu filho de 1 ano e meio 👶. Devido a uma exposição a telas, ele acabou desenvolvendo outras linguagens antes da qual será a principal em sua vida. Ele já compreende o português, compreende algumas músicas, consegue cantarolar…. Mas não consegue falar ainda. Só o papai e mamãe, mas ainda não associa a fala dele as coisas. Ele associa o som nosso as coisas. Bizarro não?</p>
+
+<p>Mas essa é a forma de compreensão nossa. Temos sons, falas, fonemas, etc… Eles existem apesar da gramática. A gramática serve como base, serve para criar uma linguagem comum onde todos podemos ser compreendidos.</p>
+
+<p>Em uma linguagem natural, ela já existe antes de uma gramática. A gramática vem para normalizar ela.</p>
+
+<p>Temos inúmeras Linguagens Natural no mundo:</p>
+<ul>
+  <li>Música ➡️ Partituras</li>
+  <li>Fala ➡️ Português, Inglês, Espanhol, etc….</li>
+  <li>UX ➡️ Aplicativo Mobile, Aplicativo Web, etc…</li>
+</ul>
+
+<p>Há inúmeras formas de Linguagem Natural, se formos analisar filosoficamente, uma <em><strong>Linguagem Natural</strong> é qualquer formas de símbolos gerados e consumidor conscientemente por humanos</em>.</p>
+
+<p>Quer saber como processar uma Linguagem Natural. Procure por <a href="https://towardsdatascience.com/natural-language-processing-from-basics-to-using-rnn-and-lstm-ef6779e4ae66">RNN ou LSTM</a>.</p>
+
+<h2 id="linguagem-formal">Linguagem Formal</h2>
+
+<p>Apesar de usar a mesma palavra, uma <strong>Linguagem Formal</strong> ela é completamente diferente de uma <strong>Linguagem Natural</strong>. Uma Linguagem Formal tem um fim especifico, seja ele dar ordens a uma máquina ou a troca de informações entre sistemas.</p>
+
+<p>Agora não sei se você percebeu a principal diferença: <em><strong>Linguagens Formais são feitas para serem compreendidas por Máquinas</strong></em>.</p>
+
+<p>Você pode ter a fé que for em Tecnologia, mas a grande diferença é que nunca existirá um <strong>Guimarães Rosa</strong> da computação, pois Linguagens Formais não aceitam neologismos. Ou a linguagem segue estritamente ao binômio gramática e sintaxe, ou ela não é compreendida. Um compilador não entende aquilo que é fora do que já conhece.</p>
+
+<p>Tá, e quais são as Linguagens Formais conhecidas:</p>
+<ul>
+  <li>C</li>
+  <li>C++</li>
+  <li>Java</li>
+  <li>XML</li>
+  <li>brainfuck!!! <em>Um dia aprenderei brainfuck!!!</em></li>
+</ul>
+
+<p>Segue o Hello World em brainfuck:</p>
+<div class="language-brainfuck highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">+</span><span class="p">[</span><span class="nf">-</span><span class="p">[</span><span class="nb">&lt;&lt;</span><span class="p">[</span><span class="nf">+</span><span class="p">[</span><span class="nf">---</span><span class="nb">&gt;</span><span class="p">]</span><span class="nf">-</span><span class="p">[</span><span class="nb">&lt;&lt;&lt;</span><span class="p">]]]</span><span class="nb">&gt;&gt;&gt;</span><span class="nf">-</span><span class="p">]</span><span class="nb">&gt;</span><span class="nf">-.---.</span><span class="nb">&gt;</span><span class="nf">..</span><span class="nb">&gt;</span><span class="nf">.</span><span class="nb">&lt;&lt;&lt;&lt;</span><span class="nf">-.</span><span class="nb">&lt;</span><span class="nf">+.</span><span class="nb">&gt;&gt;&gt;&gt;&gt;</span><span class="nf">.</span><span class="nb">&gt;</span><span class="nf">.</span><span class="nb">&lt;&lt;</span><span class="nf">.</span><span class="nb">&lt;</span><span class="nf">-.</span><span class="c1">
+</span></code></pre></div></div>
+
+<h1 id="a-necessidade">A Necessidade</h1>
+
+<p>Tá, mais porque vou precisar de uma nova linguagem? Bom, antes disso é preciso de uma necessidade. Eu acabei desenvolvendo uma em casa nos últimos dias como um exercício. A necessidade era: em uma reunião, todos odeia o JMeter.</p>
+
+<p>A razão de todos odiarem o JMeter era óbvia, o JMeter usa o XML como Linguagem e XML é apenas uma Linguagem para armazenar informações, ela não é desenvolvida para se processar testes.</p>
+
+<p>Então fiz esse exercício: Como seria uma Linguagem de Testes?</p>
+
+<p><strong>Observação</strong>: Esse é um exercício e existem outras linguagens para Testes. Mas poucas substituem o que o JMeter faz…</p>
+
+<h1 id="criando-o-parser">Criando o Parser</h1>
+
+<p>A partir desse ponto, irei me referir a essa linguagem que estou desenvolvendo como <strong>PlainTest</strong>.</p>
+
+<h2 id="imaginar">Imaginar</h2>
+
+<p>O primeiro passo para se projetar uma Linguagem Formal é imaginar uma gramática básica.</p>
+
+<p>Para a <strong>PlainTest</strong>, eu imaginei duas unidades básicas:</p>
+
+<ul>
+  <li>A <strong>Suite</strong>: É um agrupamento ordenado de passos ou suites. Serve como agrupamento lógico. Seria o <em>CriarUsuário</em>.</li>
+  <li>O <strong>Step</strong>: É a únidade básica do Teste, ou seja a realização dele. Executar um comando, enviar uma Request HTTP, etc…</li>
+</ul>
+
+<p>Segue o meu primeiro exemplo de <strong>PlainTest</strong>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Suite UserTest {
+    HTTP CreateUser {
+        url   : "http://127.0.0.1"
+        method: "POST"
+        body  : """
+                   {
+                       "id": 123,
+                       "firstName": "John",
+                       "lastName" : "Doe"
+                   }
+                """
+        assert responseCode Equals 200
+    }
+}
+</code></pre></div></div>
+
+<h2 id="extrair">Extrair</h2>
+
+<p>Imaginada a gramática, é preciso extrair dela algumas informações: seu léxico e sua gramática. Para isso precisaremos de uma Linguagem Formal, e por isso escolheremos o <a href="https://www.antlr.org/">ANTLR4</a>. O ANTLR4 tem uma gramática própria onde o desenvolvedor pode declarar a gramática e o léxico da sua linguagem.</p>
+
+<h2 id="léxico">Léxico</h2>
+
+<p>Vamos definir grosseiramente o Léxico, ou Tokenização, como a identificação de cada elemento da Linguagem.</p>
+
+<p>Assim podemos definir na nossa linguagem:</p>
+<ul>
+  <li>Reserved Words: <code class="language-plaintext highlighter-rouge">Suite</code>, <code class="language-plaintext highlighter-rouge">assert</code></li>
+  <li>Identifier: Serve para identificar elementos</li>
+  <li>Número: sim, um número….</li>
+  <li>String: sim, uma string…</li>
+  <li>MultilineString: String definida por <code class="language-plaintext highlighter-rouge">"""</code> e que não necessita <em>escapes</em>.</li>
+</ul>
+
+<p>Para definir um <a href="https://github.com/antlr/antlr4/blob/master/doc/lexicon.md#identifiers">Token</a> em ANTLR4, é preciso definir um identificar com letra maiúscula:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>grammar TestSuite;
+
+STRING : DQUOTE (ESC | ~["\\])* DQUOTE;
+
+VERB: 'Contains' | 'Equals';
+
+IDENTIFIER: [A-Za-z] [._\-A-Za-z0-9]*;
+
+NUMBER: '-'? INT '.' [0-9]+ EXP? | '-'? INT EXP | '-'? INT;
+
+fragment DQUOTE: '"';
+
+fragment ESC: '\\' (["\\/bfnrt] | UNICODE);
+
+fragment UNICODE: 'u' HEX HEX HEX HEX;
+
+fragment HEX: [0-9a-fA-F];
+
+fragment INT: '0' | [1-9] [0-9]*; // no leading zeros
+
+fragment EXP: [Ee] [+\-]? INT; // \- since - means "range" inside [...]
+
+// Just ignore WhiteSpaces
+WS: [ \t\r\n]+ -&gt; skip;
+</code></pre></div></div>
+<p>Na gramática acima definimos apenas alguns tokens. Observe que existem Tokens e fragmentos. No ANTLR4, o <em>fragment</em> deve ser usado porque um identificador não aceita ser composto por identificadores, ele deve ser composto por algo similar a um Regex e fragmentos.</p>
+
+<h2 id="sintático">Sintático</h2>
+
+<p>Quando me refiro a Sintático em ANTLR4, estou falando da gramática em si, as regras. No nosso caso iremos criar os seguintes valores:</p>
+
+<ul>
+  <li>Suite: Composto por Suites e Steps</li>
+  <li>Step: Unidade básica do test</li>
+  <li>Attribute: Um par de Chave/Valor</li>
+  <li>Assertion: Um par de Chave/Valor</li>
+  <li>Value: Um valor que pode ser de Attribute ou Assertion.</li>
+</ul>
+
+<p>Cada regra dessa será uma <a href="https://github.com/antlr/antlr4/blob/master/doc/parser-rules.md#parser-rules">Parser Rule</a> na gramática do ANTLR4. Na definição da gramática elas são diferenciadas pela primeira letra. O Léxico é maiúscula, enquanto o Sintático é minúsculo. Posteriormente veremos a diferença na prática.</p>
+
+<p>Segue o exemplo de como ficaria nossa Suite definida:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>grammar TestSuite;
+
+suite:
+	'Suite' IDENTIFIER '{'
+		(suite | step)* 
+	'}'
+;
+
+step:
+	IDENTIFIER IDENTIFIER '{'
+		(assertion | attribute)* 
+	'}'
+;
+
+assertion: 'assert' IDENTIFIER VERB value;
+
+attribute: IDENTIFIER ':' value;
+
+value: NUMBER | STRING;
+
+STRING : DQUOTE (ESC | ~["\\])* DQUOTE;
+
+VERB: 'Contains' | 'Equals';
+
+IDENTIFIER: [A-Za-z] [._\-A-Za-z0-9]*;
+
+NUMBER: '-'? INT '.' [0-9]+ EXP? | '-'? INT EXP | '-'? INT;
+
+fragment DQUOTE: '"';
+
+fragment ESC: '\\' (["\\/bfnrt] | UNICODE);
+
+fragment UNICODE: 'u' HEX HEX HEX HEX;
+
+fragment HEX: [0-9a-fA-F];
+
+fragment INT: '0' | [1-9] [0-9]*; // no leading zeros
+
+fragment EXP: [Ee] [+\-]? INT; // \- since - means "range" inside [...]
+
+// Just ignore WhiteSpaces
+WS: [ \t\r\n]+ -&gt; skip;
+</code></pre></div></div>
+<h2 id="gerando-o-código">Gerando o Código</h2>
+
+<p>Essa Gramática não ir se <em>plugar</em> automaticamente no código, antes disso é necessário gerar alguns códigos antes.</p>
+
+<p>Nesse ponto recomendo fortemente usar o Maven para gerenciar o ANTLR4, assim você já terá tudo configurado facilmente.</p>
+
+<p>Mas caso queira gerar manualmente…</p>
+
+<h3 id="gerando-código-manualmente">Gerando Código Manualmente</h3>
+
+<ol>
+  <li>Faça o download do ANTLR4 Tool em <a href="https://www.antlr.org/download.html">
+Download ANTLR</a>, procura por <strong>ANTLR tool itself</strong></li>
+  <li>Depois execute o ANTLR4 Tool:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-jar</span> ~/Downloads/antlr-4.8-complete.jar <span class="nt">-package</span> io.vepo.tutorial.antlr4.generated src/main/antlr4/io/vepo/tutorial/antlr4/generated/TestSuite.g4
+</code></pre></div>    </div>
+  </li>
+  <li>Use os arquivos gerados no seu projeto, conforme abaixo:
+<img src="https://dev-to-uploads.s3.amazonaws.com/i/wbw4yg3ntuv7bhha3ms8.png" alt="Arquivos ANTLR4" /></li>
+</ol>
+
+<h3 id="gerando-usando-o-maven">Gerando usando o Maven</h3>
+
+<p>Usando o Maven é bem mais simples. Crie seu arquivo <code class="language-plaintext highlighter-rouge">.g4</code> no diretório similar ao pacote. Por exemplo, em nosso exemplo está:</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/iuughcd323jeemn01d2f.png" alt="ANTLR4 Gramática" /></p>
+
+<p>E depois configure o plugin do ANTLR4 em seu <code class="language-plaintext highlighter-rouge">pom.xml</code></p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+	<span class="nt">&lt;groupId&gt;</span>org.antlr<span class="nt">&lt;/groupId&gt;</span>
+	<span class="nt">&lt;artifactId&gt;</span>antlr4-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+	<span class="nt">&lt;version&gt;</span>${version.antlr4}<span class="nt">&lt;/version&gt;</span>
+	<span class="nt">&lt;configuration&gt;</span>
+		<span class="nt">&lt;arguments&gt;</span>
+			<span class="nt">&lt;argument&gt;</span>-package<span class="nt">&lt;/argument&gt;</span>
+			<span class="nt">&lt;argument&gt;</span>io.vepo.tutorial.antlr4.generated<span class="nt">&lt;/argument&gt;</span>
+		<span class="nt">&lt;/arguments&gt;</span>
+	<span class="nt">&lt;/configuration&gt;</span>
+	<span class="nt">&lt;executions&gt;</span>
+		<span class="nt">&lt;execution&gt;</span>
+			<span class="nt">&lt;goals&gt;</span>
+				<span class="nt">&lt;goal&gt;</span>antlr4<span class="nt">&lt;/goal&gt;</span>
+			<span class="nt">&lt;/goals&gt;</span>
+		<span class="nt">&lt;/execution&gt;</span>
+	<span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<h2 id="usando-o-código-gerado">Usando o Código Gerado</h2>
+
+<p>Do código gerado, será preciso apenas reimplementar uma classe. Veja a interface <code class="language-plaintext highlighter-rouge">TestSuiteListener</code>, para cada Regra é chamado um Método antes e depois de processado. Em cada método há um objeto de contexto onde podemos acessar todos os Tokens.</p>
+
+<p>Esses métodos são chamados em ordem, assim para o exemplo abaixo, qualquer metodo do atributo <code class="language-plaintext highlighter-rouge">url</code> será chamado antes de <code class="language-plaintext highlighter-rouge">method</code> e assim por diante. Todos como tem apenas uma suite, o <code class="language-plaintext highlighter-rouge">enterSuite</code> e  o <code class="language-plaintext highlighter-rouge">exitSuite</code> serão o primeiro e último a serem chamados.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Suite UserTest {
+    HTTP CreateUser {
+        url   : "http://127.0.0.1"
+        method: "POST"
+        body  : """
+                   {
+                       "id": 123,
+                       "firstName": "John",
+                       "lastName" : "Doe"
+                   }
+                """
+        assert responseCode Equals 200
+    }
+}
+</code></pre></div></div>
+
+<p>Por fim, para transformar texto em Objetos, basta chamar o parser?</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">TestSuiteParser</span> <span class="n">parser</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">TestSuiteParser</span><span class="o">(</span>
+		<span class="k">new</span> <span class="nf">CommonTokenStream</span><span class="o">(</span><span class="k">new</span> <span class="nc">TestSuiteLexer</span><span class="o">(</span><span class="nc">CharStreams</span><span class="o">.</span><span class="na">fromString</span><span class="o">(</span><span class="n">contents</span><span class="o">))));</span>
+<span class="nc">ParseTreeWalker</span> <span class="n">walker</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ParseTreeWalker</span><span class="o">();</span>
+<span class="nc">SuiteCreator</span> <span class="n">creator</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SuiteCreator</span><span class="o">();</span>
+<span class="n">walker</span><span class="o">.</span><span class="na">walk</span><span class="o">(</span><span class="n">creator</span><span class="o">,</span> <span class="n">parser</span><span class="o">.</span><span class="na">suite</span><span class="o">());</span>
+<span class="nc">Suite</span> <span class="n">suite</span> <span class="o">=</span> <span class="n">creator</span><span class="o">.</span><span class="na">getTestSuite</span><span class="o">();</span>
+</code></pre></div></div>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Existem problemas que só podem ser resolvidos criando uma linguagem. Se usarmos padrões como JSON ou XML vamos complicar mais que simplificar.</p>
+
+<p>Para essas soluções, é mais fácil usar o ANTLR. Assim criamos uma linguagem facilmente.</p>
+
+<h1 id="recursos">Recursos</h1>
+
+<p>Todo o código usado nesse post está disponível no repositório <a href="https://github.com/vepo/antlr4-post">github.com/vepo/antlr4-post</a></p>
+
+<p>Continuarei o desenvolvimento dessa tool em <a href="https://github.com/vepo/plain-test">Plain Test github.com/vepo/plain-test</a>. Qualquer ajuda é bem vinda….</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Parser" /><category term="ANTLR4" /><category term="Tutorial" /><summary type="html"><![CDATA[Nesse post ensinarei como criar uma linguagem, não de programação, usando ANTLR4 em Java.]]></summary></entry></feed>

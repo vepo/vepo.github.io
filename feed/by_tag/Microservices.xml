@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Microservices.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Microservices.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Log Cleanup no Kafka</title><link href="https://blog.vepo.dev/posts/log-cleanup-no-kafka" rel="alternate" type="text/html" title="Log Cleanup no Kafka" /><published>2020-11-27T00:00:00+00:00</published><updated>2020-11-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/16-10-00-log-cleanup-no-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/log-cleanup-no-kafka"><![CDATA[<p>Ao ler o livro <a href="https://www.confluent.io/designing-event-driven-systems/">Designing Event-Driven Systems</a>, tive a impressão que o Kafka atua exatamente como uma base de dados. Essa é uma informação falsa. Ele pode atuar como uma base de dados, desde que seja configurado para.</p>
+
+<p>Nesse post vou mostrar algumas configurações de tópicos que deve ser feitas para que o dado seja persistente e não efêmero.</p>
+
+<h1 id="partições-e-segmentos">Partições e Segmentos</h1>
+
+<p>Espero que você já conheça alguns elementos importantes de um tópico, como Partições e Fator de Replicação. Caso não conheça, leia <a href="https://blog.vepo.dev/posts/anatomia-de-um-topico">Anatomia de um Tópico</a> para podermos conhecer basicamente como funciona um tópico.</p>
+
+<p>No post anterior, só entrei até o detalhe do número de partição, pois essa é a parte importante quando falamos de <strong>ordenação de mensagens</strong>.</p>
+
+<p>Já quando falamos de Cleanup, precisamos introduzir Segmentos. Cada partição, é subdividida em Segmentos. Segmentos contém os dados ordenados sequencialmente (um arquivo de log), assim como a partição. Ao escrever, o Broker escreve apenas ao final do último segmento da partição. Mas os dados são lidos sequencialmente pelos consumers.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/6r0v1w4vphys98eh76xp.png" alt="Segmentos" /></p>
+
+<p>Se formos fazer um levantamento nas configurações de um tópico, podemos ver que muitas das propriedades são referentes não somente ao tópico, mas ao segmento.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Propriedade</th>
+      <th>Descrição</th>
+      <th>Valor Padrão</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.bytes"><code class="language-plaintext highlighter-rouge">segment.bytes</code></a></td>
+      <td>Tamanho do arquivo de segmento.</td>
+      <td>1073741824 (1 GB)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.index.bytes"><code class="language-plaintext highlighter-rouge">segment.index.bytes</code></a></td>
+      <td>Tamanho do arquivo de index do segmento.</td>
+      <td>10485760 (10 MB)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.jitter.ms"><code class="language-plaintext highlighter-rouge">segment.jitter.ms</code></a></td>
+      <td>O jitter aleatório máximo subtraído do tempo de rolagem do segmento programado para evitar sobrecargas.</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.ms"><code class="language-plaintext highlighter-rouge">segment.ms</code></a></td>
+      <td>Idade máxima do segmento. O Kafka fará a rolagem para garantir sua limpeza</td>
+      <td>604800000 (7 dias)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Todos esses valores também podem ser configurados por cluster. A configuração de cluster é usando como padrão, caso o valor não seja configurado no Tópico.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuração do Tópico</th>
+      <th>Configuração do Broker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.segment.bytes</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.index.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.index.size.max.bytes</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.jitter.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.roll.jitter.ms</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.roll.ms</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Dado os valores de <code class="language-plaintext highlighter-rouge">segmento.ms</code> e <code class="language-plaintext highlighter-rouge">segment.bytes</code>, o Kafka decidirá quando um segmento será finalizado para que outro seja inicializado.</p>
+
+<p>O arquivo de index, como o nome já diz, é um índice que mapeia em qual posição do arquivo de offset uma mensagem está armazenada, garantindo assim ao Kafka que qualquer mensagem seja lida em tempo constante.</p>
+
+<p>Há também um outro arquivo de index, o <code class="language-plaintext highlighter-rouge">timeindex</code>. Este tem como função criar um index baseado no timestamp da mensagem.</p>
+
+<h1 id="políticas-de-limpeza">Políticas de Limpeza</h1>
+
+<p>Mas o que o Kafka faz com mensagens antigas? Isso é configurável por Tópico ou no Cluster.</p>
+
+<p>Essa configuração é muito importante se você usa seu Cluster como Fonte de Verdade ou caso você precise fazer um reset de todo pipeline.</p>
+
+<p>Para configurar é preciso alterar o valor de <code class="language-plaintext highlighter-rouge">cleanup.policy</code> (ou <code class="language-plaintext highlighter-rouge">log.cleanup.policy</code> para o Cluster). Essa propriedade aceita os valores <code class="language-plaintext highlighter-rouge">compact</code> e <code class="language-plaintext highlighter-rouge">delete</code>. Por padrão, essas propriedades vêm como <code class="language-plaintext highlighter-rouge">delete</code>.</p>
+
+<h2 id="delete">Delete</h2>
+
+<p>Quando a política de limpeza selecionada é delete, o Kafka vai remover o segmento baseado na sua idade ou no tamanho da partição.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Propriedade</th>
+      <th>Descrição</th>
+      <th>Valor Padrão</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#retention.ms"><code class="language-plaintext highlighter-rouge">retention.ms</code></a></td>
+      <td>Idade máxima de um segmento</td>
+      <td>604800000 (7 dias)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#retention.bytes"><code class="language-plaintext highlighter-rouge">retention.bytes</code></a></td>
+      <td>Tamanho máximo da partição</td>
+      <td>-1 (desabilitado)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vale lembrar que essas duas propriedades podem também ser configuradas por Cluster.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuração do Tópico</th>
+      <th>Configuração do Broker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.retention.ms</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.retention.bytes</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="compactação">Compactação</h2>
+
+<p>A compactação do Log vai fazer uma limpeza, mas garantindo que você terá ao menos a última mensagem enviada por chave. Assim teremos apenas a última informação de cada chave.</p>
+
+<p>A compactação não irá alterar os offsets das mensagens, uma mensagem é imutável. Irá apenas remover mensagem com <code class="language-plaintext highlighter-rouge">offset</code> inferior a última mensagem de cada chave.</p>
+
+<p>Mensagens anda podem ser recebidas, mesmo depois de removidas, isso é feito baseado na propriedade <a href="https://kafka.apache.org/documentation/#delete.retention.ms"><code class="language-plaintext highlighter-rouge">delete.retention.ms</code></a>. Após esse tempo se esgotar a mensagem não será recebida.</p>
+
+<p>Uma mensagem apagada, significa que novos consumidores não a receberão. Consumidores que já estejam recebendo mensagens não perceberão que o histórico foi alterado, a não ser que este tenha seu offset reiniciado.</p>
+
+<p>A compactação ocorre quando o segmento é finalizado.</p>
+
+<h1 id="implicações">Implicações</h1>
+
+<p>Ao desenvolvedor e arquiteto, uma pergunta deve ser feita. Quais as implicações da escolha da política de limpeza?</p>
+
+<p>Um Cluster terá suas configurações padrão, mas cada Tópico pode ter sua própria configuração.</p>
+
+<h2 id="delete-1">Delete</h2>
+
+<p>Ao se escolher por remover mensagens de um Tópico, deve-se ter ciência que novos consumers não receberão mensagens antigas. Vamos imaginar que, com os valores padrões, a idade máxima de uma mensagem será 14 dias. Assim, se um tópico é considerado fonte de verdade, deve ter os valores de <code class="language-plaintext highlighter-rouge">retention.ms</code> e <code class="language-plaintext highlighter-rouge">retention.bytes</code> configurados corretamente.</p>
+
+<p>Para se calcular o volume de dados armazenado por Tópico, é preciso levar em consideração o tamanho médio de uma mensagem, o número de mensagens por dia e o tempo de retenção de uma mensagem. Essa é uma informação que o Arquiteto de Software tem que ter, e mesmo que não tenha, deve estimar baseado nas estatisticas da aplicação.</p>
+
+<h2 id="compactação-1">Compactação</h2>
+
+<p>Ao se escolher compactar segmentos de um Tópico, deve-se ter ciência que uma mensagem não deve conter apenas uma atualização de estado, mas a informação completa. Caso haja apenas atualização de estado, haverá perca de dados.</p>
+
+<p>Para se calcular o volume de dados armazenado por Tópico, é necessário ter ciência do número de chaves únicas e o tamanho médio da mensagem, e adicionar o tamanho máximo de um segmento.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Kafka pode ser usado como Fonte de Verdade, mas antes deve-se conhecer a fundo como configurar. As configurações padrão garantem que uma mensagem ficará armazenada por entre 7 e 14 dias, mas isso pode ser alterado de acordo com os requisitos do sistema.</p>
+
+<hr />
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/1os85b4rmdpauz3yjbsu.jpg" alt="Hard Disk" /></p>
+
+<p>Foto de <strong>Azamat E</strong> no <a href="https://www.pexels.com/pt-br/foto/analogico-analogo-aparelhos-armazenamento-117729/"><strong>Pexels</strong></a>.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Kafka" /><category term="Apache Kafka" /><category term="Microservices" /><summary type="html"><![CDATA[Como o Kafka limpa as informações antigas? Quais parâmetros configurar?]]></summary></entry><entry><title type="html">Entendendo o Kafka — Uma Introdução à Plataforma de Eventos</title><link href="https://blog.vepo.dev/posts/entendendo-o-kafka" rel="alternate" type="text/html" title="Entendendo o Kafka — Uma Introdução à Plataforma de Eventos" /><published>2018-04-30T00:00:00+00:00</published><updated>2023-09-25T20:00:00+00:00</updated><id>https://blog.vepo.dev/posts/00-00-00-entendendo-o-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/entendendo-o-kafka"><![CDATA[<h1 id="o-que-é">O que é?</h1>
+
+<p>O Apache Kafka é muito mais que um Message Broker open source. Com uma grande comunidade e muita estabilidade possui muito mais funcionalidades do que a simples troca de mensagens entre produtores e consumidores.</p>
+
+<p>Ele é bem mais complexo que seus similares <strong>RabbitMQ</strong>, <strong>ActiveMQ</strong>, ou o <strong>SQS</strong> da Amazon. Caso você deseja somente uma troca de mensagens entre serviços, não perca tempo usando o Kafka, há outros mais simples.</p>
+
+<p>Por sua grande complexidade, algumas pessoas vêem o Kafka do ponto de vista limitado ao uso que fizeram. Algumas vêem como uma API assyncrona, outros como uma base de dados para eventos e outras como um substituto para um Service Bus (ESB). Todos esses uso são usos limitados da plataforma.</p>
+
+<p>O que você precisa saber é que, se você precisa manter mensagens por longos períodos, reprocessar mensagens antigas, baixo acoplamento entre serviços e tolerância a falhas, então é o Kafka que você procura!</p>
+
+<p>Segundo o livro <a href="https://www.confluent.io/designing-event-driven-systems">Designing Event-Driven System</a>, o Kafka é uma plataforma de Streaming. Há APIs de processamento de Stream e APIs para envio e recebimento de dados.</p>
+
+<p><img src="/assets/images/stream-data-platform.webp" alt="Stream Data Platform" /></p>
+
+<p>Você pode usar o Kafka como uma <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">Fonte da Verdade</a>. Recebendo eventos e dados, processando os dados e construir pipelines de dados e complexas arquiteturas baseadas em eventos e dados.</p>
+
+<h1 id="para-que-usar">Para que usar?</h1>
+
+<p>Caso você não tenha contato com padrões de arquitetura de Microserviços, sugiro ler alguns artigos em <a href="http://microservices.io/">microservices.io</a>. Nos últimos anos, as aplicações web pararam de ser apenas um servidor monólito tratando todas as requisições sincronamente.</p>
+
+<p>Hoje, uma única aplicação pode se constituida de vários serviços, todos atuando independentemente. O dado agora flui entre os serviços e nenhum deles tem o total controle de um único dado. São novos padrões arquiteturais para satisfazer requisitos como escalabilidade.</p>
+
+<h1 id="arquitetura">Arquitetura</h1>
+
+<p>O Kafka é um broker que roda em cluster, para sistemas tolerante a falhas, é aconselhável que seja configurar mais de uma instância. Como é um cluster, ele roda usando o ZooKeeper para sincronia.</p>
+
+<p>Ele recebe, armazena e distribui records. Um record é um dado gerado por algum nó do sistema que pode ser um evento ou uma informação. Ele é enviado para o cluster e o mesmo o armazena em uma partition do tópico.</p>
+
+<p>Cada record possui um offset sequência, e o consumer pode controlar o offset que está consumindo. Assim, caso há a necessidade de se reprocessar o tópico, pode ser feito baseado no offset.</p>
+
+<h1 id="criando-um-cluster-kafka">Criando um cluster Kafka</h1>
+
+<p>Vamos criar um cluster Kafka usando docker? Bom, não é necessário “reescrever” a roda, já temos algumas imagens prontas, vamos usar a do Spotify! E criar uma imagem do Kafka é um pouco mais complexo do que apenas docker, ele depende do ZooKeeper, mas é um bom exercício de configuração.</p>
+
+<p>Antes de começar é necessário ter instalado:</p>
+
+<ul>
+  <li>Docker</li>
+  <li>Virtualbox</li>
+</ul>
+
+<p>Para isso crie uma <code class="language-plaintext highlighter-rouge">docker-machine</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-machine create <span class="nt">--driver</span> virtualbox kafka-broker
+</code></pre></div></div>
+
+<p>Agora que temos uma docker-machine precisamos colocar ela como a ativa:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">eval</span> <span class="si">$(</span>docker-machine <span class="nb">env </span>kafka-broker<span class="si">)</span>
+</code></pre></div></div>
+
+<p>Pronto! Agora podemos executar os passos para criar um container usando a imagem do Spotify:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-p</span> 2181:2181 <span class="nt">-p</span> 9092:9092 <span class="nt">--env</span> <span class="nv">ADVERTISED_HOST</span><span class="o">=</span><span class="sb">`</span>docker-machine ip <span class="se">\`</span>docker-machine active<span class="se">\`</span><span class="sb">`</span> <span class="nt">--env</span> <span class="nv">ADVERTISED_PORT</span><span class="o">=</span>9092 spotify/kafka
+</code></pre></div></div>
+
+<p>Sucesso! Agora temos um cluster Kafka rodando dentro de uma docker machine. Para saber qual o IP dela, basta executar:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-machine ip kafka-broker
+</code></pre></div></div>
+
+<p>O comando acima retornará um IP, que deve ser usado como nosso broker. Para se usar os exemplos abaixo, substitua <em>localhost</em> pelo IP.</p>
+
+<h1 id="produzindo-mensagens">Produzindo Mensagens</h1>
+
+<p>A produção de mensagens no Kafka é mais simples que o consumo. Uma mensagem é produzida e enviada para um Tópico. Não é preciso especificar um schema para mensagem, a única preocupação entre produtor e consumidor é como ela será Serializada.</p>
+
+<p>Sistemas mais antigos usavam XML, mas o tanto de dados gerados é muito grande para pouca informação. Hoje é muito usado o formato JSON, que é de fácil leitura humana e gera mensagens menores do que se usarmos XML. Uma boa dica é usar <a href="https://github.com/google/protobuf">Protobuf</a>, este gera mensagens mais compactas e pode haver suporte a alterações de <em>schemas</em>.</p>
+
+<p>Para o produtor, você pode serializar suas mensagens em ByteArray e enviar, no exemplo abaixo usaremos o meio mais simples, apenas o envio de String.</p>
+
+<div data-gist="https://gist.github.com/vepo/ddd1afc55d38165b61eab83371723541"></div>
+
+<h1 id="consumindo-mensagens">Consumindo Mensagens</h1>
+
+<p>Como já disse anteriormente, para consumir uma mensagem sua única preocupação tem que ser a Serialização de dados. Esse é o maior contrato entre produtor e consumidor no Kafka.</p>
+
+<p>O Kafka garante que todas as mensagens somente serão consumidas uma vez por cliente. Isso significa, se eu enviar uma mensagem para um tópico X, e tiver 1000 consumidores com o Client ID Y, somente um vai processar essa mensagem. Isso garante um bom desacoplamento e fácil escalabilidade. Você pode delegar toda a sincronicidade do processamento para o Kafka.</p>
+
+<p>Para que uma mensagem seja consumida por dois consumidores diferentes, só usar dois client ID diferentes.</p>
+
+<div data-gist="https://gist.github.com/vepo/b63ff8384941329485266999f99e2264"></div>
+
+<h1 id="outras-funcionalidades">Outras funcionalidades</h1>
+
+<p>O Kafka permite usar os tópicos como tabelas, permitindo fazer <em>queries</em> para aquisição de dados, isso pode ser usado para uma arquitetura baseada em Eventos.</p>
+
+<p>Essa funcionalidade porém não é tão simples como é descrito na documentação. A serialização é um grande impeditivo e em muitos momentos o stream “<em>se perde</em>”. Acredito que essa feature só é recomendada quando:</p>
+
+<ul>
+  <li>Os dados são apenas incrementais</li>
+  <li>Os dados não são relacionais</li>
+  <li>Os dados são sequênciais</li>
+</ul>
+
+<h1 id="ordenação-das-mensagens">Ordenação das mensagens</h1>
+
+<p>O Kafka permite que as mensagens sejam processadas em ordem, isso é habilitado com a configuração do número de partições de um mesmo tópico</p>
+
+<p>Para maiores detalhes veja o post <a href="https://blog.vepo.dev/posts/ordenacao-no-kafka">Ordenação no Kafka</a>.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Kafka é o middleware mais robusto no mercado para atuar se criar uma arquitetura baseada em Eventos.</p>
+
+<p>Fácil de se usar, dá para se construir uma arquitetura baseada em eventos na qual cada novas funcionalidades podem ser plugadas, desplugadas e atualizadas sem a necessidade de deploys em todos os serviços.</p>
+
+<p>Seu backend pode se preocupar com o mínimo para um rápido processamento, criando pipelines assíncronas complexas. Assim, um webcomerce pode finalizar a compra e apenas enviando uma mensagem disparar outras ações como Nota Fiscal, Estoque, E-mail, etc…</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Message Broker" /><category term="Microsserviços" /><category term="Pub/Sub" /><category term="Arquitetura Orientada a Eventos" /><category term="Data Stream Processing" /><category term="Java" /><category term="Microservices" /><summary type="html"><![CDATA[Descubra como o Apache Kafka vai além de um simples message broker e se torna a base ideal para arquiteturas orientadas a eventos e microsserviços. Neste guia introdutório, você vai aprender: - O que é o Kafka e quando usá-lo (ou não) em comparação com RabbitMQ, ActiveMQ e Amazon SQS; - Como ele atua como uma plataforma de streaming completa, permitindo reprocessamento, baixo acoplamento e alta tolerância a falhas; - Passo a passo para criar um cluster Kafka com Docker; - Exemplos práticos de produção e consumo de mensagens; - Como garantir a ordenação das mensagens e usar tópicos como fontes da verdade. Ideal para desenvolvedores e arquitetos que buscam escalabilidade, resiliência e flexibilidade em sistemas distribuídos. 🚀]]></summary></entry></feed>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Middleware.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Middleware.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">O que é o Apache Kafka</title><link href="https://blog.vepo.dev/posts/o-que-e-o-apache-kafka" rel="alternate" type="text/html" title="O que é o Apache Kafka" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-46-34-o-que-e-o-apache-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-que-e-o-apache-kafka"><![CDATA[<p>Esse artigo é uma <a href="https://medium.com/@vepo/entendendo-o-kafka-bf64169e421f">reescrita de um que escrevi 2 anos atrás</a>. Naquela época estava tentando entender como funcionava esse middleware tão importante em sistemas distribuídos. Depois trabalhei na reestruturação de um sistema bem complexo usando Kafka como base de verdade.</p>
+
+<h1 id="o-que-é">O que é?</h1>
+
+<p>Antes de Entender o que é Kafka, precisamos entender um pouco de Sistemas Distribuídos.</p>
+
+<h2 id="pubsub">Pub/Sub</h2>
+
+<p>Dentre os padrões de arquiteturas de Sistemas Distribuídos há o <a href="https://cloud.google.com/pubsub/docs/overview?hl=pt-br">Pub/Sub</a>. Quando desenhamos um sistema, ao enviar uma mensagem, há duas questões básicas:</p>
+
+<ol>
+  <li>Para quem enviaremos?</li>
+  <li>Como enviaremos?</li>
+</ol>
+
+<p>Quando usamos APIs REST (ou gRPC) estamos limitados a conhecer o destinatário e enviar para todos os destinatários que estão esperando essa mensagem. Usando um middleware Pub/Sub não precisamos nos preocupar com isso.</p>
+
+<p>Em uma arquitetura Pub/Sub, temos duas perguntas básicas para fazer ao se enviar uma mensagem:</p>
+
+<ol>
+  <li>Para quais Tópicos enviaremos essa mensagem?</li>
+  <li>Qual o formato que será a mensagem?</li>
+</ol>
+
+<p>Pub/Sub é baseado no conceito de Tópico. Tópico é como se fosse um canal, quem subscreve a um Tópico irá receber todas as mensagens enviadas nele. Quem envia a mensagem não sabe quem irá receber, e vice versa! 🧐</p>
+
+<h2 id="o-kafka">O Kafka</h2>
+
+<p>Kafka estende o conceito de Pub/Sub ao seu limite. O que de certa forma por o tornar bem mais complexo que seus similares como <a href="https://www.rabbitmq.com/">RabbitMQ</a>, <a href="https://activemq.apache.org/">ActiveMQ</a>, ou o <a href="https://aws.amazon.com/pt/sqs/">SQS</a>/<a href="https://aws.amazon.com/pt/sns/">SNS</a> da Amazon.</p>
+
+<p>Com o Kafka você pode:</p>
+
+<ol>
+  <li>Configurar o tempo de armazenamento de cada Tópico.
+    <ul>
+      <li>Por padrão o <a href="http://kafka.apache.org/documentation/#topicconfigs">retention.ms</a> de um Tópico é configurado para 604800000 ms (7 dias!)</li>
+    </ul>
+  </li>
+  <li>Criar vários <em>Consumers</em> concorrentes e garantir a forma de funcionamento deles!
+    <ul>
+      <li>Uma Mensagem ser recebida por todos os <em>Consumers</em></li>
+      <li>Uma Mensagem ser recebida por apenas um <em>Consumer</em></li>
+      <li>Uma Mensagem ser recebida por <em>Consumers</em> Diferentes!</li>
+      <li>Etc… Com o Kafka qualquer tipo de configuração é possível</li>
+    </ul>
+  </li>
+  <li>Escalonamento fácil.
+    <ul>
+      <li>Fácil de adicionar um novo nó Kafka</li>
+      <li>Fácil de adicionar um novo <em>Consumer</em>/<em>Producer</em></li>
+    </ul>
+  </li>
+  <li>Reprocessamento de mensagens
+    <ul>
+      <li>É possível reprocessar todas as mensagens de um Tópico/<em>Consumer</em> específico</li>
+    </ul>
+  </li>
+  <li>Sem <a href="https://pt.wikipedia.org/wiki/Ponto_%C3%BAnico_de_falha">Ponto Único de Falha (SPOF)</a></li>
+  <li>Criar Streaming de Eventos</li>
+  <li>Tratar Streaming de Eventos como Base de Dados</li>
+</ol>
+
+<p>Essas duas últimas features são bastantes complexas e não devem ser utilizadas sem muito experimentação prévia.</p>
+
+<h1 id="referência-literária">Referência Literária</h1>
+
+<p>Há um termo comum que muitos não devem conhecer que é a <a href="https://www.jornalopcao.com.br/colunas-e-blogs/contraponto/burocracia-brasileira-e-mais-kafkiana-do-que-kafka-56504/">Burocracia Kafkaniana</a>. Talvez se você é que nem eu, que conhece a literatura de Franz Kafka, mas nunca a leu, só sabe que ele vira uma barata, você não saberá que ele tinha horror a burocracia e que isso está expresso nos livros dele.</p>
+
+<p>Talvez esse nome se refere ao problema que o Apache Kafka resolve. Seu sistema não precisa ser que nem Guichês do Detran, vai de um para outro, para outro… indefinidamente!!!</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/akka1r41bfnwlf4hrjpg.jpg" alt="A Barata" /></p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Se você está construindo um sistema que demandará um nível de complexidade ainda desconhecido, mas já seguro que será bastante complexo. Você pode considerar de usar o Kafka para delegar a responsabilidade de integração de cada serviço.</p>
+
+<p>Com o Kafka, cada serviço deve se preocupar em:</p>
+
+<ol>
+  <li>Gerar Eventos</li>
+  <li>Ouvir os Eventos interessados</li>
+</ol>
+
+<p>Assim há um grande desacoplamento dos serviços. Você pode criar uma Loja virtual que apenas emite um evento de <em>CompraEfetuada</em> gerando assincronamente:</p>
+<ol>
+  <li>Um serviço de EmitirNotaFiscal</li>
+  <li>Um serviço de ProcessarPacote</li>
+  <li>Etc…</li>
+  <li>Etc… no tempo! Daqui a 1 semana você pode criar um novo serviço e usar TODOS esses eventos! 😊😊😊😊</li>
+</ol>
+
+<p><em>To be continue…</em></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Messaging" /><category term="Middleware" /><category term="Microsserviços" /><summary type="html"><![CDATA[Nesse artigo vou explicar brevemente o que é o Kafka e qual sua finalidade]]></summary></entry><entry><title type="html">Rodando o Apache Kafka localmente</title><link href="https://blog.vepo.dev/posts/rodando-o-apache-kafka-localmente" rel="alternate" type="text/html" title="Rodando o Apache Kafka localmente" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-47-27-rodando-o-apache-kafka-localmente</id><content type="html" xml:base="https://blog.vepo.dev/posts/rodando-o-apache-kafka-localmente"><![CDATA[<p>Continuando a série de <strong>Entendendo o Kafka</strong>, vou criar aqui um pequeno tutorial de como rodar o Kafka localmente em ambiente Windows.</p>
+
+<p>Para desenvolvimento, recomendo usar containers Docker. Porém, para aprendizado vale a pena configurar um cluster manualmente.</p>
+
+<h1 id="configurando">Configurando</h1>
+
+<ol>
+  <li>Instale o JDK 8</li>
+  <li>Baixe a última versão do Kafka em <a href="https://kafka.apache.org/downloads">https://kafka.apache.org/downloads</a>
+    <ul>
+      <li>Há várias versões baseadas na versão do Scala, escolha qualquer uma delas. Vamos usar a <strong>kafka_2.12-2.4.0</strong> por ela estar recomendada no site.</li>
+    </ul>
+  </li>
+  <li>Extraia o arquivo
+    <ul>
+      <li>No Windows a extensão <strong>.tgz</strong> não é muito amigável, mas você precisa das ferramentas corretas. Dica, use o <a href="https://www.7-zip.org/">7-Zip</a>. Com ele dá pra extrair usando o menu de contexto do mouse.</li>
+    </ul>
+  </li>
+  <li>Feito! Não é necessário nenhuma configuração a mais. Para melhor organização eu sempre instalo em <code class="language-plaintext highlighter-rouge">C:\opt</code>, ficando o Kafka com o PATH <code class="language-plaintext highlighter-rouge">C:\opt\kafka</code>.</li>
+</ol>
+
+<h1 id="iniciando-o-servidor-kafka">Iniciando o Servidor Kafka</h1>
+
+<p>O Kafka depende do Zookeeper. Este é um serviço para sincronia de configurações. Provavelmente será removido em futuras release. Mas por enquanto é necessário.</p>
+
+<p>Para iniciar o Kafka, abra duas linhas de comando e execute a partir da pasta de instalação do Kafka:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-server-start.bat config\server.properties
+</code></pre></div></div>
+
+<p>Pronto! Você tem um Kafka <strong><em>Up &amp; Running</em></strong>!</p>
+
+<h2 id="testando-o-cluster">Testando o Cluster</h2>
+
+<p>Para testar o cluster, a instalação do Kafka já vem com alguns scripts preparados.</p>
+
+<p>Primeiro precisamos criar um tópico para enviar mensagens. Isso pode ser feito com a linha abaixo:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
+</code></pre></div></div>
+
+<p>Após criado o tópico é só, a partir de duas janelas, executar as seguintes linhas abaixo:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic test --from-beginning
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/x6zzoik8zb1a66ytivow.png" alt="Kafka Consumer" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.\bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic test
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/3plxrkla0kra0g7ga46p.png" alt="Kafka Producer" /></p>
+
+<p>A primeira inicia um consumidor do Tópico <code class="language-plaintext highlighter-rouge">test</code> e a segunda um produtor. Cada mensagem escrita na segunda será enviada para a primeira.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>É fácil configurar um servidor Kafka para testes. Em outra oportunidade vou compartilhar como utilizar uma imagem docker, mas por enquanto apenas com o JDK 8 instalado é possível fazer essa configuração de qualquer ambiente.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Messaging" /><category term="Middleware" /><category term="Microsserviços" /><summary type="html"><![CDATA[Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows.]]></summary></entry><entry><title type="html">Enviando Mensagens</title><link href="https://blog.vepo.dev/posts/enviando-mensagens" rel="alternate" type="text/html" title="Enviando Mensagens" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-09-55-enviando-mensagens</id><content type="html" xml:base="https://blog.vepo.dev/posts/enviando-mensagens"><![CDATA[<p>Enviar mensagens no Kafka é bastante simples.</p>
+
+<h1 id="instanciando-um-producer">Instanciando um Producer</h1>
+
+<p>Para configurar, é preciso basicamente apenas 3 parametros:</p>
+
+<ul>
+  <li><strong>BOOTSTRAP_SERVERS</strong>: Conjunto de pares IP:PORTA para acessar o cluster. Por exemplo, <code class="language-plaintext highlighter-rouge">kafka-1:9092,kafka-2:9092</code> irá acessar o cluster que contem os duas instâncias <code class="language-plaintext highlighter-rouge">kafka-1:9092</code> e <code class="language-plaintext highlighter-rouge">kafka-2:9092</code></li>
+  <li><strong>KEY_SERIALIZER_CLASS</strong>: É a classe que fará a serialização da Chave. O que é e como é usada a chave, vamos explicar posteriormente. Deve ser uma implementação da interface <code class="language-plaintext highlighter-rouge">org.apache.kafka.common.serialization.Serializer</code>.</li>
+  <li><strong>VALUE_SERIALIZER_CLASS</strong>: É a class que fará a serialização do Valor. Não há mensagem sem um valor. Deve ser uma implementação da interface <code class="language-plaintext highlighter-rouge">org.apache.kafka.common.serialization.Serializer</code>.</li>
+</ul>
+
+<div data-gist="https://gist.github.com/vepo/1468c5a3af73aff7e0fc78ae296ca589"></div>
+
+<p>Pronto, configurado o <em>Producer</em>, basta criar o objeto <code class="language-plaintext highlighter-rouge">ProducerRecord</code>, que irá associar mensagem/chave/tópico, e enviar ela.</p>
+
+<p>No código acima, eu criei um simples cliente que lê todas as mensagens do STDIN e envia para o tópico em questão.</p>
+
+<h1 id="recomendações">Recomendações</h1>
+
+<ul>
+  <li>O envio é assíncrono, verifique se a mensagem foi realmente enviada e tente novamente caso negativo. Normalmente o cliente Kafka já faz algumas tentativas.</li>
+  <li>Particione tipos de mensagens por chave, a ordem das entregas de mensagens só é garantida para mensagens com mesma chave.</li>
+</ul>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>O envio de mensagens Kafka é simples e descomplicado, mas mesmo assim deve ser feito de forma cuidadosa para se garantir a entrega. Tendo a entrega da mensagem garantida, é certo que teremos o recebimento dela garantido.</p>
+
+<p>Mais informações sobre Chave serão dadas quando formos falar de ordenação.</p>
+
+<h1 id="referências">Referências</h1>
+
+<p>Todos os códigos estão no repositório <a href="https://github.com/vepo/kafka-articles">vepo/kafka-articles</a></p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Messaging" /><category term="Middleware" /><category term="Microsserviços" /><summary type="html"><![CDATA[Exemplo de como enviar uma mensagem para um broker Kafka]]></summary></entry><entry><title type="html">Recebendo Mensagens</title><link href="https://blog.vepo.dev/posts/recebendo-mensagens" rel="alternate" type="text/html" title="Recebendo Mensagens" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/19-01-26-recebendo-mensagens</id><content type="html" xml:base="https://blog.vepo.dev/posts/recebendo-mensagens"><![CDATA[<p>Ao iniciar o post <strong>Enviando Mensagens</strong>, falei que enviar é simples. Se você não achou simples, depois de ver a complexidade de receber uma mensagem verá que <em>sim, é simples!</em></p>
+
+<h1 id="parâmetros-comuns">Parâmetros comuns</h1>
+
+<p>Para configurar um <em>consumer</em> são necessários mais parâmetros. Os parâmetros abaixo são similares ao do <em>producer</em> com excessão da troca de Serializador por Desserializador, visto que a mensagem deve ser agora transformada de byte[] para um objeto.</p>
+
+<ul>
+  <li><strong>BOOTSTRAP_SERVERS</strong>: Conjunto de pares IP:PORTA para acessar o cluster. Por exemplo, <code class="language-plaintext highlighter-rouge">kafka-1:9092,kafka-2:9092</code> irá acessar o cluster que contem os duas instâncias <code class="language-plaintext highlighter-rouge">kafka-1:9092</code> e <code class="language-plaintext highlighter-rouge">kafka-2:9092</code></li>
+  <li><strong>KEY_DESERIALIZER_CLASS</strong>: É a classe que fará a desserialização da Chave. O que é e como é usada a chave, vamos explicar posteriormente. Deve ser uma implementação da interface <code class="language-plaintext highlighter-rouge">org.apache.kafka.common.serialization.Deserializer</code>.</li>
+  <li><strong>VALUE_DESERIALIZER_CLASS</strong>: É a class que fará a desserialização do Valor. Não há mensagem sem um valor. Deve ser uma implementação da interface <code class="language-plaintext highlighter-rouge">org.apache.kafka.common.serialization.Deserializer</code>.</li>
+</ul>
+
+<p>Dados os parametros abaixo, agora é preciso configurar o <strong>GROUP_ID</strong>. Antes de escolher um, é necessário pensar em como será a leitura dessa mensagem.</p>
+
+<h1 id="read-once"><em>Read once</em></h1>
+
+<p>Um <em>Producer</em>, escreve uma mensagem por tópico. Ele não se preocupa como essa mensagem será lida. Já o <em>Consumer</em> deve se preocupar para que a mensagem não apenas uma vez, não menos que isso.</p>
+
+<p>No Kafka, uma mensagem é recebida apenas uma vez por um <em>Consumer</em> de um <strong>GROUP_ID</strong>. Isso que dizer que, se dois processos diferentes tiverem consumers com o mesmo <strong>GROUP_ID</strong>, essa mensagem será consumida por apenas um.</p>
+
+<p>Essa funcionalidade pode ajudar muito, mas pode também atrapalhar. O cuidado que deve ser tomado é:</p>
+<ul>
+  <li>Para cada tipo de consumer, sempre escolher um <strong>GROUP_ID</strong> por tipo</li>
+  <li>Tratar as mensagens como <a href="https://pt.wikipedia.org/wiki/Idempot%C3%AAncia">idempotentes</a></li>
+</ul>
+
+<h1 id="instanciando-um-consumer">Instanciando um <em>Consumer</em></h1>
+
+<p>Para instanciar um consumer, então, são necessários os 4 parâmetros: <strong>BOOTSTRAP_SERVERS</strong>, <strong>KEY_DESERIALIZER_CLASS</strong>, <strong>VALUE_DESERIALIZER_CLASS</strong> e <strong>GROUP_ID</strong>.</p>
+
+<div data-gist="https://gist.github.com/vepo/66ee3db0a6684cec90d8c1349a2a2e1d"></div>
+
+<p>Pronto, criado o <em>Consumer</em>, deve-se fazer o pull e processar as mensagens.</p>
+
+<p>No exemplo acima, há uma condição de saida, mas isso é apenas para exemplo. Normalmente um programa que processas mensagens opera até ser interrompido.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Criar um <em>Consumer</em> para um Tópico Kafka é simples, não tão simples quanto um <em>Producer</em>. Deve-se atentar para quantos outros consumers vão concorrer pelas mensagens, se uma mensagem deve ser lida por um ou mais consumer. E ainda deve-se tratar a mensagem como se ela fosse repetida.</p>
+
+<p>Ficou com dúvida… alguns pontos ainda serão tradados. Mas pode perguntar!</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Messaging" /><category term="Middleware" /><category term="Microsserviços" /><summary type="html"><![CDATA[Exemplo de como receber uma mensagem para um broker Kafka]]></summary></entry></feed>

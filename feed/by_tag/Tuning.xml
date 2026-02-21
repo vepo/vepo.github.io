@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Tuning.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Tuning.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Como gerar flamegraph em aplicações Java</title><link href="https://blog.vepo.dev/posts/como-gerar-flamegraph-na-jvm" rel="alternate" type="text/html" title="Como gerar flamegraph em aplicações Java" /><published>2025-02-24T00:00:00+00:00</published><updated>2025-02-24T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/07-59-00-como-gerar-flamegraph-em-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/como-gerar-flamegraph-na-jvm"><![CDATA[<div class="paragraph">
+<p>Profiling tem sido uma das minhas principais atividades nos últimos meses. Como a aplicação que eu trabalho chegou a um bom grau de
+maturidade onde há poucas funcionalidades a sere feitas e os bugs de produção são raros, hoje o principal esforço é melhorar o desempenho
+e reduzir o uso de recursos. Por isso muito se pede para investigar o uso de CPU ou reduzir o tempo de processamento, o que me levou a
+estudar com se dá o uso da CPU em produção e como funciona internamente o Kafka Stream.</p>
+</div>
+<div class="paragraph">
+<p>É nesse contexto que resolvi finalmente investir um tempo para tentar gerar um diagrama muito interessante chamado Flamegraph. Caso você
+ainda não o conheça, vamos primeiro falar sobre ele e depois mostrar como você pode gerar ele na sua aplicação Java facilmente!</p>
+</div>
+<div class="sect1">
+<h2 id="_o-flamegraph">O Flamegraph</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O Flamegraph é um diagrama de monitoramento do uso da CPU <a href="https://www.brendangregg.com/flamegraphs.html">criado por Brendan Gregg</a> enquanto trabalhava
+investigando problemas de performance no MySQL. Caso você queira ler a descrição do próprio criador, recomendo um post no site pessoal dele
+<a href="https://www.brendangregg.com/flamegraphs.html">Flame Graphs</a> e um artigo na Communications da ACM chamado
+<a href="https://cacm.acm.org/practice/the-flame-graph/">The Flame Graph</a>.</p>
+</div>
+<div id="cpu-mysql-updated" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/cpu-mysql-updated.svg" alt="cpu mysql updated">
+</div>
+<div class="title">Figura 1. Flamegraph do uso de CPU do MySQL</div>
+</div>
+<div class="paragraph">
+<p>A informação provida pelo flamegraph pode não parecer nova, ela já era provida por diversas ferramentas de profiling, mas a forma de interação
+com o dado é mais interessante e dos dá mais informações sobre o que realmente acontece em tempo de execução. O VisualVM já provê informação semelhante,
+mas a forma que ela é exibida, apesar de mais acurada, torna difícil visualizar o real uso da CPU. As ferramentas tradicionais agrupavam o uso de CPUs por
+<em>threads</em>, como é visto na imagem abaixo. Conseguimos ver o uso de cada thread, o que de certa forma está parcialmente certo, mas dificulta a visualização
+pois não vemos o dado real por CPU.</p>
+</div>
+<div id="visualvm-cpu-profiling" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java/visualvm-cpu-profiling.png" alt="visualvm cpu profiling">
+</div>
+<div class="title">Figura 2. Profiling da CPU pelo VisualVM.</div>
+</div>
+<div class="paragraph">
+<p>Pode parecer estranho o que vou afirmar aqui, mas <em>threads</em> não existem! <em>Threads</em> são uma abstração do Sistema Operacional que facilitam o desenvolvimento de
+software ao tratar o paralelismo como uma necessidade básica. Para entender melhor essa afirmação temos que entender que CPU é um recurso do nosso sistema que é
+compartilhado entre as diversas <em>threads</em>. O que o flamegraph faz é mostrar todo o uso de CPU ignorando a existência de <em>threads</em> e isso ajuda muito na visualização!</p>
+</div>
+<div class="paragraph">
+<p>Ao afirmar the <em>threads</em> não existem não estou dizendo que você não deva abolir <em>threads</em>, muito pelo contrário. Mas muitas vezes o processamento que está distribuído
+em diversas <em>threads</em> é implementado pelo memso código. Vamos pensar no Kafka Stream! Nós normalmente implementamos uma pipeline que é única e será executada pela
+<em>StreamThread</em>. Uma aplicação em produção terá diversas <em>StreamThread</em> executando o mesmo código! Quando olhamos para o VisualVM, temos que optar por uma dessas
+<em>StreamThread</em>, enquanto ao olharmos para o flamegraph, vemos todas as <em>StreamThreads</em>!!!</p>
+</div>
+<div class="paragraph">
+<p>Isso acontece porque ao se colocar todo o tempo de CPU em um único eixo, facilita-se a visualização. O flamegraph reduz o número de variáveis a se considerar para
+se extrair um dado simples: tempo de CPU!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-extrair-o-flamegraph">Como extrair o Flamegraph?!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Se você fizer essa pesquisa no Google, já aviso que se deparará com diversos posts com muita informação antiga e pouca comparação. Verá posts onde só se usou
+as ferramentas de performance do Linux, outros posts usando somente o Java Flight Recorder e outros posts usando agentes nativos que integram código Java com
+as ferramentas nativas do Linux. Nesse post eu vou mostrar como exatrair de duas formas e depois comparar os resultados obtidos por ambas as formas.</p>
+</div>
+<div class="sect2">
+<h3 id="_extraindo-usando-apenas-o-java-flight-recorder">Extraindo usando apenas o Java Flight Recorder!</h3>
+<div class="paragraph">
+<p>A primeira forma de se extrair o flamegraph é pegar as informações necessárias usando apenas ferramentas providas pela JVM e depois processar essa informações
+criando o framegraph. A JVM já provê uma série de ferramentas de profiling que estão dentro do JDK. Se você não conhece o comando <code>jcmd</code> recomendo parar tudo que
+está fazendo e dar uma olhada nele. <a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html">Na documentação do <code>jcmd</code></a> você consegue encontrar a
+descrição de todo comandos que você pode executar só passando o PID da JVM que você quer olhar.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="o">&gt;</span> jcmd MyProgram <span class="nb">help</span> <span class="o">(</span>or <span class="s2">"jcmd 2125 help"</span><span class="o">)</span>
+2125:
+The following commands are available:
+JFR.stop
+JFR.start
+JFR.dump
+JFR.check
+VM.native_memory
+VM.check_commercial_features
+VM.unlock_commercial_features
+ManagementAgent.stop
+ManagementAgent.start_local
+ManagementAgent.start
+Thread.print
+GC.class_stats
+GC.class_histogram
+GC.heap_dump
+GC.run_finalization
+GC.run
+VM.uptime
+VM.flags
+VM.system_properties
+VM.command_line
+VM.version
+<span class="nb">help</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Para gerar o flamegraph independentemente do método, você precisará do <a href="https://github.com/async-profiler/async-profiler"><strong>async-profiler</strong></a>. É uma excelente
+ferramenta que gera o flamegraph a partir da gravação do Java Flight Recorder e também gera usando o agente nativo.</p>
+</div>
+<div class="paragraph">
+<p>Nesse primeiro método vamos usar o Java Flight Recorder para gravar as informações de execução e depois gerar o flamegraph, para gravar as informações você
+pode usar os dois métodos abaixos, ambos foram extraídos de scripts de profile que eu uso. No primeiro eu inicio a gravação, depois gero trafego (o qual foi
+substituído pelo <code>sleep</code>) e por fim finalizo a gravação. A vantagem desse método é que você grava somente o periodo em que o trafego foi gerado.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">DURATION</span><span class="o">=</span>1200 <span class="c">## 2 minutos</span>
+<span class="nb">rm</span> <span class="nt">-f</span> /tmp/recording.jfr                                            <span class="c">## Apaga gravações antigas que podem ter sido feitas</span>
+<span class="nv">NAME</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat</span> /dev/urandom | <span class="nb">tr</span> <span class="nt">-dc</span> <span class="s1">'a-zA-Z'</span> | <span class="nb">fold</span> <span class="nt">-w</span> 15 | <span class="nb">head</span> <span class="nt">-n</span> 1<span class="si">)</span> <span class="c">## Gera um nome aleatório para evitar conflitos</span>
+<span class="nv">PID</span><span class="o">=</span><span class="si">$(</span>ps <span class="nt">-a</span> | <span class="nb">grep </span>java | <span class="nb">awk</span> <span class="s1">'{print $1}'</span><span class="si">)</span>                         <span class="c">## Acessa número do processo em execução se rodando em docker/k8s</span>
+jcmd <span class="nv">$PID</span> JFR.start <span class="nv">name</span><span class="o">=</span><span class="nv">$NAME</span> <span class="nv">settings</span><span class="o">=</span>profile                     <span class="c">## Inicia gravação</span>
+<span class="nb">sleep</span> <span class="nv">$DURATION</span>
+jcmd <span class="nv">$PID</span> JFR.stop <span class="nv">name</span><span class="o">=</span><span class="nv">$NAME</span> <span class="nv">filename</span><span class="o">=</span>/tmp/recording.jfr</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No segundo método, o <code>jcmd</code> é executado de forma asincrona usando os parâmetros <code>duration</code> e <code>delay</code>. Esse método é bom para capturar informações
+do ambiente de produção sem precisar reiniciar o servidor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">DELAY</span><span class="o">=</span>10m
+<span class="nv">DURATION</span><span class="o">=</span>20m
+<span class="nb">rm</span> <span class="nt">-f</span> /tmp/recording.jfr                                                        <span class="c">## Apaga gravações antigas que podem ter sido feitas</span>
+<span class="nv">NAME</span><span class="o">=</span><span class="si">$(</span><span class="nb">cat</span> /dev/urandom | <span class="nb">tr</span> <span class="nt">-dc</span> <span class="s1">'a-zA-Z'</span> | <span class="nb">fold</span> <span class="nt">-w</span> 15 | <span class="nb">head</span> <span class="nt">-n</span> 1<span class="si">)</span>             <span class="c">## Gera um nome aleatório para evitar conflitos</span>
+<span class="nv">PID</span><span class="o">=</span><span class="si">$(</span>ps <span class="nt">-a</span> | <span class="nb">grep </span>java | <span class="nb">awk</span> <span class="s1">'{print $1}'</span><span class="si">)</span>                                     <span class="c">## Acessa número do processo em execução se rodando em docker/k8s</span>
+jcmd <span class="nv">$PID</span> JFR.start <span class="nv">name</span><span class="o">=</span><span class="nv">$NAME</span> <span class="nv">settings</span><span class="o">=</span>profile <span class="nv">delay</span><span class="o">=</span><span class="nv">$DELAY</span> <span class="nv">duration</span><span class="o">=</span><span class="nv">$DURATION</span> <span class="c">## Inicia gravação</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Depois de capturado o arquivo <code>recording.jfr</code>, você precisa gerar o flamegraph usando o
+<a href="https://github.com/async-profiler/async-profiler/releases/download/v3.0/converter.jar">converter</a> do async-profile.
+Para isso execute o comando abaixo e <em>voilà</em>!!! Você tem uma pagina HTML pura para colocar onde quiser. Eu coloquei ela como
+artefato dos testes de carga da aplicação.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">java <span class="nt">-cp</span> converter.jar jfr2flame <span class="nt">--dot</span> <span class="nt">--total</span> <span class="nt">--alloc</span> <span class="nt">--classify</span> <span class="nt">--title</span> <span class="s2">"My CPU Profile"</span> /tmp/recording.jfr /tmp/flamegraph.html</code></pre>
+</div>
+</div>
+<div class="exampleblock">
+<div class="title">Example 1. Aviso</div>
+<div class="content">
+<div class="paragraph">
+<p>O tamanho do arquivo gerado será proporcional ao tempo de gravação, por isso garanta que há espaço em disco
+e use sabiamente a duração (<em>duration</em>) e o atrado (<em>delay</em>) para capturar o melhor momento da execução.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_extraindo-usando-agente-nativo">Extraindo usando agente nativo</h3>
+<div class="paragraph">
+<p>A grande desvantagem de usar somente o Java Flight Recorder é que algumas informações sobre a execução nativa é perdida. Ao migrar para
+a execução usando o agente nativo consegui, por exemplo, identificar alguns trechos de código que usavam <strong>exceptions para controle de fluxo
+o que pode ser um grande problema de desempenho</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Para executar usando agente natvo com o <a href="https://github.com/async-profiler/async-profiler"><strong>async-profiler</strong></a>, basta fazer o download da buil,
+copiar para o ambiente de execução e depois executar o comando <code>asprof</code> como mostrado abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">DURATION</span><span class="o">=</span>1200
+<span class="nv">PID</span><span class="o">=</span><span class="si">$(</span>ps <span class="nt">-a</span> | <span class="nb">grep </span>java | <span class="nb">awk</span> <span class="s1">'{print $1}'</span><span class="si">)</span>                                                <span class="c">## Acessa número do processo em execução se rodando em docker/k8s</span>
+/tmp/async-profiler-3.0-linux-x64/bin<span class="p">;</span> ./asprof <span class="nt">-d</span> <span class="nv">$DURATION</span> <span class="nt">-f</span> /tmp/flamegraph.html <span class="nv">$PID</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A desvantagem desse método é que você alterou o ambiente em que o seu software está rodando. Isso não tem problemas na grande maioria dos casos,
+mas não é muito bem visto para ambientes de produção.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_recomendações">Recomendações</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Eu recomendo que você use constantemente ferramentas de profiling para visualizar o que está acontecendo no seu software. Existe uma máxima na área
+de adminstração que pode ser aplicada em qualquer lugar das nossa vidas "o que não pode ser medido, não pode ser gerenciado", logo é importante para
+você saber como está o tempo de execução do seu software.</p>
+</div>
+<div class="paragraph">
+<p>A segunda recomendação é você, caso precise melhorar o desempenho do seu software, olhar primeiro para o local que mais impacta o desemepenho. Ganho
+de performance é proprocional ao tempo de desempenho, por isso só investa tempo onde há mais indicios de tempo gasto.</p>
+</div>
+<div class="paragraph">
+<p>Uma outra recomendação é que você pode criar ferramentas de análise de desempenho automatizadas usando ferramentas de DevOps. Quem sabe criar uma task no
+Jenkins que extrai o FlameGraph e depois salva para análises futuras? Ou salvar essa página para cada nova versão e comparar como o desempenho tem evoluido?</p>
+</div>
+<div class="paragraph">
+<p>Eu espero ter ajuda com alguma coisa!</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Observabilidade" /><category term="Profiling" /><category term="Tuning" /><category term="JVM" /><category term="Flamegraph" /><summary type="html"><![CDATA[Já ouviu falar de Flamegraph? E quais ferramentas de profiling você usa? Nesse post vamos falar de como podemos ver qual é o uso da CPU em produção de uma aplicação rodando na JVM usando ferramentas simples e um ótimo formato de visualização.]]></summary></entry><entry><title type="html">Memória</title><link href="https://blog.vepo.dev/posts/java-101-memoria" rel="alternate" type="text/html" title="Memória" /><published>2022-11-11T00:00:00+00:00</published><updated>2022-11-11T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-55-00-java-101-memoria</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-101-memoria"><![CDATA[<div class="paragraph">
+<p>Esse post faz parte de uma série introdutória sobre Java, se você não conhece a linguagem e não leu os posts anteriores, recomendo os ler para ter uma visão melhor da plataforma. Nessa série, já falamos sobre o que é o ecossistema Java, o que é a biblioteca Collections, como Java faz Orientação a Objetos, o que é a biblioteca I/O e como Java implementa paralelismo e concorrência, esses tópicos são necessários para o que vamos falar agora: <strong>Gerenciamento de Memória</strong></p>
+</div>
+<div class="sect1">
+<h2 id="cap-07-o-que-e-memoria">O que é Memória</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Antes de falar de Memória em programas Java, precisamos definir o que é Memória. Memória é o principal recurso de um computador junto com a CPU. A função da CPU é executar operações que alteram a memória e a memória é responsável por quase todas as operações de um computador. Tudo se comunica através da memória. Mas como Java é uma linguagem de alto nível, não temos acesso a memória completa, ela é gerenciada pelo Sistema Operacional e pela JVM.</p>
+</div>
+<div class="paragraph">
+<p>Programas Java rodam dentro de uma Máquina Virtual, logo não precisamos nos preocupar com a alocação de memória. Toda vez que nosso programa precisar de mais memória ela será fornecida automaticamente. Esse tópico é muito importante quando formos falar sobre o <em>tuning</em> de aplicações Java, uma forma de garantir a performance. Precisamos entender que cada objeto e cada linha de comando ocupa um posição da memória. A memória é como um caderno de papel que pegamos pra fazer conta, cada operação realizada ocupa um espaço e quando não há mais espaço na folha temos a opção de pegar uma nova folha ou apagar uma conta já finalizada.</p>
+</div>
+<div id="cap-07-folha-de-caderno" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-07/pexels-david-bares-204511.jpg" alt="pexels david bares 204511">
+</div>
+<div class="title">Figura 1. Memória é como uma folha de caderno que usamos como rascunho.</div>
+</div>
+<div class="paragraph">
+<p>A memória é volátil. Isso significa que toda vez que precisamos salvar uma informação que é relevante ou escrevemos ela em um banco de dados ou escrevemos em um arquivo. O "caderno" é apagado toda vez que o computador reinicia.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-07-topologia-da-memoria">Topologia da Memória</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Talvez você já tenha ouvido falar de <em>heap</em> ou <em>stack</em>, essa são dois tidos de memória distintas que existem em todos os programas. Vamos tentar entender elas sem falar de Java?</p>
+</div>
+<div class="paragraph">
+<p><em>Stack</em> significa pilha que é um conceito fundamental em computação. Toda pilha é uma estrutura que você pode apenas remover o elemento superior e quando você adiciona elementos você adiciona em cima do último elemento. Você não pode pegar o terceiro item de uma pilha, você tem que remover os 3 itens superiores. Essa é a memória responsável pela execução do seu programa, cada vez que você entra em um bloco de execução, você adiciona elementos a pilha, quando você sai de um bloco de execução você remove. Para cada execução existe uma <em>stack</em> especifica, isso significa que um programa single thread vai existir apenas uma <em>stack</em>, já um multi-thread terá várias <em>stacks</em>.</p>
+</div>
+<div class="paragraph">
+<p>Já <em>heap</em> significa amontoado, ou seja, é uma memória sem organização, sem hierarquia. A memória <em>heap</em> é usada conforme a necessidade do programa e pode ser compartilhada entre as várias pilhas de execução. Cada programa deve alocar e desalocar espaços na memória <em>heap</em>, a alocação é feita por uma chamada de sistema (<em>system call</em>) <a href="https://man7.org/linux/man-pages/man3/free.3.html"><em>malloc</em></a> (ou <em>calloc</em>) e deve ser liberada pelo programa usando <em>free</em>.</p>
+</div>
+<div id="cap-05-c-close" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://man7.org/linux/man-pages/man3/free.3.html"><img src="/assets/images/java-101/cap-07/malloc.png" alt="malloc"></a>
+</div>
+<div class="title">Figura 2. Documentação das funções de gerenciamento de memória oferecidas pelo Sistema Operacional.</div>
+</div>
+<div class="paragraph">
+<p>Quando uma porção da memória é alocada, tudo que o sistema operacional precisa saber é o tamanho da memória que o programa necessita, assim o sistema operacional retorna o endereço de memória onde essa porção de memória foi alocada. Quando o programa não precisa mais dessa posição de memória ela deve ser liberada, para liberar o sistema operacional precisa do endereço de memória que deve ser desalocada. Quando falamos "endereço de memória" estamos falando de um endereço físico mesmo, é a posição da memória que o sistema operacional achou conveniente oferecer ao programa. Com a posse desse endereço o programa pode manipular a memória, por exemplo se estamos falando de um array, o programa pode fazer operações matemática para acessar as posições. Esse é o conceito de ponteiro, ele aponta para uma posição de memória, mas é apenas um número que representa um endereço físico.</p>
+</div>
+<div class="paragraph">
+<p><em>— E se eu não desalocar a posição de memória?</em></p>
+</div>
+<div class="paragraph">
+<p>Todo programa tem que ter muito cuidado ao usar a memória por dois motivos. Primeiro memória é um recurso finito, compartilhado e escasso. Isso significa que se seu servidor tem 10GiB de memória RAM, todos os processos só podem usar 10GiB de memória RAM. Caso seja necessário mais memória, o sistema operacional vai criar um arquivo de paginação que podem degradar a eficiência dos programas em execução. Depois cada programa deve operar com o mínimo de memória possível, logo a alocação e liberação de memória deve ser feita de maneira consciente, se seu programa começa a alocar memória a eficiência dele vai degradar até que o sistema operacional simplesmente, e sem cerimônia, vai finalizar a execução. Então quando um programa simplesmente para de funcionar sem nenhum motivo aparente, a primeira coisa que um desenvolvedor observar é o consumo de memória, se ele está crescendo até o programa ser finalizado isso pode ser um sintoma de um problema chamado <em>Memory Leak</em> (vazamento de memória em tradução livre).</p>
+</div>
+<div class="paragraph">
+<p><em>Memory Leak</em> acontece quando porções de memória são alocados mas não são desalocados criando porções da memória não utilizadas até não haver mais memória disponível. Um programa com <em>memory leak</em> pode comprometer a eficiente de um servidor ou até de um cluster.</p>
+</div>
+<div id="cap-07-memoria-c" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-07/memoria-c.png" alt="memoria c">
+</div>
+<div class="title">Figura 3. Topologia de uma memória de um programa C. Todo gerenciamento das alocações é feita manualmente.</div>
+</div>
+<div class="paragraph">
+<p><em>— E porque eu preciso saber disso se vou programar em Java?</em></p>
+</div>
+<div class="paragraph">
+<p>Porque esses conceitos são importantes para você fazer um uso consciente da memória. Você já parou para pensar que ao declara um objeto você ocupa um espaço físico? Mas agora vamos rever todos esses conceitos em Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-07-topologia-da-memoria-na-jvm">Topologia da Memória na JVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Na JVM também existe a memória <em>heap</em> e a <em>stack</em>. A <em>stack</em> irá conter todas as informações de execução e os valores das variáveis primitivas, quando uma variável é um objeto a <em>stack</em> contém uma <a href="https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-2.html#jvms-2.4"><strong>referência</strong></a> para a <em>heap</em>. Todo objeto é alocado na <em>heap</em>, mas ele não ocupa uma posição fixa pois a <em>heap</em> é gerenciada pela JVM. Diferentemente das linguagens de baixo nível, em Java um novo objeto já cria uma nova alocação de memória sem precisar interagir diretamente com o sistema operacional, mas quando o objeto não é mais necessário ele não precisa ser liberado, pois a JVM tem um processo chamado Garbage Collector que remove da <em>heap</em> todo objeto que não é mais referenciado.</p>
+</div>
+<div class="paragraph">
+<p>Já a <em>heap</em> será dividida entre várias regiões. As primeiras regiões são a <em>Young Generation</em> e a <em>Old Generation</em>, como o nome já demonstra na <em>Young Generation</em> estão localizados os objetos gerados recentemente e na <em>Old Generation</em> estão os objetos mais antigos. Da mesma forma a <em>Young Generation</em> é dividida entre <em>Eden</em>, <em>S1</em> e <em>S2</em> (S de <em>Suvivor</em> 1 e 2, que significa sobrevivente) onde <em>Eden</em> é a região onde os objetos nascem e depois migram pra <em>S1</em> e depois pra <em>S2</em>.</p>
+</div>
+<div id="cap-07-memoria-java" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-07/memoria-java.png" alt="memoria java">
+</div>
+<div class="title">Figura 4. Topologia de uma memória de um processo Java. Todo gerenciamento das alocações é automaticamente pela JVM.</div>
+</div>
+<div class="paragraph">
+<p><em>— Mas como acontecem essas migrações? Porque eu preciso saber disso?!?</em></p>
+</div>
+<div class="paragraph">
+<p>Essa informação é importante por dois motivos. O primeiro deles é que o ciclo de vida de um objeto impacta na performance pois a operação feita pelo <em>Garbage Collector</em> é uma operação custosa, já vi processos que 30% do tempo de execução era gasto para liberar memória. O segundo motivo é que, conhecendo o ciclo de vida de um objeto, podemos ajudar o Garbage Collector a eliminar objetos descartáveis.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas qual é o ciclo de vida de um objeto?</em></p>
+</div>
+<div class="paragraph">
+<p>Quando a JVM encontra um <code>new ObjetoX()</code>, ela vai alocar o espaço necessário na <em>Eden</em>. Se há espaço suficiente, tudo bem. Se não há espaço suficiente o <em>Garbage Collector</em> vai fazer uma limpeza na <em>Eden</em> descartando todos objetos que não são referenciados na <em>stack</em> e movendo todos os objetos restante para a <em>S1</em>. Se há espaço suficiente na <em>S1</em>, tudo bem. Se não há espaço suficiente o <em>Garbage Collector</em> vai fazer uma limpeza na <em>S1</em> descartando todos objetos que não são referenciados na <em>stack</em> e movendo todos os objetos restante para a <em>S2</em>. Se há espaço suficiente na <em>S2</em>, tudo bem. Se não há espaço suficiente o <em>Garbage Collector</em> vai fazer uma limpeza na <em>S2</em> descartando todos objetos que não são referenciados na <em>stack</em> e movendo todos os objetos restante para a <em>Old Generation</em>. Se há espaço suficiente na <em>Old Generation</em>, tudo bem. Se não há espaço suficiente o <em>Garbage Collector</em> vai fazer uma limpeza na <em>Old Generation</em> descartando todos objetos que não são referenciados na <em>stack</em>. Quando essa operação for executada e a JVM não conseguir alocar espaço, a JVM vai lançar uma exceção: <strong>Exception in thread thread_name: java.lang.OutOfMemoryError: Java heap space</strong>.</p>
+</div>
+<div class="paragraph">
+<p>As informações sobre a classe <code>ObjetoX</code> ficam armazenadas no <em>Metaspace</em> que fica responsável por armazenar as informações de classes e <em>ClassLoaders</em>. O <em>Metaspace</em> pode também ser alvo de uma limpeza do <em>Garbage Collector</em>, mas ele só irá atuar se não houver mais espaço no <em>Metaspace</em>. O <em>Metaspace</em> pode, também, conter referências a objetos que estão na <em>heap</em>, qualquer campo <em>estático</em> (que usa <em>static</em>) faz parte da classe e não do objeto e criará uma referência do <em>Metaspace</em> para a <em>heap</em>.</p>
+</div>
+<div class="paragraph">
+<p><em>— Mas na descrição do Garbage Collector só se falou de referência da heap?</em></p>
+</div>
+<div class="paragraph">
+<p>SIM! Por precisamos entender que uma classe pertence a um <em>ClassLoader</em> e se o <em>ClassLoader</em> não for mais usado na heap, ele pode ser eliminado. Um campo estático só será liberado se o <em>ClassLoader</em> for descartado pelo <em>Garbage Collector</em> ou se o valor dele for alterado para <em>null</em>. O <em>ClassLoader</em> é um objeto que tem como responsabilidade ler as informações da classe, ele pode ser definido dinamicamente e sempre tem uma estrutura em árvore, ou seja, se a classe não for encontrada nele será procurada no <em>ClassLoader</em> pai, se não houver <em>ClassLoader</em> pai a JVM lança uma <code>ClassNotFoundException</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="cap-referencias-e-ponteiros">Referências e Ponteiros</h3>
+<div class="paragraph">
+<p>Agora quero levantar uma provocação:</p>
+</div>
+<div class="paragraph">
+<p><strong>Seriam as referências a objetos estruturas similares aos ponteiros?</strong></p>
+</div>
+<div class="paragraph">
+<p>A primeira resposta pode parecer sim, mas é não. Primeiro porque ponteiros apontam diretamente para posições de memória, já nossas referências apontam para um objeto que pode ser realocado fisicamente na memória. Depois o gerenciamento dos ponteiros é de total responsabilidade do desenvolvedor, já as referências são parte do design do código, uma vez que a referência não existe na <em>stack</em> a JVM está ciente e pode remover a posição porque ela é gerenciada pela JVM.</p>
+</div>
+<div class="paragraph">
+<p>Mas referências podem ser declaras em código também, por isso existe a interface <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ref/Reference.html">java.lang.ref.Reference</a> que é implementada por <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ref/PhantomReference.html">PhantomReference</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ref/SoftReference.html">SoftReference</a> e <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ref/WeakReference.html">WeakReference</a>. Essas classes recebem um tratamento especial do <em>Garbage Collector</em> e podem ser usadas para tornar mais eficiente o uso da memória. Elas devem ser usadas com muita parcimônia pois não são de fácil compreensão.</p>
+</div>
+<div class="paragraph">
+<p>Uma <code>PhantomReference</code> é usada para verificar se um objeto é elegível para o <em>Garbage Collector</em>. Quando não há nenhuma referência ao objeto, ele é removido do PhantomReference e adicionado ao <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ref/ReferenceQueue.html">ReferenceQueue</a> que é uma pilha especial. Se o objeto está dentro da pilha ou o método <code>get</code> retorna <code>null</code>, significa que ele pode ser eliminado pela JVM. A <code>PhantomReference</code> pode ser usada para verificar se um objeto foi descartado ou não. Se o objeto não for removido da pilha, pode gerar uma <em>memory leak</em>.</p>
+</div>
+<div class="paragraph">
+<p>A classe <code>SoftReference</code> tem um comportamento similar, mas apresenta a possibilidade de não se usar a pilha. Ela pode ser usada para construir cache sensível ao uso da memória. Se um objeto é apenas armazenado dentro de um <code>SoftReference</code> pode ser descartado pelo <code>Garbage Collector</code> quando não há espaço disponível na <em>heap</em> sendo necessário criar uma nova instância.</p>
+</div>
+<div class="paragraph">
+<p>A classe <code>WeakReference</code> é muito similar a classe <code>SoftReference</code>, exceto que o <em>Garbage Collector</em> irá eliminar o objeto na primeira oportunidade ao invés de esperar a necessidade de alocação de espaço.</p>
+</div>
+<div class="paragraph">
+<p>Essas classes podem ser usadas para construção de Caches inteligentes que otimizam o uso da memória. Imagina se você tem um requisito que é manter um valor até que ele não seja mais necessário, basta criar uma <code>HashMap</code> que armazena <code>PhantomReference</code>. Existe também uma mapa chamado <a href="https://docs.oracle.com/javase/8/docs/api/java/util/WeakHashMap.html">WeakHashMap</a> que traz um comportamento semelhante, mas a referência fraca é a chave e não o valor.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-07-ferramentas-de-diagnostico">Ferramentas de Diagnóstico</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Como falamos, o principal problema que o mau uso da memória pode nos trazer é lentidão ou vazamento de memória, mas como podemos analisar se nosso programa tem esses problemas?</p>
+</div>
+<div class="paragraph">
+<p>Podemos usar ferramentas que a própria JVM nos dá para ver o que está acontecendo na memória.</p>
+</div>
+<div class="sect2">
+<h3 id="_visualvm">VisualVM</h3>
+<div class="paragraph">
+<p>Uma das mais importantes ferramentas é a <a href="https://visualvm.github.io/">VisualVM</a>. Com ela é possível monitorar a memória para ver como a alocação da memória está evoluindo. Para os testes usei um código simples que consumia uma API e envia para um Apache Kafka, e podemos ver abaixo que o uso da memória é bem estável. Um programa em uso estável de memória vai sempre apresentar um uso de memória serrilhado, esse padrão acontece porque objetos são criados até que sejam finalizados pelo <em>Garbage Collector</em>, então podemos afirmar que cada vez que o uso de memória cai houve uma execução do <em>Garbage Collector</em>.</p>
+</div>
+<div id="cap-07-visualvm" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-07/visualvm.png" alt="visualvm">
+</div>
+<div class="title">Figura 5. Interface do VisualVM mostrando o uso de memória de um programa simples.</div>
+</div>
+<div class="paragraph">
+<p>Ao executar o VisualVM você consegue atrelar a qualquer JVM em execução na máquina local ou a uma JVM que exponha o gerenciamento através de uma porta JMX. A linha de comando abaixo mostra como executar um processo Java que seja acessível pela porta 8080 sem nenhuma segurança.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>java <span class="nt">-Dcom</span>.sun.management.jmxremote.port<span class="o">=</span>8080 <span class="se">\</span>
+       <span class="nt">-Dcom</span>.sun.management.jmxremote.ssl<span class="o">=</span><span class="nb">false</span> <span class="se">\</span>
+       <span class="nt">-Dcom</span>.sun.management.jmxremote.authenticate<span class="o">=</span><span class="nb">false</span> <span class="se">\</span>
+       <span class="nt">-jar</span> target/produtor.jar <span class="nt">--appId</span> <span class="nv">$APP_ID</span> <span class="nt">--timeout</span> 1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><em>— Será que eu consigo saber quando o Garbage Collector foi chamado? Ou chamar ele manualmente?</em></p>
+</div>
+<div class="paragraph">
+<p>A resposta simples é não! De dentro do seu código Java não dá pra escutar o funcionamento do <em>Garbage Collector</em> e nem é recomendável chamar ele através da biblioteca. A VisualVM possibilita que ele seja chamada manualmente através da interface gráfica (e não da biblioteca padrão). Mas existe a possibilidade de que salvar o log do <em>Garbage Collector</em> para futura analise. Por exemplo, no comando bash abaixo estamos ordenando a JVM a salvar as informações no arquivo <code>gc.log</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">$ </span>java <span class="nt">-XX</span>:+PrintGCDetails <span class="nt">-Xloggc</span>:gc.log <span class="nt">-jar</span> target/produtor.jar <span class="nt">--appId</span> <span class="nv">$APP_ID</span> <span class="nt">--timeout</span> 1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Vamos observar o que temos o cabeçalho desse arquivo de log?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>[0.009s][info][gc,init] CardTable entry size: 512
+[0.009s][info][gc     ] Using G1
+[0.011s][info][gc,init] Version: 18+36-2087 (release)
+[0.011s][info][gc,init] CPUs: 8 total, 8 available
+[0.011s][info][gc,init] Memory: 16099M
+[0.011s][info][gc,init] Large Page Support: Disabled
+[0.011s][info][gc,init] NUMA Support: Disabled
+[0.011s][info][gc,init] Compressed Oops: Enabled (Zero based)
+[0.011s][info][gc,init] Heap Region Size: 2M
+[0.011s][info][gc,init] Heap Min Capacity: 8M
+[0.011s][info][gc,init] Heap Initial Capacity: 252M
+[0.011s][info][gc,init] Heap Max Capacity: 4026M
+[0.012s][info][gc,init] Pre-touch: Disabled
+[0.012s][info][gc,init] Parallel Workers: 8
+[0.012s][info][gc,init] Concurrent Workers: 2
+[0.012s][info][gc,init] Concurrent Refinement Workers: 8
+[0.012s][info][gc,init] Periodic GC: Disabled
+[0.012s][info][gc,metaspace] CDS archive(s) mapped at: [0x0000000800000000-0x0000000800b90000-0x0000000800b90000), size 12124160, SharedBaseAddress: 0x0000000800000000, ArchiveRelocationMode: 0.
+[0.012s][info][gc,metaspace] Compressed class space mapped at: 0x0000000800c00000-0x0000000840c00000, reserved size: 1073741824
+[0.012s][info][gc,metaspace] Narrow klass base: 0x0000000800000000, Narrow klass shift: 0, Narrow klass range: 0x100000000</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe que temos várias informações sobre a máquina e a configuração da JVM. Temos o total de CPU (<em>CPUs: 8 total, 8 available</em>), memória (<em>Memory: 16099M</em>), versão da JVM, <em>Garbage Collector</em> selecionado (<em>Using G1</em>) e configurações do <em>Garbage Collector (_Parallel Workers: 8</em>, <em>Concurrent Workers: 2</em>, <em>Concurrent Refinement Workers: 8</em> e <em>Periodic GC: Disabled</em>). Os valores específicos da JVM podem ser configurados através de parâmetros.</p>
+</div>
+<div class="paragraph">
+<p>Com o log habilitado toda atividade do <em>Garbage Collector</em> estará registrada, vamos analisar uma delas?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>[48.661s][info][gc,start    ] GC(7) Pause Young (Normal) (G1 Evacuation Pause)
+[48.662s][info][gc,task     ] GC(7) Using 2 workers of 8 for evacuation
+[48.671s][info][gc,phases   ] GC(7)   Pre Evacuate Collection Set: 0.1ms
+[48.671s][info][gc,phases   ] GC(7)   Merge Heap Roots: 0.1ms
+[48.672s][info][gc,phases   ] GC(7)   Evacuate Collection Set: 8.8ms
+[48.672s][info][gc,phases   ] GC(7)   Post Evacuate Collection Set: 0.7ms
+[48.672s][info][gc,phases   ] GC(7)   Other: 0.2ms
+[48.672s][info][gc,heap     ] GC(7) Eden regions: 6-&gt;0(6)
+[48.672s][info][gc,heap     ] GC(7) Survivor regions: 1-&gt;1(1)
+[48.672s][info][gc,heap     ] GC(7) Old regions: 5-&gt;5
+[48.672s][info][gc,heap     ] GC(7) Archive regions: 0-&gt;0
+[48.672s][info][gc,heap     ] GC(7) Humongous regions: 0-&gt;0
+[48.672s][info][gc,metaspace] GC(7) Metaspace: 30289K(31040K)-&gt;30289K(31040K) NonClass: 27043K(27392K)-&gt;27043K(27392K) Class: 3245K(3648K)-&gt;3245K(3648K)
+[48.672s][info][gc          ] GC(7) Pause Young (Normal) (G1 Evacuation Pause) 21M-&gt;10M(34M) 10.497ms
+[48.672s][info][gc,cpu      ] GC(7) User=0.00s Sys=0.00s Real=0.01s</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Primeiro vamos observar a topologia dessa mensagem de log. O primeiro parâmetro é de suma importância, ele vai registrar o momento em que a mensagem foi gerada, podemos dizer por exemplo eu que essa execução começou exatamente em <code>48.661s</code> e terminou <code>48.672s</code>. Por fim temos a mensagem de log, e veja que na penúltima linha temos o tempo total da execução <code>10.497ms</code>. Temos os registros de como as regiões foram impactadas, no caso acima os 6 objetos residentes no Eden foram removidos deixando as outras regiões intactas.</p>
+</div>
+<div class="paragraph">
+<p>Qual outra informação esse log trás? Talvez você não tenha percebido, mas se você somar todas as linhas que contém a string <code>[info][gc          ]</code> você tem o tempo total gasto em <em>Garbage Collector</em> que pode ser usado com o tempo de execução que está na primeira coluna e temos a porcentagem de tempo de execução que o <em>Garbage Collector</em> usa. Essa informação é importante porque a maioria das implementações de <em>Garbage Collector</em> para as threads para não criar inconsistências.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-07-solucoes-comuns">Soluções Comuns</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Se seu processo está gastando muito tempo com o <em>Garbage Collector</em> pode ser que algumas ações devam ser tomadas. Não existe uma regra padrão sobre como se otimiza a memória pois cada programa tem um comportamento diferente.</p>
+</div>
+<div class="paragraph">
+<p>O ideal é construir um modelo de otimização, você precisa de dados para isso. Primeiro coloque seu programa em execução com determinada configuração, depois registre o número máximo de requisições por segundo, o tempo usado com <em>Garbage Collector</em> e a latência de resposta de uma requisição. Depois vá alterando as configurações e veja como esses valores se comportam.</p>
+</div>
+<div class="paragraph">
+<p>Eu já trabalhei em um sistema que era possível configurar o número de threads de execução e a performance estava degradada porque a pessoa que dava suporte configurou um elevado número de threads. A solução nesse caso foi reduzir o número de threads e rodar outra instância em paralelo.</p>
+</div>
+<div class="paragraph">
+<p>Com esse experimento, você será capaz de dizer o que acontece com o sistema se você reduzir o tamanho da <em>heap</em> ou se você aumentar o tamanho do <em>Eden</em>, etc.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Gerenciamento de Memória" /><category term="Tuning" /><summary type="html"><![CDATA[Como funciona o gerenciamento de memória com Java? Nesse post vou descrever como funciona a memória de um programa Java e comparar ele com de outros programas. Depois vou mostrar quais os principais desafios do gerenciamento de memória em programas Java. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.]]></summary></entry></feed>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Kafka.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Kafka.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Log Cleanup no Kafka</title><link href="https://blog.vepo.dev/posts/log-cleanup-no-kafka" rel="alternate" type="text/html" title="Log Cleanup no Kafka" /><published>2020-11-27T00:00:00+00:00</published><updated>2020-11-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/16-10-00-log-cleanup-no-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/log-cleanup-no-kafka"><![CDATA[<p>Ao ler o livro <a href="https://www.confluent.io/designing-event-driven-systems/">Designing Event-Driven Systems</a>, tive a impressão que o Kafka atua exatamente como uma base de dados. Essa é uma informação falsa. Ele pode atuar como uma base de dados, desde que seja configurado para.</p>
+
+<p>Nesse post vou mostrar algumas configurações de tópicos que deve ser feitas para que o dado seja persistente e não efêmero.</p>
+
+<h1 id="partições-e-segmentos">Partições e Segmentos</h1>
+
+<p>Espero que você já conheça alguns elementos importantes de um tópico, como Partições e Fator de Replicação. Caso não conheça, leia <a href="https://blog.vepo.dev/posts/anatomia-de-um-topico">Anatomia de um Tópico</a> para podermos conhecer basicamente como funciona um tópico.</p>
+
+<p>No post anterior, só entrei até o detalhe do número de partição, pois essa é a parte importante quando falamos de <strong>ordenação de mensagens</strong>.</p>
+
+<p>Já quando falamos de Cleanup, precisamos introduzir Segmentos. Cada partição, é subdividida em Segmentos. Segmentos contém os dados ordenados sequencialmente (um arquivo de log), assim como a partição. Ao escrever, o Broker escreve apenas ao final do último segmento da partição. Mas os dados são lidos sequencialmente pelos consumers.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/6r0v1w4vphys98eh76xp.png" alt="Segmentos" /></p>
+
+<p>Se formos fazer um levantamento nas configurações de um tópico, podemos ver que muitas das propriedades são referentes não somente ao tópico, mas ao segmento.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Propriedade</th>
+      <th>Descrição</th>
+      <th>Valor Padrão</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.bytes"><code class="language-plaintext highlighter-rouge">segment.bytes</code></a></td>
+      <td>Tamanho do arquivo de segmento.</td>
+      <td>1073741824 (1 GB)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.index.bytes"><code class="language-plaintext highlighter-rouge">segment.index.bytes</code></a></td>
+      <td>Tamanho do arquivo de index do segmento.</td>
+      <td>10485760 (10 MB)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.jitter.ms"><code class="language-plaintext highlighter-rouge">segment.jitter.ms</code></a></td>
+      <td>O jitter aleatório máximo subtraído do tempo de rolagem do segmento programado para evitar sobrecargas.</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#segment.ms"><code class="language-plaintext highlighter-rouge">segment.ms</code></a></td>
+      <td>Idade máxima do segmento. O Kafka fará a rolagem para garantir sua limpeza</td>
+      <td>604800000 (7 dias)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Todos esses valores também podem ser configurados por cluster. A configuração de cluster é usando como padrão, caso o valor não seja configurado no Tópico.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuração do Tópico</th>
+      <th>Configuração do Broker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.segment.bytes</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.index.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.index.size.max.bytes</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.jitter.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.roll.jitter.ms</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">segment.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.roll.ms</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Dado os valores de <code class="language-plaintext highlighter-rouge">segmento.ms</code> e <code class="language-plaintext highlighter-rouge">segment.bytes</code>, o Kafka decidirá quando um segmento será finalizado para que outro seja inicializado.</p>
+
+<p>O arquivo de index, como o nome já diz, é um índice que mapeia em qual posição do arquivo de offset uma mensagem está armazenada, garantindo assim ao Kafka que qualquer mensagem seja lida em tempo constante.</p>
+
+<p>Há também um outro arquivo de index, o <code class="language-plaintext highlighter-rouge">timeindex</code>. Este tem como função criar um index baseado no timestamp da mensagem.</p>
+
+<h1 id="políticas-de-limpeza">Políticas de Limpeza</h1>
+
+<p>Mas o que o Kafka faz com mensagens antigas? Isso é configurável por Tópico ou no Cluster.</p>
+
+<p>Essa configuração é muito importante se você usa seu Cluster como Fonte de Verdade ou caso você precise fazer um reset de todo pipeline.</p>
+
+<p>Para configurar é preciso alterar o valor de <code class="language-plaintext highlighter-rouge">cleanup.policy</code> (ou <code class="language-plaintext highlighter-rouge">log.cleanup.policy</code> para o Cluster). Essa propriedade aceita os valores <code class="language-plaintext highlighter-rouge">compact</code> e <code class="language-plaintext highlighter-rouge">delete</code>. Por padrão, essas propriedades vêm como <code class="language-plaintext highlighter-rouge">delete</code>.</p>
+
+<h2 id="delete">Delete</h2>
+
+<p>Quando a política de limpeza selecionada é delete, o Kafka vai remover o segmento baseado na sua idade ou no tamanho da partição.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Propriedade</th>
+      <th>Descrição</th>
+      <th>Valor Padrão</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#retention.ms"><code class="language-plaintext highlighter-rouge">retention.ms</code></a></td>
+      <td>Idade máxima de um segmento</td>
+      <td>604800000 (7 dias)</td>
+    </tr>
+    <tr>
+      <td><a href="https://kafka.apache.org/documentation/#retention.bytes"><code class="language-plaintext highlighter-rouge">retention.bytes</code></a></td>
+      <td>Tamanho máximo da partição</td>
+      <td>-1 (desabilitado)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vale lembrar que essas duas propriedades podem também ser configuradas por Cluster.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuração do Tópico</th>
+      <th>Configuração do Broker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention.ms</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.retention.ms</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">retention.bytes</code></td>
+      <td><code class="language-plaintext highlighter-rouge">log.retention.bytes</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="compactação">Compactação</h2>
+
+<p>A compactação do Log vai fazer uma limpeza, mas garantindo que você terá ao menos a última mensagem enviada por chave. Assim teremos apenas a última informação de cada chave.</p>
+
+<p>A compactação não irá alterar os offsets das mensagens, uma mensagem é imutável. Irá apenas remover mensagem com <code class="language-plaintext highlighter-rouge">offset</code> inferior a última mensagem de cada chave.</p>
+
+<p>Mensagens anda podem ser recebidas, mesmo depois de removidas, isso é feito baseado na propriedade <a href="https://kafka.apache.org/documentation/#delete.retention.ms"><code class="language-plaintext highlighter-rouge">delete.retention.ms</code></a>. Após esse tempo se esgotar a mensagem não será recebida.</p>
+
+<p>Uma mensagem apagada, significa que novos consumidores não a receberão. Consumidores que já estejam recebendo mensagens não perceberão que o histórico foi alterado, a não ser que este tenha seu offset reiniciado.</p>
+
+<p>A compactação ocorre quando o segmento é finalizado.</p>
+
+<h1 id="implicações">Implicações</h1>
+
+<p>Ao desenvolvedor e arquiteto, uma pergunta deve ser feita. Quais as implicações da escolha da política de limpeza?</p>
+
+<p>Um Cluster terá suas configurações padrão, mas cada Tópico pode ter sua própria configuração.</p>
+
+<h2 id="delete-1">Delete</h2>
+
+<p>Ao se escolher por remover mensagens de um Tópico, deve-se ter ciência que novos consumers não receberão mensagens antigas. Vamos imaginar que, com os valores padrões, a idade máxima de uma mensagem será 14 dias. Assim, se um tópico é considerado fonte de verdade, deve ter os valores de <code class="language-plaintext highlighter-rouge">retention.ms</code> e <code class="language-plaintext highlighter-rouge">retention.bytes</code> configurados corretamente.</p>
+
+<p>Para se calcular o volume de dados armazenado por Tópico, é preciso levar em consideração o tamanho médio de uma mensagem, o número de mensagens por dia e o tempo de retenção de uma mensagem. Essa é uma informação que o Arquiteto de Software tem que ter, e mesmo que não tenha, deve estimar baseado nas estatisticas da aplicação.</p>
+
+<h2 id="compactação-1">Compactação</h2>
+
+<p>Ao se escolher compactar segmentos de um Tópico, deve-se ter ciência que uma mensagem não deve conter apenas uma atualização de estado, mas a informação completa. Caso haja apenas atualização de estado, haverá perca de dados.</p>
+
+<p>Para se calcular o volume de dados armazenado por Tópico, é necessário ter ciência do número de chaves únicas e o tamanho médio da mensagem, e adicionar o tamanho máximo de um segmento.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Kafka pode ser usado como Fonte de Verdade, mas antes deve-se conhecer a fundo como configurar. As configurações padrão garantem que uma mensagem ficará armazenada por entre 7 e 14 dias, mas isso pode ser alterado de acordo com os requisitos do sistema.</p>
+
+<hr />
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/1os85b4rmdpauz3yjbsu.jpg" alt="Hard Disk" /></p>
+
+<p>Foto de <strong>Azamat E</strong> no <a href="https://www.pexels.com/pt-br/foto/analogico-analogo-aparelhos-armazenamento-117729/"><strong>Pexels</strong></a>.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Kafka" /><category term="Apache Kafka" /><category term="Microservices" /><summary type="html"><![CDATA[Como o Kafka limpa as informações antigas? Quais parâmetros configurar?]]></summary></entry></feed>

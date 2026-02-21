@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>O que é Docker</title>
+  <meta property="og:title" content="O que é Docker" />
+  
+
+  
+  <meta name="description" content="Nesse tutorial vou ensinar o que é o docker e como usar Docker para distribuir aplicações." />
+  <meta property="og:description" content="Nesse tutorial vou ensinar o que é o docker e como usar Docker para distribuir aplicações." />
+  
+
+  
+  <meta name="keywords" content="Docker">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/tutorial/o-que-e-docker" />
+  <meta property="og:url" content="https://blog.vepo.dev/tutorial/o-que-e-docker" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/capas/chaplin-modern-times.webp" />
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2024-07-28T19:00:00+00:00" />
+  <meta property="article:modified_time" content="2024-07-28T19:00:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Docker" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "O que é Docker",
+      "datePublished": "2024-07-28T19:00:00+00:00",
+      
+      "description": "Nesse tutorial vou ensinar o que é o docker e como usar Docker para distribuir aplicações.",
+      
+      
+      "url": "https://blog.vepo.dev/tutorial/o-que-e-docker"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+<script async src="https://visita.vepo.dev/visita.js" data-token="legacy-token"></script>
+
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+        <header class="site-header">
+            <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+            <nav class="menu-list">
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+        </header>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="article cover-image">
+                    
+                    <img alt="O que é Docker" src="/assets/images/capas/chaplin-modern-times.webp" class="img-fluid" />
+                    
+                </div>
+        <div class="title">
+                    
+            <h1 class="serie-title">
+                O que é Docker
+            </h1>
+                    
+        </div>
+                
+        
+        <div class="publish_date">
+            <strong>
+                <time datetime="2024-07-28T19:00:00+00:00">
+                    28/julho/2024
+                </time>
+            </strong> 
+        </div>
+        
+        <div class="tag-container">
+            
+                    <a class="label label-default docker" href="/tags/#docker">
+            <i class="fas fa-tags"></i>
+                        Docker
+                    </a>
+            
+        </div>
+                
+                
+                <hr>
+                
+                
+        <article>
+            <p>Esse tutorial está armazenado em</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/docker-tutorial">
+                docker-tutorial
+            </a>
+        </span>
+    </h2>
+</div>
+
+<p>Antes de começa precisamos primeiro definir o que é Docker. Seria?</p>
+
+<ol>
+  <li>Uma empresa?</li>
+  <li>Uma tecnologia?</li>
+  <li>Um produto?</li>
+  <li>Um padrão?</li>
+</ol>
+
+<p>A respota certa são todas as respostas acima. Docker é uma tecnologia de conteinerização <em>(2)</em> criada pela empresa Docker Inc. <em>(1)</em> que acabou gerando uma série de produtos como Docker Hub <em>(3)</em>, mas posteriormente foi aberto para CNCF como um padrão chamado <a href="https://containerd.io/">containerd.io</a> <em>(4)</em>.</p>
+
+<p>Ao contrário da virtualização, a conteinerização consiste em se criar processos isolados dentro de um sistema operacional usando uma série de tecnologias do proprio Kernel do SO. Como falamos de Kernel, já estamos afirmando que ele surgiu no ambiente Linux, mas sistemas operacionais como o Windows já se mostraram capazes de criar containeres, mesmo não sendo popular.</p>
+
+<p>Um container é um padrão de componente que permite o empacotamento de aplicações e suas dependências em uma forma de fácil distribuição. Ao executar uma aplicação baseada em containers, não dependemos de nenhuma dependência além da plataforma de conteinerização.</p>
+
+<h2 id="quais-são-essas-tecnologias">Quais são essas tecnologias?</h2>
+
+<p>Docker se baseia em algumas tecnologias já existentes no Linux.</p>
+<ul>
+  <li><a href="https://pt.wikipedia.org/wiki/C%C3%B3pia_em_grava%C3%A7%C3%A3o">COW - Copy On Write</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Cgroups">cgroups</a></li>
+  <li><a href="https://pt.wikipedia.org/wiki/Iptables">iptables</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Linux_namespaces">Linux Namespaces</a></li>
+</ul>
+
+<h3 id="cow">COW</h3>
+
+<p><em>Copy On Write</em> é uma técnica que permite a criação de uma estrutura de arquivos por camada. Cada camada altera a anterior e camadas podem ser compartilhadas com processos diferentes.</p>
+
+<h3 id="cgroups">cgroups</h3>
+
+<p><em>cgroups</em> é uma feature do Linux que permite controlar o tanto de recurso (CPU, Memória, I/O) que um processo pode utilizar.</p>
+
+<h3 id="iptables">iptables</h3>
+
+<p><em>iptables</em> é um programa Linux que permite criar regras de redirecionamento de portas dentro do Linux.</p>
+
+<h3 id="linux-namespaces">Linux Namespaces</h3>
+
+<p><em>Linux Namespaces</em> permite o compartilhamento, e o isolamento, de recursos do SO dentro do Linux. Similar ao <em>cgroups</em>, mas se refere a outros tipos de recursos. Por exemploe: PIDs, nomes de arquivos, hostnames, etc…</p>
+
+<h2 id="docker-building-blocks">Docker Building Blocks</h2>
+
+<p>Gosto do conceito de Building Blocks, quando me refiro a ele estou definindo elementos básicos para algo. Assim em Docker podemos definir alguns building blocks.</p>
+
+<p>Para o desenvolvimento de qualquer aplicação Docker, é necessário entender o que são cada um desses elementos.</p>
+
+<ul>
+  <li>Imagem
+    <ul>
+      <li>TAGs</li>
+    </ul>
+  </li>
+  <li>Container
+    <ul>
+      <li>Volume</li>
+      <li>Network</li>
+    </ul>
+  </li>
+  <li>Registry</li>
+  <li>Dockerfile</li>
+</ul>
+
+<h3 id="imagem">Imagem</h3>
+
+<p>Uma Imagem é uma foto do Container em seu momento inicial. Se formos comparar com os conceitos de máquinas virtuais, a Imagem seria um SNAPSHOT.</p>
+
+<p>Uma Imagem é usada para gerar um Container. Uma Imagem pode ser gerada a partir de um Container. Uma Imagem tem algumas propriedades que extendem o conceito de Snapshot, podemos definir qual comando a Imagem irá executar assim que ela iniciar.</p>
+
+<p>Uma Imagem é preferencialmente construida a partir de um Dockerfile.</p>
+
+<h4 id="tags">TAGs</h4>
+
+<p>Uma Imagem pode ter uma ou mais TAG associada. Cada imagem possui um nome, este nome pode estar associado a várias TAGs.</p>
+
+<p>Por exemplo, se formos criar um container do MariaDB, sabemos que o nome dele é <code class="language-plaintext highlighter-rouge">mariadb</code>. Mas se referenciarmos apenas esse nome, será baixada a image <code class="language-plaintext highlighter-rouge">mariadb:latest</code>, o que não é tão bom, visto que não sabemos exatamente qual versão será executada. No caso do MariaDB, temos as seguintes TAGs:</p>
+<ul>
+  <li>10.4.10-bionic, 10.4-bionic, 10-bionic, bionic, 10.4.10, 10.4, 10, latest</li>
+  <li>10.3.20-bionic, 10.3-bionic, 10.3.20, 10.3</li>
+  <li>10.2.29-bionic, 10.2-bionic, 10.2.29, 10.2</li>
+  <li>10.1.43-bionic, 10.1-bionic, 10.1.43, 10.1</li>
+</ul>
+
+<p>Uma boa opção, seria utilizar <code class="language-plaintext highlighter-rouge">mariadb:10.4</code> para escolher a versão <strong>10.4.10</strong> ou qualquer versão futura com bug fixes.</p>
+
+<h3 id="container">Container</h3>
+
+<p>Um Container é uma instância de uma aplicação. Pode haver vários Containers rodando com a partir da mesma Imagem. Ao se executar um Container é preciso uma Imagem e um conjunto de informações:</p>
+<ul>
+  <li>Volumes</li>
+  <li>Variáveis de Ambiente</li>
+  <li>Portas</li>
+  <li>etc…</li>
+</ul>
+
+<h4 id="volume">Volume</h4>
+
+<p>O Sistema de Arquivo de um Container é descartável. Assim, ao se remover o container, todos os arquivos dele são removidos. Um Volume é um mapeamento entre um diretório da máquina hospedeira para o container. Usando COW, o diretório, ou arquivo, dentro container é sobrescrito.</p>
+
+<h4 id="network">Network</h4>
+
+<p>Quando um container é executado, pode pertencer a uma ou várias Networks. Por padrão, ele pertence a Network Default. Para cada Network associada, ele terá um IP NAT associado.</p>
+
+<p>Uma Network serve para criar uma VPC. Dois containers só podem se comunicar se pertencerem a mesma Network. Uma Network contém DNS que resolve o IP através do nome do container. Assim, se um container tentar acessar <code class="language-plaintext highlighter-rouge">container-1:8080</code> estará tentando acessar a porta <strong>8080</strong> do container com nome <strong>container-1</strong>.</p>
+
+<h3 id="registry">Registry</h3>
+
+<p>Um Registry é um servidor web para armazenar uma Imagem. No ciclo de vida de uma Imagem, ela pode ser gerada ou baixada de um Registry.</p>
+
+<p>O padrão é o <a href="https://hub.docker.com/">Docker Hub</a>, sempre que possível procure imagens lá. No Docker Hub há imagens verificadas e não verificadas. Procure usar as imagens verificadas, caso contrário você pode estar correndo o risco de expor seus dados.</p>
+
+<h3 id="dockerfile">Dockerfile</h3>
+
+<p>Dockerfile é o script de criação de uma Imagem. Uma Imagem deve ser construida através de um script, e pode ser reconstruida em qualquer máquina.</p>
+
+<h2 id="criando-um-servidor-web">Criando um Servidor Web</h2>
+
+<p>Nessa passo vamos criar um servidor Web usando Nginx:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker search nginx
+NAME                              DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+nginx                             Official build of Nginx.                        15820     <span class="o">[</span>OK]
+jwilder/nginx-proxy               Automated Nginx reverse proxy <span class="k">for </span>docker con…   2094                 <span class="o">[</span>OK]
+richarvey/nginx-php-fpm           Container running Nginx + PHP-FPM capable of…   818                  <span class="o">[</span>OK]
+jc21/nginx-proxy-manager          Docker container <span class="k">for </span>managing Nginx proxy ho…   275
+linuxserver/nginx                 An Nginx container, brought to you by LinuxS…   159
+tiangolo/nginx-rtmp               Docker image with Nginx using the nginx-rtmp…   145                  <span class="o">[</span>OK]
+jlesage/nginx-proxy-manager       Docker container <span class="k">for </span>Nginx Proxy Manager        143                  <span class="o">[</span>OK]
+alfg/nginx-rtmp                   NGINX, nginx-rtmp-module and FFmpeg from sou…   110                  <span class="o">[</span>OK]
+nginxdemos/hello                  NGINX webserver that serves a simple page co…   77                   <span class="o">[</span>OK]
+privatebin/nginx-fpm-alpine       PrivateBin running on an Nginx, php-fpm &amp; Al…   60                   <span class="o">[</span>OK]
+nginx/nginx-ingress               NGINX and  NGINX Plus Ingress Controllers fo…   57
+nginxinc/nginx-unprivileged       Unprivileged NGINX Dockerfiles                  54
+staticfloat/nginx-certbot         Opinionated setup <span class="k">for </span>automatic TLS certs lo…   25                   <span class="o">[</span>OK]
+nginxproxy/nginx-proxy            Automated Nginx reverse proxy <span class="k">for </span>docker con…   24
+nginx/nginx-prometheus-exporter   NGINX Prometheus Exporter <span class="k">for </span>NGINX and NGIN…   22
+schmunk42/nginx-redirect          A very simple container to redirect HTTP tra…   19                   <span class="o">[</span>OK]
+centos/nginx-112-centos7          Platform <span class="k">for </span>running nginx 1.12 or building …   16
+centos/nginx-18-centos7           Platform <span class="k">for </span>running nginx 1.8 or building n…   13
+bitwarden/nginx                   The Bitwarden nginx web server acting as a r…   11
+flashspys/nginx-static            Super Lightweight Nginx Image                   11                   <span class="o">[</span>OK]
+mailu/nginx                       Mailu nginx frontend                            9                    <span class="o">[</span>OK]
+sophos/nginx-vts-exporter         Simple server that scrapes Nginx vts stats a…   7                    <span class="o">[</span>OK]
+ansibleplaybookbundle/nginx-apb   An APB to deploy NGINX                          3                    <span class="o">[</span>OK]
+wodby/nginx                       Generic nginx                                   1                    <span class="o">[</span>OK]
+arnau/nginx-gate                  Docker image with Nginx with Lua enabled on …   1                    <span class="o">[</span>OK]
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> hello-world <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+Unable to find image <span class="s1">'nginx:latest'</span> locally
+7d63c13d9b9b: Pull <span class="nb">complete
+</span>5cb019b641b5: Pull <span class="nb">complete
+</span>d477de77abf8: Pull <span class="nb">complete
+</span>c60e7d4c1c30: Pull <span class="nb">complete
+</span>365a49996569: Pull <span class="nb">complete
+</span>039c6e901970: Pull <span class="nb">complete
+</span>Digest: sha256:d1ce0f99f6a8acc9162c29497014716c44d126f1d41deee40a2c13e3d9d9b02a
+Status: Downloaded newer image <span class="k">for </span>nginx:latest
+afc52ea50894abea646ccbeff935b77206e68b53bb05b32b4c5679e5b014743b
+</code></pre></div></div>
+
+<p>Agora o NGIX está rodando e pode ser usado através da porta 8080, mesmo internamente expondo a porta 80.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl localhost:8080 <span class="nt">-s</span>
+&lt;<span class="o">!</span>DOCTYPE html&gt;
+&lt;html&gt;
+&lt;<span class="nb">head</span><span class="o">&gt;</span>
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+html <span class="o">{</span> color-scheme: light dark<span class="p">;</span> <span class="o">}</span>
+body <span class="o">{</span> width: 35em<span class="p">;</span> margin: 0 auto<span class="p">;</span>
+font-family: Tahoma, Verdana, Arial, sans-serif<span class="p">;</span> <span class="o">}</span>
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.&lt;/p&gt;
+
+&lt;p&gt;For online documentation and support please refer to
+&lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">"http://nginx.org/"</span><span class="o">&gt;</span>nginx.org&lt;/a&gt;.&lt;br/&gt;
+Commercial support is available at
+&lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">"http://nginx.com/"</span><span class="o">&gt;</span>nginx.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Thank you <span class="k">for </span>using nginx.&lt;/em&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+
+<p>Esse container está rodando com a imagem base do NGIX, para verificar quais containeres estão em execução, execute <code class="language-plaintext highlighter-rouge">docker ps</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+afc52ea50894   nginx     <span class="s2">"/docker-entrypoint.…"</span>   6 minutes ago   Up 6 minutes   0.0.0.0:8080-&gt;80/tcp, :::8080-&gt;80/tcp   hello-world
+</code></pre></div></div>
+
+<p>Através do CLI do docker é possível verificar as estatísticas do container em execução.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker stats <span class="nt">--no-stream</span>
+CONTAINER ID   NAME          CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O   PIDS
+afc52ea50894   hello-world   0.00%     6.719MiB / 12.26GiB   0.05%     2.56kB / 2.47kB   0B / 0B     9
+</code></pre></div></div>
+
+<p>Os recursos podem ser limitados ao iniciar o container, se quisermos limitar  a memória em 12MB e CPU em 1, basta executar:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> hello-world <span class="nt">--memory</span> 12MB  <span class="nt">--cpus</span> 1 <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+43848a573db629515d2a73a26eb7293eb2421de937240197f3dfcde97aa26cb6
+
+<span class="nv">$ </span>docker stats <span class="nt">--no-stream</span>
+CONTAINER ID   NAME          CPU %     MEM USAGE / LIMIT   MEM %     NET I/O     BLOCK I/O   PIDS
+43848a573db6   hello-world   0.00%     6.652MiB / 12MiB    55.44%    696B / 0B   0B / 0B     9
+</code></pre></div></div>
+
+<p>O próximo passo é alterar o container em execução, para isso:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker <span class="nb">cp </span>index.html hello-world:/usr/share/nginx/html/index.html
+
+<span class="nv">$ </span>curl localhost:8080 <span class="nt">-s</span>
+&lt;html&gt;
+    &lt;body&gt;
+        &lt;h1&gt;My First Container!!!&lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+
+<h2 id="controlando-um-container">Controlando um container</h2>
+
+<p>Containers tem um ciclo de vida. Eles nascem e morrem. Mas o pronto principal é que containers tem um processo principal, quando esse processo termina, o container para. Você pode controlar o ciclo de vida de um container pelos comandos <code class="language-plaintext highlighter-rouge">docker start</code>, <code class="language-plaintext highlighter-rouge">docker stop</code> e <code class="language-plaintext highlighter-rouge">docker rm</code>.</p>
+
+<p>Abaixo podemos ver que ao verificar que programa o programa sendo executado pelo processo 1 é o nginx, se esse processo morrer, o container para.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">--name</span> hello-world <span class="nt">-p</span> 8080:80 <span class="nt">-d</span> nginx
+f32f770597d5d97f0600c9382dee67e9728f3c5fba9ae82ab2df632ae2977246
+
+<span class="nv">$ </span>docker <span class="nb">exec</span> <span class="nt">-it</span> hello-world bash
+root@f32f770597d5:/# <span class="nb">ls</span> <span class="nt">-lah</span> /proc/1/exe
+lrwxrwxrwx 1 root root 0 Nov 22 13:08 /proc/1/exe -&gt; /usr/sbin/nginx
+</code></pre></div></div>
+
+<p>Para ter maior familiaridade com a linha de comando docker, execute alguns containers e leia um pouco da documentação do proprio docker.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker <span class="nb">help
+
+</span>Usage:  docker <span class="o">[</span>OPTIONS] COMMAND
+
+A self-sufficient runtime <span class="k">for </span>containers
+
+Options:
+      <span class="nt">--config</span> string      Location of client config files <span class="o">(</span>default
+                           <span class="s2">"/home/vepo/.docker"</span><span class="o">)</span>
+  <span class="nt">-c</span>, <span class="nt">--context</span> string     Name of the context to use to connect to the
+                           daemon <span class="o">(</span>overrides DOCKER_HOST <span class="nb">env </span>var and
+                           default context <span class="nb">set </span>with <span class="s2">"docker context use"</span><span class="o">)</span>
+  <span class="nt">-D</span>, <span class="nt">--debug</span>              Enable debug mode
+  <span class="nt">-H</span>, <span class="nt">--host</span> list          Daemon socket<span class="o">(</span>s<span class="o">)</span> to connect to
+  <span class="nt">-l</span>, <span class="nt">--log-level</span> string   Set the logging level
+                           <span class="o">(</span><span class="s2">"debug"</span>|<span class="s2">"info"</span>|<span class="s2">"warn"</span>|<span class="s2">"error"</span>|<span class="s2">"fatal"</span><span class="o">)</span>
+                           <span class="o">(</span>default <span class="s2">"info"</span><span class="o">)</span>
+      <span class="nt">--tls</span>                Use TLS<span class="p">;</span> implied by <span class="nt">--tlsverify</span>
+      <span class="nt">--tlscacert</span> string   Trust certs signed only by this CA <span class="o">(</span>default
+                           <span class="s2">"/home/vepo/.docker/ca.pem"</span><span class="o">)</span>
+      <span class="nt">--tlscert</span> string     Path to TLS certificate file <span class="o">(</span>default
+                           <span class="s2">"/home/vepo/.docker/cert.pem"</span><span class="o">)</span>
+      <span class="nt">--tlskey</span> string      Path to TLS key file <span class="o">(</span>default
+                           <span class="s2">"/home/vepo/.docker/key.pem"</span><span class="o">)</span>
+      <span class="nt">--tlsverify</span>          Use TLS and verify the remote
+  <span class="nt">-v</span>, <span class="nt">--version</span>            Print version information and quit
+
+Management Commands:
+  builder     Manage builds
+  buildx<span class="k">*</span>     Build with BuildKit <span class="o">(</span>Docker Inc., v0.6.3<span class="o">)</span>
+  compose<span class="k">*</span>    Docker Compose <span class="o">(</span>Docker Inc., v2.1.1<span class="o">)</span>
+  config      Manage Docker configs
+  container   Manage containers
+  context     Manage contexts
+  image       Manage images
+  manifest    Manage Docker image manifests and manifest lists
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  scan<span class="k">*</span>       Docker Scan <span class="o">(</span>Docker Inc., 0.9.0<span class="o">)</span>
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+
+Commands:
+  attach      Attach <span class="nb">local </span>standard input, output, and error streams to a running container
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container<span class="s1">'s changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container'</span>s filesystem
+  events      Get real <span class="nb">time </span>events from the server
+  <span class="nb">exec        </span>Run a <span class="nb">command </span><span class="k">in </span>a running container
+  <span class="nb">export      </span>Export a container<span class="s1">'s filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a filesystem image
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop, then print their exit codes
+
+Run '</span>docker COMMAND <span class="nt">--help</span><span class="s1">' for more information on a command.
+
+To get more help with docker, check out our guides at https://docs.docker.com/go/guides/
+</span></code></pre></div></div>
+
+<h2 id="imagens-e-repositório">Imagens e Repositório</h2>
+
+<p>O docker é baseado em uma imagem. Uma imagem é o ponto de inicio de um container. Ao se criar um container a partir de uma imagem, ela permanece imutável. Se você alterar um container, a imagem não é alterada.</p>
+
+<p>Containers em execução podem ser salvos como uma nova imagem, para isso use o comando <code class="language-plaintext highlighter-rouge">docker commit</code>, veja a documentação abaixo:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker commit <span class="nt">--help</span>
+
+Usage:  docker commit <span class="o">[</span>OPTIONS] CONTAINER <span class="o">[</span>REPOSITORY[:TAG]]
+
+Create a new image from a container<span class="s1">'s changes
+
+Options:
+  -a, --author string    Author (e.g., "John Hannibal Smith
+                         &lt;hannibal@a-team.com&gt;")
+  -c, --change list      Apply Dockerfile instruction to the created image
+  -m, --message string   Commit message
+  -p, --pause            Pause container during commit (default true)
+
+</span></code></pre></div></div>
+
+<p>Apesar de existir o comando <code class="language-plaintext highlighter-rouge">docker commit</code>, não use ele para gerar imagens, prefira o Dockerfile que vamos falar mais a frente.</p>
+
+<p>Imagens são construida em camadas, que podem ser compartilhada entre vários containers. Para verificar o histórico e as informações de uma imagem, use <code class="language-plaintext highlighter-rouge">docker history &lt;image&gt;</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker <span class="nb">history </span>nginx
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+e9ce56a96f8e   5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  CMD ["nginx" "-g" "daemon…   0B</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  STOPSIGNAL SIGQUIT           0B</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  EXPOSE 80                    0B</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  ENTRYPOINT ["/docker-entr…   0B</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop) COPY file:09a214a3e07c919a…   4.61kB</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop) COPY file:0fd5fca330dcd6a7…   1.04kB</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop) COPY file:0b866ff3fc1ef5b0…   1.96kB</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="c">#(nop) COPY file:65504f71f5855ca0…   1.2kB</span>
+&lt;missing&gt;      5 days ago    /bin/sh <span class="nt">-c</span> <span class="nb">set</span> <span class="nt">-x</span>     <span class="o">&amp;&amp;</span> addgroup <span class="nt">--system</span> -…   61.1MB
+&lt;missing&gt;      12 days ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  ENV PKG_RELEASE=1~bullseye   0B</span>
+&lt;missing&gt;      12 days ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  ENV NJS_VERSION=0.7.0        0B</span>
+&lt;missing&gt;      12 days ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  ENV NGINX_VERSION=1.21.4     0B</span>
+&lt;missing&gt;      12 days ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  LABEL maintainer=NGINX Do…   0B</span>
+&lt;missing&gt;      5 weeks ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop)  CMD ["bash"]                 0B</span>
+&lt;missing&gt;      5 weeks ago   /bin/sh <span class="nt">-c</span> <span class="c">#(nop) ADD file:16dc2c6d1932194ed…   80.4MB</span>
+</code></pre></div></div>
+
+<p>Imagens podem ser amarzenadas localmente, mas podem ser amarzenadas em um repositório. Ao executar o comando <code class="language-plaintext highlighter-rouge">docker run</code>, o docker vai procurar a imagem socilitada localmente, se não encontrar vai procurar remotamente. Nos nossos exemplos usamos imagens do repositório padrão do docker, o (hub.docker.com)[https://hub.docker.com/], mas quando há um prefixo na image terminado em <code class="language-plaintext highlighter-rouge">/</code> significa que esse prefix é a URL do repositório. Isso que dizer que se usassemos a image <code class="language-plaintext highlighter-rouge">quay.io/bitnami/nginx</code> estariamos usando a imagem armazenada no <a href="https://quay.io/">quay.io</a> e não no hub.docker.com.</p>
+
+<p>Caso você queira baixar uma imagem, pode fazer isso pelo comando <code class="language-plaintext highlighter-rouge">docker pull quay.io/bitnami/nginx</code>. Caso você queira fazer o upload de uma imagem, pode usar o comando <code class="language-plaintext highlighter-rouge">docker push &lt;nome da imagem&gt;</code>. O upload vai seguir a mesma lógica do download, usando o nome da imagem para escolher o repositório.</p>
+
+<p>Imagens podem ser renomeadas e versionadas. Para isso use o comando <code class="language-plaintext highlighter-rouge">docker tag</code>, veja a documentação abaixo:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker tag <span class="nt">--help</span>
+
+Usage:  docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+</code></pre></div></div>
+
+<h2 id="criando-uma-imagem">Criando uma imagem</h2>
+
+<p>Agora para finalizar precisamos vamos descrever o melhor método de se criar uma imagem. Vamos supor que queremos criar uma imagem de um servidor Java. Como eu devo começar?</p>
+
+<p>Para se criar imagem, devemos partir de uma outra imagem. Um erro comum de alguns desenvolvedores é usarem imagens das distribuições mais famosas do Linux, mas isso irá gerar uma imagem grande. Prefira imagens menores, se você precisa partir de um Linux básico, prefira o <a href="https://www.alpinelinux.org/">Alpine Linux</a>. Você pode verificar abaixo que um Centos tem 231MB enquanto um Alpine apenas 5,61MB.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker image <span class="nb">ls
+</span>REPOSITORY                         TAG         IMAGE ID       CREATED        SIZE
+alpine                             latest      0a97eee8041e   9 days ago     5.61MB
+centos                             latest      5d0da3dc9764   2 months ago   231MB
+</code></pre></div></div>
+
+<p>Como vamos criar um servidor Java, vamos usar a imagem oficial do <a href="https://hub.docker.com/_/openjdk">openjdk</a>. Essa imagem tem várias tags que são usadas para se escolher tanto a versão do Java que vamos usar quanto o sistema operacional que ela contém. Vamos escolher a <strong>openjdk:17-alpine</strong> por dois motivos, o primeiro é que a versão 17 do Java é a Long Term Support (LST), isso signifca mais estabildiade, e por ser menor o que implica que o download dela é mais rápido.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker image <span class="nb">ls
+</span>REPOSITORY                         TAG         IMAGE ID       CREATED        SIZE
+openjdk                            17-oracle   1b3756d6df61   3 days ago     471MB
+openjdk                            17-alpine   264c9bdce361   5 months ago   326MB
+</code></pre></div></div>
+
+<p>Agora com essa imagem podemos contruir o nosso Dockerfile. Um Dockerfile é um arquivo descritivo que contém todos os comandos necessários para se contruir uma imagem. É um arquivo texto e o processo de build é feito passo por passo. Para cada passo, o docker inicia um container, aplica o novo comando e salva uma imagem. Isso significa que o Dockerfile não é um script, um processo iniciado em um passo anterior não está ativo no próximo passo. Vamos ao exemplo mais simples?</p>
+
+<div class="language-Dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> openjdk:17-alpine</span>
+
+<span class="k">ADD</span><span class="s"> target/my-server.jar my-server.jar</span>
+
+<span class="k">EXPOSE</span><span class="s"> 8080/tcp</span>
+<span class="k">ENV</span><span class="s"> HTTP_PORT="8080"</span>
+
+<span class="k">ENTRYPOINT</span><span class="s"> ["java", "-jar", "my-server.jar"]</span>
+</code></pre></div></div>
+
+<p>A partir desse arquivo podemos gerar uma imagem usando o comando <code class="language-plaintext highlighter-rouge">docker build -t my-server:1.0.0 .</code>. Observe que o último paramêtro é diretório onde o Dockerfile está localizado. Para conhecer melhor um Dockerfile, recomendo ler a <a href="https://docs.docker.com/engine/reference/builder">documentação</a> e o guia de <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">boas práticas</a> dele.</p>
+
+<p>Caso você não queira ter o Java instalado na sua máquina e fazer toda a build usando o docker, é possível fazer uma <em>multi stage build</em> sem comprometer sua imagem com camadas desncessárias.</p>
+
+<div class="language-Dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Passo 1: Build e Package</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">maven:3.8.3-openjdk-17</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="s">builder</span>
+
+<span class="k">WORKDIR</span><span class="s"> /build</span>
+
+<span class="k">ADD</span><span class="s"> pom.xml   /build/pom.xml</span>
+<span class="k">RUN </span>mvn dependency:go-offline
+
+<span class="k">ADD</span><span class="s"> src       /build/src</span>
+<span class="k">RUN </span>mvn package
+
+<span class="c"># Passo 2: create image</span>
+<span class="k">FROM</span><span class="s"> openjdk:17-alpine</span>
+
+<span class="k">ADD</span><span class="s">  --from=target /build/target/my-server.jar my-server.jar</span>
+
+<span class="k">EXPOSE</span><span class="s"> 8080/tcp</span>
+<span class="k">ENV</span><span class="s"> HTTP_PORT="8080"</span>
+
+<span class="k">ENTRYPOINT</span><span class="s"> ["java", "-jar", "my-server.jar"]</span>
+</code></pre></div></div>
+
+<p>Finalizada a imagem, é só subir para algum repositório: <code class="language-plaintext highlighter-rouge">docker push my-server:1.0.0</code>. É muito provavel que você tenha que fazer login no repoisótio, isso pode ser feito usando <code class="language-plaintext highlighter-rouge">docker login</code> (para o hub.docker.com) e <code class="language-plaintext highlighter-rouge">docker login &lt;repo&gt;</code> para demais.</p>
+
+        </article>
+        
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+                
+        <div class="article-footer">
+            
+            <div class="published">
+                <div>Escrito em 28/julho/2024</div>
+            </div>
+            
+                    
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+
+
+    
+<div class="related-posts">
+    <h2>Posts relacionados</h2>
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/usando-https-com-lets-encrypt">
+                
+                    Habilitando HTTPS com Let's Encrypt!
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+    
+
+</div>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+ </body>

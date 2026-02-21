@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Collections.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Collections.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Entendendo equals(), hashCode() e Collections em Java</title><link href="https://blog.vepo.dev/posts/java-collections-equals-hashcode" rel="alternate" type="text/html" title="Entendendo equals(), hashCode() e Collections em Java" /><published>2024-01-09T00:00:00+00:00</published><updated>2024-01-09T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-13-46-java-collections-equals-hashcode</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-collections-equals-hashcode"><![CDATA[<p>Neste post, vamos explorar os conceitos fundamentais de <code class="language-plaintext highlighter-rouge">equals()</code>, <code class="language-plaintext highlighter-rouge">hashCode()</code> e como eles são utilizados em estruturas de dados como <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code> no Java. Além disso, discutiremos a importância da imutabilidade e como implementar esses métodos corretamente.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-ATMYvny-7Y" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="introdução-ao-java-collections">Introdução ao Java Collections</h2>
+
+<p>O pacote <code class="language-plaintext highlighter-rouge">java.util.Collections</code> é uma biblioteca padrão do Java que fornece implementações de estruturas de dados comuns, como listas, conjuntos e mapas. Essas estruturas são essenciais para o desenvolvimento eficiente em Java, pois eliminam a necessidade de implementar soluções personalizadas para problemas recorrentes.</p>
+
+<hr />
+
+<h2 id="contratos-em-java">Contratos em Java</h2>
+
+<p>Em Java, os contratos são regras documentadas que definem como determinados métodos devem se comportar. Diferentemente de outras linguagens, o Java não possui um mecanismo embutido para validação de contratos, mas a documentação é clara sobre as expectativas. Dois dos contratos mais importantes são os métodos <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code>, herdados da classe <code class="language-plaintext highlighter-rouge">Object</code>.</p>
+
+<h3 id="regras-para-equals">Regras para <code class="language-plaintext highlighter-rouge">equals()</code></h3>
+<ol>
+  <li><strong>Reflexividade</strong>: Um objeto deve ser igual a si mesmo.</li>
+  <li><strong>Simetria</strong>: Se <code class="language-plaintext highlighter-rouge">A.equals(B)</code> é <code class="language-plaintext highlighter-rouge">true</code>, então <code class="language-plaintext highlighter-rouge">B.equals(A)</code> também deve ser <code class="language-plaintext highlighter-rouge">true</code>.</li>
+  <li><strong>Transitividade</strong>: Se <code class="language-plaintext highlighter-rouge">A.equals(B)</code> e <code class="language-plaintext highlighter-rouge">B.equals(C)</code> são <code class="language-plaintext highlighter-rouge">true</code>, então <code class="language-plaintext highlighter-rouge">A.equals(C)</code> também deve ser <code class="language-plaintext highlighter-rouge">true</code>.</li>
+  <li><strong>Consistência</strong>: O método deve sempre retornar o mesmo valor, desde que o objeto não seja modificado.</li>
+  <li><strong>Não-nulidade</strong>: Um objeto nunca deve ser igual a <code class="language-plaintext highlighter-rouge">null</code>.</li>
+</ol>
+
+<h3 id="regras-para-hashcode">Regras para <code class="language-plaintext highlighter-rouge">hashCode()</code></h3>
+<ol>
+  <li><strong>Consistência</strong>: Deve retornar o mesmo valor para um objeto não modificado.</li>
+  <li><strong>Correspondência com <code class="language-plaintext highlighter-rouge">equals()</code></strong>: Se dois objetos são iguais (<code class="language-plaintext highlighter-rouge">equals()</code> retorna <code class="language-plaintext highlighter-rouge">true</code>), seus <code class="language-plaintext highlighter-rouge">hashCode()</code> devem ser iguais. O inverso não é necessariamente verdadeiro.</li>
+</ol>
+
+<hr />
+
+<h2 id="hashset-e-hashmap">HashSet e HashMap</h2>
+
+<h3 id="hashset">HashSet</h3>
+<ul>
+  <li>É uma implementação de <code class="language-plaintext highlighter-rouge">Set</code> que não permite elementos duplicados.</li>
+  <li>Utiliza <code class="language-plaintext highlighter-rouge">hashCode()</code> para determinar a posição do elemento em uma tabela interna.</li>
+  <li>Em caso de colisões (dois objetos com o mesmo <code class="language-plaintext highlighter-rouge">hashCode()</code>), o <code class="language-plaintext highlighter-rouge">equals()</code> é usado para verificar a igualdade.</li>
+</ul>
+
+<h3 id="hashmap">HashMap</h3>
+<ul>
+  <li>É uma implementação de <code class="language-plaintext highlighter-rouge">Map</code> que armazena pares chave-valor.</li>
+  <li>A chave é usada para calcular o <code class="language-plaintext highlighter-rouge">hashCode()</code> e determinar a posição na tabela.</li>
+  <li>Assim como no <code class="language-plaintext highlighter-rouge">HashSet</code>, colisões são resolvidas usando <code class="language-plaintext highlighter-rouge">equals()</code>.</li>
+</ul>
+
+<h4 id="exemplo-de-colisão">Exemplo de Colisão</h4>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">HashSet</span><span class="o">&lt;</span><span class="nc">Objeto</span><span class="o">&gt;</span> <span class="n">set</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;&gt;();</span>
+<span class="nc">Objeto</span> <span class="n">obj1</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Objeto</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="nc">Objeto</span> <span class="n">obj2</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Objeto</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// Mesmo hashCode que obj1</span>
+<span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">obj1</span><span class="o">);</span>
+<span class="n">set</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">obj2</span><span class="o">);</span> <span class="c1">// Só será adicionado se obj1.equals(obj2) for false</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="imutabilidade">Imutabilidade</h2>
+
+<p>Objetos imutáveis são aqueles cujo estado não pode ser alterado após a criação. Eles são ideais para uso em <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code> porque:</p>
+
+<ol>
+  <li><strong>Consistência</strong>: O <code class="language-plaintext highlighter-rouge">hashCode()</code> não muda, evitando comportamentos inesperados.</li>
+  <li><strong>Segurança</strong>: Não há risco de modificar uma chave após inserção, o que poderia tornar o valor inacessível.</li>
+</ol>
+
+<h3 id="como-criar-uma-classe-imutável">Como criar uma classe imutável</h3>
+<ul>
+  <li>Declare todos os campos como <code class="language-plaintext highlighter-rouge">final</code>.</li>
+  <li>Não forneça métodos modificadores (setters).</li>
+  <li>Para campos que requerem inicialização tardia (lazy initialization), use campos não <code class="language-plaintext highlighter-rouge">final</code> com cuidado.</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">Pessoa</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">idade</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Pessoa</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">,</span> <span class="kt">int</span> <span class="n">idade</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">nome</span> <span class="o">=</span> <span class="n">nome</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">idade</span> <span class="o">=</span> <span class="n">idade</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// Getters, mas sem setters!</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="implementando-equals-e-hashcode">Implementando <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code></h2>
+
+<h3 id="usando-a-ide">Usando a IDE</h3>
+<p>A maioria das IDEs (como IntelliJ ou Eclipse) pode gerar automaticamente esses métodos. Basta selecionar os campos relevantes.</p>
+
+<h3 id="implementação-manual">Implementação manual</h3>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">o</span><span class="o">)</span> <span class="k">return</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// Reflexividade</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">o</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="nc">Pessoa</span> <span class="n">pessoa</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Pessoa</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">idade</span> <span class="o">==</span> <span class="n">pessoa</span><span class="o">.</span><span class="na">idade</span> <span class="o">&amp;&amp;</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">nome</span><span class="o">,</span> <span class="n">pessoa</span><span class="o">.</span><span class="na">nome</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">nome</span><span class="o">,</span> <span class="n">idade</span><span class="o">);</span> <span class="c1">// Usa a classe utilitária Objects</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="conclusão">Conclusão</h2>
+
+<ol>
+  <li><strong>Siga os contratos</strong>: Implemente <code class="language-plaintext highlighter-rouge">equals()</code> e <code class="language-plaintext highlighter-rouge">hashCode()</code> corretamente para evitar bugs.</li>
+  <li><strong>Prefira imutabilidade</strong>: Objetos imutáveis simplificam o uso em <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">HashMap</code>.</li>
+  <li><strong>Use ferramentas</strong>: Aproveite as IDEs para gerar código, mas entenda o que está sendo gerado.</li>
+</ol>
+
+<p>Dominar esses conceitos é essencial para escrever código Java eficiente e livre de erros. Se tiver dúvidas, consulte a documentação oficial ou livros como <em>“Java Efetivo”</em> de Joshua Bloch.</p>
+
+<p><strong>Palavras-chave</strong>: Java, equals, hashCode, HashSet, HashMap, imutabilidade, collections.
+```</p>
+
+<p>Este post resume os principais pontos da transcrição, organizando-os em um formato claro e fácil de seguir, com exemplos práticos e dicas úteis.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Collections" /><category term="Algoritmos" /><summary type="html"><![CDATA[Neste post, vamos explorar os conceitos fundamentais de equals(), hashCode() e como eles são utilizados em estruturas de dados como HashSet e HashMap no Java. Além disso, discutiremos a importância da imutabilidade e como implementar esses métodos corretamente.]]></summary></entry><entry><title type="html">Java Collections e Algoritmos: Entendendo LinkedList vs. ArrayList</title><link href="https://blog.vepo.dev/posts/java-collections-e-algoritmos" rel="alternate" type="text/html" title="Java Collections e Algoritmos: Entendendo LinkedList vs. ArrayList" /><published>2024-01-02T00:00:00+00:00</published><updated>2024-01-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-08-39-java-collections-e-algoritmos</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-collections-e-algoritmos"><![CDATA[<p>Neste post, vamos explorar o pacote <strong>Java Collections</strong>, suas principais classes e interfaces, e focar em um comparativo detalhado entre <strong>LinkedList</strong> e <strong>ArrayList</strong>. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.</p>
+
+<hr />
+<iframe width="560" height="315" src="https://www.youtube.com/embed/xGCeneJ7kNo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<hr />
+
+<h2 id="introdução-ao-java-collections">Introdução ao Java Collections</h2>
+
+<p>O <strong>Java Collections</strong> é um pacote da API base do Java que oferece um conjunto de classes e interfaces para implementar estruturas de dados comuns, como listas, conjuntos, filas e mapas. Ele é essencial para qualquer desenvolvedor Java, pois simplifica o trabalho com estruturas de dados sem a necessidade de implementá-las do zero.</p>
+
+<h3 id="principais-interfaces-e-classes">Principais Interfaces e Classes:</h3>
+<ul>
+  <li><strong>List</strong>: Implementada por <code class="language-plaintext highlighter-rouge">ArrayList</code> e <code class="language-plaintext highlighter-rouge">LinkedList</code>.</li>
+  <li><strong>Queue</strong>: Implementada por <code class="language-plaintext highlighter-rouge">LinkedList</code> e <code class="language-plaintext highlighter-rouge">PriorityQueue</code>.</li>
+  <li><strong>Set</strong>: Implementada por <code class="language-plaintext highlighter-rouge">HashSet</code> e <code class="language-plaintext highlighter-rouge">TreeSet</code>.</li>
+  <li><strong>Map</strong>: Implementada por <code class="language-plaintext highlighter-rouge">HashMap</code> e <code class="language-plaintext highlighter-rouge">TreeMap</code>.</li>
+</ul>
+
+<p>Cada uma dessas estruturas tem características específicas. Por exemplo:</p>
+<ul>
+  <li><strong>Listas</strong> permitem elementos duplicados e mantêm a ordem de inserção.</li>
+  <li><strong>Conjuntos (Set)</strong> não permitem elementos duplicados.</li>
+  <li><strong>Mapas (Map)</strong> armazenam pares chave-valor, onde as chaves são únicas.</li>
+</ul>
+
+<hr />
+
+<h2 id="algoritmos-e-estruturas-de-dados">Algoritmos e Estruturas de Dados</h2>
+
+<p>Embora não seja necessário implementar estruturas de dados manualmente, é crucial <strong>entender como elas funcionam</strong> para usá-las eficientemente. Um algoritmo é um conjunto finito de passos bem definidos que resolvem um problema específico, com características como:</p>
+<ul>
+  <li><strong>Entrada e saída</strong>: Dados de entrada são processados para produzir um resultado.</li>
+  <li><strong>Efetividade</strong>: O algoritmo deve resolver o problema de forma eficiente.</li>
+</ul>
+
+<h3 id="crescimento-assintótico-e-notação-big-o">Crescimento Assintótico e Notação Big O</h3>
+
+<p>O desempenho de um algoritmo é frequentemente analisado usando a <strong>notação Big O</strong>, que descreve como o tempo de execução ou o uso de memória cresce em relação ao tamanho da entrada. Algumas classes comuns de complexidade são:</p>
+<ul>
+  <li><strong>O(1)</strong>: Tempo constante (excelente).</li>
+  <li><strong>O(n)</strong>: Tempo linear (justo).</li>
+  <li><strong>O(n²)</strong>: Tempo quadrático (ruim).</li>
+  <li><strong>O(2ⁿ)</strong>: Tempo exponencial (horrível).</li>
+</ul>
+
+<p>Essa análise é especialmente importante em cenários extremos, como processar milhões de elementos, onde a escolha da estrutura de dados pode impactar significativamente o desempenho.</p>
+
+<hr />
+
+<h2 id="comparativo-linkedlist-vs-arraylist">Comparativo: LinkedList vs. ArrayList</h2>
+
+<h3 id="arraylist">ArrayList</h3>
+<ul>
+  <li><strong>Implementação</strong>: Baseada em um vetor dinâmico.</li>
+  <li><strong>Vantagens</strong>:
+    <ul>
+      <li>Acesso aleatório rápido (<strong>O(1)</strong>).</li>
+      <li>Ideal para buscas e operações que envolvem índices.</li>
+    </ul>
+  </li>
+  <li><strong>Desvantagens</strong>:
+    <ul>
+      <li>Inserções e remoções no início ou meio podem ser custosas (<strong>O(n)</strong>), pois podem exigir redimensionamento do vetor.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="linkedlist">LinkedList</h3>
+<ul>
+  <li><strong>Implementação</strong>: Baseada em uma lista encadeada, onde cada elemento (nó) aponta para o próximo e o anterior.</li>
+  <li><strong>Vantagens</strong>:
+    <ul>
+      <li>Inserções e remoções nas extremidades são rápidas (<strong>O(1)</strong>).</li>
+      <li>Ideal para operações sequenciais.</li>
+    </ul>
+  </li>
+  <li><strong>Desvantagens</strong>:
+    <ul>
+      <li>Acesso aleatório é lento (<strong>O(n)</strong>), pois requer percorrer a lista desde o início.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="quando-usar-cada-uma">Quando Usar Cada Uma?</h3>
+<ul>
+  <li><strong>ArrayList</strong>:
+    <ul>
+      <li>Quando o acesso aleatório é frequente.</li>
+      <li>Quando o tamanho da lista é conhecido antecipadamente (para evitar redimensionamentos).</li>
+    </ul>
+  </li>
+  <li><strong>LinkedList</strong>:
+    <ul>
+      <li>Quando há muitas inserções/remoções no início ou fim da lista.</li>
+      <li>Quando a ordem de inserção é importante e operações sequenciais são predominantes.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="dicas-práticas">Dicas Práticas</h2>
+<ol>
+  <li><strong>Inicialize o <code class="language-plaintext highlighter-rouge">ArrayList</code> com um tamanho inicial</strong> se souber o número aproximado de elementos, para evitar redimensionamentos.</li>
+  <li><strong>Prefira <code class="language-plaintext highlighter-rouge">LinkedList</code></strong> para filas ou pilhas onde inserções/remoções são frequentes.</li>
+  <li><strong>Use <code class="language-plaintext highlighter-rouge">ArrayList</code></strong> para cenários com muitas buscas ou acessos aleatórios.</li>
+</ol>
+
+<hr />
+
+<h2 id="conclusão">Conclusão</h2>
+
+<p>Entender as diferenças entre <strong>LinkedList</strong> e <strong>ArrayList</strong> é essencial para escrever código eficiente em Java. A escolha entre elas depende do contexto de uso e das operações mais frequentes. Além disso, conhecer algoritmos e o crescimento assintótico ajuda a tomar decisões informadas sobre desempenho.</p>
+
+<p>Para se aprofundar, recomendo o livro <strong>“Entendendo Algoritmos”</strong> (Aditya Bhargava), que explica conceitos complexos de forma didática.</p>
+
+<hr />
+
+<p><strong>Palavras-chave</strong>: Java Collections, LinkedList, ArrayList, Algoritmos, Big O, Estruturas de Dados.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Collections" /><category term="LinkedList" /><category term="ArrayList" /><category term="Algoritmos" /><summary type="html"><![CDATA[Neste post, vamos explorar o pacote Java Collections, suas principais classes e interfaces, e focar em um comparativo detalhado entre LinkedList e ArrayList. Além disso, discutiremos a importância dos algoritmos e como o crescimento assintótico impacta o desempenho do código.]]></summary></entry><entry><title type="html">Collections!?!? Listas, conjuntos e mapas… as classes mais usadas do Java!</title><link href="https://blog.vepo.dev/posts/java-101-collections" rel="alternate" type="text/html" title="Collections!?!? Listas, conjuntos e mapas… as classes mais usadas do Java!" /><published>2022-05-06T00:00:00+00:00</published><updated>2022-05-06T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/17-38-00-java-101-collections</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-101-collections"><![CDATA[<div class="paragraph">
+<p>No post anterior nós falamos sobre o que é a JVM e sobre como criar seu primeiro projeto Java. Se você não leu e não sabe escrever um código Java, volta aí no post anterior e veja.</p>
+</div>
+<div class="paragraph">
+<p>Agora vamos dar um segundo passo, pois para quem está começando a entender Java uma das dificuldades é conhecer a extensa biblioteca que a JVM provê. Essa biblioteca trás para nos dá a capacidade de não reescrever códigos básicos para qualquer software, por isso não conhecer é um risco, pois podemos precisar reescrever código que já estão a nossa disposição. Precisamos também compreender alguns conceitos para usar bem os recursos a nossa disposição, vou dar um exemplo fora do contexto desse post, ninguém precisa implementa uma conexão socket, basta usar a classe <a href="https://docs.oracle.com/javase/8/docs/api/java/net/Socket.html"><code>java.net.Socket</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Na figura abaixo, temos a lista de todos os módulos da versão 17 do Java (uma versão é chamada de JDK, <em>Java Development Kit</em>). É essencial conhecermos o módulo <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/module-summary.html"><code>java.base</code></a>, já os demais módulos podem ser necessários para funcionalidades específica.</p>
+</div>
+<div id="jdk-libs" class="imageblock text-center text-center">
+<div class="content">
+<a class="image" href="https://docs.oracle.com/en/java/javase/18/docs/api/index.html"><img src="/assets/images/java-101/cap-03/jdk-libs.PNG" alt="jdk libs"></a>
+</div>
+<div class="title">Figura 1. Módulos do JDK 17</div>
+</div>
+<div class="paragraph">
+<p><em>— Tem muita biblioteca aí! Pode onde devo começar?</em></p>
+</div>
+<div class="paragraph">
+<p>Eu recomendaria pelo que conhecemos como <em>Collections</em>. Ela não é especificamente um pacote, mas uma interface, a <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/Collection.html"><code>Collection</code></a>, e uma série de classes que a usam. A Collections é praticamente onipresente em todo código Java.</p>
+</div>
+<div class="paragraph">
+<p>Quando ouvimos falar das Java Collections, podemos assumir que estamos falando de classes da biblioteca padrão do Java que estendem a interface Collection, essa interface por sua vez irá implementar uma serie de métodos que são comuns em todas as classes que implementam ela. Mas ter métodos em comum não implica em comportamento similar. Para entender o comportamento, precisamo olhar para interfaces que estendem a interface Collection, as principais são <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/List.html"><code>List</code></a> e <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/Set.html"><code>Set</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Mas a biblioteca Collections não está restrita a interface Collection, outras interfaces podem ser incluídas como a <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/Map.html"><code>Map</code></a> e a <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/stream/Stream.html"><code>Stream</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Vamos olhar como usar cada uma dessas interfaces e classes? No diagrama abaixo estão listadas as classes mais importantes, exceto a <code>Stream</code> da qual discutiremos no final.</p>
+</div>
+<div id="jdk-lib-collections" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-03/Collections.png" alt="Collections">
+</div>
+<div class="title">Figura 2. Pacote Java Collections</div>
+</div>
+<div class="sect1">
+<h2 id="_listas-conjuntos-e-mapas">Listas, Conjuntos e Mapas</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Listas, Conjuntos e Mapas são os conceitos básicos da biblioteca Collections. Esses conceitos podem ser abstratos a primeira vista, mas a diferença é percebida quando perguntamos o que indexa cada um deles.</p>
+</div>
+<div class="paragraph">
+<p>Se você não entendeu o significado de indexar (indexação), podemos assumir que estou falando da forma como os elementos são agrupados. Vamos pensar uma lista (<code>List</code>), nela os elementos são agrupados de forma sequencial, ou seja, indexados pela posição. Mas quando temos um conjuntos (<code>Set</code>), eles estão agrupados pela identidade própria deles, ou seja, elementos iguais não devem ser repetidos, sendo contado apenas uma vez. Já nos Mapas (<code>Map</code>), os elementos são indexados por uma chave externa a própria natureza do elemento, nesse caso podemos afirmar que temos um par de chave/valor. É por isso que <code>List</code> e <code>Set</code> estendem a interface <code>Collection</code> enquanto <code>Map</code> não estende, porque essa classe não é apenas uma coleção, mas uma indexação composta por dois valores.</p>
+</div>
+<div id="indexacao-significado" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-03/indexação.PNG" alt="indexação">
+</div>
+<div class="title">Figura 3. Significado de indexação</div>
+</div>
+<div class="paragraph">
+<p><em>— Cara, você falou um monte aí, mas eu não entendi nada!</em></p>
+</div>
+<div class="paragraph">
+<p>OK! Então vamos demonstrar isso por código? No pequeno trecho abaixo estou inicializando uma lista, um conjunto e um mapa e usando eles para adicionar alguns valores. Você pode ser por exemplo Strings, tente executar o código abaixo usando a ferramenta <em>jshell</em> (ferramenta REPL excelente adicionada na JDK 9), preste bem atenção no trecho de código a esquerda e no resultado a direta (<code>$x</code> representa o resultado retornado pela operação).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+
+<span class="kt">var</span> <span class="n">lista</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;();</span>       <span class="c1">// lista ==&gt; []</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 1"</span><span class="o">);</span>                      <span class="c1">// $5 ==&gt; true</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 2"</span><span class="o">);</span>                      <span class="c1">// $6 ==&gt; true</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 1"</span><span class="o">);</span>                      <span class="c1">// $7 ==&gt; true</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">==</span> <span class="mi">3</span>                          <span class="c1">// $8 ==&gt; true</span>
+<span class="n">lista</span><span class="o">;</span>                                     <span class="c1">// lista ==&gt; [Valor 1, Valor 2, Valor 1]</span>
+
+<span class="kt">var</span> <span class="n">conjunto</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashSet</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;();</span>      <span class="c1">// conjunto ==&gt; []</span>
+<span class="n">conjunto</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 1"</span><span class="o">);</span>                   <span class="c1">// $11 ==&gt; true</span>
+<span class="n">conjunto</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 2"</span><span class="o">);</span>                   <span class="c1">// $12 ==&gt; true</span>
+<span class="n">conjunto</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Valor 1"</span><span class="o">);</span>                   <span class="c1">// $13 ==&gt; false</span>
+<span class="n">conjunto</span><span class="o">;</span>                                  <span class="c1">// conjunto ==&gt; [Valor 1, Valor 2]</span>
+
+<span class="kt">var</span> <span class="n">mapa</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;();</span> <span class="c1">// mapa ==&gt; {}</span>
+<span class="n">mapa</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"Valor 1"</span><span class="o">);</span>                    <span class="c1">// $16 ==&gt; null</span>
+<span class="n">mapa</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"Valor 2"</span><span class="o">);</span>                    <span class="c1">// $17 ==&gt; null</span>
+<span class="n">mapa</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"Valor 1"</span><span class="o">);</span>                    <span class="c1">// $18 ==&gt; null</span>
+<span class="n">mapa</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"Valor 3"</span><span class="o">);</span>                    <span class="c1">// $19 ==&gt; "Valor 1"</span>
+<span class="n">mapa</span><span class="o">;</span>                                      <span class="c1">// mapa ==&gt; {1=Valor 3, 2=Valor 2, 3=Valor 1}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dá pra ver claramente que em uma <code>List</code> podemos adicionar (<code>add</code>) elementos repetidos, mas ao adicionar um elemento repetido em um <code>Set</code> ele não é alterado. Apesar de nosso exemplo manter a ordem, um <code>Set</code> não garante a ordem dos elementos. Observe também que quando adicionamos um elemento em um <code>Set</code> o método <code>add</code> irá retornar se o valor já existia ou não no conjunto.</p>
+</div>
+<div class="paragraph">
+<p>Para um <code>Map</code> temos o comportamento um pouco diferente. Temos que usar a operação <code>put</code> com uma chave e um valor como parâmetros. Valores repetidos podem ser adicionados desde que com chaves diferentes, mas quando reutilizamos uma chave, o antigo valor associado a ele é o retorno da operação.</p>
+</div>
+<div class="paragraph">
+<p>Essas três classes são muito usadas e por isso é bom conhecer cada método dela. Recomendo ler o <em>Javadoc</em> mesmo que você não saiba ler em inglês, tente usar o Google Translator. Você deve ficar atento é a versão da documentação que você está lendo. Cada método e classe terá uma referência sobre a versão do Java na qual ela foi introduzida. Por exemplo, abaixo tempos o método <a href="https://cr.openjdk.java.net/~iris/se/18/build/latest/api/java.base/java/util/Map.html#copyOf(java.util.Map">Map#copyOf</a>) que foi introduzida na JDK 9.</p>
+</div>
+<div id="javadoc-map-copyof" class="imageblock text-center text-center">
+<div class="content">
+<img src="/assets/images/java-101/cap-03/javadoc.png" alt="javadoc">
+</div>
+<div class="title">Figura 4. Documentação da classe Map, método copyOf</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tipos-de-listas">Tipos de Listas</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Como falamos anteriormente, listas servem para armazenar objetos sequencialmente. No nosso exemplo, usamos a class <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/ArrayList.html"><code>ArrayList</code></a>, mas ela não é a única classe de lista existente, temos também a <a href="https://docs.oracle.com/en/java/javase/18/docs/api/java.base/java/util/LinkedList.html"><code>LinkedList</code></a>. Vamos ver a diferença das duas?</p>
+</div>
+<div class="paragraph">
+<p>Para compreender bem a diferença das duas classes, precisamos conhecer um pouco de como elas são implementadas.</p>
+</div>
+<div class="paragraph">
+<p>A classe <code>ArrayList</code> é uma abstração de uma lista sobre um vetor. A classe é inicializada, por padrão, alocando um vetor de tamanho 10. Esse tamanho só será alterado quando a capacidade máxima dela for atingida, o que significa que a operação <code>add</code> pode significar que um vetor inteiro foi criado com o tamanho <code>n + 1</code> e depois todos os elementos foram copiados para o novo vetor.</p>
+</div>
+<div class="paragraph">
+<p><em>— Isso não me parece uma boa coisa&#8230;&#8203;</em></p>
+</div>
+<div class="paragraph">
+<p>Exato! Se a classe é utilizada para uma lista que removemos e adicionamos elementos constantemente, ela terá uma péssima performance. Quando adicionamos um elemento, no melhor caso é uma operação de tempo constante, mas no pior caso pode ser que o tempo dessa operação dependa do tamanho da lista (aqui tem o conceito de <a href="https://pt.wikipedia.org/wiki/An%C3%A1lise_assint%C3%B3tica"><strong>Análise assintótica</strong></a> que vamos falar em outro post). Já para se remover um elemento é preciso copiar todos os elementos posteriores a posição do elemento removido, o que significa que essa operação só é ótima quando removemos o último elemento.</p>
+</div>
+<div class="paragraph">
+<p><em>— Então a classe ArrayList é péssima!</em></p>
+</div>
+<div class="paragraph">
+<p>Não! Nós só falamos as desvantagens dessa classe! Ela é a classe do Java Collection mais utilizada, pois ela é ótima quando você tem uma lista de acesso aleatório.</p>
+</div>
+<div class="paragraph">
+<p><em>— Que raios é acesso aleatório?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Acesso aleatório é quando você precisa acessar um elemento qualquer da lista sem nenhuma ordenação. Digamos que você deseja acessar a posição <em>541</em> de uma lista com <em>9172</em> elementos, o tempo de acesso é constante. O mesmo acontece se você precisa substituir um elemento dentro da lista.</p>
+</div>
+<div class="paragraph">
+<p>Logo, essa classe é ótima para listas de tamanhos fixos (ou com pouca variação) e que precise de acesso aleatório. Se você já sabe o tamanho da lista que irá preencher, você pode já iniciar a classe com o tamanho deseja, isso vai poupar muito processamento do seu software!</p>
+</div>
+<div class="paragraph">
+<p>A outra classe é a <code>LinkedList</code>, ela é bem mais complexa que a <code>ArrayList</code>. Se você abrir o código dela, vai ver que a classe só armazena o primeiro elemento, o último elemento e o tamanho da lista. Cada elemento é um nó da lista, que contém uma referência ao elemento posterior e anterior. Isso significa que para acessar um elemento, é preciso navegar na lista pelos nós.</p>
+</div>
+<div class="paragraph">
+<p><em>— OI?!?!</em></p>
+</div>
+<div class="paragraph">
+<p>Vamos demonstrar&#8230;&#8203; Se tivermos uma lista com 10 elementos, e eu preciso acessar o elemento na 5ͣ  a operação vai acessar os elementos 1, 2, 3, 4 e depois retornar o 5. Isso significa que qualquer operação que não seja na cabeça ou na calda da lista vai depender da posição do elemento.</p>
+</div>
+<div class="paragraph">
+<p><em>— Então ela não serve para acesso aleatórios como a <code>ArrayList</code>?!?</em></p>
+</div>
+<div class="paragraph">
+<p>Servir ela serve&#8230;&#8203; Devemos usar a palavra <strong>ótimo</strong>! Ótimo é um conceito que sempre associamos a algo bom, mas na verdade ótimo é quando atingimos uma situação satisfatória de acordo com certos parâmetros. Servir não é um termo correto porque independente do uso as duas classes vão responder corretamente, mas se considerarmos o parâmetro velocidade, podemos escolher uma implementação de lista ótima.</p>
+</div>
+<div class="paragraph">
+<p>Mas voltando a resposta&#8230;&#8203; A <code>LinkedList</code> é ótima para usos em que elementos são adicionados/removidos no inicio e no final constantemente. É por esse motivo que a classe implementa duas interfaces que adicionam métodos importantes para o acesso direto desses elementos, a <code>Queue</code> e <code>Deque</code>.</p>
+</div>
+<div class="paragraph">
+<p>Por fim podemos falar da <code>PriorityQueue</code>&#8230;&#8203; Essa classe é especial porque ela pode funcionar como uma lista comum, mas podemos associar ela a um <code>Comparator</code> que irá definir a prioridade que os elementos devem ser acessados. Internamente os elementos são armazenados pela ordem de inserção, mas eles são retornados pelos métodos <code>poll()</code> de acordo com a ordem estabelecida pelo comparador usado no construtor, isso significa que você sempre inicializar com um comparador.</p>
+</div>
+<div class="paragraph">
+<p>Vamos ver ela em execução? No exemplo abaixo vamos adicionar algumas Strings e ver como elas são retornadas pelo método <code>poll()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">lista</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PriorityQueue</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;();</span>  <span class="c1">// lista ==&gt; []</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"a"</span><span class="o">);</span>                           <span class="c1">// $2 ==&gt; true</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"d"</span><span class="o">);</span>                           <span class="c1">// $3 ==&gt; true</span>
+<span class="n">lista</span><span class="o">;</span>                                    <span class="c1">// lista ==&gt; [a, d]</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"b"</span><span class="o">);</span>                           <span class="c1">// $5 ==&gt; true</span>
+<span class="n">lista</span><span class="o">;</span>                                    <span class="c1">// lista ==&gt; [a, d, b]</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"d"</span><span class="o">);</span>                           <span class="c1">// $7 ==&gt; true</span>
+<span class="n">lista</span><span class="o">;</span>                                    <span class="c1">// lista ==&gt; [a, d, b, d]</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>                             <span class="c1">// $9 ==&gt; "a"</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>                             <span class="c1">// $10 ==&gt; "b"</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>                             <span class="c1">// $11 ==&gt; "d"</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>                             <span class="c1">// $12 ==&gt; "b"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe que existe uma ordenação no retorno, tanto que a falta de ordem na adição foi resolvida. Essa classe é muito útil quando precisamos implementar uma lista de prioridades.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tipos-de-conjuntos">Tipos de Conjuntos</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Os conjuntos são mais simples que as Listas, vamos ter duas classes importantes: <code>HashSet</code> e <code>TreeSet</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>HashSet</code> deve ser usada quando a ordem dos elementos não é importante, tanto que a interface não dispõe de métodos para acesso sequencial aos elementos. Os elementos são tratados como um conjunto. Se você for abrir a implementação do <code>HashSet</code>, ela usa um <code>HashMap</code> internamente, a seguir veremos como o <code>HashMap</code> funciona. A adição/remoção em um <code>HashSet</code> são mais rápidas que em uma <code>TreeSet</code>.</p>
+</div>
+<div class="paragraph">
+<p>Já a <code>TreeSet</code> é um conjunto ordenado, por isso existe a necessidade de um <code>Comparator</code>, isso significa que os elementos podem ser acessados em ordem, mas ao se adicionar há uma penalidade pois haverá uma operação de balanceamento da árvore interna.</p>
+</div>
+<div class="paragraph">
+<p>Em resumo, use <code>HashSet</code> se a ordem não importa e <code>TreeSet</code> se a ordem importa!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tipos-de-mapas">Tipos de Mapas</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Os mapas são a base de implementação dos conjuntos, <code>HashMap</code> terá o mesmo comportamento do <code>HashSet</code> exceto pelo fato de que ao invés de indexar pelo próprio elemento, ele será indexado pela chave. Já o <code>TreeMap</code> vai armazenar os elementos seguindo a ordenação das chaves.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_streams">Streams</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Stream</code> é uma interface pela qual teremos um post especifico futuramente pois essa foi uma das maiores contribuições do Java 8. Quando usamos o método <code>stream()</code> presente em cada Collection, nós não criamos uma nova coleção, nós apenas iniciamos o processo de criação de uma pipeline. O principal conceito de um Stream é que a construção da nova collection será postergada até que o final dela seja conhecido. Essa propriedade é o que chamamos de <a href="https://pt.wikipedia.org/wiki/Avalia%C3%A7%C3%A3o_pregui%C3%A7osa"><em>Lazy Evaluation</em></a>, isso significa que existirá um algoritmo para criação dessa lista, mas ele só será executado ao final.</p>
+</div>
+<div class="paragraph">
+<p><em>— Entendi bulhufas!</em></p>
+</div>
+<div class="paragraph">
+<p>OK! Vamos demonstrar usando o JShell&#8230;&#8203;</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">lista</span> <span class="o">=</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span> <span class="s">"aaa"</span><span class="o">,</span> <span class="s">"b"</span><span class="o">,</span> <span class="s">"c"</span><span class="o">,</span> <span class="s">"aaaaa"</span><span class="o">,</span> <span class="s">"asdada"</span><span class="o">);</span>       <span class="c1">// lista ==&gt; [a, aaa, b, c, aaaaa, asdada]</span>
+<span class="n">lista</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">filter</span><span class="o">(</span><span class="n">x</span> <span class="o">-&gt;</span> <span class="n">x</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="s">"a"</span><span class="o">)).</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span> <span class="c1">// $2 ==&gt; [a, aaa, aaaaa, asdada]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No código acima nós criamos uma lista e depois criamos um <code>Stream</code> baseado nela. Até chamar o método <code>collect</code>, o <code>Stream</code> não passava de uma sequência de operações sob a lista, depois se cria uma nova lista (poderia ser qualquer coisa) usando as operações. A lista original não é alterada!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cap-03-conclusao">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Collections é uma biblioteca onipresente! Em qualquer código você verá vestígio dela. Experimente e conheça.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Tutorial" /><category term="Collections" /><category term="Bibliotecas" /><summary type="html"><![CDATA[Continuando a série sobre Java, vamos apresentar o que é o Java Collections. Vou apresentar um panorama sobre a biblioteca contendo as principais classes. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.]]></summary></entry></feed>

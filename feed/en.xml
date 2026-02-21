@@ -1,0 +1,1539 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/en.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/en.xml</id><title type="html">vepo | En</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Everything is a file</title><link href="https://blog.vepo.dev/en/linux-everything-is-a-file" rel="alternate" type="text/html" title="Everything is a file" /><published>2021-03-03T00:00:00+00:00</published><updated>2021-03-03T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/12-00-00-linux-everything-is-a-file</id><content type="html" xml:base="https://blog.vepo.dev/en/linux-everything-is-a-file"><![CDATA[<h2 id="starting-point">Starting point</h2>
+
+<p>To learn about the Linux Kernel, the starting point is knowing that everything is a file. Instead of opening the Task Manager, you can inspect the content of <code class="language-plaintext highlighter-rouge">/proc</code> folder. You can control everything on your running Linux instance only by inspecting some files.</p>
+
+<p>For example:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Folder</th>
+      <th>Content</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/proc</code></td>
+      <td>All running process information</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/dev</code></td>
+      <td>All available devices</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/sys</code></td>
+      <td>The sysfs is used by programs such as udev to access device and device driver information.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/var</code></td>
+      <td>The standard folder where system writes data during the course of its operation.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/usr</code></td>
+      <td>This is one of the most important directories in the system as it contains all the user binaries, their documentation, libraries, header files, etc….</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">/bin</code></td>
+      <td>This folder contains commands or scripts or executable which can be executed to accomplish a task.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A good starting point is exploring <code class="language-plaintext highlighter-rouge">/proc</code> folder. This folder has all information about all running process. All running process has a unique identifier called PID, that means <strong>Process IDentification</strong>. If you have a process with PID <code class="language-plaintext highlighter-rouge">472</code>, you can get all information about it using:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span>  /proc/472
+attr  auxv  cgroup  cmdline  <span class="nb">comm  </span>cwd  environ  exe  fd  gid_map  limits  maps  mountinfo  mounts  mountstats  net  ns  oom_adj  oom_score_adj  root  schedstat  setgroups  smaps  <span class="nb">stat  </span>statm  status  task  uid_map
+<span class="nv">$ </span><span class="nb">cat</span>  /proc/472/cmdline 
+java-classpath/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-3.8.0/lib/languagetool-languageserver/build/install/languagetool-languageserver/lib/<span class="k">*</span>:/home/vepo/.vscode-server/extensions/adamvoss.vscode-languagetool-pt-3.8.0/lib/<span class="k">*</span>App54469
+</code></pre></div></div>
+
+<hr />
+
+<p><img src="/assets/images/pexels-dick-hoskins-6969512.jpg" alt="Pinguims" />
+Picture by Dick Hoskins on Pexels</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Linux" /><summary type="html"><![CDATA[On Linux everything is a file. This is the starting point to learn Linux]]></summary></entry><entry><title type="html">Using Bean Validation on Quarkus.io</title><link href="https://blog.vepo.dev/en/using-bean-validation-on-quarkus" rel="alternate" type="text/html" title="Using Bean Validation on Quarkus.io" /><published>2021-01-25T00:00:00+00:00</published><updated>2021-01-25T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/11-00-00-using-bean-validation</id><content type="html" xml:base="https://blog.vepo.dev/en/using-bean-validation-on-quarkus"><![CDATA[<p><a href="https://beanvalidation.org/latest-draft/spec/">Jakarta Bean Validation</a> is a very useful specification. I can’t find any reason to do not use it. If you know, please share with me.</p>
+
+<h2 id="the-worst-way-to-do-it">The worst way to do it</h2>
+
+<p>Validation is a boring feature. It is important, but most of the time it pollutes the code. You have to check function by function if all values are according to the expected.</p>
+
+<p>So, let’s imagine the in the code of our Step 02 we need to validate that the <code class="language-plaintext highlighter-rouge">username</code> is a String not empty, with a minimum size of 4 and a maximum of 15 and no whitespace. How can we do it?</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nc">User</span> <span class="nf">create</span><span class="o">(</span><span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Objects</span><span class="o">.</span><span class="na">requireNonNull</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span> <span class="s">"\"username\" cannot be null!"</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">().</span><span class="na">isBlank</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">BadRequestException</span><span class="o">(</span><span class="s">"\"username\" may not be blank"</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">().</span><span class="na">matches</span><span class="o">(</span><span class="s">"^[a-zA-Z][a-zA-Z0-9]+$"</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">BadRequestException</span><span class="o">(</span><span class="s">"\"username\" should start with a letter and should only accept letters and numbers"</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&lt;</span> <span class="mi">4</span> <span class="o">||</span> <span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">BadRequestException</span><span class="o">(</span><span class="s">"\"username\" should have size [4,15]"</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">users</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                            <span class="o">.</span><span class="na">email</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getEmail</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">username</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">firstName</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getFirstName</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">lastName</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getLastName</span><span class="o">()).</span><span class="na">admin</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">isAdmin</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">hashedPassword</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getHashedPassword</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Jakarta Bean Validation allow us to remove all this code and replace with simple annotations.</p>
+
+<h2 id="configuring-jpa-in-an-existent-quarkus-project">Configuring JPA in an existent Quarkus Project</h2>
+
+<p>To enable Jakarta Bean Validation, you should add it’s implementation to Quarkus, that is <a href="https://hibernate.org/validator/">Hibernate Validator</a>.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-hibernate-validator<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p>That is all you need! Now you just need to configure where you will use and what fields you want to validate.</p>
+
+<h2 id="requiring-valid-parameters">Requiring Valid Parameters</h2>
+
+<p>The next step, you should inform Quarkus, where you want to use the validate. From the example above, we can remove all validation lines and just add the annotation <code class="language-plaintext highlighter-rouge">javax.validation.Valid</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@POST</span>
+<span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+<span class="kd">public</span> <span class="nc">User</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">users</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                            <span class="o">.</span><span class="na">email</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getEmail</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">username</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getUsername</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">firstName</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getFirstName</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">lastName</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getLastName</span><span class="o">()).</span><span class="na">admin</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">isAdmin</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">hashedPassword</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getHashedPassword</span><span class="o">())</span>
+                            <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Then we need to inform Quarkus the logic for this validation, it can be done inside CreataUserRequest class. We will use the annotations <code class="language-plaintext highlighter-rouge">Email</code>, <code class="language-plaintext highlighter-rouge">NotBlank</code>, <code class="language-plaintext highlighter-rouge">Pattern</code> and <code class="language-plaintext highlighter-rouge">Size</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">javax.validation.constraints.Email</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.validation.constraints.Pattern</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.validation.constraints.Size</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CreateUserRequest</span> <span class="o">{</span>
+
+    <span class="nd">@Email</span>
+    <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"email may not be blank"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@Size</span><span class="o">(</span><span class="n">min</span> <span class="o">=</span> <span class="mi">4</span><span class="o">,</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">15</span><span class="o">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s">"username should have size [{min},{max}]"</span><span class="o">)</span>
+    <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"username may not be blank"</span><span class="o">)</span>
+    <span class="nd">@Pattern</span><span class="o">(</span><span class="n">regexp</span> <span class="o">=</span> <span class="s">"^[a-zA-Z][a-zA-Z0-9]+$"</span><span class="o">,</span> <span class="n">message</span> <span class="o">=</span> <span class="s">"\"username\" should start with a letter and should only accept letters and numbers"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"firstName may not be blank"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">firstName</span><span class="o">;</span>
+
+    <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"lastName may not be blank"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastName</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">admin</span><span class="o">;</span>
+
+    <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"hashedPassword may not be blank"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">hashedPassword</span><span class="o">;</span>
+
+    <span class="c1">// [Getters and Setters]</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>This can be used in any Managed Bean inside Quarkus, but if you used on Endpoints it will enable HTTP validation returning a Bad Request response, as we can see in the response bellow. This is not a good way to present errors on a REST API, but at least follow some patterns as returning the correct HTTP Status Code and informing all constraint violations.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"classViolations"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+    </span><span class="nl">"parameterViolations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"constraintType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PARAMETER"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"</span><span class="se">\"</span><span class="s2">username</span><span class="se">\"</span><span class="s2"> should start with a letter and should only accept letters and numbers"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"create.request.username"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2vepo"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"propertyViolations"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+    </span><span class="nl">"returnValueViolations"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If you need to add validation for a parameter that you do not implement the class, like a <code class="language-plaintext highlighter-rouge">String</code> or a primitive type, you can use the annotations directly on the bean parameter. In this case, you can omit the <code class="language-plaintext highlighter-rouge">Valid</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nd">@Size</span><span class="o">(</span><span class="n">min</span> <span class="o">=</span> <span class="mi">4</span><span class="o">,</span> <span class="n">max</span> <span class="o">=</span> <span class="mi">15</span><span class="o">)</span> <span class="nc">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">TypedQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">createNamedQuery</span><span class="o">(</span><span class="s">"User.findByUsername"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">query</span><span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"username"</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="na">getResultStream</span><span class="o">().</span><span class="na">findFirst</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="creating-custom-validations">Creating Custom Validations</h2>
+
+<p>Now that we are able to use the Built-in validations, let’s create some custom validators. First, we need to define the annotation for it. It should have the following pattern.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Documented</span>
+<span class="nd">@Constraint</span><span class="o">(</span><span class="n">validatedBy</span> <span class="o">=</span> <span class="nc">ReservedWordValidator</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@Target</span><span class="o">({</span>
+    <span class="no">METHOD</span><span class="o">,</span>
+    <span class="no">FIELD</span><span class="o">,</span>
+    <span class="no">ANNOTATION_TYPE</span><span class="o">,</span>
+    <span class="no">CONSTRUCTOR</span><span class="o">,</span>
+    <span class="no">PARAMETER</span><span class="o">,</span>
+    <span class="no">TYPE_USE</span> <span class="o">})</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="no">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Repeatable</span><span class="o">(</span><span class="nc">ReservedWords</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@SupportedValidationTarget</span><span class="o">(</span><span class="no">ANNOTATED_ELEMENT</span><span class="o">)</span>
+<span class="nd">@ReportAsSingleViolation</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="nc">ReservedWord</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="nf">value</span><span class="o">();</span>
+
+    <span class="nc">String</span> <span class="nf">message</span><span class="o">()</span> <span class="k">default</span> <span class="s">"You are using a Reserved Word"</span><span class="o">;</span>
+
+    <span class="nc">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">Payload</span><span class="o">&gt;[]</span> <span class="nf">payload</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
+
+    <span class="nc">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">groups</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>In our case, we are creating a <code class="language-plaintext highlighter-rouge">Repeatable</code> just for an example, but you can set any kind of Type for value. Then we need to declare and implement the Validator. As you can see, we are already linking the Validator with the Annotation using <code class="language-plaintext highlighter-rouge">@Constraint(validatedBy = ReservedWordValidator.class)</code>, now we only need to implement it.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReservedWordValidator</span> <span class="kd">implements</span> <span class="nc">ConstraintValidator</span><span class="o">&lt;</span><span class="nc">ReservedWord</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">word</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="o">(</span><span class="nc">ReservedWord</span> <span class="n">wordAnnotation</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">word</span> <span class="o">=</span> <span class="n">wordAnnotation</span><span class="o">.</span><span class="na">value</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isValid</span><span class="o">(</span><span class="nc">String</span> <span class="n">value</span><span class="o">,</span> <span class="nc">ConstraintValidatorContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="na">compareToIgnoreCase</span><span class="o">(</span><span class="n">word</span><span class="o">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Now you can use it in your service.</p>
+
+<h2 id="executing-and-testing">Executing and Testing</h2>
+
+<p>With the database running you only need to start the Quarkus using maven.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn quarkus:dev
+</code></pre></div></div>
+
+<p>In our example, we have provided 2 endpoints where you can test with valid and invalid parameters.</p>
+
+<ul>
+  <li>Create an User: <code class="language-plaintext highlighter-rouge">POST /user</code></li>
+  <li>Find User by Username: <code class="language-plaintext highlighter-rouge">GET /user/{username}</code></li>
+</ul>
+
+<p><a href="https://app.getpostman.com/run-collection/f9fc24e64abbfb3aac90"><img src="https://run.pstmn.io/button.svg" alt="Run in Postman" /></a></p>
+
+<p>You can find all the code on github.com/vepo/quarkus-tutorial.</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/quarkus-tutorial">
+                quarkus-tutorial
+            </a>
+        </span>
+    </h2>
+</div>
+
+<h2 id="design-by-contract">Design by Contract</h2>
+
+<p>The most important concept on Validating parameters is <strong>Design By Contract</strong>. A contract defines your rights and responsibility, if you define a contract you will not handle values outside that contract. And using Bean Validation enables you to implement Orthogonal Contracts, keeping your code clear. You do not mix validation with business logic. And you don’t need to replicate code, only adding an annotation you can spread validation in all your Managed Beans.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Quarkus is easy to configure. You can remove a lot of code, only creating validations.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/e65xl1069bgqs8ge87wm.jpg" alt="Man drawing a Software Architecture diagram" />
+Foto de Startup Stock Photos no Pexels</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Quarkus" /><category term="Java" /><category term="Bean Validation" /><category term="Hibernate" /><summary type="html"><![CDATA[A minimal how-to of how to use Bean Validation on Quarkus.io]]></summary></entry><entry><title type="html">Configure JPA on Quarkus.io</title><link href="https://blog.vepo.dev/en/configure-jpa-on-quarkus" rel="alternate" type="text/html" title="Configure JPA on Quarkus.io" /><published>2020-11-25T00:00:00+00:00</published><updated>2020-11-25T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/23-50-00-configure-jpa-on-quarkus</id><content type="html" xml:base="https://blog.vepo.dev/en/configure-jpa-on-quarkus"><![CDATA[<blockquote>
+  <p><strong>Warning</strong>
+This post was updated to use Java 19 with the latest Quarkus version.</p>
+</blockquote>
+
+<p>JPA is a specification from Jakarta EE that controls the Data Access Layer. The most common implementation for it is <a href="https://hibernate.org/orm/">Hibernate ORM</a>.</p>
+
+<h1 id="trade-offs">Trade-offs</h1>
+
+<p>Choose technology involves a trade-off. I always thought that if I choose JPA, I will lose control of any generated SQL. And that is true!</p>
+
+<p>JPA is an ORM, so most of the SQL is generated from a JPQL. If you do a bad design of your code, you will have SQL been generated at execution time, that is a bad design. In truth, horrible design.</p>
+
+<p>But you will boost your coding speed. You will no more care about writing SQL or modelling the database. You can think in terms of objects, not tables. This does not mean that you will not care about modelling. In the first time is better to create the database model before, than design the objects according to what you want. This will avoid you creating some very commons Anti Patterns from JPA. I, have worked on a project where if you get a user from the database, you can load all objects associated with that user on the memory crashing the application.</p>
+
+<p>It is important to know well the specification to create an optimal service, balancing database performance with development speed.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Advantages</th>
+      <th>Aisadvantages</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fast Coding</td>
+      <td>SQL is generated</td>
+    </tr>
+    <tr>
+      <td>Easy to change the model</td>
+      <td>Lack of support for NoSQL ¹</td>
+    </tr>
+    <tr>
+      <td>Database agnostic</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><em>¹ Use <a href="https://www.jnosql.org/">JNoSQL</a> instead of JPA</em></p>
+
+<h1 id="configuring-jpa-in-an-existent-quarkus-project">Configuring JPA in an existent Quarkus Project</h1>
+
+<h2 id="configure-dependencies">Configure dependencies</h2>
+
+<p>So the first step is to configure the dependencies. For adding JPA you will have to add the Hibernate Plugin and the Database JDBC plugin.</p>
+
+<p><em>Why we have two dependencies?</em> This is one of the code ideas of JPA, it is database agnostic. You can change your database with almost no change on your code.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-hibernate-orm<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-jdbc-postgresql<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p>If you want to know which database you can use, just search on <a href="https://mvnrepository.com/search?q=jdbc&amp;d=io.quarkus">mvnrepository.com</a>.</p>
+
+<h2 id="modeling-the-database">Modeling the database</h2>
+
+<p>The next step we need to model the database. You probably have your database model using SQL, but you need to create Java POJOs that will map your data in your Java code.</p>
+
+<p>For this example we will create a backend CRUD for User. That means we will create the Create, Read, Update and Delete endpoints for it.</p>
+
+<p>So, to model we have to add the annotations:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Annotation</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">javax.persistence.Entity</code></td>
+      <td>Specifies that the class is an entity.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">javax.persistence.Table</code></td>
+      <td>Specifies the primary table for the annotated entity.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">javax.persistence.Id</code></td>
+      <td>Specifies the primary key of an entity.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">javax.persistence.Column</code></td>
+      <td>Specifies the mapped column for a persistent property or field.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Not even all annotations are required, but you should do a good design of your code.</p>
+
+<p>So I’m defining the User adding all required annotations, and some NamedQuery and a Builder. The builder is just a fancy code to improve the readability and the NamedQuery it will be used later to search for users.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">io.vepo.tutorial.quarkus.user</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.persistence.Column</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.Entity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.GenerationType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.NamedQuery</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.Table</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.UniqueConstraint</span><span class="o">;</span>
+
+<span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_users"</span><span class="o">,</span> <span class="n">uniqueConstraints</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="nd">@UniqueConstraint</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"uq_users_username"</span><span class="o">,</span> <span class="n">columnNames</span> <span class="o">=</span> <span class="o">{</span>
+        <span class="s">"username"</span> <span class="o">}),</span>
+    <span class="nd">@UniqueConstraint</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"uq_users_email"</span><span class="o">,</span> <span class="n">columnNames</span> <span class="o">=</span> <span class="o">{</span>
+        <span class="s">"email"</span> <span class="o">})</span>
+<span class="o">})</span>
+<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"User.findByUsernameAndHashedPassword"</span><span class="o">,</span> <span class="n">query</span> <span class="o">=</span> <span class="s">"SELECT usr FROM User usr WHERE usr.username = :username AND usr.hashedPassword = :hashedPassword AND usr.enabled = true"</span><span class="o">)</span>
+<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"User.findByUsername"</span><span class="o">,</span> <span class="n">query</span> <span class="o">=</span> <span class="s">"SELECT usr FROM User usr WHERE usr.username = :username"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">UserBuilder</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">firstName</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastName</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">admin</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">String</span> <span class="n">hashedPassword</span><span class="o">;</span>
+
+        <span class="kd">private</span> <span class="nf">UserBuilder</span><span class="o">()</span> <span class="o">{</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">email</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">email</span> <span class="o">=</span> <span class="n">email</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">username</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">firstName</span><span class="o">(</span><span class="nc">String</span> <span class="n">firstName</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">firstName</span> <span class="o">=</span> <span class="n">firstName</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">lastName</span><span class="o">(</span><span class="nc">String</span> <span class="n">lastName</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">lastName</span> <span class="o">=</span> <span class="n">lastName</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">admin</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">admin</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">admin</span> <span class="o">=</span> <span class="n">admin</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">UserBuilder</span> <span class="nf">hashedPassword</span><span class="o">(</span><span class="nc">String</span> <span class="n">hashedPassword</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">hashedPassword</span> <span class="o">=</span> <span class="n">hashedPassword</span><span class="o">;</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">User</span> <span class="nf">build</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">User</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">UserBuilder</span> <span class="nf">builder</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">UserBuilder</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="nd">@Column</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@Column</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"first_name"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">firstName</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"last_name"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastName</span><span class="o">;</span>
+
+    <span class="nd">@Column</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">admin</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"hashed_password"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">hashedPassword</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"enabled"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">enabled</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nf">User</span><span class="o">(</span><span class="nc">UserBuilder</span> <span class="n">builder</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">email</span><span class="o">;</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">username</span><span class="o">;</span>
+        <span class="n">firstName</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">firstName</span><span class="o">;</span>
+        <span class="n">lastName</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">lastName</span><span class="o">;</span>
+        <span class="n">admin</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">admin</span><span class="o">;</span>
+        <span class="n">hashedPassword</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">hashedPassword</span><span class="o">;</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Integer</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="nc">Integer</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getEmail</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">email</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">email</span> <span class="o">=</span> <span class="n">email</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getUsername</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">username</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getFirstName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">firstName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setFirstName</span><span class="o">(</span><span class="nc">String</span> <span class="n">firstName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">firstName</span> <span class="o">=</span> <span class="n">firstName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getLastName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">lastName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setLastName</span><span class="o">(</span><span class="nc">String</span> <span class="n">lastName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">lastName</span> <span class="o">=</span> <span class="n">lastName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isAdmin</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">admin</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAdmin</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">admin</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">admin</span> <span class="o">=</span> <span class="n">admin</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getHashedPassword</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">hashedPassword</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setHashedPassword</span><span class="o">(</span><span class="nc">String</span> <span class="n">hashedPassword</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">hashedPassword</span> <span class="o">=</span> <span class="n">hashedPassword</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEnabled</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">enabled</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEnabled</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">enabled</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">enabled</span> <span class="o">=</span> <span class="n">enabled</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">final</span> <span class="kt">int</span> <span class="n">prime</span> <span class="o">=</span> <span class="mi">31</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">prime</span> <span class="o">*</span> <span class="n">result</span> <span class="o">+</span> <span class="o">((</span><span class="n">id</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">id</span><span class="o">.</span><span class="na">hashCode</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">obj</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="nc">User</span> <span class="n">other</span> <span class="o">=</span> <span class="o">(</span><span class="nc">User</span><span class="o">)</span> <span class="n">obj</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">id</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">other</span><span class="o">.</span><span class="na">id</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(!</span><span class="n">id</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">other</span><span class="o">.</span><span class="na">id</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"User [id="</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">", email="</span> <span class="o">+</span> <span class="n">email</span> <span class="o">+</span> <span class="s">", username="</span> <span class="o">+</span> <span class="n">username</span> <span class="o">+</span> <span class="s">", firstName="</span> <span class="o">+</span> <span class="n">firstName</span>
+                <span class="o">+</span> <span class="s">", lastName="</span> <span class="o">+</span> <span class="n">lastName</span> <span class="o">+</span> <span class="s">", admin="</span> <span class="o">+</span> <span class="n">admin</span> <span class="o">+</span> <span class="s">", hashedPassword="</span> <span class="o">+</span> <span class="n">hashedPassword</span> <span class="o">+</span> <span class="s">", enabled="</span>
+                <span class="o">+</span> <span class="n">enabled</span> <span class="o">+</span> <span class="s">"]"</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>I want to point out some important things on this code. The <code class="language-plaintext highlighter-rouge">@Column</code> annotation is not required, if you omit does not mean that JPA will ignore, it will only read the column with the same name from the field. If you want a not persisted column, you should use create a <code class="language-plaintext highlighter-rouge">transient</code> field. If you have a compound name for the field, for example, <code class="language-plaintext highlighter-rouge">lastName</code>, if you do not specify the name in <code class="language-plaintext highlighter-rouge">@Column</code>, JPA will search for <code class="language-plaintext highlighter-rouge">lastName</code>, not <code class="language-plaintext highlighter-rouge">last_name</code>. I don’t know if you have understood, but naming is important! All applications should follow naming conventions and the <a href="https://dzone.com/articles/a-guide-to-sql-naming-conventions">SQL Naming Convetions</a> is different from <a href="https://www.oracle.com/java/technologies/javase/codeconventions-namingconventions.html">Java Naming Convetions</a>.</p>
+
+<p>With the <code class="language-plaintext highlighter-rouge">@Column</code> you have more options, like <code class="language-plaintext highlighter-rouge">required</code> and <code class="language-plaintext highlighter-rouge">unique</code>. You can see all options on <a href="https://jakarta.ee/specifications/persistence/2.2/apidocs/javax/persistence/Column.html">Jakarta Documentation</a>.</p>
+
+<p>For the <code class="language-plaintext highlighter-rouge">id</code> column, I have added two important annotations. <code class="language-plaintext highlighter-rouge">@Id</code> and <code class="language-plaintext highlighter-rouge">@GeneratedValue</code>are required to create a good design, but if you choose a different database probably it will have different values!</p>
+
+<p>I have added the Unique Constraints, this is not required, but as I’m creating the database automatically, I have to do it. In a future tutorial I will teach how to use Flyway to create automatically the database using SQL.</p>
+
+<h2 id="define-the-parameters">Define the parameters</h2>
+
+<p>Hibernate requires few parameters to configure, you can put all in <code class="language-plaintext highlighter-rouge">src/main/resources/application.properties</code>. But you can also replace it using environment variables. This will take place later in a tutorial from Microprofile Config.</p>
+
+<p>So we need to define the Database type and credentials and what Hibernate will do with the Schema. For production always use <code class="language-plaintext highlighter-rouge">quarkus.hibernate-orm.database.generation=validate</code>, but in our example, we will use <code class="language-plaintext highlighter-rouge">drop-and-create</code> recreating the database schema every deploy.</p>
+
+<p>If you need to change more configurations properties, the <a href="https://quarkus.io/guides/hibernate-orm#quarkus-hibernate-orm_configuration">Quarkus documentation has a list of all available configurations</a>.</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">quarkus.datasource.db-kind</span> <span class="p">=</span> <span class="s">postgresql</span>
+<span class="py">quarkus.datasource.username</span> <span class="p">=</span> <span class="s">postgres</span>
+<span class="py">quarkus.datasource.password</span> <span class="p">=</span> <span class="s">password</span>
+<span class="py">quarkus.datasource.jdbc.url</span> <span class="p">=</span> <span class="s">jdbc:postgresql://localhost:5432/tutorial</span>
+
+<span class="py">quarkus.hibernate-orm.database.generation</span><span class="p">=</span><span class="s">drop-and-create</span>
+</code></pre></div></div>
+
+<h2 id="creating-the-database">Creating the database</h2>
+
+<p>To create the database, we will use Docker. So just execute the line bellow.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">--rm</span> <span class="nt">--name</span> postgres-db <span class="nt">-e</span> <span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>password <span class="nt">-e</span> <span class="nv">POSTGRES_DB</span><span class="o">=</span>tutorial <span class="nt">-p</span> 5432:5432 <span class="nt">-d</span> postgres:13-alpine
+</code></pre></div></div>
+
+<p>If you want to use Postgres directly, just download and install it. It will work fine.</p>
+
+<h2 id="acessing-the-database">Acessing the database</h2>
+
+<p>There is a lot of ways to access the database, but you should always use <code class="language-plaintext highlighter-rouge">javax.persistence.EntityManager</code>. I have created a service class called <code class="language-plaintext highlighter-rouge">Users</code> and added some methods to show the best way to access it.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">io.vepo.tutorial.quarkus.user</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Objects</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.enterprise.context.ApplicationScoped</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.EntityManager</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.PersistenceContext</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.TypedQuery</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.criteria.CriteriaBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.persistence.criteria.CriteriaQuery</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.transaction.Transactional</span><span class="o">;</span>
+
+<span class="nd">@Transactional</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Users</span> <span class="o">{</span>
+    <span class="nd">@PersistenceContext</span>
+    <span class="nc">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">list</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">CriteriaBuilder</span> <span class="n">criteriaBuilder</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">getCriteriaBuilder</span><span class="o">();</span>
+        <span class="nc">CriteriaQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">query</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">em</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="n">query</span><span class="o">).</span><span class="na">getResultList</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">User</span> <span class="nf">create</span><span class="o">(</span><span class="nc">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getId</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">"Id should be null!"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">em</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">TypedQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">createNamedQuery</span><span class="o">(</span><span class="s">"User.findByUsername"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">query</span><span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"username"</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="na">getResultStream</span><span class="o">().</span><span class="na">findFirst</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">User</span> <span class="nf">get</span><span class="o">(</span><span class="kt">int</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">em</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">userId</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="using-criteria-builder">Using Criteria Builder</h3>
+
+<p>Using Criteria Builder is a good way when you need to generate dynamically the query. You will create the query programmatically, the API is not so easy to understand because it is very powerful.</p>
+
+<h3 id="using-named-query">Using Named Query</h3>
+
+<p>For me, Named Queries is the best way to execute commons queries. You have to write the query on JPQL, not SQL. JPQL is very similar to SQL, but you can use the same query in different databases, Hibernate will translate it for you. It is better to use it than custom JPQL queries because it will compile it once.</p>
+
+<h3 id="using-query">Using Query</h3>
+
+<p>You can create the query directly. But this is not a good approach! Every time you call <code class="language-plaintext highlighter-rouge">createQuery</code> it will compile the query.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">TypedQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"SELECT usr FROM User usr WHERE usr.username = :username"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">query</span><span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"username"</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="na">getResultStream</span><span class="o">().</span><span class="na">findFirst</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="access-the-data-directly">Access the data directly</h3>
+
+<p>If you have a Class and an Id, you can access the object directly.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">User</span> <span class="nf">get</span><span class="o">(</span><span class="kt">int</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">em</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">userId</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="transactional-objects">Transactional Objects</h3>
+
+<p>As we are using a transactional object, all changes we do in the JPA object it will be updated on the database. Each object read from the database is attached to the current session.</p>
+
+<h2 id="integrating-endpoing-and-database">Integrating Endpoing and Database</h2>
+
+<p>The last step we need to add is injecting the pass <code class="language-plaintext highlighter-rouge">Users</code> inside our <code class="language-plaintext highlighter-rouge">UserEndpoint</code> as we show on the previous posts. So we need to use the Java CDI, inject it using the annotation <code class="language-plaintext highlighter-rouge">@Inject</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserEndpoing</span> <span class="o">{</span>
+    <span class="nd">@Inject</span>
+    <span class="nc">Users</span> <span class="n">users</span><span class="o">;</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">list</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">users</span><span class="o">.</span><span class="na">list</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="executing-and-testing">Executing and Testing</h2>
+
+<p>With the database running you only need to start the Quarkus using maven.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn quarkus:dev
+</code></pre></div></div>
+
+<p>In our example, we have provided 3 endpoints:</p>
+
+<ul>
+  <li>List all Users: <code class="language-plaintext highlighter-rouge">GET /user</code></li>
+  <li>Create an User: <code class="language-plaintext highlighter-rouge">POST /user</code></li>
+  <li>Find User by Username: <code class="language-plaintext highlighter-rouge">GET /user/{username}</code></li>
+</ul>
+
+<p>You can find all code in the repository bellow.</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/quarkus-tutorial">
+                quarkus-tutorial
+            </a>
+        </span>
+    </h2>
+</div>
+
+<p>And you can test it using Postman.</p>
+
+<p><a href="https://app.getpostman.com/run-collection/f9fc24e64abbfb3aac90"><img src="https://run.pstmn.io/button.svg" alt="Run in Postman" /></a></p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>If you want to develop fast and use databases, you should use JPA. You will not be worried about queries and knowing the JPA features and implementation, you can optimize the access from your database.</p>
+
+<h1 id="future-readings">Future Readings</h1>
+<ul>
+  <li><a href="https://github.com/spgroup/ORM-Smells-Catalog">Catálogo de Code Smells ORM</a></li>
+</ul>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Quarkus" /><category term="Java" /><category term="JPA" /><category term="Hibernate" /><summary type="html"><![CDATA[A minimal how-to of how to configure JPA on Quarkus.io]]></summary></entry><entry><title type="html">How to set up a REST API using Quarkus.io</title><link href="https://blog.vepo.dev/en/quarkus-rest-api" rel="alternate" type="text/html" title="How to set up a REST API using Quarkus.io" /><published>2020-11-09T00:00:00+00:00</published><updated>2020-11-09T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/14-00-00-quakus-setup</id><content type="html" xml:base="https://blog.vepo.dev/en/quarkus-rest-api"><![CDATA[<blockquote>
+  <p><strong>Warning</strong>
+This post was updated to use Java 19 with the latest Quarkus version.</p>
+</blockquote>
+
+<h1 id="why-quarkus-is-a-good-choice">Why Quarkus is a good choice?</h1>
+
+<p>Quarkus is one of the best frameworks for Java! First, there was the Wildfly, that as an experiment became a microservices focus project called Wildfly Swarm. Then Wildfly Swarm was renamed to Thorntail. The main purpose of Thorntail was to build a Jakarta EE implementation build for microservices. But there was some pitfall that needed a full rewrite for the code. So this is Quarkus, a light implementation, ready for microservices and it has native support to GraalVM.</p>
+
+<p><img src="/assets/images/quarkus/quarkus_metrics.png" alt="Quarkus metrics" /></p>
+
+<p>So Quarkus is based on <a href="https://web.archive.org/web/20230323075232/https://docs.thorntail.io/4.0.0-SNAPSHOT/">lessons learned</a> from previous development. Based on these lessons I believe this will be a better framework, easy to use and fast on execution.</p>
+
+<p><img src="/assets/images/quarkus/thorntail_icon_rgb_64px.png" alt="Thorntail icon" /></p>
+
+<blockquote>
+  <p><strong>Mangling artifacts is dangerous</strong>
+<em>When you mangle and repackage a user’s artifacts and dependencies, it can many times go awry.</em></p>
+
+  <p><strong>Don’t replace Maven</strong>
+<em>Let Maven (or Gradle) handle the entirety of pulling dependencies. We cannot predict the topology of someone’s repository managers, proxies and network.</em></p>
+
+  <p><strong>Don’t get complicated with uberjars</strong>
+<em>The more complex our uberjar layout is, the harder it is to support Gradle or other non-Maven build systems.</em></p>
+
+  <p><strong>Classpaths are tricky</strong>
+<em>If different codepaths are required for executing from Maven, an IDE, a unit-test, and during production, you will have a bad time.</em></p>
+
+  <p><strong>Don’t insist on uberjars</strong>
+<em>For Linux containers, people want layers that cleanly separate application code from runtime support code.</em></p>
+
+  <p><strong>Testability is important</strong>
+<em>A slow test is a test that is never willingly executed. PRs take forever to validate. Users like to be able to test their own code quickly and iteratively.</em></p>
+
+  <p><strong>Easily extensible means ecosystem</strong>
+<em>If it’s entirely too difficult to extend the platform, the ecosystem will not grow. New integrations should be simple.</em></p>
+
+  <p><strong>Related: Core things should not be any more first-class than community contributions</strong>
+<em>For instance, auto-detection in WildFly Swarm only worked with core fractions; user-provided wouldn’t auto-detect.</em></p>
+
+  <p><strong>Ensure the public-vs-private API guarantees are clear.</strong>
+<em>Intertwingly code (and javadocs) make finding the delineation between public API and private implementations difficult.</em></p>
+
+  <p><strong>Allow BYO components</strong>
+<em>We don’t want to decide all of the implementations, and certainly not versions, of random components we support.</em></p>
+
+  <p><strong>Be a framework, not a platform</strong>
+<em>Frameworks are easier to integrate into an existing app; a platform becomes the target with (generally too many) constraints.</em></p>
+
+  <p><strong>Maintain tests &amp; documentation</strong>
+<em>Ensure the definition of “done” includes both tests and documentation.</em></p>
+
+  <p><strong>Productization complexity</strong>
+<em>The greater divergence between community and product, the more effort is required for productization. Complicating any process to automate productization from community.</em></p>
+
+  <p><strong>BOM complexity</strong>
+<em>Related to productization as well, but of itself having a handful of BOMs made life confusing for us and for users. There were often times where fractions would be “Unstable” or “Experimental” for months with no real reason other than we forgot to update it.</em></p>
+</blockquote>
+
+<h1 id="configure-quarkus">Configure Quarkus</h1>
+
+<p>The first question we need to answer on a tutorial is: <em>To build a project using Quarkus, what do you need?</em></p>
+
+<p>For Quarkus we need:</p>
+<ol>
+  <li>Add the dependencies</li>
+  <li>Configure the package</li>
+  <li>Starting coding</li>
+</ol>
+
+<h2 id="1-configure-the-dependencies">1. Configure the dependencies</h2>
+
+<p>As Quarkus is a Jakarta EE, we will use the Jakarta EE annotations on the code. But, for the <code class="language-plaintext highlighter-rouge">pom.xml</code> we should point to Quarkus dependencies because quarkus has native support for GraalVM.</p>
+
+<p>First we need add all dependencies to Quarkus, this can be done using dependencyManagement:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependencyManagement&gt;</span>
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>quarkus-universe-bom<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>3.18.4<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;type&gt;</span>pom<span class="nt">&lt;/type&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>import<span class="nt">&lt;/scope&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/dependencyManagement&gt;</span>
+</code></pre></div></div>
+
+<p>The for that project we will need:</p>
+
+<ol>
+  <li>Create REST API</li>
+  <li>Add JSON Support</li>
+  <li>Add Reactive Support</li>
+</ol>
+
+<p>For that we will need the following dependencies:</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:quarkus-rest</code> for creating the REST API</li>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:quarkus-arc</code> for enabling CDI</li>
+  <li><code class="language-plaintext highlighter-rouge">io.quarkus:quarkus-rest-jackson</code> for using JSON on request/response</li>
+</ol>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>quarkus-rest<span class="nt">&lt;/artifactId&gt;</span>            
+    <span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-arc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-rest-jackson<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h2 id="2-configuring-the-build">2. Configuring the build</h2>
+
+<p>The next step we should configure Quarkus build. As we know, Quarkus creates a fat jar with all dependencies.</p>
+
+<p>To enable the Quarkus builder on Maven, just add the following plugin:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>quarkus-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>3.19.0<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>build<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>generate-code<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>generate-code-tests<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>In this example, I’m compiling as Java 11, but I’m using Java 15 to test. It will work for any version of Java newer than 11. If you need to execute it on Java 8, just change the compiler options.</p>
+
+<p>We can make the build just executing:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package
+</code></pre></div></div>
+
+<p>This will create a <code class="language-plaintext highlighter-rouge">jar</code> inside the target folder and a <code class="language-plaintext highlighter-rouge">quarkus-app</code> folder. This folder contains the application that can be executed by the <code class="language-plaintext highlighter-rouge">quarkus-run.jar</code> jar inside it.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>java <span class="nt">-jar</span> target/quarkus-app/quarkus-run.jar
+__  ____  __  _____   ___  __ ____  ______
+ <span class="nt">--</span>/ __ <span class="se">\/</span> / / / _ | / _ <span class="se">\/</span> //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,&lt; / /_/ /<span class="se">\ \</span>
+<span class="nt">--</span><span class="se">\_</span>__<span class="se">\_\_</span>___/_/ |_/_/|_/_/|_|<span class="se">\_</span>___/___/
+2022-11-18 11:03:25,031 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> microblogging 0.0.1-SNAPSHOT on JVM <span class="o">(</span>powered by Quarkus 2.14.1.Final<span class="o">)</span> started <span class="k">in </span>8.499s. Listening on: http://0.0.0.0:8080
+2022-11-18 11:03:25,072 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> Profile prod activated.
+2022-11-18 11:03:25,072 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> Installed features: <span class="o">[</span>cdi, resteasy-reactive, resteasy-reactive-jackson, smallrye-context-propagation, vertx]
+2022-11-18 11:03:49,906 INFO  <span class="o">[</span>io.quarkus] <span class="o">(</span>main<span class="o">)</span> microblogging stopped <span class="k">in </span>6.942
+</code></pre></div></div>
+
+<p>This is the way we should execute for production environments, for development we can use Quarkus Maven plugin. It already does the deploy of any change on the running server:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn quarkus:dev
+</code></pre></div></div>
+
+<h2 id="3-adding-the-rest-api-endpoint">3. Adding the REST API Endpoint</h2>
+
+<p>The latest step for creating an API is creating the code that will handle the requests. Using JAX-RS is easy, just create a class and add the annotations.</p>
+
+<p>The most simple example is:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="nd">@GET</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">sayHello</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"Hello World!"</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>JAX-RS automatically generate a JSON representation for any object returned by this method, you have just to inform the MIME Type.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">HelloResponse</span> <span class="nf">generateResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">HelloResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setCode</span><span class="o">(</span><span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/json"</span><span class="o">)</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">HelloResponse</span> <span class="nf">sayHelloWithJson</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">generateResponse</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Quarkus also have support for reactive programming. For JAX-RS, you have just to return a <code class="language-plaintext highlighter-rouge">Uni</code> or a <code class="language-plaintext highlighter-rouge">CompletableFuture</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Path</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloEndpoint</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">HelloResponse</span> <span class="nf">generateResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">HelloResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HelloResponse</span><span class="o">();</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setCode</span><span class="o">(</span><span class="k">new</span> <span class="nc">Random</span><span class="o">().</span><span class="na">nextInt</span><span class="o">());</span>
+        <span class="n">response</span><span class="o">.</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GET</span>
+    <span class="nd">@Path</span><span class="o">(</span><span class="s">"/json/reactive"</span><span class="o">)</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">Uni</span><span class="o">&lt;</span><span class="nc">HelloResponse</span><span class="o">&gt;</span> <span class="nf">sayHelloWithJsonReactively</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Uni</span><span class="o">.</span><span class="na">createFrom</span><span class="o">().</span><span class="na">item</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">generateResponse</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>With Quarkus you can build quickly a REST API using JAX-RS. As JAX-RS is a Jakarta EE specification, you can migrate your code with few changes to another existing implementation, but Quarkus is the lighter implementation.</p>
+
+<p>Quarkus is a good choice!</p>
+
+<p>You can find all examples on <a href="https://github.com/vepo/quarkus-tutorial">github.com/vepo/quarkus-tutorial</a></p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/quarkus-tutorial">
+                quarkus-tutorial
+            </a>
+        </span>
+    </h2>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Quarkus" /><category term="Java" /><category term="JAX-RS" /><summary type="html"><![CDATA[A minimal how-to of how to create a REST API using Quarkus.io]]></summary></entry><entry><title type="html">Algorithms - An introduction</title><link href="https://blog.vepo.dev/en/algorithms-an-introduction" rel="alternate" type="text/html" title="Algorithms - An introduction" /><published>2020-01-10T00:00:00+00:00</published><updated>2020-01-10T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/12-47-30-algorithms-an-introduction</id><content type="html" xml:base="https://blog.vepo.dev/en/algorithms-an-introduction"><![CDATA[<blockquote>
+  <p><em>The NOTION of an algorithm is basic to all computer programming.</em> 
+Donald E. Knuth</p>
+</blockquote>
+
+<p>Even you do not care about algorithms, if you program in any programming language you use, produce and read algorithms.</p>
+
+<p>A Programming Language is the language you can express algorithms to the computer can understand it. So, here I want to make a difference between Programming Languages and Presentation Languages. HTML for me is not a programming language… No worries if you believe it is. 🤓</p>
+
+<div class="dev-article">
+    <div class="dev-user-picture">
+        <img src="https://media2.dev.to/dynamic/image/width=90,height=90,fit=cover,gravity=auto,format=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Fuser%2Fprofile_image%2F16729%2F332ce8ed-1887-41dc-b8df-b14e172486d8.jpg" />
+    </div>
+    <div class="dev-article-title">
+        <a href="https://dev.to/mortoray/of-course-html-is-a-programming-language-4ll5">
+            Of course HTML is a programming language
+        </a>
+        <div class="dev-tags"><div class="dev-tag"><a href="https://dev.to/t/programming">programming</a></div><div class="dev-tag"><a href="https://dev.to/t/webdev">webdev</a></div><div class="dev-tag"><a href="https://dev.to/t/career">career</a></div><div class="dev-tag"><a href="https://dev.to/t/language">language</a></div></div>
+    </div>
+    <div class="dev-logo">
+        <img src="/assets/images/plugins/dev-logo.webp" />
+    </div>
+</div>
+
+<h1 id="defining-algorithms">Defining Algorithms</h1>
+
+<p>The <a href="https://www.oxfordlearnersdictionaries.com/definition/english/algorithm">Oxford Dictionary</a> define algorithm as:</p>
+
+<blockquote>
+  <p>A set of rules that must be followed when solving a particular problem.</p>
+</blockquote>
+
+<p>Any computer program is developed to solve a problem. <em>Or to create a problem… no worries</em> 😉</p>
+
+<p>So a program <strong>SHOULD</strong> follow a Recipe, and that is the algorithm. This is ubiquitous in any computing.</p>
+
+<h2 id="characteristics">Characteristics</h2>
+
+<p>An algorithm is a recipe, but a recipe is not an algorithm. Why? You can understand a recipe, but a computer cannot! You are much smarter than a computer.</p>
+
+<p>To be an algorithm, a set of rules must have the following features</p>
+
+<ol>
+  <li>Finiteness</li>
+  <li>Definiteness</li>
+  <li>Input</li>
+  <li>Output</li>
+  <li>Effectiveness</li>
+</ol>
+
+<h3 id="1-finiteness">1. Finiteness</h3>
+
+<p>An algorithm <strong>SHOULD</strong> always terminate after a finite number of steps.</p>
+
+<p>There are some algorithms that search infinitely for a optimal value. Even this kind of algorithms should have a end, probably an finite number of iterations or an <em>“stable”</em> value.</p>
+
+<h3 id="2-definiteness">2. Definiteness</h3>
+
+<p>Each step of an algorithm <strong>SHOULD</strong> be precisely defined.</p>
+
+<p>You can make assumptions about something you read, but a computer cannot make any assumption. Each step should be precise.</p>
+
+<p><a href="https://www.monkeyuser.com/2019/determinism/"><img src="/assets/images/monkeyuser/148-determinism.png" alt="&quot;Determinism&quot; from monkeyuser.com with description &quot;Assumptions are the mother of all fuck ups!&quot;" /></a></p>
+
+<p>Imagine an algorithm that says:</p>
+
+<blockquote>
+  <p>Divide m by n and assign x with the value</p>
+</blockquote>
+
+<p>This step is defined? No! You can make questions to this step: <em>Is x an Integer value?</em> If we have <code class="language-plaintext highlighter-rouge">m=4</code> and <code class="language-plaintext highlighter-rouge">n=3</code>, the result in <code class="language-plaintext highlighter-rouge">x</code> can be <code class="language-plaintext highlighter-rouge">x=1</code> or <code class="language-plaintext highlighter-rouge">x=1.333</code>. Depending from the algorithm it can be any value.</p>
+
+<p>The correct step should be:</p>
+
+<blockquote>
+  <p>Assign the x (integer) with the value of m divided by n</p>
+</blockquote>
+
+<p>In an algorithm there is no space for questions in steps.</p>
+
+<h3 id="3-input">3. Input</h3>
+
+<p>An algorithm has zero or more <em>inputs</em>.</p>
+
+<h3 id="4-output">4. Output</h3>
+
+<p>An algorithm has one or more <em>outputs</em>.</p>
+
+<h3 id="5-effectiveness">5. Effectiveness</h3>
+
+<p>All steps need to be effective, that means it should be simple enough to be done without any other knowledge</p>
+
+<h1 id="notation">Notation</h1>
+
+<p>For writing an algorithm we need:</p>
+<ul>
+  <li>Numbered steps: We should be able to refer to steps</li>
+  <li>Pseudocode: We should be able to translate the algorithm in any programming language</li>
+  <li>Given inputs</li>
+  <li>Given outputs</li>
+  <li>Assignments: This represents when a variable assume a new value. Normally we use the notation <code class="language-plaintext highlighter-rouge">x ← y</code>where means that <code class="language-plaintext highlighter-rouge">x</code> will be attributed the value of <code class="language-plaintext highlighter-rouge">y</code>.</li>
+</ul>
+
+<h1 id="sorting-a-array">Sorting a array</h1>
+
+<p>How can I sort an array of integers?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GIVEN:
+    v    → The given array
+    n    → The length of the given array
+    x[i] → The value stored in the position i from the array x
+
+START:
+  S1: FOR EACH i IN [0, n - 2]:
+  S2:   min_index ← i
+  S3:   FOR EACH j IN [i + 1, n - 1]:
+  S4:     IF v[j] &lt; v[min_index]?
+  S5:       min_index ← j
+  S6:   IF v[i] != v[min_index]?
+  S7:     aux ← v[min_index]
+  S8:     v[min_index] ← v[i]
+  S9:     v[i] ← aux
+</code></pre></div></div>
+
+<p>About this algorithm we can ask:</p>
+
+<ol>
+  <li><strong>Is it finite?</strong> Yes, it will iterate over the array.</li>
+  <li><strong>Is it definite?</strong> Yes, every step can be done without any assumption.</li>
+  <li><strong>What is the input?</strong> The array and it’s length.</li>
+  <li><strong>What is the output?</strong> The same array, every change is made inplace</li>
+  <li><strong>Is it effective?</strong> Yes, it will sort any array.</li>
+</ol>
+
+<h2 id="running-with-the-pen">Running with the pen</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GIVEN: 
+  v = [5, 100, -6, 98, -111, 0]
+  n = 6
+
+  S1: i ← 0                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S2: min_index ← 0                        v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S3: j ← 1                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S4: v[1] &lt; v[0] ? (100 &lt; 5)    NO        v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S3: j ← 2                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S4: v[2] &lt; v[0] ? (-6 &lt; 5)     YES       v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S5: min_index ← 2                        v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S3: j ← 3                                v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S4: v[3] &lt; v[2] ? (98 &lt; -6)    NO        v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S3: j ← 4                                v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S4: v[4] &lt; v[2] ? (-111 &lt; -6)  YES       v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S5: min_index ← 4                        v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S3: j ← 5                                v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S4: v[5] &lt; v[4] ? (0 &lt; -111)   NO        v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S6: v[0] != v[4] ? (5 != -111) YES       v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = -111
+  S7: aux ← -111                           v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = -111
+  S8: v[4] ← 5                             v = [5, 100, -6, 98, 5, 0]      min_index = 4   aux = -111
+  S9: v[0] = -111                          v = [-111, 100, -6, 98, 5, 0]   min_index = 4   aux = -111
+  S1: i ← 1                                v = [-111, 100, -6, 98, 5, 0]   min_index = 4   aux = -111
+  S2: min_index ← 1                        v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S3: j ← 2                                v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S4: v[2] &lt; v[1] ? (-6 &lt; 100)   YES       v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S5: min_index ← 2                        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 3                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[3] &lt; v[2] ? (98 &lt; -6)    NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 4                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[4] &lt; v[2] ? (5 &lt; -6)     NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 5                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[5] &lt; v[2] ? (0 &lt; -6)     NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S6: v[1] != v[2] ? (100 != -6) YES       v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S7: aux ← -6                             v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -6
+  S8: v[2] ← 100                           v = [-111, 100, 100, 98, 5, 0]  min_index = 2   aux = -6
+  S9: v[1] = -6                            v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S1: i ← 2                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S2: min_index ← 2                        v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S3: j ← 3                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S4: v[3] &lt; v[2] ? (98 &lt; 100)   NO        v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S3: j ← 4                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S4: v[4] &lt; v[2] ? (5 &lt; 100)    YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S5: min_index ← 4                        v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S3: j ← 5                                v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S4: v[5] &lt; v[4] ? (0 &lt; 5)      YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S5: min_index ← 5                        v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = -6
+  S6: v[2] != v[5] ? (100 != 0)  YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = -6
+  S7: aux ← 0                              v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = 0
+  S8: v[5] ← 100                           v = [-111, -6, 100, 98, 5, 100] min_index = 5   aux = 0
+  S9: v[2] = 0                             v = [-111, -6, 0, 98, 5, 100]   min_index = 5   aux = 0
+  S1: i ← 3                                v = [-111, -6, 0, 98, 5, 100]   min_index = 2   aux = 0
+  S2: min_index ← 3                        v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S3: j ← 4                                v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S4: v[4] &lt; v[3] ? (5 &lt; 98)     YES       v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S5: min_index ← 4                        v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S3: j ← 5                                v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S4: v[5] &lt; v[4] ? (100 &lt; 5)    NO        v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S6: v[3] != v[4] ? (98 != 5)   YES       v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S7: aux ← 5                              v = [-111, -6, 0, 98, 5, 100]   min_index = 5   aux = 5
+  S8: v[4] ← 98                            v = [-111, -6, 0, 98, 98, 100]  min_index = 5   aux = 5
+  S9: v[3] = 5                             v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S1: i ← 4                                v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S2: min_index ← 4                        v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S3: j ← 5                                v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S4: v[5] &lt; v[4] ? (100 &lt; 98)   NO        v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+</code></pre></div></div>
+
+<p>As we can see, given the input <code class="language-plaintext highlighter-rouge">[5, 100, -6, 98, -111, 0]</code>, it returns the output <code class="language-plaintext highlighter-rouge">[-111, -6, 0, 5, 98, 100]</code>. So in the output there is no value <code class="language-plaintext highlighter-rouge">v[i]</code> and <code class="language-plaintext highlighter-rouge">v[j]</code> where <code class="language-plaintext highlighter-rouge">i &lt; j</code> and <code class="language-plaintext highlighter-rouge">v[i] &gt; v[j]</code>, that means the array is sorted.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Algorithms" /><category term="Computer Science" /><summary type="html"><![CDATA[What is an algorithm? How can we define an algorithm?]]></summary></entry><entry><title type="html">Tests and Requirements</title><link href="https://blog.vepo.dev/en/tests-and-requirements" rel="alternate" type="text/html" title="Tests and Requirements" /><published>2019-07-24T00:00:00+00:00</published><updated>2019-07-24T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/13-24-59-tests-and-requirements</id><content type="html" xml:base="https://blog.vepo.dev/en/tests-and-requirements"><![CDATA[<p>In the last days I’m facing a huge question: <em>With several teams working with several projects, how to avoid new bugs?</em></p>
+
+<p>In the company that I work, we have a lot of microservices, but there is no owner. Probably someone can start working in a project and a new feature should be added in a microservice. When this happen, <strong>no bug should be added to any service in any client!</strong></p>
+
+<p>In this post I will describe how we are handling features changes with TDD.</p>
+
+<h1 id="tdd-process-review">TDD process review</h1>
+<p>When using TDD to develop any software we must:</p>
+
+<ol>
+  <li>Configure Testing Frameworks</li>
+  <li>Write a Test that fails</li>
+  <li>Write the code that fixes all the Tests</li>
+  <li>Refactor your code if necessary</li>
+</ol>
+
+<p>This is what we call Red-Green-Refactor. First you make a test fail, then you fix and at least you improve your code organization.</p>
+
+<p><img src="https://s3.amazonaws.com/codecademy-content/programs/tdd-js/articles/red-green-refactor-tdd.png" alt="RGR Process" /></p>
+
+<h1 id="some-thoughts-on-red-green-refactor">Some thoughts on Red-Green-Refactor</h1>
+
+<p><strong>Red-Green-Refactor</strong> most of time is used for Unit Tests. And this lead some questions about requirements:</p>
+<ul>
+  <li><strong><em>How can we ensure that all the requirements are implemented by the our code?</em></strong></li>
+  <li><strong><em>How can we ensure that any future implementation will not change any requirement?</em></strong></li>
+  <li><strong><em>How can we ensure that all developers will know all requirements in any future implementation?</em></strong></li>
+</ul>
+
+<p><img src="https://memeworld.funnyjunk.com/pictures/When+you+have+a+group+project_a71b2c_6624638.jpg" alt="When someone change your code" /></p>
+
+<p>If we are talking about Unit Testing, this questions is not applied, because we are testing a class or a small piece of code. One change on this piece of code can change all software behaviour.</p>
+
+<h1 id="create-test-for-requirements">Create Test for Requirements</h1>
+
+<p>For all types of tests, none apply for requirements, they are all named according with the implementation components:</p>
+
+<ul>
+  <li>Unit testing</li>
+  <li>Integration testing</li>
+  <li>System testing</li>
+  <li>Sanity testing</li>
+  <li>Smoke testing</li>
+  <li>Interface testing</li>
+  <li>Regression testing</li>
+  <li>Beta/Acceptance testing</li>
+</ul>
+
+<p><strong><em>But…</em></strong> This names can mean nothing, we can create test for any purpose we want! So, I’m proposing a new kind of test: <strong><em>Requirement Test</em></strong>… Ok, <a href="https://www.tutorialspoint.com/software_testing_dictionary/requirements_based_testing">it already exists</a>! No problem.</p>
+
+<ul>
+  <li>First create A Test Suite based on the Domain, not on the implementation. Instead of <code class="language-plaintext highlighter-rouge">UserManagerTests</code>, just a <code class="language-plaintext highlighter-rouge">UserTests</code>class.</li>
+  <li>Then add all Requirement with a plain and complete text descriptions. This works fine on JUnit5</li>
+  <li>If any test are failing, correct the code</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">UserTests</span> <span class="o">{</span>
+   <span class="nd">@Test</span>
+   <span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"It SHOULD allow create Users without a name"</span><span class="o">)</span>
+   <span class="kt">void</span> <span class="nf">createWithoutNameTest</span><span class="o">()</span> <span class="o">{</span>
+       <span class="c1">// Do the tests</span>
+       <span class="n">fail</span><span class="o">();</span>
+   <span class="o">}</span>
+
+   <span class="nd">@Test</span>
+   <span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"It SHOULD only requires username and password"</span><span class="o">)</span>
+   <span class="kt">void</span> <span class="nf">createWithMinimumPropertiesTest</span><span class="o">()</span> <span class="o">{</span>
+       <span class="c1">// Do the tests</span>
+       <span class="n">fail</span><span class="o">();</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>It is important to keep this tests in all changes, because this tests keep a memory of all requirements.</p>
+
+<h2 id="tips">Tips</h2>
+
+<ul>
+  <li>The more you abuse of words like <strong>SHOULD</strong>, <strong>NEVER</strong>, <strong>ALWAYS</strong> or <strong>CAN</strong> better is your description.</li>
+  <li>Keep in mind the desired behaviour should be expressed as a <strong>Test</strong> and a <strong>Test Description</strong>. Any future development should know why all theses tests exists.</li>
+  <li>Keep in mind that in a future modification, the developer cannot talk with you, but he can see what you were thinking in the moment of the change.</li>
+</ul>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Most of TDD approaches always talk about unit testing, but unit testing does not prevent you of any undesired requirement change. For that we purpose a Requirement Test. All requirement should be written as a Test. If any failed it cab be:</p>
+<ul>
+  <li>The requirement has changed</li>
+  <li>This change adds a bug in any other piece of code.</li>
+</ul>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="TDD" /><category term="Bugs" /><category term="Requirement" /><summary type="html"><![CDATA[How can we ensure that any new development does not create an undesired behaviour?]]></summary></entry><entry><title type="html">Start a project by the README</title><link href="https://blog.vepo.dev/en/start-a-project-by-the-readme" rel="alternate" type="text/html" title="Start a project by the README" /><published>2019-06-25T00:00:00+00:00</published><updated>2019-06-25T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/14-07-06-start-a-project-by-the-readme</id><content type="html" xml:base="https://blog.vepo.dev/en/start-a-project-by-the-readme"><![CDATA[<p>In the last months I’m investing my time in learning how write a good documetation.</p>
+
+<p>Almost all projects I had worked had a lack of documentation. If you have already try to start develop/use any project, you probably had to face with the problem of knowing where to start.</p>
+
+<p>So here is my approache of how to build a well documented project</p>
+
+<h1 id="1-starting-describing-your-project">1. Starting describing your project</h1>
+
+<p>Be short! Describe you project in few lines.</p>
+
+<h2 id="good-example">Good Example</h2>
+
+<p>A good example is <a href="http://zookeeper.apache.org/">Zookeeper</a> description:</p>
+
+<p><em>ZooKeeper is a centralized service for maintaining configuration information, naming, providing distributed synchronization, and providing group services.</em></p>
+
+<p>In the first line you know what problem you an solve with this project. If you continue to reading there is a more detailed description. Good!</p>
+
+<h2 id="bad-example">Bad Example</h2>
+
+<p>A bad example is <a href="https://kafka.apache.org/intro">Kafka</a> description:</p>
+
+<p><em>Apache Kafka® is a distributed streaming platform. What exactly does that mean?</em></p>
+
+<p>The documentation is clear that the reader will not undestand!! If you continue to read, it will describe <em>real time pipelines</em>, <em>clusters</em>, etc… But what the main porpuse of Kafka?</p>
+
+<p>If I had to rewrite Kafka documentation, this will be the second item from it. The first will be a short description of <strong>What is</strong> Kafka and <strong>Which type of problem it solves</strong>.</p>
+
+<h2 id="tips">Tips</h2>
+
+<ol>
+  <li>Avoid own defined terms. Use commons terms</li>
+  <li>Be short. Few and short lines.</li>
+  <li>Answer questions.</li>
+</ol>
+
+<h2 id="briefly">Briefly…</h2>
+<p>A good description is a short text that answer two question. What is and Which type of problem solves.</p>
+
+<h1 id="2-after-describing-you-project-explain-hidden-ideas">2. After describing you project, explain hidden ideas</h1>
+
+<p>The second section of my READMEs are the <strong>Rational</strong> section. Here I quickly list all ideas behind my code.</p>
+
+<p>Let’s imagine we are building a new NoSQL database.</p>
+
+<p>The first thought a user can have is: <em>I lost all my SQL validations?</em></p>
+
+<p>The first thought a developer can have is: <em>Can we add some kind of validations?</em></p>
+
+<p>Both questions are welcome, but it can be answer with a single line in this session:</p>
+
+<ul>
+  <li>This achieve a High-Throughput, no validation will be done by the database.</li>
+</ul>
+
+<p>Any important idea <strong>SHOULD</strong> be described in this session shortly. If more information is need, you can add a link to another README explain it.</p>
+
+<h1 id="3-explain-resources-and-terms">3. Explain Resources and Terms</h1>
+
+<p>Does your project define any term? Explain here.</p>
+
+<p>Does your project uses a own file format? Explain here.</p>
+
+<p>Imagine that I’m building a Business Rule Engine, all business rule must be written in a specifica file format. You should explain shortly what is this file format and create a specific README file for it:</p>
+
+<ul>
+  <li>BR file defines a single Business Rule. (More information link)</li>
+</ul>
+
+<h1 id="4-explain-behaviour-and-interactions">4. Explain behaviour and Interactions</h1>
+
+<p>Explain how your code works. A user or a developer should know how your project works. If you are developing a Message Queue, here is a good place where you can describe shortly how a message will be delivered to all (or not to all) clients.</p>
+
+<h1 id="5-describe-which-api-you-provide">5. Describe which API you provide</h1>
+
+<p>Do you provide a REST API? An Java library? A C library? Describe the key points for the provided API. Shortly!</p>
+
+<h1 id="be-short">Be short!</h1>
+
+<p>In the main README file you <strong>SHOULD</strong> be shortly. This is not the place where you will deeply explain everything, this is the place to show key concepts.</p>
+
+<h1 id="be-consistent">Be consistent!</h1>
+
+<p>What if a change on the code change something related with what is written in the README? This is the main problem that occurs in software development. The documentation is not consistent with the code.</p>
+
+<p>For each project you should define your own <strong>Definition Of Done</strong>. If the change does not reflects the documention, so the change is not ready!</p>
+
+<h1 id="concluding">Concluding</h1>
+
+<p>When you listen that <em>the documentation is the code</em>, do not touch in this code! Every line of code there is a hidden idea that sometimes are not expressed because it cannot be expressed in code.</p>
+
+<p>The idea of Uncle Bob is well accepted in simple projects, but what if the project has some architectural complex decisions? How can express it without a README or some comments?</p>
+
+<h1 id="more">More</h1>
+
+<p>You can add more sections to your main README file. But you should be short.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Software Documentation" /><category term="README" /><category term="Documentation" /><summary type="html"><![CDATA[Before start code, describe what you are doing...]]></summary></entry><entry><title type="html">Java Memory Leak for JDBC</title><link href="https://blog.vepo.dev/en/java-memory-leak-for-jdbc" rel="alternate" type="text/html" title="Java Memory Leak for JDBC" /><published>2019-06-03T00:00:00+00:00</published><updated>2019-06-03T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/15-46-08-java-memory-leak-for-jdbc</id><content type="html" xml:base="https://blog.vepo.dev/en/java-memory-leak-for-jdbc"><![CDATA[<h1 id="the-context">The Context</h1>
+
+<p>I had written an engine using a custom ClassLoader. To do that just create a new <a href="https://docs.oracle.com/javase/7/docs/api/java/net/URLClassLoader.html">URLClassLoader</a>, load a jar and execute what code you want, than close the URLClassLoader. If the new ClassLoader doesn’t have access to the current ClassLoader, the loaded classes does not have access to your code. Good! Very Good!</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">URL</span><span class="o">[]</span> <span class="n">jars</span> <span class="o">=</span> <span class="k">new</span> <span class="no">URL</span><span class="o">[]</span> <span class="o">{</span> <span class="cm">/* The jars to be loaded */</span> <span class="o">};</span> <span class="c1">//</span>
+<span class="k">try</span> <span class="o">(</span><span class="nc">URLClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">URLClassLoader</span><span class="o">(</span><span class="n">jars</span><span class="o">))</span> <span class="o">{</span>
+    <span class="nc">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="nc">Job</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+    <span class="n">job</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="the-problem">The Problem</h1>
+
+<p>But… We do not have control with the code loaded from an external Jar. That is the problem. So if you want to avoid memory leaks the your custom classloader should be released by Garbage Collector. If the loaded code uses JDBC you will soon get an OutOfMemoryError and everything will crash! Not good!</p>
+
+<h1 id="the-reason">The reason</h1>
+<p>Whe JDBC loads the driver they assumes that you will use only one ClassLoader, so  it create a reference to your ClassLoader. This reference prevents the Garbage Collector from removing your custom ClassLoader from the memory.</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/789mmfr2dkp8ezgm2p91.png" alt="" /></p>
+
+<p>So, even if you create your ClassLoader, execute your code and close it. The total of loaded classes will never decrease.</p>
+
+<h1 id="how-to-solve">How to solve?</h1>
+
+<p>To solve this problem we have to unregister all JDBC drivers just after the execution, than close URLClassLoader.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">URL</span><span class="o">[]</span> <span class="n">jars</span> <span class="o">=</span> <span class="k">new</span> <span class="no">URL</span><span class="o">[]</span> <span class="o">{</span> <span class="cm">/* The jars to be loaded */</span> <span class="o">};</span> <span class="c1">//</span>
+<span class="k">try</span> <span class="o">(</span><span class="nc">URLClassLoader</span> <span class="n">classLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">URLClassLoader</span><span class="o">(</span><span class="n">jars</span><span class="o">))</span> <span class="o">{</span>
+  <span class="nc">Job</span> <span class="n">job</span> <span class="o">=</span> <span class="n">classLoader</span><span class="o">.</span><span class="na">loadClass</span><span class="o">(</span><span class="nc">Job</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+  <span class="n">job</span><span class="o">.</span><span class="na">execute</span><span class="o">();</span>
+  <span class="nc">Collections</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="nc">DriverManager</span><span class="o">.</span><span class="na">getDrivers</span><span class="o">()).</span><span class="na">forEach</span><span class="o">(</span><span class="n">driver</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="nc">DriverManager</span><span class="o">.</span><span class="na">deregisterDriver</span><span class="o">(</span><span class="n">driver</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Error unregistering driver!"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+  <span class="o">});</span>
+<span class="o">}</span> 
+</code></pre></div></div>
+
+<p>Now, let’s look for the loaded classes:</p>
+
+<p><img src="https://thepracticaldev.s3.amazonaws.com/i/xzaa7ftdokc0078tg9n5.png" alt="" /></p>
+
+<h1 id="possible-problems">Possible problems</h1>
+
+<ol>
+  <li>If the executed code create any Thread, the URLClassLoader is not eligible for Garbage Collector.</li>
+  <li>If some library create any Thread, same problem from #1.</li>
+  <li>MongoDb client create a Thread. 😫</li>
+</ol>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="JDBC" /><category term="Memory Leak" /><category term="Garbage Collector" /><summary type="html"><![CDATA[Have you ever used custom ClassLoaders in Java? This is a troubleshooting for whom is using it.]]></summary></entry><entry><title type="html">A very simple Test Driven Development Tutorial</title><link href="https://blog.vepo.dev/en/a-very-simple-test-driven-development-tutorial" rel="alternate" type="text/html" title="A very simple Test Driven Development Tutorial" /><published>2019-03-28T00:00:00+00:00</published><updated>2019-03-28T00:00:00+00:00</updated><id>https://blog.vepo.dev/en/15-32-22-a-very-simple-test-driven-development-tutorial</id><content type="html" xml:base="https://blog.vepo.dev/en/a-very-simple-test-driven-development-tutorial"><![CDATA[<p>Now I’m addicted with Test Driven Development, but… Somewhere in the past I thought it was a bad idea. Now I can’t develop any code without this technique.</p>
+
+<p>In this post I will present some steps to starting using TDD in your daily work.</p>
+
+<h1 id="tips">Tips</h1>
+
+<h2 id="tip-1-know-which-tools-you-must-use">Tip 1: Know which tools you must use</h2>
+
+<p>Which language you use? I work mostly using Java and for many years I never heard about Maven and how integrate Maven with JUnit. So JUnit without Maven or Gradle or any other building tool is nothing! <em>Nobody in the company I was working kwen Maven or any building tool… It was some kind of amateur craftsmanship software</em>.</p>
+
+<p>When I was introduced to Maven, after some years using Gradle by my own, I only asked: <em>“Ok. It make the build, run the tests and make the application deployable?</em>”. That was I was looking for! 😀</p>
+
+<p>When start a new project make a roadmap:</p>
+
+<ol>
+  <li>Set up building tool: <em>Maven or Gradle for Java</em></li>
+  <li>Configure the Testing tool: <em>Why not using JUnit 5</em></li>
+  <li>Create your first Test with an assert and check if works!</li>
+</ol>
+
+<h2 id="tip-2-know-the-tdd-cycles">Tip 2: Know the TDD Cycles</h2>
+
+<p>Red, Green, Refactor! This makes senses? No, so <a href="https://blog.cleancoder.com/uncle-bob/2014/12/17/TheCyclesOfTDD.html">read about it!</a> This is the way you will develop using TDD. Write a falling test, write the code for make the test works and refactor it.</p>
+
+<p>Until the test works, do not worry about replicated code, or bad smells, or if your code is good and beautiful! Just solve the problem. This is not the moment for that.</p>
+
+<p>Make small steps. Do not worry about write the full feature before tests. Test every step of your code. If you should save a entity on your database, first save it, then test every kind of input for this entity, then write all business rules. It is a waste of time write the full feature and then tests. Making small steps you can fix an error before it gets bigger, and you make sure that the code you wrote a hour ago works well.</p>
+
+<h2 id="tip-3-validate-your-code">Tip 3: Validate your code</h2>
+
+<p>What means pass the test? For a development team a work with, it means giving a Coverage Report with at least 80%! Is that correct? No! You should validate what you have done.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">givenUser</span><span class="o">();</span>
+<span class="n">userService</span><span class="o">.</span><span class="na">createUser</span><span class="o">(</span><span class="n">user</span><span class="o">);</span> <span class="c1">// here I have 100% of Code Coverage</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">list</span><span class="o">();</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">users</span><span class="o">).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="c1">// But I do not know if it was save</span>
+                 <span class="o">.</span><span class="na">allMatch</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">passwordIsEncrypted</span><span class="o">);</span> <span class="c1">// And if the password is correctly encrypted</span>
+</code></pre></div></div>
+
+<h2 id="tip-4-know-good-test-libraries">Tip 4: Know Good Test Libraries</h2>
+
+<p>Mockito, AssertJ, To String Verifier, etc… This will help you. Trust in me! Do not reinvent a library, reuse. There is a lot of good libraries for tests.</p>
+
+<h2 id="tip-5-organize-your-code-for-testing">Tip 5: Organize your code for testing</h2>
+
+<p>Write your production code thinking who can you test it.</p>
+
+<p>Imagine that you have a code with a lot of Services Consumers and Providers (Kafka, <em>MQ, Aws</em>, Google*, etc..). Every time you create a new producer or consumer, it should be created by the same piece of code! When you do it, it is easy to create a Mock for this class. If you have a KafkaClientFactory, you do need to worry about a new KafkaProducer, just use Mockito to mock KafkaClientFactory and be happy</p>
+
+<p>How to build a Singleton?</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeSingleton</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">instance</span> <span class="nc">AtomicReference</span><span class="o">&lt;</span><span class="nc">SomeSingleton</span><span class="o">&gt;</span> <span class="n">ref</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AtomicReference</span><span class="o">&lt;&gt;();</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">SomeSingleton</span> <span class="nf">get</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="na">updateAndGet</span><span class="o">(</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="nf">isNull</span><span class="o">(</span><span class="n">e</span><span class="o">)</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">SomeSingleton</span><span class="o">()</span> <span class="o">:</span> <span class="n">e</span><span class="o">;</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Is this implementation good? No! Why? If I want to cleanup this singleton and recreated? How can I access the field <code class="language-plaintext highlighter-rouge">ref</code>? You can’t! You have to options, or you let the field <code class="language-plaintext highlighter-rouge">ref</code> as a <code class="language-plaintext highlighter-rouge">package private</code> or you create a cleanup method as package private, and create a SomeSingletonHelper in the same package as a code test to reset all values.</p>
+
+<p>The intention is thinking, how can I test my code when you are writing the code.</p>
+
+<h2 id="tip-6-know-the-input-and-output">Tip 6: Know the input and output</h2>
+
+<p>When creating tests, you should known with type of input your code will received, and which type of output should provide. Use known inputs, not only auto-generated. This helps you to make sure its working</p>
+
+<h2 id="tip-7-use-real-inputs">Tip 7: Use real inputs</h2>
+
+<p>Use real inputs, not only generated/dummy inputs. Found a production bug? Get what input produces the bug, create a test with it!</p>
+
+<h2 id="tip-8-testing-language">Tip 8: Testing language</h2>
+
+<p>Create a Test DSL for your code.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+<span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">randomString</span><span class="o">());</span>
+<span class="n">user</span><span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="n">randomString</span><span class="o">());</span>
+<span class="n">userService</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">allUsers</span> <span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">list</span><span class="o">();</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">allUsers</span><span class="o">).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>Compare the code above with the code bellow</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userService</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">givenRandonUser</span><span class="o">())</span>
+
+<span class="n">assertThat</span><span class="o">(</span><span class="n">thenAllUsers</span><span class="o">()).</span><span class="na">hasSize</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>Build a High Level <a href="https://en.wikipedia.org/wiki/Given-When-Then">Given-When-Then</a> library for your code</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Testing is not a waste of time! When you had never done TDD you will think that, but with TDD you use better your time.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Testing" /><category term="Java" /><category term="Test" /><category term="TDD" /><summary type="html"><![CDATA[Some small tips for who wants to beggan with TDD]]></summary></entry></feed>

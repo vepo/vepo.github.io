@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+  <meta name="google-site-verification" content="xw_kgncLhv22qVjTIPi7adALZre8FIHY02-DGCuYuZ4" />
+
+   <!-- SEO stuff -->
+  
+  <title>Como criar um projeto Java usando Maven</title>
+  <meta property="og:title" content="Como criar um projeto Java usando Maven" />
+  
+
+  
+  <meta name="description" content="Nesse tutorial eu vou ensinar como criar um projeto Java usando o Maven" />
+  <meta property="og:description" content="Nesse tutorial eu vou ensinar como criar um projeto Java usando o Maven" />
+  
+
+  
+  <meta name="keywords" content="Java">
+  
+
+  <link rel="canonical" href="https://blog.vepo.dev/tutorial/como-criar-um-projeto-java-usando-maven" />
+  <meta property="og:url" content="https://blog.vepo.dev/tutorial/como-criar-um-projeto-java-usando-maven" />
+  <meta property="og:site_name" content="Notas do dia a dia de um engenheiro de software" />
+
+  
+  <meta property="og:image" content="https://blog.vepo.dev/assets/images/capas/chaplin-modern-times.webp" />
+  
+
+  
+  <!-- if it's an article -->
+  <meta property="og:type" content="article" />
+  
+  <meta property="article:published_time" content="2024-07-04T12:00:00+00:00" />
+  <meta property="article:modified_time" content="2024-07-04T12:00:00+00:00" />
+  
+
+  <meta content="https://www.linkedin.com/in/victorosorio/" property="article:author">
+
+  
+  
+  
+
+  
+  
+  <meta content="Java" property="article:tag">
+  
+  
+
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Como criar um projeto Java usando Maven",
+      "datePublished": "2024-07-04T12:00:00+00:00",
+      
+      "description": "Nesse tutorial eu vou ensinar como criar um projeto Java usando o Maven",
+      
+      
+      "url": "https://blog.vepo.dev/tutorial/como-criar-um-projeto-java-usando-maven"
+    }
+  </script>
+
+  
+
+  <link rel="author" href="https://www.linkedin.com/in/victorosorio/" />
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://db.onlinewebfonts.com/c/1e44faec07b8b81f60a3215d76bd0086?family=Irvin-Heading" rel="stylesheet">
+  <link href="https://db.onlinewebfonts.com/c/68e94a17c3e618dbe0936fcbf25b26c6?family=TNY+Adobe+Caslon+Pro+Regular" rel="stylesheet"> 
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/main.css" />
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="/assets/css/syntax.css">
+  <script src="/assets/js/jquery.min.js"></script>
+  <script src="/assets/js/adjustments.js" async></script>
+  <!--script src="https://stats.vepo.dev/load-stats.js" async></script-->
+  <script src="https://kit.fontawesome.com/9b30a05807.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script src="/assets/js/pdf.js"></script>
+  <script>
+      window.MathJax = {
+      tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+      };
+  </script>
+</head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-YXWDKRN6ZR');
+</script>
+<script async src="https://visita.vepo.dev/visita.js" data-token="legacy-token"></script>
+
+
+
+<body>
+    <main class="container">
+        <div class="row g-5">
+            <div class="col-md-2">
+                <div class="position-sticky" style="top: 2rem;">
+        <header class="site-header">
+            <h3 class="site-title"><a href="/">Victor Osório</a></h3>
+            <nav class="menu-list">
+	
+	<a href="/tags" class="menu-link">Tags</a>
+	
+	<a href="/series" class="menu-link">Séries</a>
+	
+	<a href="/palestras" class="menu-link">Palestras</a>
+	
+	<a href="/en" class="menu-link">English</a>
+	
+	<a href="/tutorial" class="menu-link">Tutoriais</a>
+	
+	<a href="/livros" class="menu-link">Livros</a>
+	
+	<a href="/about" class="menu-link">Sobre</a>
+	
+</nav>
+        </header>
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="article cover-image">
+                    
+                    <img alt="Como criar um projeto Java usando Maven" src="/assets/images/capas/chaplin-modern-times.webp" class="img-fluid" />
+                    
+                </div>
+        <div class="title">
+                    
+            <h1 class="serie-title">
+                Como criar um projeto Java usando Maven
+            </h1>
+                    
+        </div>
+                
+        
+        <div class="publish_date">
+            <strong>
+                <time datetime="2024-07-04T12:00:00+00:00">
+                    04/julho/2024
+                </time>
+            </strong> 
+        </div>
+        
+        <div class="tag-container">
+            
+                    <a class="label label-default java" href="/tags/#java">
+            <i class="fas fa-tags"></i>
+                        Java
+                    </a>
+            
+        </div>
+                
+                
+                <hr>
+                
+                
+        <article>
+            <h3 id="introdução">Introdução</h3>
+<p>Neste tutorial, você aprenderá como criar um projeto Java usando Maven, uma poderosa ferramenta de automação e gerenciamento de dependências. O Apache Maven simplifica o processo de construção de projetos Java ao fornecer uma estrutura padrão e automatizar tarefas comuns, como compilação, empacotamento, teste e gerenciamento de bibliotecas externas.</p>
+
+<p>Para compreender melhor um projeto Maven, é preciso entender que o Maven funciona sob o paradiga “Convenção sobre Configuração”. Um projeto Maven possui certas convenções que facilitam o desenvolvimento ao se evitar configurações. Sabemos, por exemplo, que todo arquivo em <code class="language-plaintext highlighter-rouge">src/main</code> será usado em produção, enquanto todo arquivo em <code class="language-plaintext highlighter-rouge">src/test</code> será usados para testes.</p>
+
+<p>Outra funcionalidade do Maven é gerenciar as dependências do projeto. Assim, se você já teve dificuldades em gerenciar as dependências de um projeto manualmente ou deseja uma maneira eficiente de organizar e construir seu código, Maven é a solução ideal. Este guia passo a passo levará você desde a configuração inicial até a criação e execução de um projeto Java básico, utilizando o Maven.</p>
+
+<p>Vamos começar criando a estrutura do projeto, em seguida, exploraremos como adicionar dependências e empacotar seu aplicativo para distribuição. Ao final deste tutorial, você terá uma base sólida para desenvolver e gerenciar seus projetos Java com eficiência usando Maven.</p>
+
+<p>Preparado? Então, vamos lá!</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/tutorial-java-maven">
+                tutorial-java-maven
+            </a>
+        </span>
+    </h2>
+</div>
+
+<h3 id="pré-requisitos">Pré-requisitos</h3>
+
+<ol>
+  <li>Java Development Kit (JDK): Certifique-se de ter o JDK instalado em sua máquina.</li>
+  <li>Apache Maven: Instale o Maven. Você pode baixar o Maven <a href="https://maven.apache.org/download.cgi">aqui</a> e seguir as instruções de instalação.</li>
+</ol>
+
+<h2 id="passo-1---crie-a-estrutura-do-projeto">Passo 1 - Crie a estrutura do projeto</h2>
+
+<p>Navegue até o diretório onde deseja criar seu projeto e execute o seguinte comando:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn archetype:generate <span class="nt">-DgroupId</span><span class="o">=</span>com.exemplo <span class="nt">-DartifactId</span><span class="o">=</span>meu-projeto <span class="nt">-DarchetypeArtifactId</span><span class="o">=</span>maven-archetype-quickstart <span class="nt">-DinteractiveMode</span><span class="o">=</span><span class="nb">false</span>
+</code></pre></div></div>
+
+<p>Isso criará um projeto Maven básico com a seguinte estrutura de diretórios:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>meu-projeto
+├── pom.xml
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── exemplo
+    │               └─── App.java
+    └── test
+        └── java
+            └── com
+                └── exemplo
+                    └─── AppTest.java
+
+</code></pre></div></div>
+
+<h2 id="passo-2---entenda-o-arquivo-pomxml">Passo 2 - Entenda o arquivo <code class="language-plaintext highlighter-rouge">pom.xml</code></h2>
+
+<p>O arquivo <code class="language-plaintext highlighter-rouge">pom.xml</code> (Project Object Model) é o coração do projeto Maven. Ele contém todas as informações sobre o projeto e as dependências necessárias. Aqui está um exemplo básico de um <code class="language-plaintext highlighter-rouge">pom.xml</code>:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+    <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.exemplo<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>meu-projeto<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>4.13.2<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<h2 id="passo-3---adicione-dependências">Passo 3 - Adicione dependências</h2>
+
+<p>Para adicionar dependências ao seu projeto, você precisa editar o arquivo <code class="language-plaintext highlighter-rouge">pom.xml</code> e incluir as dependências necessárias dentro da tag <code class="language-plaintext highlighter-rouge">&lt;dependencies&gt;</code>. Por exemplo, para adicionar a biblioteca Jackson para manipulação de JSON adicione as <strong>Coordenadas Maven</strong> <code class="language-plaintext highlighter-rouge">com.fasterxml.jackson.core:jackson-core:2.17.1</code>.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jackson-databind<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>2.17.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+<blockquote>
+  <h2 id="coordenadas-maven">Coordenadas Maven</h2>
+
+  <p>O Maven gerencia automaticamente as dependências do projeto. No <code class="language-plaintext highlighter-rouge">pom.xml</code> podemos definir uma sessão chamada <code class="language-plaintext highlighter-rouge">dependencies</code> onde todas as dependências podem ser definidas. Existem inúmeras bibliotecas disponíveis para serem usadas em projetos Java, muitas delas podem ser encontradas através do site <a href="https://mvnrepository.com/">mvnrepository.com</a>.</p>
+
+  <p>Para identificar um artefato especifico, o Maven define o conceito de Coordenada Maven. Uma coordenada é definda por todos elementos necessáios para identificar um artefato, as principais são <code class="language-plaintext highlighter-rouge">groupId</code>, <code class="language-plaintext highlighter-rouge">artifactId</code> e <code class="language-plaintext highlighter-rouge">version</code>. Mas também podem ser definidos os elementos <code class="language-plaintext highlighter-rouge">classifier</code> e <code class="language-plaintext highlighter-rouge">type</code>.</p>
+  <ul>
+    <li><strong>groupId</strong>: Identificador de agroupamento, normalmente referindo-se a uma organização, uma empresa e pode incluir um tema básico para um ou mais projetos.</li>
+    <li><strong>artifactId</strong>: Nome para o projeto. Entre os muitos projetos que existem no grupo, o artifactId pode identificar exclusivamente  artefato.</li>
+    <li><strong>version</strong>: Um identificador que rastreia builds exclusivas de um artefato. Uma versão é uma string construída pela equipe de desenvolvimento do projeto para identificar builds, diferenciado novos artefatos e catalogando alterações.</li>
+  </ul>
+</blockquote>
+
+<p>Para fazer busca por dependências, procure no site <a href="https://mvnrepository.com/">MVN Repository</a>.</p>
+
+<p>Vamos usar o Jackson databind para criar a classe Usuario.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="n">record</span> <span class="nf">Usuario</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">,</span> <span class="kt">int</span> <span class="n">idade</span><span class="o">,</span> <span class="nc">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Usuario</span> <span class="nf">fromJson</span><span class="o">(</span><span class="nc">String</span> <span class="n">jsonContent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">var</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ObjectMapper</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">mapper</span><span class="o">.</span><span class="na">readValue</span><span class="o">(</span><span class="n">jsonContent</span><span class="o">,</span> <span class="nc">Usuario</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">InvalidParameterException</span><span class="o">(</span><span class="s">"Erro ao converter json para Usuario"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="passo-4---compile-o-projeto">Passo 4 - Compile o projeto</h2>
+
+<p>Para compilar o projeto, navegue até o diretório do projeto (meu-projeto) e execute:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn compile
+</code></pre></div></div>
+<p>Isso irá compilar as classes Java no diretório <code class="language-plaintext highlighter-rouge">src/main/java</code>.</p>
+
+<h2 id="passo-5---execute-os-testes">Passo 5 - Execute os testes</h2>
+
+<p>Antes de executar os testes, vamos atualizar o JUnit para a versão 5. O JUnit é um dos mais famosos frameworks de testes para Java. Com ele os testes podem ser criados e serão automaticamente identificados desde que tenha as anotações <code class="language-plaintext highlighter-rouge">@Test</code>.</p>
+
+<p>Para atualizar a biblioteca, remova a antiga dependência e adicione a nova versão. Observe que além das coordenadas maven, ela define o escopo de utilização. Os escopos possíveis são <code class="language-plaintext highlighter-rouge">compile</code>, <code class="language-plaintext highlighter-rouge">provided</code>, <code class="language-plaintext highlighter-rouge">runtime</code>, <code class="language-plaintext highlighter-rouge">test</code>, <code class="language-plaintext highlighter-rouge">system</code> e <code class="language-plaintext highlighter-rouge">import</code>. O escopo padrão é o <code class="language-plaintext highlighter-rouge">compile</code> e quando definimos o escopo como <code class="language-plaintext highlighter-rouge">test</code> elá será usada apenas durante os testes da aplicação.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.junit.jupiter<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>junit-jupiter<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>5.10.3<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p>Agora vamos criar uma classe de testes a classe <code class="language-plaintext highlighter-rouge">UsuarioTest</code> em <code class="language-plaintext highlighter-rouge">src/test/java/com/exemplo/UsuarioTest.java</code> que deve ser automaticamente identificada pelo Maven.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">com.exemplo</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertNotNull</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">UsuarioTest</span> <span class="o">{</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">parserTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">var</span> <span class="n">usuario</span> <span class="o">=</span> <span class="nc">Usuario</span><span class="o">.</span><span class="na">fromJson</span><span class="o">(</span><span class="s">"""
+                                       {
+                                         "</span><span class="n">nome</span><span class="s">": "</span><span class="nc">John</span> <span class="nc">Doe</span><span class="s">",
+                                         "</span><span class="n">idade</span><span class="s">": 30,
+                                         "</span><span class="n">email</span><span class="s">": "</span><span class="n">john</span><span class="o">.</span><span class="na">doe</span><span class="nd">@corp</span><span class="o">.</span><span class="na">com</span><span class="s">"
+                                       }
+                                       """</span><span class="o">);</span>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">usuario</span><span class="o">,</span> <span class="s">"Usuário não pode ser nulo"</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"John Doe"</span><span class="o">,</span> <span class="n">usuario</span><span class="o">.</span><span class="na">nome</span><span class="o">(),</span> <span class="s">"Nome do usuário não confere"</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="mi">30</span><span class="o">,</span> <span class="n">usuario</span><span class="o">.</span><span class="na">idade</span><span class="o">(),</span> <span class="s">"Idade do usuário não confere"</span><span class="o">);</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"john.doe@corp.com"</span><span class="o">,</span> <span class="n">usuario</span><span class="o">.</span><span class="na">email</span><span class="o">(),</span> <span class="s">"Email do usuário não confere"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Para executar os testes, use o comando:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nb">test</span>
+</code></pre></div></div>
+
+<h2 id="passo-6---execute-o-projeto">Passo 6 - Execute o projeto</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean compile <span class="nb">exec</span>:java <span class="nt">-Dexec</span>.mainClass<span class="o">=</span><span class="s2">"com.exemplo.App"</span>
+</code></pre></div></div>
+
+<p>Isso irá compilar e executar as classes de teste localizadas em src/test/java.</p>
+<h2 id="passo-7---empacote-o-projeto">Passo 7 - Empacote o projeto</h2>
+
+<p>Para criar um arquivo JAR do seu projeto, execute:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn package
+</code></pre></div></div>
+
+<p>Isso irá gerar um arquivo JAR dentro do diretório target.</p>
+<h2 id="passo-8---execute-o-aplicativo">Passo 8 - Execute o aplicativo</h2>
+
+<p>Para executar o aplicativo, use o seguinte comando:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-cp</span> target/meu-projeto-1.0-SNAPSHOT.jar com.exemplo.App
+</code></pre></div></div>
+
+<h3 id="conclusão">Conclusão</h3>
+
+<p>Você criou com sucesso um projeto Java básico usando Maven. A partir daqui, você pode adicionar mais dependências, configurar plugins e desenvolver sua aplicação conforme necessário. Maven oferece uma poderosa ferramenta de automação para gerenciamento de projetos, simplificando o processo de construção e gerenciamento de dependências.</p>
+
+<p>Se precisar de mais ajuda ou tiver alguma dúvida, sinta-se à vontade para perguntar!</p>
+
+        </article>
+        
+        <div style="text-align: center;margin: 10px auto;max-width: 50%;">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                        <img alt="Licença Creative Commons" style="border-width:0"
+                            src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
+            </a>
+            <br />
+            Este obra está licenciado com uma Licença 
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+                Creative Commons Atribuição-NãoComercial-CompartilhaIgual 4.0 Internacional
+            </a>.
+        </div>
+                
+        <div class="article-footer">
+            
+            <div class="published">
+                <div>Escrito em 04/julho/2024</div>
+            </div>
+            
+                    
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+ 
+     
+        
+        
+         
+ 
+     
+         
+     
+ 
+     
+         
+     
+ 
+     
+        
+        
+         
+
+
+    
+<div class="related-posts">
+    <h2>Posts relacionados</h2>
+     
+        
+         
+            
+    <a href="/posts/entendendo-o-kafka">
+                
+                    Entendendo o Kafka — Uma Introdução à Plataforma de Eventos
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Jakarta EE e Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/escolhendo-uma-implementacao-jakarta-ee-e-microprofile-io">
+                
+                    Especificações Jakarta EE & Microprofile.io: Escolhendo uma implementação Jakarta EE & Microprofile.io
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/como-criar-uma-linguagem-usando-antlr4-e-java">
+                
+                    Como criar uma linguagem usando ANTLR4 e Java
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/trabalhando-com-dinheiro">
+                
+                    Coisas que todo Sênior deve saber: Trabalhando com dinheiro!
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/deixando-rastros-ou-como-usar-log">
+                
+                    Coisas que todo Sênior deve saber: Deixando rastros, ou como usar log
+                
+    </a>
+                
+                 
+     
+        
+         
+            
+    <a href="/posts/anatomia-de-um-topico">
+                
+                    Entendendo o Kafka: Anatomia de um Tópico
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto">
+                
+                    Coisas que todo Sênior deve saber: S.O.L.I.D.: A sólida base para Orientação a Objeto
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/devops-como-comecar">
+                
+                    Coisas que todo Sênior deve saber: DevOps! Como começar?
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/testes-101-testando-aplicacoes-java">
+                
+                    Level Up: Testes 101 - Testando aplicações Java
+                
+    </a>
+                
+                 
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+             
+         
+     
+        
+         
+            
+    <a href="/posts/context-and-dependency-injection-cdi-2-0">
+                
+                    Especificações Jakarta EE & Microprofile.io: Contexts and Dependency Injection (CDI) 2.0
+                
+    </a>
+                
+                 
+     
+        
+            
+
+</div>
+                    
+                </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    <footer class="footer">
+	<ul class="footer-links">
+		<li>
+			<a href="/pj-clt/">
+				<button type="button" class="btn btn-dark">
+					Calculadora PJxCLT
+				</button>
+			</a>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/@victor.osorio">
+				<i class="fab fa-youtube fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://github.com/vepo"> 
+				<i class="fab fa-github fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="http://www.linkedin.com/in/victorosorio">
+				<i class="fab fa-linkedin-in fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a href="https://bsky.app/profile/vepo.dev">
+				<i class="fab fa-bluesky fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>
+			<a rel="me" href="https://mastodon.social/@vepo">
+				<i class="fab fa-brands fa-mastodon fa-inverse fa-2x"></i>
+			</a>
+		</li>
+		<li>&nbsp;</li>
+	</ul>
+</footer>
+
+ </body>

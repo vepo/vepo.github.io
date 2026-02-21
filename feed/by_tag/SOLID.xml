@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/SOLID.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-02-21T19:42:20+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/SOLID.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">S.O.L.I.D.: A sólida base para Orientação a Objeto</title><link href="https://blog.vepo.dev/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto" rel="alternate" type="text/html" title="S.O.L.I.D.: A sólida base para Orientação a Objeto" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/22-33-17-s-o-l-i-d-a-solida-base-para-orientacao-a-objeto</id><content type="html" xml:base="https://blog.vepo.dev/posts/s-o-l-i-d-a-solida-base-para-orientacao-a-objeto"><![CDATA[<p>Entrevistas para vagas em empresas brasileiras é muito focada nas tecnologias. Você é um bom desenvolvedor do Framework ZYX? Ok. Sempre estive acostumado com isso, apesar de nunca querer me especializar em um framework.</p>
+
+<p>Até que quando fui fazer minha primeira entrevista para uma vaga em uma empresa de fora, a primeira pergunta foi: <em>“Me explique o que é o SOLID e como se aplica em Java.”</em> <strong>PÃ!</strong> 🚨🚨🚨 Bugou! Em mais de 10 anos ninguém nunca tinha me perguntado isso. Acho que nunca mais tinha ouvido falar em SOLID desde a faculdade, e também não lembrava, obviamente.</p>
+
+<h1 id="porque-é-importante">Porque é importante?</h1>
+
+<p>Mas se ninguém se importa com isso, porque é importante?</p>
+
+<p>Simplesmente porque não devemos saber as coisas só pra mostrar para os outros. SOLID é a base paa um bom design <em>Orientado a Objetos</em>. Se você deseja ser um bom desenvolvedor Java, ou qualquer outra linguagem OO que aparecer num futuro, você vai ter que saber aplicar o SOLID. Ele vai ter ajudar a fazer um código mais elegante. 🤵</p>
+
+<h1 id="porque-solid">Porque SOLID?</h1>
+
+<p>SOLID foi proposto pelo ~Uncle Bob~ Seo Roberto, vulgo Robert C. Martin, em <a href="https://web.archive.org/web/20150906155800/http://www.objectmentor.com/resources/articles/Principles_and_Patterns.pdf">2000</a>. Sua ideia ao propor alguns padrões era evitar podridão no código. Essa ideia de podridão não era novo, Joseph Yoder já tinha usado o termo Big Ball of Mud alguns anos antes. Mas a ideia era, quando um software vai evoluindo, algumas vezes o design/arquitetura não evolui, logo é preciso ter algumas parametros para analise antes de fazer uma alteração.</p>
+
+<blockquote>
+  <p>Atualização: Acerca do <strong>Seo Roberto</strong>, eu não sou fã das ideias dele. Na época que escrevi esse texto eu tinha um pé atrás, hoje tenho 2 pés atrás. <a href="https://youtu.be/_5023ZrV2ek">O livro dele sobre Design De Código é um desserviço</a> e a pessoa dele é ligada a movimentos politicos radicais. Mas isso é o de menos, o pior é a opinião dele sobre comentários de código. (É ironia, a posição politica dele é repugnante)</p>
+</blockquote>
+
+<p>Mas vamos conhecer antes quais problemas ele identificou?</p>
+
+<h2 id="rigidez">Rigidez</h2>
+
+<p>Está dificil alterar o seu código? Bom, então ele está rigido!</p>
+
+<p>Rigidez é a capacidade de não ser fácil fazer uma alteração no código. Ou por um alto acoplamento. Se mexer em um lugar vai ter que mexer em outro e assim por diante.</p>
+
+<p>Desenvolvedores pouco experientes vão achar que isso é natural de um sistema. Na verdade isso é bastante comum e sempre irá existir, mas pode ser reduzido. Com a experiência temos mais repertório de soluções de como deixar nosso código pouco acoplado.</p>
+
+<h2 id="fragilidade">Fragilidade</h2>
+
+<p>Fragilidade é a capacidade do código de apresentar erros ao se criar alterações. Quem nunca encontrou um comentário “DO NOT TOUCH!” no meio do código?</p>
+
+<p>As vezes isso acontece por códigos que iteragem entre si ou mesmo de comportamentos poucos ortodoxos. Ou isso simplesmente acontece por mudanças de requisitos. Muda-se o requisito, mas não se altera todo o software referente aquele requisito.</p>
+
+<p>Mas há meios de se resolver isso…</p>
+
+<h2 id="imobilidade">Imobilidade</h2>
+
+<p>Já teve que reescrever uma solução? Quando temos um código que precisa ser replicado porque simplemente não dá pra generalizar o uso dele para dois casos bem similares, temos uma imobilidade.</p>
+
+<p>Desenvolvedores menos experientes não verão problema nisso. Até o dia que alguém alterar em um lugar e esquecer do outro.</p>
+
+<h2 id="viscosidade">Viscosidade</h2>
+
+<p>Viscosidade vem de duas forma: viscosidade do design e viscosidade do ambiente.</p>
+
+<p>Viscosidade do Design acontece quando na necessidade de uma mudança, manter a consistência do design se torna dificil. Sempre que há a necessidade de uma mudança, você pode alterar o design ou manter o designo original. Se manter o padrão do desing é dificil, temos um código viscoso.</p>
+
+<p>Viscosidade do Ambiente acontece quando o ambiente de desenvolvimento é dificil de operar. Ou o tempo de compilação é demorado, ou o deploy em ambiente de desenvolvimento é demorado.</p>
+
+<h1 id="principios-da-orientação-objeto">Principios da Orientação Objeto</h1>
+
+<p>Para resolver esses problemas foram propostos alguns principios que podem nos dar um caminho.</p>
+
+<h2 id="srp---principio-da-responsabilidade-única">SRP - Principio da Responsabilidade Única</h2>
+
+<blockquote>
+  <p>“<em>Uma classe deve ter um, e somente um, motivo para mudar.</em>”</p>
+</blockquote>
+
+<p>Também chamado de Coesão, esse principio se relaciona a proximidade das funções de um modulo. Se o modulo faz diversas funções, não é coeso. Já se o modulo possue uma única função, se torna coeso.</p>
+
+<p>Quando uma classe é coesa, a necessidade de alterar ela diminui, pois as interações com ela se reduzem.</p>
+
+<p>Por exemplo, imagine que tenho um framework de testes. Posso pensar em vários tipos de testes a serem feitos, porém a classe que Executa os testes não deve se preocupar com nada. Deve haver uma interface para se abstrair quais as atividades de um teste e essa classe deve chamar apenas essas abstrações.</p>
+
+<div data-gist="https://gist.github.com/vepo/cdcaa8c6adb667bdb305cfe02f8e8252"></div>
+
+<h3 id="anti-pattern">Anti-Pattern</h3>
+
+<p>O princípio da Responsabilidade Única vem associada a um Anti-Pattern bem comum o <a href="https://pt.wikipedia.org/wiki/Objeto_deus">Objeto Deus</a>. Este objeto é aquele que Sabe Tudo e Faz Tudo. Já trabalhei em uma empresa que tinha que dá manutenção em um servidor de serviços de voz (TTS e ASR), quando abri a classe que tratava as requisiões…. Mais de 10.000 linhas!!! 😱 Qualquer alteração era bastante dolorosa, porém com a implentação de alguns Design Patterns foi possível reduzir ela para algo em torno de 100 linhas.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/ltor91r9jxxdf09s5uio.jpeg" alt="Matador de Deuses" /></p>
+
+<h2 id="ocp---princípio-aberto-fechado">OCP - Princípio Aberto-Fechado</h2>
+
+<blockquote>
+  <p>“<em>Um módulo deve estar aberto para extensão, mas fechado para modificação.</em>”</p>
+</blockquote>
+
+<p>Esse principio pode ser resumido em dizer que um módulo, ou uma classe, deve ser aberto para extensão sem ser necessário modificação.</p>
+
+<p>Na época em que foi proposto o SOLID isso se dava basicamente por herança, ou seja, criação de hieraquias de classes e interfaces. Porém hoje há outras formas mais comuns, e composição é uma bem mais aceitável para isso.</p>
+
+<p>Voltando ao nosso exemplo da classe de teste, podemos ter Testes de vários tipos, mas podemos criar testes compostos:</p>
+
+<div data-gist="https://gist.github.com/vepo/21d01d3768980317d62ec8beccf29aae"></div>
+
+<p>Nesse examplo acima vemos que Testes novos podem ser criados tanto por Herança quanto por acoplamento e não será necessário reimplementar nenhuma das classes.</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/kfzcj8aiuaz4c1s9txpo.jpg" alt="Please, come in and be nice!" /></p>
+
+<h2 id="lsp---princípio-da-substituição-de-liskov">LSP - Princípio da Substituição de Liskov</h2>
+
+<blockquote>
+  <p>“<em>As subclasses devem ser substituíveis por suas classes base.</em>”</p>
+</blockquote>
+
+<p>Esse principio parece simples, principalmente se você usa linguagens como Java, pois a linguagem aparentemente já garante ele. Certo?</p>
+
+<p>Nem sempre, um dos erros mais comuns em Java é não se atentar ao Contrato de um Método. Vamos explicar…</p>
+
+<p>Em Java todo Objeto estende a classe Object, essa classe define alguns Métodos para validar igualdade de objetos como o <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#hashCode--">hashCode</a> e <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html#equals-java.lang.Object-">equals</a>. Muitos desenvolvedores nunca leram a definição desses métodos ou nunca se preocuparam em implementar eles. Mas o que acontece se eu não implemento eles? Algumas classes da API dependem deles, as mais comuns são: <a href="https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html">HashMap</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/util/HashSet.html">HashSet</a>. Caso um objeto não implemente corretamente esses métodos, uma operação de adição em uma dessas classes pode resultar em comportamentos inesperados.</p>
+
+<h2 id="isp---princípio-da-segregação-da-interface">ISP - Princípio da Segregação da Interface</h2>
+
+<blockquote>
+  <p>“<em>Muitas interfaces específicas do cliente são melhores que uma interface de uso geral</em>”.</p>
+</blockquote>
+
+<p>Esse é um padrão bem comum nas interfaces gráficas, para cada ação há uma interface <strong>Listerner</strong>. Havendo uma grande variedade de interfaces promove o desacoplamento de uma implementação com outras ações indesejadas.</p>
+
+<p>Esse princípio tem um efeito negativo que pode deve ser contido. Não se deve criar interfaces indesejadas. Por exemplo, se temos em uma interface gráfica um <strong>Botão</strong> e <strong>Link</strong>, podemos supor que ambos possuem a mesma operação de <strong>Clique</strong>, logo não faz sentido criar mais do que um <strong>CliqueListerner</strong>.</p>
+
+<p>O Java padeceu por muito tempo de uma sobrecarga nas definições de classes por causa desse principio, em um único projeto havia inumeras implementas de Listeners etc… Porém, desde o Java 8 isso pode ser contornado pelo uso de Lambdas e funções como parâmetros. Um bom inicio para se conhecer essa interfaces é o package <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html">java.util.function</a>. Nele é possível encontrar interfaces como <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html">Consumer</a> e <a href="https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html">Function</a> que nos ajudam a evitar criar novas interfaces.</p>
+
+<h2 id="dip---princípio-da-inversão-da-dependência">DIP - Princípio da inversão da dependência</h2>
+
+<blockquote>
+  <p>“<em>Dependa de abstrações. Não dependa de implementações.</em>”</p>
+</blockquote>
+
+<p>Esse princípio não é resolvido pela linguagem, mas pelo design do seu código. Dependa sempre de Classes Abstratas ou de Interfaces.</p>
+
+<p>Porque disso? Supõe-se que toda implementação é volátil e pode ser alterada, estendida ou substituida. Até mesmo classes bem pouco volátil com String sofreu algumas alterações com a adição de métodos. Obviamente que essa alteração não torna nenhum código já implementado imcompatível. Mas se se houvesse uma mudança interna na classe? Isso alteraria seu código?</p>
+
+<p>Imagine que você estende um Cliente HTTP e altera o comportamento interno dele por algum motivo exotérico. Seria possível migrar para uma nova versão dessa dependência que usa HTTP2? Ou seria possível trocar o cliente em tempo de execução? Muito provavél que não.</p>
+
+<p>Isso serve de sinal até mesmo quando for referenciar uma variável, use sempre o tipo mais abstrato que puder, evitando assim acoplamento.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Esses 5 princípios existem há muito tempo, e é sempre bom relembrar eles. Com a ajuda deles podemos criar códigos mais elegantes e que vão garantir que as alterações sejam mais fáceis e a manutenção menos trabalhosa.</p>
+
+<p>Uma outra dica é sempre refatorar seu código. Procure pelos sinais de putrefação e levante esses defeitos com a equipe.</p>
+
+<h1 id="livros-recomendados">Livros Recomendados</h1>
+
+<ul>
+  <li><a href="https://www.amazon.com.br/Java-Efetivo-Melhores-Pr%C3%A1ticas-Plataforma/dp/8550804622?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2WMKZ78ONZQ85&amp;dchild=1&amp;keywords=java+efetivo&amp;qid=1595295115&amp;s=books&amp;sprefix=java+ef%2Caps%2C281&amp;sr=1-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=c2642a6b2cbf9bbe71fd0f272208ffe2&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Java Efetivo: as Melhores Práticas Para a Plataforma Java</a> de Joshua Bloch</li>
+</ul>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Orientação a Objeto" /><category term="Java" /><category term="SOLID" /><category term="Programação" /><summary type="html"><![CDATA[SOLID é uma das base a Orientação a Objeto. Nesse post explico os motivos que geraram essa base e os princípios de cada letra.]]></summary></entry></feed>
