@@ -1,0 +1,83 @@
+---
+title: "SQL na Prática: Criando e Atualizando tabelas"
+published: false
+description: "Aprenda a criar e modificar tabelas em SQL com exemplos práticos em PostgreSQL. Descubra a diferença entre constraints em nível de coluna e tabela, chaves primárias compostas, e como nomear constraints para facilitar a manutenção do banco de dados."
+tags: [SQL, PostgreSQL, Banco de Dados, Modelagem de Dados, Backend, Desenvolvimento Web]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/banco-de-dados-relacional-em-java
+publish_date: 2026-02-20 12:40:00 +0300
+---
+Agora que entendemos como modelar e usar um banco de dados relacional, é hora de aprender como usar-lo em uma aplicação Java. Vamos mostrar quais as bibliotecas e frameworks que podem ser usados e quais os principios de design de cada uma delas. Esse módulo será apenas introdutório, e não vamos entrar em detalhes de cada uma das bibliotecas, mas sim mostrar como elas se encaixam no ecossistema Java e como escolher a melhor para o seu projeto.
+
+Para usar bancos de dados relacionais em Java, podemos usar:
+
+- JDBC (Java Database Connectivity): é a API padrão para acessar bancos de dados em Java. Ela é uma camada de abstração que permite que você se conecte a qualquer banco de dados relacional usando um driver específico para cada banco. O JDBC é uma boa opção para projetos simples ou quando você quer ter controle total sobre as consultas SQL e a gestão de conexões.
+- JPA (Jakarta Persistence API): é uma especificação para mapeamento objeto-relacional (ORM) em Java. Ela permite que você trabalhe com objetos Java em vez de escrever consultas SQL diretamente. O JPA é uma boa opção para projetos mais complexos ou quando você quer abstrair a camada de persistência e focar na lógica de negócios.
+- Hibernate: é uma implementação popular do JPA que oferece recursos adicionais, como cache de segundo nível, suporte a consultas nativas e integração com outros frameworks. O Hibernate é uma boa opção para projetos que precisam de um ORM robusto e flexível.
+- Spring Data JPA: é uma extensão do Spring Framework que facilita o uso do JPA em aplicações Spring. Ele oferece uma camada de abstração adicional sobre o JPA, permitindo que você crie repositórios de dados com menos código e suporte a consultas personalizadas. O Spring Data JPA é uma boa opção para projetos que já usam o Spring Framework e querem aproveitar seus recursos de integração.
+- Spring Data JDBC: é uma extensão do Spring Framework que facilita o uso do JDBC em aplicações Spring. Ele oferece uma camada de abstração adicional sobre o JDBC, permitindo que você execute consultas SQL com menos código e suporte a mapeamento de resultados. O Spring Data JDBC é uma boa opção para projetos que já usam o Spring Framework e querem ter controle total sobre as consultas SQL, mas ainda assim aproveitar os recursos de integração do Spring.
+- Jakarta Data: é uma especificação para acesso a dados em Java que visa unificar as APIs de persistência, como JPA, JDBC e outras. Ela oferece uma abordagem mais simples e consistente para acessar dados em diferentes fontes, como bancos de dados relacionais, NoSQL e serviços REST. O Jakarta Data é uma boa opção para projetos que precisam de uma solução de acesso a dados mais flexível e moderna.
+- Quarkus Panache: é uma extensão do Quarkus que facilita o uso do JPA em aplicações Quarkus. Ele oferece uma camada de abstração adicional sobre o JPA, permitindo que você crie repositórios de dados com menos código e suporte a consultas personalizadas. O Quarkus Panache é uma boa opção para projetos que já usam o Quarkus e querem aproveitar seus recursos de integração.
+- Jakarta Transaction: é uma especificação para gerenciamento de transações em Java. Ela permite que você gerencie transações de forma declarativa, definindo trechos de código que devem ser executados dentro do escopo de uma transação.
+- Flyway: é uma ferramenta de migração de banco de dados que permite versionar e gerenciar as mudanças no esquema do banco de dados. Ele é uma boa opção para projetos que precisam de controle sobre as mudanças no banco de dados e querem garantir a consistência entre os ambientes de desenvolvimento, teste e produção.
+
+Cada uma dessas opções tem suas vantagens e desvantagens, e a escolha depende do contexto do seu projeto, das suas necessidades de desempenho, da sua familiaridade com as tecnologias e do seu estilo de desenvolvimento. O importante é entender as diferenças entre elas e como elas se encaixam no ecossistema Java para tomar a melhor decisão para o seu projeto.
+
+== JDBC (Java Database Connectivity)
+
+O JDBC é uma biblioteca de baixo nível provida pela plataforma Java que permite a conexão com diversos bancos de dados relacionais através de uma mesma interface. O JDBC é uma alternativa orientada a objetos ao ODBC (Open Database Connectivity) e é parte integrante do Java SE. Ele é uma boa opção para projetos simples ou quando você quer ter controle total sobre as consultas SQL e a gestão de conexões.
+
+A primeira versão do JDBC foi lançada em 1997, como parte integrante da versão 1.1 do Java SE e permite manipulação de scripts SQL para criação de tabelas, inserção de dados, consultas e outras operações de banco de dados. É importante lembrar que a interface JDBC é uma camada de abstração que permite manipular a conexão com o banco de dados, sem muitas funcionalidades adicionais que ficam a cargo do desenvolvedor ou de um framework de mais alto nível.
+
+Ao usar o JDBC, o desenvolvedor precisa lidar diretamente com a criação de conexões, a execução de consultas SQL e o tratamento de resultados. Isso pode ser mais trabalhoso e propenso a erros, especialmente em projetos maiores ou mais complexos. No entanto, o JDBC oferece um controle total sobre as consultas SQL e a gestão de conexões, o que pode ser vantajoso em alguns casos.
+
+== JPA (Jakarta Persistence API)
+
+O JPA é uma especificação para mapeamento objeto-relacional (ORM) em Java. Ele permite que você trabalhe com objetos Java em vez de escrever consultas SQL diretamente. O JPA é uma boa opção para projetos mais complexos ou quando você quer abstrair a camada de persistência e focar na lógica de negócios.
+
+Uma aplicação que usa JPA pode ser mais fácil de desenvolver e manter, pois o desenvolvedor pode trabalhar com objetos Java para modelar os dados e as relações entre eles, em vez de lidar diretamente com tabelas e consultas SQL. O JPA também oferece recursos como cache de segundo nível, suporte a consultas nativas e integração com outros frameworks, o que pode ser vantajoso em projetos mais complexos.
+
+É importante lembrar que o JPA é uma especificação e que existem várias implementações, como o https://hibernate.org/[Hibernate], https://eclipse.dev/eclipselink/[EclipseLink] e https://openjpa.apache.org/[OpenJPA]. O Hibernate é uma implementação popular do JPA. O projeto JPA é mantido pela Eclipse Foundation e é parte integrante do Jakarta EE, um conjunto de especificações para desenvolvimento de aplicações corporativas em Java. A última versão estável do JPA é a https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2[3.2], lançada em 2024.
+
+Apesar da facilidade de desenvolvimento e manutenção, o JPA pode trazer uma sobrecarga de desempenho se não for usado corretamente, pois a abstração pode ocultar detalhes importantes sobre como as consultas SQL são geradas e executadas. É importante entender como o JPA funciona e como otimizar suas consultas para evitar problemas de desempenho.
+
+Outra preocupação comum com o JPA é o mecanismo de cache de segundo nível, os desenvolvedores devem estar ciente sobre como a aplicação lida com o cache e como os objetos são carregados na memória.
+
+== Hibernate
+
+O Hibernate é uma implementação popular do JPA que oferece recursos adicionais, como suporte a auditoria, implementação de repositórios, paginação e tipos especiais. Em muitos casos o uso do Hibernate é através das anotações do JPA.
+
+== Spring Data JPA
+
+O Spring Data JPA é uma extensão do Spring Framework que facilita o uso do JPA em aplicações Spring. Ele oferece uma camada de abstração adicional sobre o JPA, permitindo que você crie repositórios de dados com menos código e suporte a consultas personalizadas. O Spring Data JPA é uma boa opção para projetos que já usam o Spring Framework e querem aproveitar seus recursos de integração.
+
+== Spring Data JDBC
+
+O Spring Data JDBC é uma extensão do Spring Framework que facilita o uso do JDBC em aplicações Spring. Ele oferece uma camada de abstração adicional sobre o JDBC, permitindo que você execute consultas SQL com menos código e suporte a mapeamento de resultados. O Spring Data JDBC remove a complexidade do JDBC ao permitir o mapeamento dos objetos Java e seu uso em consultas SQL.
+
+== Jakarta Data
+
+O Jakarta Data é uma especificação de acesso a dados em Java que visa unificar as APIs de persistência, como JPA, JDBC e outras. Ela oferece uma abordagem mais simples e consistente para acessar dados em diferentes fontes, como bancos de dados relacionais, NoSQL e serviços REST. O Jakarta Data é uma boa opção para projetos que precisam de uma solução de acesso a dados mais flexível e moderna.
+
+Como é uma https://jakarta.ee/specifications/data/1.0/jakarta-data-1.0[especificação], há várias https://jakarta.ee/specifications/data/1.0/[implementações], como o Hibernate, Eclipse JNoSQL e Open Liberty.
+
+== Quarkus Panache
+
+O Quarkus Panache é uma extensão do Quarkus que facilita o uso do JPA em aplicações Quarkus. Ele oferece uma camada de abstração adicional sobre o JPA, permitindo que você crie repositórios de dados com menos código e suporte a consultas personalizadas. O Quarkus Panache é uma boa opção para projetos que já usam o Quarkus e querem aproveitar seus recursos de integração.
+
+== Jakarta Transaction
+
+O Jakarta Transaction é uma especificação para gerenciamento de transações em Java. Ela permite que você gerencie transações de forma declarativa, definindo trechos de código que devem ser executados dentro do escopo de uma transação. O Jakarta Transaction é uma boa opção para projetos que precisam de controle sobre as transações e querem garantir a consistência dos dados em operações que envolvem múltiplas etapas.
+
+== Flyway
+
+O Flyway é uma ferramenta de migração de banco de dados que permite versionar e gerenciar as mudanças no esquema do banco de dados. Ele é uma boa opção para projetos que precisam de controle sobre as mudanças no banco de dados e querem garantir a consistência entre os ambientes de desenvolvimento, teste e produção. O Flyway suporta diversos bancos de dados relacionais e pode ser integrado com ferramentas de build como Maven e Gradle, facilitando a automação do processo de migração.
+
+É possível também integrar o Flyway com frameworks de persistência como JPA e Hibernate, garantindo que as migrações sejam aplicadas antes da aplicação iniciar, evitando problemas de incompatibilidade entre o código e o esquema do banco de dados.
+
+== Conclusão
+
+Podemos dividir os frameworks de acesso a dados em Java em quatro grande categorias: acesso, mapeamento, transação e migração. O acesso é a camada mais baixa, onde o desenvolvedor tem controle total sobre as consultas SQL e a gestão de conexões, como o JDBC. O mapeamento é a camada intermediária, onde o desenvolvedor pode trabalhar com objetos Java para modelar os dados e as relações entre eles, como o JPA e suas implementações. A transação é a camada que permite gerenciar transações de forma declarativa, garantindo a consistência dos dados, como o Jakarta Transaction. A migração é a camada que permite versionar e gerenciar as mudanças no esquema do banco de dados, garantindo a consistência entre os ambientes de desenvolvimento, teste e produção, como o Flyway.
+
+É importante que o desenvolvedor entenda as diferenças e objetivos de cada um desses frameworks para escolher a melhor opção para o seu projeto, levando em consideração as necessidades de desempenho, a familiaridade com as tecnologias e o estilo de desenvolvimento. A escolha de um framework sempre será baseada entre a necessidade de adaptação ou a facilidade de desenvolvimento. Em alguns casos, o desenvolvedor quer ter o controle total sobre as consultas SQL, em detrimento da velocidade de desenvolvimento. Em outros casos, o desenvolvedor quer abstrair a camada de persistência e focar na lógica de negócios, em detrimento do controle sobre as consultas SQL. O importante é entender as diferenças entre eles e como eles se encaixam no ecossistema Java para tomar a melhor decisão para o seu projeto.
