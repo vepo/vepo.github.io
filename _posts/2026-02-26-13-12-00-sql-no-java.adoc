@@ -1,13 +1,13 @@
 ---
 title: "Acessando Bancos de Dados Relacionais em Java: JDBC, JPA, Hibernate e mais"
-published: false
+published: true
 description: |
-    Conheça as principais bibliotecas e frameworks para acesso a dados em Java: JDBC, JPA, Hibernate, Spring Data, Flyway e muito mais. Aprenda as diferenças entre cada abordagem e como escolher a melhor para seu projeto.
+    Conheça as principais bibliotecas e frameworks para acesso a dados em Java: JDBC, jOOQ, JPA, Hibernate, Spring Data, Flyway e muito mais. Aprenda as diferenças entre cada abordagem e como escolher a melhor para seu projeto.
 tags: [Java, JDBC, JPA, Hibernate, Spring Data, Banco de Dados, Flyway]
 cover_image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
 permalink: /posts/banco-de-dados-relacional-em-java
-publish_date: 2026-02-20 16:40:00 +0300
+publish_date: 2026-02-26 13:12:00 +0300
 ---
 
 Depois de entender como modelar e usar um banco de dados relacional, chegou a hora de aprender como integrá-lo a uma aplicação Java. A seguir, apresentamos as principais bibliotecas e frameworks disponíveis, seus princípios de design e como escolher a melhor opção para o seu projeto.
@@ -19,12 +19,12 @@ Podemos dividir as ferramentas de acesso a dados em Java em quatro grandes categ
 .Visão por categorias
 [cols="1,2,2,1,1", options="header"]
 |====
-| Categoria                 | Propósito                          | Frameworks                                     | Nível de abstração | Controle sobre SQL 
-| Acesso direto             | Executar SQL manualmente           | JDBC, Spring Data JDBC                         | Baixo              | Total
+| Categoria                 | Propósito                          | Frameworks                                     | Nível de abstração | Controle sobre SQL
+| Acesso direto             | Executar SQL manualmente           | JDBC, jOOQ, Spring Data JDBC                   | Baixo              | Total
 | ORM                       | Mapear objetos para tabelas        | JPA, Hibernate                                 | Alto               | Médio
-| Abstrações de repositório | Facilitar o uso de ORMs            | Spring Data JPA, Quarkus Panache, Jakarta Data | Muito alto         | Baixo 
-| Transações                | Garantir consistência em operações | Jakarta Transaction, Spring @Transactional     | -                  | - 
-| Migração                  | Versionar o esquema do banco       | Flyway, Liquibase                              | -                  | - 
+| Abstrações de repositório | Facilitar o uso de ORMs            | Spring Data JPA, Quarkus Panache, Jakarta Data | Muito alto         | Baixo
+| Transações                | Garantir consistência em operações | Jakarta Transaction, Spring @Transactional     | -                  | -
+| Migração                  | Versionar o esquema do banco       | Flyway, Liquibase                              | -                  | -
 |====
 
 ---
@@ -43,7 +43,7 @@ Com JDBC, o desenvolvedor tem controle total sobre as consultas SQL, a gestão d
 try (Connection conn = DriverManager.getConnection(url, user, password);
      Statement stmt = conn.createStatement();
      ResultSet rs = stmt.executeQuery("SELECT * FROM usuarios")) {
-    
+
     while (rs.next()) {
         System.out.println(rs.getString("nome"));
     }
@@ -58,6 +58,26 @@ O JDBC é recomendado para:
 . Casos onde o desempenho máximo é crítico
 . Situações que exigem consultas SQL altamente otimizadas
 
+=== jOOQ
+
+O jOOQ é uma biblioteca que oferece uma abordagem mais fluida para construir consultas SQL em Java. Ele gera código a partir do esquema do banco, permitindo escrever consultas de forma programática, mas ainda com controle total sobre o SQL gerado. O jOOQ é especialmente útil para projetos que precisam de consultas complexas, mas querem evitar o boilerplate do JDBC.
+
+.Exemplo de consulta com jOOQ
+[source,java]
+----
+var userName = "postgres";
+var password = "Password123";
+var url = "jdbc:postgresql://localhost:5432/postgres";
+var create = DSL.using(connection, SQLDialect.POSTGRES);
+Result<Record> result = create.select()
+                              .from(USUARIOS)
+                              .where(USUARIOS.NOME.like("A%"))
+                              .fetch();
+for (Record r : result) {
+    System.out.println(r.get(USUARIOS.NOME));
+}
+----
+
 === Spring Data JDBC
 
 O Spring Data JDBC é uma abstração sobre o JDBC que elimina grande parte do código boilerplate, mantendo o controle sobre as consultas SQL. Ele oferece mapeamento automático entre linhas do resultado e objetos Java, além de repositórios com métodos prontos para operações comuns.
@@ -65,12 +85,24 @@ O Spring Data JDBC é uma abstração sobre o JDBC que elimina grande parte do c
 
 [source,java]
 ----
+@Table("tb_users")
+public class User {
+  @Id
+  private Integer id;
+  private String username;
+  private String email;
+  private String name;
+  private String lastname;
+
+  // getters e setters
+}
+
 interface UserRepository extends CrudRepository<User, Integer> {
-  List<User> findUserNoArgumentsBy();                                                  
-  Page<User> findPageOfUsersByLastnameStartingWith(String lastname, Pageable page);    
-  @Query("select * from User u where username = ?1")
-  User findAnnotatedQueryByEmailAddress(String username);                              
-  User findByEmailAddress(String emailAddress);                                        
+  List<User> findUserNoArgumentsBy();
+  Page<User> findPageOfUsersByLastnameStartingWith(String lastname, Pageable page);
+  @Query("select * from User u where lower(username) = lower(?1)")
+  User findByUsername(String username);
+  User findByEmail(String email);
 }
 ----
 
@@ -89,10 +121,10 @@ public class Usuario {
     @Id
     @GeneratedValue
     private Long id;
-    
+
     private String nome;
     private String email;
-    
+
     // getters e setters
 }
 ----
@@ -104,7 +136,7 @@ O JPA oferece recursos avançados como:
 . Carregamento lazy ou eager de relacionamentos
 . Consultas com JPQL (Java Persistence Query Language)
 
-A versão mais recente é a JPA 3.2, lançada em 2024 como parte do Jakarta EE.
+A versão mais recente é a https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2[JPA 3.2], lançada em 2024 como parte do Jakarta EE.
 
 === Hibernate
 
@@ -126,7 +158,7 @@ O Spring Data JPA integra o JPA ao ecossistema Spring, reduzindo significativame
 ----
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findByNomeContainingIgnoreCase(String nome);
-    
+
     @Query("SELECT u FROM Usuario u WHERE u.email LIKE %:dominio")
     List<Usuario> buscarPorDominioEmail(@Param("dominio") String dominio);
 }
@@ -137,16 +169,21 @@ O Spring Data JPA implementa automaticamente os métodos da interface, incluindo
 
 === Quarkus Panache
 
-No universo Quarkus, o Panache oferece uma abordagem ainda mais opinada para persistência. Duas estratégias estão disponíveis:
+No universo Quarkus, o Panache oferece uma abordagem ainda mais simples para persistência. Duas estratégias estão disponíveis:
 
 [source,java]
 ----
 public class Usuario extends PanacheEntity {
     public String nome;
+    @Column(unique = true)
     public String email;
-    
+
     public static List<Usuario> findByNome(String nome) {
         return list("nome", nome);
+    }
+
+    public static Usuario findByEmail(String email){
+        return find("name", name).firstResult();
     }
 }
 ----
@@ -160,11 +197,14 @@ public class UsuarioRepository implements PanacheRepository<Usuario> {
     public List<Usuario> findByNome(String nome) {
         return list("nome", nome);
     }
+
+    public Usuario findByEmail(String email){
+        return find("email", email).firstResult();
+    }
 }
 ----
 
 O Panache elimina a necessidade de getters, setters e muitas anotações, priorizando produtividade e desempenho em ambientes nativos.
-
 
 === Jakarta Data
 
@@ -173,9 +213,9 @@ O Jakarta Data é uma especificação recente que busca unificar o acesso a dado
 [source,java]
 ----
 @Repository
-public interface UsuarioRepository extends DataRepository<Usuario, Long> {
+public interface UsuarioRepository extends CrudRepository<Usuario, Long> {
     List<Usuario> findByNome(String nome);
-    
+
     Optional<Usuario> findByEmail(String email);
 }
 ----
@@ -186,7 +226,7 @@ Por ser uma especificação, existem múltiplas implementações disponíveis, i
 
 === Jakarta Transaction
 
-Operações que envolvem múltiplas etapas no banco de dados precisam ser atômicas: ou todas executam com sucesso, ou nenhuma delas é aplicada. O Jakarta Transaction (antigo JTA) é a especificação para gerenciamento declarativo de transações em Java.
+Operações que envolvem múltiplas etapas no banco de dados precisam ser atômicas: ou todas executam com sucesso, ou nenhuma delas é aplicada. O https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0[Jakarta Transaction] (antigo JTA) é a especificação para gerenciamento declarativo de transações em Java.
 
 Em aplicações Spring, o gerenciamento é simplificado com a anotação `@Transactional`:
 
@@ -194,7 +234,7 @@ Em aplicações Spring, o gerenciamento é simplificado com a anotação `@Trans
 ----
 @Service
 public class UsuarioService {
-    
+
     @Transactional
     public void criarUsuarioComPedido(Usuario usuario, Pedido pedido) {
         usuarioRepository.save(usuario);
@@ -228,15 +268,14 @@ V0.0.3__criar_tabela_pedidos.sql
 
 Além do Flyway, existe também o Liquibase, que oferece formato XML/YAML/JSON para definição das mudanças.
 
-
 .Integração com Spring Boot:
-[source,yaml]
+[source,properties]
 ----
-spring:
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
 ----
+
+O Flyway pode também ser usado em projetos Quarkus, para isso basta adicionar a extensão `quarkus-flyway` e colocar os scripts de migração na pasta `src/main/resources/db/migration`.
 
 ---
 
@@ -247,7 +286,7 @@ Não existe bala de prata. A escolha depende de vários fatores:
 [cols="2,1", options="header"]
 |====
 | Cenário                                        | Abordagem recomendada
-| Projeto pequeno, controle total sobre SQL      | JDBC puro
+| Projeto pequeno, controle total sobre SQL      | JDBC puro ou jOOQ
 | Aplicação Spring, deseja produtividade         | Spring Data JPA
 | Microsserviço com Quarkus, performance nativa  | Quarkus Panache
 | Banco não relacional ou múltiplas fontes       | Jakarta Data
