@@ -1,0 +1,214 @@
+---
+title: Entendendo o JDBC
+published: true
+description: | 
+  O JDBC é uma API que permite a comunicação entre aplicações Java e bancos de dados. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões. Nesse post, vamos explorar os principais componentes do JDBC e como utilizá-los para interagir com um banco de dados.
+tags: [Java, JDBC, Banco de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/entendendo-o-jdbc
+publish_date: 2026-02-26 18:29:00 +0300
+---
+
+Como falamos no último post, o JDBC é uma API que permite a comunicação entre aplicações Java e bancos de dados. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões.
+
+Nesse post, vamos explorar os principais componentes do JDBC e como utilizá-los para interagir com um banco de dados. 
+
+NOTE: Esse post trata somente da biblioteca JDBC, e não do Spring Data JDBC, que é um framework que utiliza o JDBC para fornecer uma camada de abstração para acesso a dados. O Spring Data JDBC é uma opção mais avançada e fácil de usar para acessar bancos de dados em aplicações Java, mas o conhecimento do JDBC é fundamental para entender como ele funciona por baixo dos panos.
+
+== O que é o JDBC?
+
+JDBC é a sigla para Java Database Connectivity. Ele é uma API que define um conjunto de classes e interfaces para acessar e manipular bancos de dados relacionais a partir de aplicações Java. O JDBC é parte integrante do Java Standard Edition (Java SE) e é amplamente utilizado para desenvolver aplicações que precisam interagir com bancos de dados.
+
+O JDBC funciona como um fachada para os diferentes drivers de banco de dados, permitindo que as aplicações Java se comuniquem com uma variedade de bancos de dados sem precisar se preocupar com as especificidades de cada um.
+
+== O que funcionalidades o JDBC não oferece?
+
+Como o JDBC é uma API de baixo nível, ele não é um framework para mapeamento objeto-relacional (ORM). Ou seja, ele não fornece uma camada de abstração para mapear objetos Java para tabelas. Se você já ouviu falar do JDBC fornecendo essa funcionalidade, talvez esteja confundindo o JDBC com o Spring Data JDBC, que é um framework que utiliza o JDBC para fornecer uma camada de abstração para acesso a dados.
+
+Outra funcionalidade que o JDBC não oferece é a capacidade de gerenciar diversas conexões de banco de dados de forma eficiente. Ele não possui um pool de conexões embutido, o que significa que os desenvolvedores precisam implementar sua própria lógica para gerenciar conexões ou utilizar bibliotecas externas para isso. 
+
+Caso você precise de um pool de conexões, pode considerar o uso de bibliotecas como https://github.com/brettwooldridge/HikariCP[HikariCP], https://www.mchange.com/projects/c3p0/[c3p0] ou https://github.com/apache/commons-dbcp[Apache DBCP], que são amplamente utilizadas para gerenciar conexões de banco de dados de forma eficiente. 
+
+É importante ressaltar que como o JDBC é uma API de baixo nível, o uso de um pool de conexões é altamente recomendado para melhorar o desempenho e a escalabilidade das aplicações que utilizam JDBC para acessar bancos de dados.
+
+== Quais são as principais classes do JDBC?
+
+O JDBC é composto por vários componentes principais, incluindo:
+
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/DriverManager.html[DriverManager]: é a classe responsável por gerenciar os drivers de banco de dados e estabelecer conexões com eles.
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Connection.html[Connection]: é a interface que representa uma conexão com um banco de dados. Ela fornece métodos para criar objetos Statement e PreparedStatement, além de gerenciar transações.
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/Statement.html[Statement]: é a interface que representa uma instrução SQL a ser executada no banco de dados. Ela fornece métodos para executar consultas e atualizações.
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/PreparedStatement.html[PreparedStatement]: é uma subinterface de Statement que permite a execução de instruções SQL pré-compiladas. Ela é mais eficiente do que Statement para executar instruções SQL repetidamente, pois o banco de dados pode otimizar a execução.
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.sql/java/sql/ResultSet.html[ResultSet]: é a interface que representa o resultado de uma consulta SQL. Ela fornece métodos para acessar os dados retornados pelo banco de dados.
+
+== Como abrir uma conexão com um banco de dados?
+
+Para abrir uma conexão com um bnaco de dados, é preciso primeiro carregar o Driver que em alguns casos pode ser um drive nativo. Existem 4 tipos de drivers JDBC:
+
+* Driver Tipo-1 ou JDBC-ODBC Bridge: é um driver que utiliza o ODBC (Open Database Connectivity) para se comunicar com o banco de dados. Ele é considerado obsoleto e não é recomendado para uso em produção.
+* Driver Tipo-2 ou Native-API: é um driver que utiliza uma API nativa para se comunicar com o banco de dados. Ele é mais rápido do que o Driver Tipo-1, mas ainda depende de bibliotecas nativas, o que pode dificultar a portabilidade da aplicação.
+* Driver Tipo-3 ou Network Protocol: é um driver que utiliza um protocolo de rede para se comunicar com o banco de dados. Ele é independente de plataforma e pode ser usado em ambientes distribuídos.
+* Driver Tipo-4 ou Thin Driver: é um driver que é escrito inteiramente em Java e se comunica diretamente com o banco de dados usando o protocolo nativo do banco. Ele é o tipo de driver mais comum e recomendado para uso em produção devido à sua portabilidade e desempenho.
+
+=== Se conectando com o PostgreSQL
+
+O driver do PostgreSQL é um driver Tipo-4, ou seja, é escrito inteiramente em Java e se comunica diretamente com o banco de dados usando o protocolo nativo do PostgreSQL. Para se conectar ao PostgreSQL usando JDBC, você precisa seguir os seguintes passos:
+
+1. Adicionar o driver do PostgreSQL ao classpath da sua aplicação. Você pode baixar o driver do PostgreSQL em https://jdbc.postgresql.org/download.html ou usar um gerenciador de dependências como o Maven ou Gradle para adicioná-lo ao seu projeto através da dependência https://mvnrepository.com/artifact/org.postgresql/postgresql[org.postgresql:postgresql]. 
+2. Carregar o driver do PostgreSQL usando a classe DriverManager. Isso pode ser feito usando o método `Class.forName()` para carregar a classe do driver, como mostrado no trecho de código abaixo.
+3. Estabelecer uma conexão com o banco de dados usando o método DriverManager.getConnection(). Você precisa fornecer a URL de conexão, que inclui o nome do host, o nome do banco de dados e as credenciais de autenticação. A URL de conexão para o PostgreSQL geralmente tem a seguinte estrutura: `jdbc:postgresql://host:port/database?user=username&password=password`.
+
+.Exemplo de código para se conectar ao PostgreSQL usando JDBC
+[source,java]
+----
+try {
+    Class.forName("org.postgresql.Driver");
+} catch (ClassNotFoundException e) {
+    logger.error("PostgreSQL JDBC Driver not found", e);
+    return;
+}
+
+// Outra possibilidade é usar um arquivo de propriedades para passar as informações de conexão, como mostrado abaixo:
+// String url = "jdbc:postgresql://localhost/test";
+// Properties props = new Properties();
+// props.setProperty("user", "fred");
+// props.setProperty("password", "secret");
+// props.setProperty("ssl", "true");
+// Connection conn = DriverManager.getConnection(url, props);
+String url = "jdbc:postgresql://localhost/test?user=fred&password=secret&ssl=true";    
+try(Connection conn = DriverManager.getConnection(url)) {
+    try(Statement st = conn.createStatement()) {
+        try(ResultSet rs = st.executeQuery("SELECT * FROM mytable WHERE columnfoo = 500")) {
+            while (rs.next()) {
+                System.out.print("Column 1 returned ");
+                System.out.println(rs.getString(1));
+            }
+        }
+    } catch (SQLException e) {
+        logger.error("Error executing query", e);
+    }    
+} catch (SQLException e) {
+    logger.error("Error connecting to the database", e);
+}
+----
+
+=== Se conectando com o MySQL
+
+O driver do MySQL também é um driver Tipo-4, ou seja, é escrito inteiramente em Java e se comunica diretamente com o banco de dados usando o protocolo nativo do MySQL. Dessa forma, a conexão com o MySQL usando JDBC é semelhante à conexão com o PostgreSQL. Você precisa seguir os seguintes passos:
+
+1. Adicionar o driver do MySQL ao classpath da sua aplicação. Você pode baixar o driver do MySQL em https://dev.mysql.com/downloads/connector/j/ ou usar um gerenciador de dependências como o Maven ou Gradle para adicioná-lo ao seu projeto através da dependência https://mvnrepository.com/artifact/com.mysql/mysql-connector-j[com.mysql:mysql-connector-j]. 
+2. Carregar o driver do MySQL usando a classe DriverManager. Isso pode ser feito usando o método `Class.forName()` para carregar a classe do driver, como mostrado no trecho de código abaixo.
+3. Estabelecer uma conexão com o banco de dados usando o método DriverManager.getConnection(). Você precisa fornecer a URL de conexão, que inclui o nome do host, o nome do banco de dados e as credenciais de autenticação. A URL de conexão para o MySQL geralmente tem a seguinte estrutura: `jdbc:mysql://host:port/database?user=username&password=password`.
+
+.Exemplo de código para se conectar ao MySQL usando JDBC
+[source,java]
+----
+try {
+    Class.forName("com.mysql.cj.jdbc.Driver");
+} catch (ClassNotFoundException e) {
+    logger.error("MySQL JDBC Driver not found", e);
+    return;
+}
+
+// Outra possibilidade é usar um arquivo de propriedades para passar as informações de conexão, como mostrado abaixo:
+// String url = "jdbc:mysql://localhost/test";
+// Properties props = new Properties();
+// props.setProperty("user", "fred");
+// props.setProperty("password", "secret");
+// props.setProperty("ssl", "true");
+// Connection conn = DriverManager.getConnection(url, props);
+String url = "jdbc:mysql://localhost/test?user=fred&password=secret";  
+try(Connection conn = DriverManager.getConnection(url)) {
+    try(Statement st = conn.createStatement()) {
+        try(ResultSet rs = st.executeQuery("SELECT * FROM mytable WHERE columnfoo = 500")) {
+            while (rs.next()) {
+                System.out.print("Column 1 returned ");
+                System.out.println(rs.getString(1));
+            }
+        }
+    } catch (SQLException e) {
+        logger.error("Error executing query", e);
+    }    
+} catch (SQLException e) {
+    logger.error("Error connecting to the database", e);
+}
+----
+
+== Como executar uma consulta SQL usando JDBC?
+
+Existem várias formas de executar uma consulta SQL usando JDBC, mas a forma mais comum é usar a interface `Statement` ou `PreparedStatement`.
+
+=== Usando `Statement`
+
+A interface `Statement` é usada para executar consultas SQL simples. Você pode criar um objeto `Statement` a partir de uma conexão e usar o método `executeQuery()` para executar uma consulta SQL e obter um objeto `ResultSet` com os resultados.
+
+Ao se usar a interface `Statement`, é importante lembrar que ela é suscetível a ataques de SQL Injection, pois ela não permite aplicar parâmetros na consulta a ser executada, sendo necessário a concatenação dos parâmetros diretamente na consulta SQL. Portanto, é recomendado usar o `PreparedStatement` para consultas que envolvem parâmetros.
+
+.Exemplo de execução de uma consulta SQL usando a interface `Statement`
+[source,java]
+----
+try(Statement st = conn.createStatement()) {
+    try(ResultSet rs = st.executeQuery("SELECT * FROM tb_users WHERE enabled = false")) {
+        while (rs.next()) {
+            // verificando todos os usuários desabilitados
+            System.out.println("Usuário '%s' está desabilitado!", rs.getString("username"));
+        }
+    }
+} catch (SQLException e) {
+    logger.error("Error executing query", e);
+}
+----
+
+No exemplo acima, é usado o método `executeQuery()` para executar uma consulta SQL que seleciona todos os usuários desabilitados da tabela `tb_users`. O resultado da consulta é armazenado em um objeto `ResultSet`, que é iterado usando um loop para acessar os dados retornados pelo banco de dados. Há outros métodos para executar consultas SQL, como `executeUpdate()` para executar consultas de atualização e `execute()` para executar consultas que podem retornar múltiplos resultados.
+
+=== Usando `PreparedStatement`
+
+A interface `PreparedStatement` é usada para executar consultas SQL que envolvem parâmetro vindos de usuários. Ela possuim uma camada de segurança ao não permitir que a consulta seja alterada, tratando os parâmetros antes de os aplicar na consulta.
+
+No exemplo abaixo, é executado uma consulta que atualiza o salário de empregado usando os valores `novoSalario` e `idEmpregado`. Observe que no exemplo abaixo os parâmetros são definidos através da sua posição dentro da consulta.
+
+.Exemplo de execucão de uma consulta SQL usando a interface `PreparedStatement`
+[source,java]
+----
+public void atualizaSalario(long idEmpregado, BigDecimal novoSalario) {
+    try (PreparedStatement stmt = conn.prepareStatement("UPDATE tb_employees SET salary = ? WHERE id = ?")) {
+        stmt.setBigDecimal(1, novoSalario);
+        stmt.setInt(2, idEmpregado);
+        int resultado = stmt.executeUpdate();
+        if (resultado == 0) {
+            throw new IllegalStateException("Empregado não encontrado! idEmpregado=%d".formatted(idEmpregado));
+        }
+    }
+}
+----
+
+Usar a posição dentro da consulta para referênciar os parâmetros pode trazer dificuldade quando se controem consultas dinâmicas, o JDBC não traz interfaces mais interessantes interessantes, como o JPA que permite aplicar parâmetros por identificador.
+
+== Como ler os resultados da consulta SQL?
+
+Como já foi dito, o JDBC não fornece uma API rica para leitura de dados. Mas essa afirmação se refere a leitura dos dados em objetos. O JDBC oferece uma API rica para ler dados de um `ResultSet`, que é o objeto que representa o resultado de uma consulta SQL. O `ResultSet` fornece métodos para acessar os dados retornados pelo banco de dados, como `getString()`, `getInt()`, `getDate()`, entre outros. Para ler os resultados de uma consulta SQL, você pode usar um loop para iterar sobre o `ResultSet` e acessar os dados usando os métodos apropriados.
+
+Os dados em um `ResultSet` podem ser acessados usando o nome da coluna ou a posição da coluna. Por exemplo, se você tiver uma coluna chamada "username", você pode acessar os dados dessa coluna usando `rs.getString("username")` ou `rs.getString(1)` se for a primeira coluna do resultado.
+
+== Porque todos os objetos do JDBC implementam a interface `AutoCloseable`?
+
+Todos os objetos do JDBC, como `Connection`, `Statement` e `ResultSet`, implementam a interface `AutoCloseable` para garantir que os recursos sejam liberados corretamente após o uso. Isso é importante porque esses objetos podem consumir recursos do sistema, como conexões de banco de dados e memória, e se não forem fechados adequadamente, podem levar a vazamentos de recursos e problemas de desempenho.
+
+Essas interfaces podem também ser implementadas por código nativo, o que pode levar a vazamentos de recursos se não forem fechados corretamente. Ao implementar a interface `AutoCloseable`, os objetos do JDBC podem ser usados em um bloco try-with-resources, que garante que o método `close()` seja chamado automaticamente no final do bloco, mesmo que ocorra uma exceção. Isso ajuda a garantir que os recursos sejam liberados corretamente e evita vazamentos de recursos.
+
+
+== Problemas comuns ao usar JDBC
+
+Ao usar JDBC, é comum encontrar alguns problemas, como:
+
+* Vazamento de conexões: se as conexões não forem fechadas corretamente, elas podem se acumular e esgotar os recursos do banco de dados. Para evitar isso, é importante usar um pool de conexões ou garantir que as conexões sejam fechadas em um bloco try-with-resources.
+* SQL Injection: se as consultas SQL forem construídas usando concatenação de strings, elas podem ser vulneráveis a ataques de SQL Injection, onde um atacante pode inserir código malicioso na consulta. Para evitar isso, é recomendado usar `PreparedStatement` para consultas que envolvem parâmetros vindos de usuários.
+* Erros de sintaxe SQL: se a consulta SQL tiver erros de sintaxe, ela pode falhar ao ser executada. Para evitar isso, é importante revisar cuidadosamente a consulta SQL e testar ela antes de usá-la em produção.
+* Problemas de desempenho: se as consultas SQL não forem otimizadas, elas podem levar a problemas de desempenho. Para evitar isso, é importante revisar as consultas SQL e usar índices adequados no banco de dados.
+* Vazamento de recursos em código nativo: como o JDBC pode usar código nativo para se comunicar com o banco de dados, é possível que haja vazamento de recursos se os objetos do JDBC não forem fechados corretamente. Para evitar isso, é importante garantir que os objetos do JDBC sejam fechados em um bloco try-with-resources ou usando um pool de conexões.
+* Vazamento de recursos em multiplos classloaders: em ambientes onde há múltiplos classloaders, como em servidores de aplicação, é possível que haja vazamento de recursos se os drivers de banco de dados não forem descarregados corretamente. Para evitar isso, é importante garantir que os drivers de banco de dados sejam carregados e descarregados corretamente, e que as conexões sejam fechadas em um bloco try-with-resources ou usando um pool de conexões.
+
+== Conclusão
+
+O JDBC é uma API fundamental para acessar bancos de dados relacionais a partir de aplicações Java. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões. No entanto, o JDBC é uma API de baixo nível e não oferece funcionalidades avançadas como mapeamento objeto-relacional (ORM) ou gerenciamento eficiente de conexões. Para evitar problemas comuns ao usar JDBC, é importante seguir boas práticas, como usar `PreparedStatement` para consultas com parâmetros, garantir que as conexões sejam fechadas corretamente e otimizar as consultas SQL para melhorar o desempenho.
