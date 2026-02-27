@@ -1,0 +1,127 @@
+---
+title: Injeção de Dependência e sua importância no gerenciamento da conexão com o banco de dados
+published: true
+description: | 
+    A injeção de dependência é uma prática fundamental para o gerenciamento eficiente da conexão com o banco de dados em aplicações Java. Neste post, exploramos o que é injeção de dependência, como ela funciona e por que é tão importante para o desenvolvimento de aplicações Java modernas.
+tags: [Java, Injeção de Dependência, Spring, Quarkus, Java CDI, Banco de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/injecao-de-dependencia
+publish_date: 2026-02-27 10:25:00 +0300
+---
+
+Esse post é parte da série "Introdução a Bases de Dados". Se você ainda não leu os posts anteriores, recomendo começar por eles para obter uma compreensão completa dos conceitos abordados. 
+
+Talvez você esteja se perguntando porque falar de "Injeção de Dependência" em uma série sobre bancos de dados. A resposta é simples: a injeção de dependência é uma prática fundamental para o gerenciamento eficiente da conexão com o banco de dados em aplicações Java. Em aplicações modernas do Java, o desenvolvedor não instancia diretamente as classes de conexão com o banco de dados. Em vez disso, ele utiliza um framework de injeção de dependência, como o Spring ou o CDI, para gerenciar essa conexão e todas as classes relacionadas. Isso traz diversos benefícios, como a redução do acoplamento entre as classes, a facilitação dos testes unitários e a melhoria da manutenção do código.
+
+== O que é Injeção de Dependência?
+
+A injeção de dependência é um padrão de design que permite que as dependências de uma classe sejam fornecidas por um framework, em vez de serem criadas diretamente pela classe. Isso promove a inversão de controle, onde o controle da criação e gerenciamento das dependências é transferido para um componente externo.
+
+Em muitas referências sobre Injeção de Dependência a palavra "container" é utilizada, mas é preciso cuidado ao se entender esse termo, porque tomou outro significado depois do surgimento do Docker. O termo "container" em Injeção de Dependência se refere a um componente que gerencia o ciclo de vida dos componentes e suas dependências, enquanto o "container" no contexto de Docker se refere a um ambiente isolado para executar aplicações. 
+
+Containers são partes dos Servidores de Aplicação, como o Tomcat, que gerenciam a execução de aplicações Java. Uma aplicação Java moderna não é controlada pelo código que implementamos, mas nós implementamos classes que se integram ao ciclo de vida do servidor de aplicação e precisamos informar o servidor de aplicação sobre como usar elas.
+
+A grande vantagem de se usar frameworks de injeção de dependência é que não precisamos nos preocupar com a criação e gerenciamento de classes de serviços, como a conexão com o banco de dados. O framework cuida disso para nós, permitindo que nos concentremos na lógica de negócios da aplicação. Além disso, a injeção de dependência facilita a substituição de implementações, o que é especialmente útil para testes unitários, onde podemos usar mocks ou stubs para simular o comportamento das dependências.
+
+// https://excalidraw.com/#json=jnp6ENco4vNU2aXa72K4a,aRr1jMAHX-IyTIo_e7PVMA
+.Servidor de Aplicação e Injeção de Dependência
+image::databases/injecao-dependencia.png[]
+
+== Injeção de Dependência no Spring Framework
+
+O Spring Framework é um dos frameworks mais populares para desenvolvimento de aplicações Java, e ele oferece suporte robusto para injeção de dependência. No Spring, podemos usar anotações como @Autowired para indicar que uma dependência deve ser injetada automaticamente pelo framework. Por exemplo, se tivermos uma classe de serviço que precisa de uma conexão com o banco de dados, podemos simplesmente anotar a dependência com @Autowired, e o Spring cuidará de fornecer a implementação correta.
+
+No exemplo abaixo, temos uma classe BasketballService que depende de um RuleRepository. Ao usar a anotação @Autowired, o Spring irá injetar automaticamente a implementação de RuleRepository quando criar uma instância de BasketballService. Isso torna o código mais simples e fácil de manter, além de facilitar a realização de testes unitários, onde podemos substituir a implementação real por um mock ou stub.
+
+.Exemplo de Injeção de Dependência no Spring via Construtor
+[source,java]
+----
+@Component   // [1] Declara que esta classe é um componente gerenciado pelo Spring
+public class BasketballService {
+
+    @Autowired // [2] Indica que o Spring deve injetar a dependência de RuleRepository
+    public BasketballService(RuleRepository ruleRepository) {
+        // O Spring irá injetar a implementação de RuleRepository aqui
+    }
+}
+----
+
+A injeção de dependência também pode ser feita usando métodos setter e campos, mas a injeção via construtor é geralmente recomendada, pois torna as dependências explícitas e facilita a criação de objetos imutáveis.
+
+.Exemplo de Injeção de Dependência via Setter
+[source,java]
+----
+@Component  // [1] Declara que esta classe é um componente gerenciado pelo Spring
+public class BasketballService {
+
+    private LogRepository logRepository;
+
+    @Autowired // [2] Indica que o Spring deve injetar a dependência de LogRepository
+    public final void setLogRepository(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
+}
+----
+
+== Injeção de Dependência no CDI (Contexts and Dependency Injection)
+
+O CDI é uma especificação de injeção de dependência para Jakarta EE (antigo Java EE). Ele oferece uma abordagem semelhante à do Spring para injeção de dependência, usando anotações como @Inject para indicar que uma dependência deve ser injetada. O CDI também suporta a criação de beans e a definição de escopos, o que facilita o gerenciamento do ciclo de vida dos objetos.
+
+[cols="^1,^1,3", options="header"]
+|=== 
+| Escopo       | Anotação            | Ciclo de vida
+| Requisição   | @RequestScoped      | A interação de um usuário com um aplicativo web em uma única requisição HTTP.
+| Sessão       | @SessionScoped      | A interação de um usuário com um aplicativo web por meio de múltiplas requisições HTTP.
+| Aplicação    | @ApplicationScoped  | Estado compartilhado entre todas as interações dos usuários com um aplicativo web.
+| Dependente   | @Dependent          | O escopo padrão, caso nenhum seja especificado; significa que um objeto existe para atender exatamente um cliente (bean) e possui o mesmo ciclo de vida que esse cliente (bean).
+| Conversação  | @ConversationScoped | A interação de um usuário com um aplicativo ocorre dentro de limites explícitos controlados pelo desenvolvedor, que estendem o escopo por múltiplas invocações do ciclo de vida. Todas as conversas de longa duração são limitadas a uma sessão específica do servlet HTTP e não podem ultrapassar os limites da sessão.
+|=== 
+
+Para usar o CDI, em alguns casos, é necessário configurar um arquivo beans.xml no diretório META-INF do projeto. Esse arquivo é usado para ativar o CDI e pode conter configurações adicionais, como a definição de interceptadores e decoradores. Mas em outros frameworks, como o Quarkus, o CDI é ativado por padrão, e não é necessário criar um arquivo beans.xml.
+
+Toda classe é possívelmente um bean gerenciado pelo CDI, mas para que o CDI possa injetar uma dependência, a classe precisa ser anotada com uma anotação de escopo, como @RequestScoped, @SessionScoped, @ApplicationScoped ou @Dependent. Essas anotações indicam ao CDI como gerenciar o ciclo de vida dos objetos e suas dependências.
+
+Dessa forma, o servidor de aplicação identifica as classes anotadas com escopos e as gerencia como beans, permitindo que o CDI injete as dependências necessárias quando essas classes forem instanciadas. No exemplo abaixo, a classe BasketballService é anotada com @ApplicationScoped, indicando que ela é um bean de escopo de aplicação, e o CDI irá injetar a dependência de RuleRepository quando criar uma instância de BasketballService.
+
+.Exemplo de Injeção de Dependência no CDI via Construtor
+[source,java]
+----
+@ApplicationScoped  // [1] Declara que esta classe é um bean de escopo de aplicação gerenciado pelo CDI
+public class BasketballService {
+
+    @Inject // [2] Indica que o CDI deve injetar a dependência de RuleRepository
+    public BasketballService(RuleRepository ruleRepository) {
+        // O CDI irá injetar a implementação de RuleRepository aqui
+    }
+}
+----
+
+O CDI também suporta a injeção via reflexão, onde as dependências são injetadas diretamente nos campos da classe, sem a necessidade de um construtor ou método setter. No entanto, a injeção via construtor é geralmente recomendada, pois torna as dependências explícitas e facilita a criação de objetos imutáveis.
+
+.Exemplo de Injeção de Dependência no CDI via Campo
+[source,java]
+----
+@ApplicationScoped  // [1] Declara que esta classe é um bean de escopo de aplicação gerenciado pelo CDI
+public class BasketballService {
+
+    @Inject // [2] Indica que o CDI deve injetar a dependência de LogRepository diretamente no campo
+    private LogRepository logRepository;
+
+    public BasketballService() {
+        // O CDI irá injetar a implementação de LogRepository diretamente no campo logRepository
+        // Mas o logRepository não é visível no construtor, o que pode dificultar a criação de objetos imutáveis e a realização de testes unitários.
+    }
+
+    @PostConstruct // [3] Indica que este método deve ser chamado após a injeção de dependências
+    public void init() {
+        // O método init() é chamado após a injeção de dependências, permitindo que o logRepository seja utilizado aqui.
+    }
+}
+----
+
+== Conclusão
+
+A injeção de dependência é uma prática essencial para o desenvolvimento de aplicações Java modernas, especialmente quando se trata do gerenciamento da conexão com o banco de dados. Ao usar frameworks como Spring ou CDI, os desenvolvedores podem se beneficiar de um código mais limpo, modular e fácil de testar, além de melhorar a manutenção e a escalabilidade da aplicação. Portanto, entender e aplicar a injeção de dependência é fundamental para qualquer desenvolvedor Java que deseja criar aplicações robustas e eficientes.
+
+É importante para o desenvolvedor conhecer os conceitos de injeção de dependência e como os frameworks de injeção de dependência funcionam, para que possa aproveitar ao máximo os benefícios que eles oferecem.
