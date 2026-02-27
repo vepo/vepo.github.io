@@ -1,0 +1,315 @@
+---
+title: Entendendo o Jakarta Persistence API (JPA)
+published: true
+description: | 
+  O JPA é uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional. Ele é amplamente utilizado em frameworks como Spring e Quarkus, e é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados. Neste post, vamos explorar os principais componentes do JPA e como utilizá-los para interagir com um banco de dados.
+tags: [Java, JPA, ORM, JDBC, Banco de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/entendendo-o-jpa
+publish_date: 2026-02-27 14:50:00 +0300
+---
+
+Continuando nossa série de posts sobre introdução a bases de dados, hoje vamos falar sobre o Jakarta Persistence API (JPA), uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional. O JPA é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados, e é amplamente utilizado em frameworks como Spring e Quarkus.
+
+== Quando surgiu o JPA? E qual a relação com o Hibernate?
+
+O Hibernate foi criado em 2001 por Gavin King como uma alternativa ao Entity EJB, que era a solução de persistência de dados oferecida pelo Java EE na época. O objetivo original era proporcionar uma maneira mais simples e eficiente de mapear objetos Java para tabelas de banco de dados, sem a complexidade e as limitações do Entity EJB.
+
+O Hibernate foi o primeiro framework de mapeamento objeto-relacional (ORM) amplamente adotado na comunidade Java, e seu sucesso levou à criação do JPA. A primeira versão do JPA foi lançada em 2006, mas não houve consenso na comunidade Java sobre a adoção do JPA, e o Hibernate continuou a ser amplamente utilizado como uma solução de persistência de dados. No entanto, depois do lançamento do JPA 2.0 em 2009, o JPA se tornou a especificação de persistência de dados mais popular na comunidade Java, e muitos frameworks, incluindo o Spring e o Quarkus, adotaram o JPA como a solução de persistência de dados padrão. O Hibernate continua a ser uma implementação popular do JPA, mas existem outras implementações disponíveis, como EclipseLink e OpenJPA.
+
+== Quais são os principais funcionalidades do JPA?
+
+O JPA oferece uma série de funcionalidades que facilitam o desenvolvimento de aplicações Java que interagem com bancos de dados. Algumas das principais funcionalidades do JPA incluem:
+
+* Mapeamento objeto-relacional: O JPA permite mapear objetos Java para tabelas em um banco de dados relacional, facilitando a persistência de dados e a recuperação de informações.
+* Consulta de dados: O JPA fornece uma linguagem de consulta chamada JPQL (Java Persistence Query Language) que permite consultar dados usando uma sintaxe semelhante ao SQL, mas orientada a objetos.
+* Gerenciamento de transações: O JPA oferece suporte ao gerenciamento de transações, permitindo que os desenvolvedores controlem o início, a confirmação e o rollback de transações de forma eficiente.
+* Cache de segundo nível: O JPA suporta um cache de segundo nível que pode melhorar o desempenho da aplicação, armazenando em cache os dados recuperados do banco de dados para evitar consultas repetidas.
+* Suporte a herança: O JPA permite mapear hierarquias de classes Java para tabelas em um banco de dados relacional, facilitando o uso de herança em aplicações Java.
+* Suporte a relacionamentos: O JPA suporta relacionamentos entre entidades, como um-para-um, um-para-muitos e muitos-para-muitos, facilitando a modelagem de dados complexos em aplicações Java.
+
+Para essa série, vamos focar no Mapeamento objeto-relacional e na consulta de dados usando JPQL e Criteria API, que são as funcionalidades mais comuns e essenciais do JPA para o desenvolvimento de aplicações Java que interagem com bancos de dados.
+
+== Porque mapear uma tabela em uma entidade JPA?
+
+Mapear uma tabela em uma entidade JPA é importante porque permite que os desenvolvedores trabalhem com objetos Java em vez de lidar diretamente com tabelas e colunas em um banco de dados relacional. Isso torna o código mais legível, fácil de manter e menos propenso a erros, além de permitir que os desenvolvedores se concentrem na lógica de negócios da aplicação, em vez de se preocupar com detalhes de persistência de dados.
+
+Quando pensamos em uma aplicação mais baixo nível, toda a lógica de recuperação dos dados e construção das consultas SQL é facilitado pelo mapeamento objeto-relacional, que abstrai a complexidade do acesso ao banco de dados e permite que os desenvolvedores trabalhem com objetos Java de forma mais natural. 
+
+Por exemplo, na consulta abaixo, todos os usuários inativos são recuperados usando uma consulta SQL e carregados em objetos usando JDBC.
+
+.Exemplo de consulta usando JDBC
+[source,java]
+----
+public List<User> getInactiveUsers() throws SQLException {
+    String sql = "SELECT * FROM tb_users WHERE active = false";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    ResultSet resultSet = statement.executeQuery();
+    List<User> inactiveUsers = new ArrayList<>();
+    while (resultSet.next()) {
+        User user = new User();
+        user.setId(resultSet.getLong("id"));
+        user.setUsername(resultSet.getString("username"));
+        user.setEmail(resultSet.getString("email"));
+        user.setActive(resultSet.getBoolean("active"));
+        inactiveUsers.add(user);
+    }
+    return inactiveUsers;
+}
+----
+
+Através do mapeamento objeto-relacional, a mesma consulta pode ser realizada de forma mais simples e eficiente usando JPQL, sem a necessidade de escrever SQL diretamente ou lidar com detalhes de persistência de dados.
+
+.Exemplo de consulta usando JPA
+[source,java]
+----
+public List<User> getInactiveUsers() {
+    String jpql = "SELECT u FROM User u WHERE u.active = false";
+    TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
+    return query.getResultList();
+}
+----
+
+Caso um novo campo seja adicionado à tabela "tb_users", como "last_login", o desenvolvedor deve alterar todas as consultas SQL que recuperam dados da tabela "tb_users" para incluir o novo campo, além de atualizar o código que mapeia os resultados para objetos Java. Com o JPA, o desenvolvedor só precisa adicionar um novo campo na entidade Java correspondente e o mapeamento objeto-relacional cuidará do resto, sem a necessidade de alterar as consultas JPQL ou o código de mapeamento.
+
+== Como mapear uma tabela em uma entidade JPA?
+
+O mapeamento de uma tabela em uma entidade JPA é feito usando anotações. A anotação `@Entity` é usada para marcar uma classe Java como uma entidade JPA, e a anotação @Table é usada para especificar o nome da tabela no banco de dados que a entidade representa. Além disso, as anotações `@Id` e `@GeneratedValue` são usadas para indicar a chave primária da entidade e como ela deve ser gerada. A anotação `@Column` é usada para mapear os campos da entidade para as colunas da tabela no banco de dados. Aqui está um exemplo de como mapear uma tabela "users" para uma entidade JPA:
+
+[source,java]
+----
+@Entity // [1] Define que a classe é uma entidade JPA
+@Table(name = "tb_users") // [2] Especifica o nome da tabela no banco de dados
+public class User {
+    
+    @Id // [3] Indica que o campo é a chave primária da entidade
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // [4] Especifica que o valor da chave primária deve ser gerado automaticamente pelo banco de dados
+    private Long id;
+    
+    @Column(nullable = false, unique = true) // [5] Especifica que a coluna "username" não pode ser nula e deve ser única
+    private String username;
+    
+    @Column(nullable = false, unique = true) // [6] Especifica que a coluna "email" não pode ser nula e deve ser única
+    private String email;
+
+    @Column(name = "last_login") // [7] Especifica o nome da coluna no banco de dados para o campo "lastLogin"
+    private LocalDateTime lastLogin;
+    
+    // getters e setters
+}
+----
+
+Ao se alterar a definição de uma entidade, o JPA automaticamente atualiza todas as consultas que são realizadas usando JPQL, garantindo que as mudanças sejam refletidas em toda a aplicação sem a necessidade de modificar o código de consulta.
+
+=== Como definir relacionamentos entre entidades JPA?
+
+O JPA suporta diferentes tipos de relacionamentos entre entidades, como um-para-um, um-para-muitos e muitos-para-muitos. Para definir um relacionamento entre entidades, são usadas anotações específicas, como `@OneToOne`, `@OneToMany`, `@ManyToMany`, `@JoinColumn` e `@JoinTable`. Essas anotações permitem que os desenvolvedores definam a natureza do relacionamento entre as entidades e como elas devem ser mapeadas para o banco de dados. Aqui estão alguns exemplos de como definir relacionamentos entre entidades JPA:
+
+.Exemplo de definição de relacionamentos entre entidades JPA
+[source,java]
+----
+@Entity
+@Table(name = "tb_users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true)
+    private String username;
+    
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @OneToOne // [1] Define um relacionamento um-para-um com a entidade Profile
+    @JoinColumn(name = "profile_id") // [2] Especifica a coluna de junção para o relacionamento um-para-um
+    private Profile profile;
+
+    @OneToMany(mappedBy = "user") // [3] Define um relacionamento um-para-muitos com a entidade Post
+    private List<Post> posts;
+
+    @ManyToMany // [4] Define um relacionamento muitos-para-muitos com a entidade Role
+    @JoinTable(
+        name = "tb_user_roles",  // [5] Especifica a tabela de junção e as colunas de junção para o relacionamento muitos-para-muitos
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
+    
+    // getters e setters
+}
+----
+
+No primeiro caso, o campo `profile` na entidade `User` é mapeado para a entidade `Profile` usando um relacionamento um-para-um, e a coluna de junção é especificada usando a anotação `@JoinColumn`. No segundo caso, o campo `posts` na entidade `User` é mapeado para a entidade `Post` usando um relacionamento um-para-muitos, e o atributo `mappedBy` é usado para indicar que o relacionamento é bidirecional e está definido na entidade `Post`. No terceiro caso, o campo `roles` na entidade `User` é mapeado para a entidade `Role` usando um relacionamento muitos-para-muitos, e a tabela de junção e as colunas de junção são especificadas usando a anotação `@JoinTable`.
+
+=== Como definir constraints e validações em entidades JPA?
+
+O JPA permite definir constraints e validações em entidades usando a anotação `@Column`. Essa anotação pode ser usada para especificar restrições de nulidade, unicidade, comprimento e outros atributos relacionados à coluna no banco de dados.
+
+.Exemplo de definição de constraints e validações em entidades JPA
+[source,java]
+----
+@Entity
+@Table(name = "tb_users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true) // [1] Especifica que a coluna "username" não pode ser nula e deve ser única
+    private String username;
+    
+    @Column(nullable = false, unique = true) // [2] Especifica que a coluna "email" não pode ser nula e deve ser única
+    private String email;
+
+    @Column(length = 255) // [3] Especifica o comprimento máximo da coluna "password"
+    private String password;
+    
+    // getters e setters
+}
+----
+
+== Como executar consultas usando o JPA?
+
+O JPA oferece duas formas principais de executar consultas: usando JPQL (Java Persistence Query Language) e usando a Criteria API. O JPQL é uma linguagem de consulta orientada a objetos que permite consultar entidades usando uma sintaxe semelhante ao SQL, mas com foco em objetos Java. A Criteria API, por outro lado, é uma API de construção de consultas que permite criar consultas de forma programática usando uma abordagem orientada a objetos.
+
+=== Como executar consultas usando JPQL?
+
+Para executar consultas usando JPQL, os desenvolvedores podem usar o método `createQuery` do `EntityManager`, passando a consulta JPQL como uma string e a classe da entidade como um parâmetro. Aqui está um exemplo de como executar uma consulta JPQL para recuperar todos os usuários inativos:
+
+.Exemplo de consulta usando JPQL
+[source,java]
+----
+@ApplicationScoped // [1] Define que a classe é um bean CDI de escopo de aplicação
+public class UserRepository {
+    
+    private final EntityManager entityManager;
+
+    @Inject // [2] Injeta o EntityManager usando CDI
+    public UserRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public List<User> getInactiveUsers() {
+        return entityManager.createQuery("FROM User u WHERE u.active = false", User.class) // [3] Cria uma consulta JPQL para recuperar todos os usuários inativos
+                            .getResultList(); // [4] Executa a consulta e retorna os resultados como uma lista de objetos User
+    }
+}
+----
+
+Quando a consulta JPQL é escrita, devem ser usados os nomes das entidades e os seus atributos, em vez dos nomes das tabelas e colunas do banco de dados. O JPA se encarrega de traduzir a consulta JPQL para a consulta SQL correspondente, garantindo que as mudanças na estrutura do banco de dados sejam refletidas automaticamente nas consultas JPQL sem a necessidade de modificar o código da aplicação.
+
+Outra facilidade é que o JPA se encarrega automaticamente de gerenciar as relações entre as entidades, permitindo que os desenvolvedores recuperem dados relacionados usando consultas JPQL sem a necessidade de escrever consultas SQL complexas ou lidar com detalhes de persistência de dados. Por exemplo, se um usuário tiver um perfil associado, o JPA permitirá que os desenvolvedores recuperem o perfil do usuário usando uma consulta JPQL simples, sem a necessidade de escrever uma consulta SQL com junções complexas.
+
+.Exemplo de consulta usando JPQL para recuperar dados relacionados
+[source,java]
+----
+public User getUserWithProfile(Long userId) {
+    return entityManager.createQuery("FROM User u WHERE u.profile.enable = true", User.class) // [1] Cria uma consulta JPQL para recuperar um usuário com seu perfil ativo
+                        .getSingleResult(); // [2] Executa a consulta e retorna o resultado como um objeto User
+}
+----
+
+=== Como definir se as entidades relacionadas fazem parte da consulta ou não?
+
+O JPA oferece dois modos de carregamento de entidades relacionadas: Eager Loading e Lazy Loading. O Eager Loading carrega as entidades relacionadas imediatamente quando a entidade principal é carregada, enquanto o Lazy Loading carrega as entidades relacionadas somente quando elas são acessadas pela primeira vez. O modo de carregamento pode ser definido usando a anotação `@OneToOne`, `@OneToMany` ou `@ManyToMany`, especificando o atributo `fetch` com os valores `FetchType.EAGER` ou `FetchType.LAZY`. Aqui está um exemplo de como definir o modo de carregamento para uma entidade relacionada:
+
+.Exemplo de definição do modo de carregamento para entidades relacionadas
+[source,java]
+----
+@Entity
+@Table(name = "tb_users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true)
+    private String username;
+    
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @OneToOne(fetch = FetchType.EAGER) // [1] Define um relacionamento um-para-um com a entidade Profile e especifica que o carregamento deve ser Eager
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY) // [2] Define um relacionamento um-para-muitos com a entidade Post e especifica que o carregamento deve ser Lazy
+    private List<Post> posts;
+
+    @ManyToMany // [3] Define um relacionamento muitos-para-muitos com a entidade Role e usa o modo de carregamento padrão (Lazy)
+    @JoinTable(
+        name = "tb_user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
+    
+    // getters e setters
+}
+----
+
+Quando o JPA carrega uma entidade, ele verifica o modo de carregamento definido para as entidades relacionadas e decide se deve carregar as entidades relacionadas imediatamente (Eager Loading) ou somente quando elas são acessadas pela primeira vez (Lazy Loading). O Eager Loading pode ser útil quando as entidades relacionadas são frequentemente acessadas junto com a entidade principal, enquanto o Lazy Loading pode ser mais eficiente quando as entidades relacionadas são acessadas com menos frequência ou quando a carga de dados é grande. 
+
+Caso uma consulta seja feita usando Lazy Loading, o JPA irá carregar a entidade principal e, quando as entidades relacionadas forem acessadas pela primeira vez, o JPA irá executar uma consulta adicional para recuperar os dados relacionados do banco de dados. Erros podem ocorrer se o contexto de persistência for fechado antes que as entidades relacionadas sejam acessadas, resultando em uma exceção `LazyInitializationException`. Para evitar esse tipo de erro, os desenvolvedores podem optar por usar Eager Loading para as entidades relacionadas ou garantir que o contexto de persistência esteja aberto quando as entidades relacionadas forem acessadas.
+
+O Eager Loading também pode ser especificado na consulta JPQL, mesmo que o modo de carregamento padrão para a entidade relacionada seja Lazy. Isso pode ser feito usando a cláusula `JOIN FETCH` na consulta JPQL, que instrui o JPA a carregar as entidades relacionadas imediatamente, independentemente do modo de carregamento definido na entidade. Aqui está um exemplo de como usar `JOIN FETCH` em uma consulta JPQL:
+
+.Exemplo de consulta usando JOIN FETCH para carregar entidades relacionadas
+[source,java]
+----
+public User getUserWithProfile(Long userId) {
+    return entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.profile WHERE u.id = :userId", User.class) // [1] Cria uma consulta JPQL que usa JOIN FETCH para carregar o perfil do usuário imediatamente
+                        .setParameter("userId", userId) // [2] Define o parâmetro da consulta
+                        .getSingleResult(); // [3] Executa a consulta e retorna o resultado como um objeto User
+}
+----
+
+=== Como executar consultas usando a Criteria API?
+
+A Criteria API é uma API de construção de consultas que permite criar consultas de forma programática usando uma abordagem orientada a objetos. Para usar a Criteria API, os desenvolvedores precisam criar um `CriteriaBuilder` a partir do `EntityManager`, e então usar o `CriteriaBuilder` para construir a consulta de forma fluente. Aqui está um exemplo de como executar uma consulta usando a Criteria API para realizar a busca de usuários baseado em diversos parâmetros:
+
+.Exemplo de consulta usando a Criteria API
+[source,java]
+----
+public List<User> search(UserSearchCriteria criteria) {
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder(); // [1] Cria um CriteriaBuilder a partir do EntityManager
+    CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class); // [2] Cria um CriteriaQuery para a entidade User
+    Root<User> userRoot = criteriaQuery.from(User.class); // [3] Define a raiz da consulta como a entidade User
+
+    List<Predicate> predicates = new ArrayList<>();
+    if (Objects.nonNull(criteria.disabled)) {
+        if (criteria.disabled) {
+            predicates.add(criteriaBuilder.isTrue(userRoot.get("disabled"))); // [4] Adiciona um predicado para filtrar usuários desativados
+        } else {
+            predicates.add(criteriaBuilder.isFalse(userRoot.get("disabled"))); // [5] Adiciona um predicado para filtrar usuários ativados
+        }
+    }
+
+    if (Objects.nonNull(criteria.name) && !criteria.name.isBlank()) {
+        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("name")),
+                                            "%%%s%%".formatted(criteria.name.toLowerCase()))); // [6] Adiciona um predicado para filtrar usuários pelo nome, usando uma comparação case-insensitive e permitindo correspondências parciais
+    }
+
+    if (Objects.nonNull(criteria.email) && !criteria.email.isBlank()) {
+        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("email")),
+                                            "%%%s%%".formatted(criteria.email.toLowerCase()))); // [7] Adiciona um predicado para filtrar usuários pelo email, usando uma comparação case-insensitive e permitindo correspondências parciais
+    }
+
+    if (!predicates.isEmpty()) {
+        criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[0]))); // [8] Adiciona os predicados à consulta usando a cláusula WHERE, combinando-os com o operador AND
+    }
+
+    criteriaQuery.orderBy(criteriaBuilder.asc(userRoot.get("name"))); // [9] Adiciona uma cláusula ORDER BY para ordenar os resultados pelo nome do usuário em ordem crescente
+    return entityManager.createQuery(criteriaQuery).getResultList();  // [10] Executa a consulta e retorna os resultados como uma lista de objetos User
+}
+----
+
+== Então é fácil usar o JPA? Há algo com que se preocupar?
+
+Apesar do JPA ser muito fácil de ser usado, ele traz diversos problemas aos desenvolvedores que não se atentam as consultas que estão sendo realizadas. Como as consultas SQL são geradas automaticamentes, em muitos casos problemas podem acontecer. No proximo post, vamos falar sobre os problemas mais comuns que podem ocorrer ao usar o JPA e como evitá-los para garantir que as aplicações Java sejam eficientes e robustas ao interagir com bancos de dados.
+
+== Conclusão
+
+O JPA é uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional, oferecendo funcionalidades como mapeamento objeto-relacional, consulta de dados e outras facilidades para o desenvolvimento de aplicações Java que interagem com bancos de dados. O JPA é amplamente utilizado em frameworks como Spring e Quarkus, e é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados. Entender o JPA e suas funcionalidades é essencial para qualquer desenvolvedor Java que deseja criar aplicações robustas e eficientes que interagem com bancos de dados.
