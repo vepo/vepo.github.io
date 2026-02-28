@@ -306,6 +306,52 @@ public List<User> search(UserSearchCriteria criteria) {
 }
 ----
 
+== E as Entidades são apenas objetos Java que representam os dados do banco de dados?
+
+Não! Um entidade não só representa o dado recuperado do banco de dados, mas eles representam uma ligação com o estado do banco de dados. Uma entidade JPA possui um ciclo de vida que é gerenciado pelo contexto de persistência do JPA, o que significa que as entidades podem estar em diferentes estados como Transitório, Gerenciado, Removido e Desanexado. O JPA se encarrega de sincronizar o estado das entidades com o banco de dados, garantindo que as mudanças feitas nas entidades sejam refletidas no banco de dados quando as transações forem confirmadas.
+
+// https://excalidraw.com/#json=eVh7b0N_-pd56KYplp07Q,z_W6eDIYPMpau4w6-LyGpQ
+
+.Ciclo de vida de uma entidade JPA
+image:databases/jpa-lifecycle.png[]
+
+=== Estado Transitório
+
+O estado transitório é o estado inicial de uma entidade, quando ela é criada usando o operador `new` e ainda não está associada a um contexto de persistência. Nesse estado, a entidade não tem um identificador atribuído e não está sendo gerenciada pelo JPA. 
+
+[source,java]
+----
+var user = new User("john.doe", "John", "Doe", "john.doe@example.com"); // [1] A entidade user é criada pelo operador new, e não possui um identificador
+System.out.println(user.getId()); // [2] O identificador da entidade user ainda é null, pois ela ainda não foi associada a um contexto de persistência
+entityManager.persist(user); // [3] A entidade user é persistida e deixa o estado transitório, passando a ser gerenciada
+System.out.println(user.getId()); // [4] O identificador da entidade user é atribuído pelo JPA, e agora a entidade está em estado gerenciado
+----
+
+=== Estado Gerenciado
+
+O estado gerenciado é o estado em que a entidade está associada a um contexto de persistência e é gerenciada pelo JPA. Nesse estado, as mudanças feitas na entidade podem ser sincronizadas com o banco de dados quando as transações forem confirmadas.
+
+É importante não alterar os valores dos campos caso não deseje que este seja atualizado no banco de dados, pois o JPA irá sincronizar as mudanças feitas na entidade com o banco.
+
+Outro ponto importante é que entidades no estado gerenciado são usadas como cache, evitando chamadas repetidas no banco de dados.
+
+[source,java]
+----
+var user = entityMananger.find(User.class, 1L); // [1] A entidade user é recuperada do banco de dados e passa a ser gerenciada
+System.out.println(user.getName()); // [2] O nome do usuário é acessado,
+user.setName("John Doe"); // [3] O nome do usuário é alterado, e a entidade user permanece em estado gerenciado
+var updatedUser = entityManager.find(User.class, 1L); // [4] A entidade user não é recuperada novamente do banco de dados, pois como ela já está em estado gerenciado, o JPA retorna a mesma instância em cache, refletindo a mudança feita no nome do usuário
+System.out.println(updatedUser.getName()); // [5] O nome do usuário é acessado novamente, e a mudança feita anteriormente é refletida, mesmo sem a necessidade de sincronizar explicitamente as mudanças com o banco de dados
+----
+
+=== Estado Removido
+
+O estado removido é o estado em que a entidade foi marcada para remoção, mas ainda não foi removida do banco de dados. Nesse estado, a entidade ainda está associada a um contexto de persistência, mas as mudanças feitas na entidade não serão sincronizadas com o banco de dados.
+
+=== Estado Desanexado
+
+O estado desanexado é o estado em que a entidade não está mais associada a um contexto de persistência, mas ainda existe como um objeto Java. Nesse estado, as mudanças feitas na entidade não serão sincronizadas com o banco de dados, e a entidade não pode ser gerenciada pelo JPA até que seja associada a um novo contexto de persistência.
+
 == Então é fácil usar o JPA? Há algo com que se preocupar?
 
 Apesar do JPA ser muito fácil de ser usado, ele traz diversos problemas aos desenvolvedores que não se atentam as consultas que estão sendo realizadas. Como as consultas SQL são geradas automaticamentes, em muitos casos problemas podem acontecer. No proximo post, vamos falar sobre os problemas mais comuns que podem ocorrer ao usar o JPA e como evitá-los para garantir que as aplicações Java sejam eficientes e robustas ao interagir com bancos de dados.

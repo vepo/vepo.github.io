@@ -1,0 +1,126 @@
+---
+title: Mal Cheiros em Mapeamento Objeto Relacional (ORM)
+published: false
+description: | 
+  O JDBC é uma API que permite a comunicação entre aplicações Java e bancos de dados. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões. Nesse post, vamos explorar os principais componentes do JDBC e como utilizá-los para interagir com um banco de dados.
+tags: [Java, JDBC, Banco de Dados]
+cover_image: /assets/images/capas/disquete-100-42.jpg
+series: Introdução a Bases de Dados
+permalink: /posts/entendendo-o-jdbc
+publish_date: 2026-02-26 18:29:00 +0300
+---
+
+https://github.com/spgroup/ORM-Smells-Catalog
+
+Os frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink são amplamente utilizados para facilitar a interação entre aplicações Java e bancos de dados relacionais. No entanto, o uso inadequado desses frameworks pode levar a uma série de "bad smells" (maus cheiros) que indicam problemas de design ou implementação. Neste post, vamos explorar alguns dos principais bad smells relacionados ao uso de JPA e como evitá-los para garantir um código mais limpo e eficiente.
+
+== O que são mau cheiros (bad smells)?
+
+Nem todo código é bem escrito. Existem códigos bem elaborados, elegantes e que são fáceis de compreender, mas existem códigos que são complexos e difíceis de compreender. Mas saindo dessa questão meramente estética, existem códigos que além do desafio da compreensão, possuem problemas de design que impactam no desempenho da aplicação e, como consequência, são mais custosos de se manter em produção, ao requerer mais memória ou capacidade de processamento, ou ainda, mais custosos ao apresentar erros que impactem diretamente no negócio.
+
+Em https://engsoftmoderna.info/cap9.html#code-smells[Engenharia de Software], se usa uma sinestesia para explicar esse tipo de código, que apesar de aparentar bem escrito, possui problemas de design. Dizemos que o código possui um "mau cheiro" (bad smell, em inglês), que é uma metáfora para indicar que algo está errado, mesmo que não seja imediatamente visível. Assim como um mau cheiro pode indicar a presença de algo podre ou sujo, um código com mau cheiro pode indicar a presença de problemas de design, como acoplamento excessivo, falta de coesão, duplicação de código, entre outros.
+
+Os pesquisadores em Engenharia de Software costuma elaborar catálogos de Bad Smells, que são listas de padrões de código que indicam a presença de problemas de design. Fazendo com que os desenvolvedores possam identificar esses padrões em seu código e tomar medidas para corrigi-los, melhorando a qualidade do software e facilitando a manutenção a longo prazo.
+
+Os Bad Smells mais comuns são:
+
+* Duplicação de código: quando o mesmo código é repetido em vários lugares, o que pode levar a erros e dificultar a manutenção.
+* Acoplamento excessivo: quando as classes ou módulos estão fortemente acoplados, o que pode dificultar a reutilização e a manutenção do código.
+* Falta de coesão: quando as classes ou módulos não têm uma única responsabilidade clara, o que pode dificultar a compreensão e a manutenção do código.
+* Nomes de variáveis ou métodos confusos: quando os nomes não são claros ou não refletem a funcionalidade do código, o que pode dificultar a compreensão e a manutenção do código.
+* Metodos longos: quando os métodos têm muitas linhas de código, o que pode dificultar a compreensão e a manutenção do código.
+* Classes grandes: quando as classes têm muitas linhas de código, o que pode dificultar a compreensão e a manutenção do código.
+* Feature Envy: quando um trecho de código em uma classe faz uso excessivo de métodos ou atributos de outra classe, indicando que o código pode estar mais relacionado à outra classe do que à sua própria classe.
+* Métodos com muitos parâmetros: quando um método tem muitos parâmetros, o que pode dificultar a compreensão e a manutenção do código.
+* Variáveis globais: quando as variáveis são acessíveis em todo o código, o que pode levar a problemas de concorrência e dificultar a manutenção do código.
+* Obsessão por Tipos Primitivos: quando o código faz uso excessivo de tipos primitivos, em vez de usar objetos ou classes, o que pode dificultar a compreensão e a manutenção do código.
+* Objetos Mutáveis: quando os objetos são mutáveis, o que pode levar a problemas de concorrência e dificultar a manutenção do código.
+* Código Comentado: quando o código contém muitos comentários, o que pode indicar que o código é difícil de entender ou que os comentários estão sendo usados para explicar um código mal escrito.
+
+== Existe um Catálogo de Bad Smells para ORM?
+
+Sim! Existe pesquisa na área de Engenharia de Software que se dedica a identificar e catalogar os bad smells específicos relacionados ao uso de frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink. Esses catálogos estão disponíveis em artigos acadêmicos, livros e recursos online. Nesse post, https://github.com/spgroup/ORM-Smells-Catalog[vamos explorar 8 dos bad smells publicados por um grupo de pesquisa da UFPE].
+
+São eles: 
+
+1. Eager como estratégia de busca nos relacionamentos a nível de classe
+2. Recuperação de dados sem projeção para somente leitura
+3. Atualização desnecessária de toda a entidade
+4. Falta de paginação quando não necessário todo o resultado
+5. Falta de Join Fetch: estratégia de busca Eager
+6. Acesso um por um: estrutura de repetição e estratégia de busca Lazy
+7. @OneToMany unilateral com uso inadequado de coleções
+8. Não uso de consultas somente leitura
+
+Mas antes de entrar em cada Bad Smell, temos que entender quais problemas eles podem nos trazer. Esse artigo também apresenta uma série de problemas relacionados a cada um dos bad smells, como:
+
+* Dados em excesso: quando a aplicação recupera mais dados do que o necessário, o que pode levar a problemas de desempenho e consumo de memória.
+* N + 1: quando a aplicação faz uma consulta para recuperar uma entidade e, em seguida, faz consultas adicionais para recuperar as entidades relacionadas, o que pode levar a problemas de desempenho.
+
+Para descrever os Bad Smells, vamos imaginar um modelo de dados que propõe três entidades: aluno, professor e curso. O aluno tem um relacionamento muitos para muitos com o curso, e o professor tem um relacionamento um para muitos com o curso. O código abaixo apresenta a entidade Aluno, que possui um relacionamento muitos para muitos com a entidade Curso.
+
+.Modelo de dados para exemplificar os Bad Smells
+[source,java]
+----
+@Entity
+@Table(name = "tb_alunos")
+public class Aluno {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "tb_aluno_curso",
+        joinColumns = @JoinColumn(name = "aluno_id"),
+        inverseJoinColumns = @JoinColumn(name = "curso_id")
+    )
+    private Set<Curso> cursos;
+}
+----
+
+[source,java]
+----
+@Entity
+@Table(name = "tb_cursos")
+public class Curso {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+    
+    @ManyToMany(mappedBy = "cursos")
+    private Set<Aluno> alunos;
+
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
+}
+----
+
+[source,java]
+----
+@Entity
+@Table(name = "tb_professores")
+public class Professor {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+    
+    @OneToMany(mappedBy = "professor")
+    private Set<Curso> cursos;
+}
+----
+
+== Eager como estratégia de busca nos relacionamentos a nível de classe
+
+Quando se decide usar o método de busca Eager (ansiosa) para um relacionamento a nível de classe, o framework ORM irá carregar automaticamente as entidades relacionadas sempre que a entidade principal for carregada. Isso pode levar a problemas de desempenho, especialmente quando há muitos relacionamentos ou quando as entidades relacionadas possuem muitos dados.
+
+Por exemplo, no caso acima, se a classe `Aluno` tiver o relacionamento `cursos` configurado como Eager, toda vez que um aluno for carregado, o framework ORM irá carregar automaticamente todos os cursos relacionados a esse aluno. Se um aluno estiver matriculado em muitos cursos, isso pode resultar em uma grande quantidade de dados sendo carregados desnecessariamente, o que pode levar a problemas de desempenho e consumo de memória.
+
+Muitos desenvolvedores por uma ansiedade de escrever menos código para evitar código possivelmente duplicado, acabam evitando escrever métodos de consulta específicos para cada caso de uso, e acabam configurando o relacionamento como Eager, o que pode levar a problemas de desempenho. Por isso, é importante avaliar cuidadosamente a necessidade de usar Eager como estratégia de busca e considerar outras opções, como Lazy (preguiçosa), que permite carregar as entidades relacionadas somente quando necessário.
