@@ -290,5 +290,35 @@ O modo Eager deve ser usado cautelosamente e prefira usar consultas JPQL com Joi
 
 == Acesso um por um: estrutura de repetição e estratégia de busca Lazy
 
-Um padrão um pouco diferente do mesmo problema é a opção pelo modo Lazy, mas quando necessário usar os valores eles serem consultados um a um.
+Um padrão um pouco diferente do mesmo problema é a opção pelo modo Lazy, mas quando necessário usar os valores eles serem consultados um a um. Em algumas situações, nós precisamos consultar uma entidade e processar valores nos campos relacionados. Vamos supor que precisamos de uma funcionalidade de integralização de curriculo e todos os cursos devem ser consultados.
 
+[source,java]
+----
+public Curriculo integralizar(long alunoId) {
+    Aluno aluno = alunoRepository.findById(alunoId)   // [1]
+                                 .orElseThrow(() -> new NotFoundException("Aluno não encontrado! alunoId=%d".formatted(alunoId)));
+    Curriculo curriculo = new Curriculo(aluno);
+    for (Cursor curso: aluno.getCursos()) {          // [2]
+      // preenche as informações do curriculo
+      // Seria melhor que isso fosse feito dentro do construtor,
+      // mas por motivos didáticos, coloquei o loop fora
+    }
+}
+----
+
+O resultado da execução acima é que cada vez que o processo passa pelos marcadores `[1]` e `[2]` uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o JOIN FETCH na operação de consulta ou adicionando a anotação `@BatchSize` para reduzir o número de vezes que a execução fiquei bloqueada para chamar o banco de dados.
+
+
+No exemplo abaixo, o método 
+
+[source,java]
+----
+public Curriculo integralizar(long alunoId) {
+    Aluno aluno = alunoRepository.findByIdWithCursos(alunoId)   // [1] Executa a consulta com JOIN FETCH
+                                 .orElseThrow(() -> new NotFoundException("Aluno não encontrado! alunoId=%d".formatted(alunoId)));
+    Curriculo curriculo = new Curriculo(aluno);
+    for (Cursor curso: aluno.getCursos()) {                     // [2] A lista de cursos não será LAZY
+      // A construção do curriculo é feita sem bloqueios
+    }
+}
+----
