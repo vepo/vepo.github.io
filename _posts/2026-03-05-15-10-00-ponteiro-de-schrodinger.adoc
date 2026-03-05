@@ -1,13 +1,13 @@
 ---
 title: Ponteiro de Schrödinger
-published: false
+published: true
 description: | 
-  
-tags: [Java, Design de Código]
-cover_image: /assets/images/capas/disquete-100-42.jpg
+  Ponteiros não existem em Java. Ou existem? A verdade é que o conceito está lá, disfarçado de referências, NullPointerException e variáveis final. Neste artigo, exploro a fronteira entre a abstração das linguagens modernas e a realidade do hardware, passando por exemplos em C e Java, e mostrando como é fácil — e perigoso — reinventar ponteiros sem perceber. Uma reflexão sobre design de código, concorrência e as armadilhas que criamos ao ignorar a biblioteca padrão.
+tags: [Java, Design de Código, Ponteiros]
+cover_image: /assets/images/capas/livro-maquina-drink.webp
 series: Introdução a Bases de Dados
 permalink: /posts/ponteiro-de-schrodinger
-publish_date: 2026-02-26 18:29:00 +0300
+publish_date: 2026-03-05 15:10:00 +0300
 ---
 
 Alguns anos atrás eu vi um tweet dizendo algo mais ou menos assim "não importa a sua linguagem, ela tem ponteiros" e me lembro que esse tweet viralizou na falecida rede. Foi um tormento que eu enfrentei com um aperitivo num sábado de manhã. Surfei a onda, criei uma lista de bloqueio para evitar pessoas que não sabia interpretar um post em uma rede de MICROblogging, mas não estamos aqui para falar da toxicidade das redes, isso é papo link:/posts/o-mundo-dos-narcisos[para outros posts].
@@ -28,7 +28,7 @@ Eu trabalho com Java e a última vez que vi um ponteiro foi antes de 2015 enquan
 
 Java é uma linguagem que surgiu em uma época que Orientação a Objetos era a panaceia para todos os problemas na computação. Se falava de Objetos Distribuídos como se eles fossem a solução de problemas arquiteturais e o último Design Pattern a existir (_ok, Design Patterns ainda estavam engatinhando_). Por isso Orientação a Objetos tem um lugar central na sua linguagem e por isso que existe uma exception chamada `NullPointerException`.
 
-Apesar de existir a excessão, as linguagens fizeram ao máximo para esconder a realidade dos ponteiros. As vezes usam outro nome como `TypeError`, as vezes criam o conceito de *classe* e *instância*, criam a abstração chamada https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html[Optional], mas elas fazem de tudo para esconder a triste realidade que tudo é um endereço de memória cheia de 1 e 0.
+Apesar de existir a exceção, as linguagens fizeram ao máximo para esconder a realidade dos ponteiros. As vezes usam outro nome como `TypeError`, as vezes criam o conceito de *classe* e *instância*, criam a abstração chamada https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html[Optional], mas elas fazem de tudo para esconder a triste realidade que tudo é um endereço de memória cheia de 1 e 0.
 
 .Pointeiros existem em Javascript e eu posso provar!
 image:design-patterns/npe-javascript.png[]
@@ -41,13 +41,13 @@ Dessa forma quem criou as linguagens com certeza se deparou com o dilema entre i
 
 Essa questão é muito facilmente resolvida se eu perguntar: _os funcionários A e B ganham um salário X, se eu aumentar o salário de B eu aumento o salário de A?_ Observa que essa igualdade não é identidade. Os salários são iguais, mas não são os mesmos. Logo esse valor não pode ser armazenado na mesma linha de um banco de dados ou em um mesmo objeto. Eles são iguais, mas não são idênticos.
 
-Mas há a grande falha no design das linguagens que é a questão da ausência. Programador é muito bom com a lógica booleana ao pensar na conceito de verdadeiro ou falso, mas a lógica computacional possui também o conceito de ausente (que é diferente de inexistente, ou _undefined_). Por exemplo, um valor booleano pode ser `true`, `false` ou `null`. E como representamos o nulo sem dizer que o nulo existe? Por isso ainda usamos o `null` que vem do C, vem do baixo nível e é tão díficil de ser compreendido.
+Mas há a grande falha no design das linguagens que é a questão da ausência. Programador é muito bom com a lógica booleana ao pensar na conceito de verdadeiro ou falso, mas a lógica computacional possui também o conceito de ausente (que é diferente de inexistente, ou _undefined_). Por exemplo, um valor booleano pode ser `true`, `false` ou `null`. E como representamos o nulo sem dizer que o nulo existe? Por isso ainda usamos o `null` que vem do C, vem do baixo nível e é tão difícil de ser compreendido.
 
 == (ii) O Conceito de Ponteiro existe, mas ele é gerenciado pela linguagem
 
 O conceito de `null` vem da história da computação, mais especificamente do https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/[ALGOL, criado 1965]. Eu não diria que foi um erro, mas uma má ideia e há explicação para isso.
 
-Para entender o conceito de `null` é preciso entender como a memória funciona e abstrações sugiram em programação. Eu entendo bem disso porque fiz Engenharia de Computação e grande parte do curso eu programei Assembly, não recomendo.
+Para entender o conceito de `null` é preciso entender como a memória funciona e abstrações surgiram na programação. Eu entendo bem disso porque fiz Engenharia de Computação e grande parte do curso eu programei Assembly, não recomendo.
 
 Sendo bem genérico, um computador é uma unidade de processamento ligada a um barramento que acessa dispositivos. A CPU possui uma memória interna (cache e registradores), mas ela sempre acessa a memória e outros dispositivos. Se você deseja criar um dispositivo IoT que lerá um sensor, ele se comportará como uma posição de memória e você acessará ele, mas para isso precisa construir um driver para expor isso em "alto nível". Essa é uma discussão muito interessante, mas limitante, fica complicado demais falar de design de código pensando no baixo nível.
 
@@ -56,7 +56,7 @@ Vamos pensar em termos de Strings. A palavra String significa cadeia, ou seja, u
 .Esse post, durante a escrita, lido com o programa `xxd`.
 image:design-patterns/memoria.png[]
 
-Observa que as duas referências ao trecho existe como duplicadas na memória e que ambas possuem endereço de memória diferentes (`0000186a` e `00001600`). Logo se eu pegar um objeto String com esse valor e chamar o método `toUpperCase()`, o que vai acontecer?
+Observa que as duas referências ao trecho existem como duplicadas na memória e que ambas possuem endereço de memória diferentes (`0000186a` e `00001600`). Logo se eu pegar um objeto String com esse valor e chamar o método `toUpperCase()`, o que vai acontecer?
 
 .Esse post, durante a escrita, lido com o programa `xxd` sem agrupar bytes.
 image:design-patterns/memoria-marcada.png[]
@@ -98,13 +98,13 @@ System.out.println(user.getUsername())             // [3] 'jao'
 
 Foi decidido enquanto a linguagem estava sendo definida, que Strings são valores imutáveis, e isso significa que valores alterados em uma String implica na criação de outra String. É seguro, mas em alguns casos ineficiente, por isso foi necessário criar objetos como o https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html[StringBuilder] e o https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuffer.html[StringBuffer].
 
-Se você não é do mundo Java, provalmente existe a mesma discussão na sua linguagem.
+Se você não é do mundo Java, provavelmente existe a mesma discussão na sua linguagem.
 
 == (iii) Como as pessoas reinventam os Ponteiros _e o fazem de maneira errada!_
 
 Não é raro encontrarmos em Java pessoas reinventando ponteiros para suplantar "*_limitações_*" da linguagem. Quero já dizer aqui que isso não é uma limitação da linguagem, mas a linguagem preocupada que você não faça 💩, mas as pessoas continuam fazendo 💩 porque elas não sabem resolver o problema de um outro modo.
 
-A primeira limitação que me vem a mente é a obrigatoriedade que uma variável seja `final` ao se usar em contextos que possivelmente podem ser acessados por mais de uma _thread_. Essa limitação é imposta para que o desenvolvedor não precise se preocupar com a sincronia entre as possíveis _threads_. 
+A primeira limitação que me vem a mente é a obrigatoriedade que uma variável seja `final` ao se usar em contextos que possivelmente podem ser acessados por mais de uma _thread_. Essa limitação é imposta para que o desenvolvedor não precise se preocupar com a concorrência entre as possíveis _threads_. 
 
 Para exemplificar, vou mostrar um exemplo bem tosco que já encontrei em diversas bases de código de diversas empresas. Vamos imaginar que temos uma lista de valores e queremos encontrar um valor especifico. Aí o desenvolvedor resolver usar lambdas, mas sem se dar o trabalho de ler muito a documentação da biblioteca padrão. Como ele implementa?
 
@@ -122,7 +122,7 @@ System.out.println("Primeiro usuário ativo: " + Arrays.toString(primeiroUsuario
 
 O código acima compila e é sintaticamente correto, mas há diversos problemas nele! Também já quero alertar que a possibilidade de algum erro acontecer é baixa, visto que provavelmente a lista retornada por `getAllUsers()` não reimplementa o método `forEach`. Mas ninguém garante a função lambda não será executada em sequência e serialmente. 
 
-A exigência que a variáveis `users` e `primeiroUsuarioAtivo` sejam `final`, e na verdade é mesmo que você não defina ela como `final` é feita para garantir que os valores não posssa ser alterados por processos concorrentes. Esse código ficaria mais "correto" se fosse sincronizado, como abaixo, mas fica ruim. 🤨
+A exigência que a variáveis `users` e `primeiroUsuarioAtivo` sejam `final`, e na verdade é mesmo que você não defina ela como `final` é feita para garantir que os valores não possa ser alterados por processos concorrentes. Esse código ficaria mais "correto" se fosse sincronizado, como abaixo, mas fica ruim. 🤨
 
 [source,java]
 ----
@@ -193,7 +193,7 @@ public class SharedMaps {
 }
 ----
 
-Com essa classe o desenvolvedor poderia usar o mapa de forma sincrona. A nessecidade dessa classe era justificada e o uso também era pontual. Mas surgiram novas funcionalidades e em uma delas surgiu a necessidade de se retornar apenas um valor para leitura. Pelo meu entendimento, o desenvolvedor desejaria algum método como `retrieveValueOrCreate(mapKey, valueKey, this::createValue)` e eu implementaria ele como fiz abaixo.
+Com essa classe o desenvolvedor poderia usar o mapa de forma sincrona. A necessidade dessa classe era justificada e o uso também era pontual. Mas surgiram novas funcionalidades e em uma delas surgiu a necessidade de se retornar apenas um valor para leitura. Pelo meu entendimento, o desenvolvedor desejaria algum método como `retrieveValueOrCreate(mapKey, valueKey, this::createValue)` e eu implementaria ele como fiz abaixo.
 
 [source,java]
 ----
