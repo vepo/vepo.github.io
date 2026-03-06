@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Carreira.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-03-06T18:17:09+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Carreira.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Construindo softwares resilientes</title><link href="https://blog.vepo.dev/posts/construindo-software-resilientes" rel="alternate" type="text/html" title="Construindo softwares resilientes" /><published>2020-05-08T00:00:00+00:00</published><updated>2020-05-08T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/20-05-31-construindo-softwares-resilientes</id><content type="html" xml:base="https://blog.vepo.dev/posts/construindo-software-resilientes"><![CDATA[<p><em>—  Já ouviu falar de <strong>eXtreme Go Horse (XGH)</strong>?</em> <br />
+<em>—  Não?!</em> 🙄 <br />
+<em>—  Mas você pratica <strong>XGH</strong>?</em> 🤨<br />
+<em>—  Não?</em> <br />
+<em>—  Ainda bem!</em> 😀</p>
+
+<p><strong>XGH</strong> é uma piada que gosto muito. Espero que você não o pratique. Mas coloquei ele na roda por seu exato oposto. Um Sênior deve construir softwares estáveis. E para se construir software estáveis você tem que ir pro extremo oposto do <strong>XGH</strong>. Devemos construir software resilientes.</p>
+
+<p>Sim, eu usei a palavra resiliente. Vamos ao significado?</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/ou8mdzzu5v5ii8n4fbay.png" alt="Alt Text" /></p>
+
+<p>Resiliência é a propriedade de um sistema suportar adversidade.</p>
+
+<h1 id="construindo-resiliência">Construindo Resiliência</h1>
+
+<p>Nós como desenvolvedores resolvemos problemas automatizando coisas. Quando vemos um problema já pensamos no modo como ele deve ser resolvido.</p>
+
+<p>Mas e se houver outra forma? 
+E se seu usuário não entender a forma como deve ser feito o processo? 
+E se houver um erro durante processo? 
+E se necessitar uma configuração na máquina?</p>
+
+<p>É nessas horas que seu software tem que ser Resiliente.</p>
+
+<p>Verdadeiros Sêniors constroem sistemas resilientes. Mas não seja gnóstico, não é um post que vai te fazer construir sistemas resilientes, é resolvendo bugs! Tudo que posso fazer por você é te ensinar o caminho, você terá que trilhar ele sozinho.</p>
+
+<p>Então vamos com algumas dicas:</p>
+
+<h2 id="1-um-sênior-pensa-em-todos-os-problemas-que-podem-acontecer-em-um-fluxo">1. Um Sênior pensa em todos os problemas que podem acontecer em um fluxo</h2>
+
+<p>Quando você vai escrever um código, você sempre tem premissas:</p>
+
+<ol>
+  <li>Existe um arquivo de configuração.</li>
+  <li>Há uma classe que implementa essa interface.</li>
+  <li>O servidor está de pé.</li>
+  <li>Etc…</li>
+</ol>
+
+<p>E se uma premissas dessas não for verdadeira? Seu código irá funcionar? Ou pelo menos irá mostrar o erro correto?</p>
+
+<p>Vamos para exemplos reais?</p>
+
+<p>Eu tenho um projeto que estou desenvolvendo para ser um tipo de tester. Dá uma olhada lá:</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a> 
+            /
+            <a href="https://github.com/vepo/plain-test">
+                plain-test
+            </a>
+        </span>
+    </h2>
+</div>
+
+<p>Nele eu executo o testes em passos (<em>Step</em>), cada passo tem um plugin que implementa. Então para execução de um passo eu preciso:</p>
+
+<ol>
+  <li>Achar o Plugin de Execução</li>
+  <li>Executar o Passo</li>
+  <li>Verificar os Assertions do Passo</li>
+</ol>
+
+<p>Simples? Poderia ser implementado em 1 linha?</p>
+
+<div data-gist="https://gist.github.com/vepo/871ebd3e0fa62aebfbc135e61ad74235"></div>
+
+<p>Mas temos dois problemas aqui que devem ser validados.</p>
+
+<ol>
+  <li>Há um Plugin para implementar o Passo?</li>
+  <li>Na definição do Passo, todos os parâmetros estão definidos?</li>
+</ol>
+
+<p>Vê que temos mais dois problemas a verificar? E detalhe, esses problemas são um erro de definição do teste e não de execução do teste. Logo o motivo da falha deve ser diferente.</p>
+
+<div data-gist="https://gist.github.com/vepo/416b699bb7c9fca3b49e202b19d99d7d"></div>
+
+<p>Ao se identificar um erro, exiba a mensagem de erro correta, que ajuda quem irá resolver esse erro.</p>
+
+<h2 id="2-um-sênior-desenvolve-software-que-é-resistente-a-desenvolvedores">2. Um Sênior desenvolve software que é resistente a desenvolvedores</h2>
+
+<p>Ok! Você desenvolveu o negócio lindamente. Está tudo funcionando perfeitamente, fez o <em>deploy</em> em produção. Resultado: usuários felizes! 😀</p>
+
+<p>Fim? Pode ser que não, em algum momento esse software poderá ser atualizado. Pode ser necessários corrigir os bugs que ainda não foram encontrados, ou poderá ser adicionada alguma feature. Qualquer alteração, em qualquer lugar, tem o potencial de alterar a lógica do seu software. Como podemos validar que tudo está funcionando corretamente?</p>
+
+<p><em>Não vou vender TDD como uma bala de prata, esse não é o problema que TDD resolve. Depois falo de TDD. Eu gosto de TDD por isso repito TDD… Continuamente… TDD</em></p>
+
+<p>Um Sênior de verdade constrói software resiliente a desenvolvedores. Mas como fazer isso?</p>
+
+<p>Você deveria se preocupar com algumas coisas:</p>
+
+<ol>
+  <li>Qual a cobertura de testes do sistema?</li>
+  <li>Os testes foram feitos só pra passar pela cobertura de testes e agradar o arquiteto? Ou os testes estão realmente validando o output?</li>
+  <li>Os testes são executados no processo de build?</li>
+</ol>
+
+<p>Caso você tenha respondido não para qualquer uma das perguntas abaixo, seu software não é resiliente a desenvolvedores. E você não pode confiar em si mesmo a ponto de pensar que você conseguirá resolver todos os problemas no futuro.</p>
+
+<p>Quando resolvemos um bug, ou adicionamos uma feature nova, temos um pensamento viciado. Apenas pensamos em um fluxo, e nos esquecemos de outros. É normal e esperado isso. Você é um engenheiro e não Deus.</p>
+
+<p>Como eu resolvo isso? Eu crio testes unitários com todos os pressupostos.</p>
+
+<div data-gist="https://gist.github.com/vepo/88d10d4c6e4ae0523ffe19268f5871f0"></div>
+
+<p>É um habito meu começar meu desenvolvimento com alguns pressupostos desses, mas eles não fazem parte do <em><strong>TDD</strong></em>, pois não são <em>Baby Step</em>. Mas eles dão uma clara visão do que vai falhar. Pode ser que em uma próxima feature um passo desses falhe, e o desenvolvedor irá decidir:</p>
+
+<ol>
+  <li>Se corrige o problema</li>
+  <li>Se corrige o teste</li>
+  <li>Se remove o teste, caso ele não faça mais sentido.</li>
+</ol>
+
+<h2 id="3-um-sênior-investiga-possíveis-erros">3. Um Sênior investiga possíveis erros</h2>
+
+<p><em>—  Então, esse teste falha em 50% dos casos. Mas caso falhe, roda de novo que dá certo.</em></p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/lefte06h7r9ngi7d4l8b.jpg" alt="Alt Text" /></p>
+
+<p>Se você ouvir essa frase. Recrimine! Isso não pode acontecer.</p>
+
+<p>Um possível erro intermitente em um teste pode ser um erro intermitente em produção. Pode ser custoso investigar antes do <em>deploy</em>? Pode! Mas será mais barato do que investigar depois do <em>deploy</em>, não?</p>
+
+<p>Um Sênior de verdade sabe que pequenos problemas não podem passar sem investigação. Não pode buscar a solução fácil de ignorar ou remover o teste. Isso é fácil, mas para um sênior é porco <em>(com todo respeito aos porcos)</em>.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Quase todo software necessita de resiliência. E um Sênior de Verdade sabe ver isso.</p>
+
+<p>Ele consegue se precaver de várias situações:</p>
+
+<ol>
+  <li>Erros esperados</li>
+  <li>Erros inesperados</li>
+  <li>Pessoas esperadas</li>
+  <li>Pessoas inesperadas</li>
+  <li>Aleatoriedades….</li>
+</ol>
+
+<p>Não que ele deva ser um Deus em se tratando de desenvolvimento, mas tem que praticar a disciplina de promover a resiliência.</p>
+
+<p>Esse é um caminho a ser trilhado….</p>
+
+<h1 id="livros-recomendados">Livros Recomendados</h1>
+
+<ol>
+  <li><a href="https://www.amazon.com.br/projeto-f%C3%AAnix-Gene-Kim/dp/8550801895?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2AYVJTDQGN55J&amp;keywords=projeto+phoenix&amp;qid=1588968692&amp;sprefix=projeto+ph%2Caps%2C272&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=45c6f18224bfe9cf0d82b737331a5761&amp;language=pt_BR&amp;ref_=as_li_ss_tl">O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vence</a></li>
+  <li><a href="https://www.amazon.com.br/Test-Driven-Development-Kent-Beck/dp/0321146530?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=BXKYM1LP3IQH&amp;keywords=test+driven+development&amp;qid=1588968574&amp;sprefix=test+dr%2Caps%2C275&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=b9ad00a6e5089e02d277bed813cb0283&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Test Driven Development: By Example</a></li>
+  <li><a href="https://www.amazon.com.br/C%C3%B3digo-limpo-Robert-C-Martin/dp/8576082675?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;keywords=clean+code&amp;qid=1588968796&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=7ff5c1abee4d3b6a1860924b6f392698&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Código Limpo: Habilidades Práticas do Agile Software</a></li>
+</ol>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Desenvolvimento de Software" /><category term="Programação" /><category term="TDD" /><category term="Carreira" /><summary type="html"><![CDATA[Um Sênior de Verdade sabe construir software resilientes! Mas o que significa um Software Resiliente?]]></summary></entry></feed>

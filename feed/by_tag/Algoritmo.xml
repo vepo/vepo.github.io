@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Algoritmo.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-03-06T18:17:09+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Algoritmo.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Algoritmos - Uma introdução</title><link href="https://blog.vepo.dev/posts/algoritmos-uma-introducao" rel="alternate" type="text/html" title="Algoritmos - Uma introdução" /><published>2022-06-10T00:00:00+00:00</published><updated>2022-06-10T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-47-30-algoritmos-uma-introducao</id><content type="html" xml:base="https://blog.vepo.dev/posts/algoritmos-uma-introducao"><![CDATA[<blockquote>
+  <p><em>A NOÇÃO de um algoritmo é básica para toda a programação de computadores.</em> 
+Donald E. Knuth</p>
+</blockquote>
+
+<p>Mesmo que você não se importe com algoritmos, se você programa em qualquer linguagem, você usa, produz e lê algoritmos. Talvez você não saiba definir o que é um algoritmo, ou talvez você tenha uma ideia errada do que é. Mas é uma ideia básica para todo programa, tanto que foram com as palavras acima que Donald E. Knuth decidiu abrir seu livro <strong>The Art of Computer Programming</strong>.</p>
+
+<p>Antes de falar em algoritmos, vamos tentar entender o que é uma linguagem de programação?</p>
+
+<h1 id="o-que-é-um-computador">O que é um computador?</h1>
+
+<p>Devemos considerar computadores como máquinas extremamente burras. Ao contrário do senso comum, os computadores não avançaram nos últimos 40 anos, todos eles seguem a mesma arquitetura de lê uma instrução, executar a instrução e lê a instrução seguinte. Essas instruções vão alterar valores na memória, ou em registradores, que podem alterar o fluxo do programa. Todo avanço que tivemos foi na velocidade de processamento dessas instruções, na quantidade de memória disponível e na velocidade de comunicação entre computadores.</p>
+
+<p>Essas instruções são armazenadas na memória em algo chamado linguagem de máquina que são dados binários. A geração desse binário é feita a partir de uma linguagem possível de ser compreendida pelo ser humano. É aí que entra uma linguagem de programação.</p>
+
+<p>Uma Linguagem de Programação é capaz de expressar algoritmos que são traduzidos para linguagem de máquina em que computadores podem o entender. É preciso fazer uma diferente entre Linguagem de Programação, Linguagem de Definição de Interface (IDL) e Linguagem de Apresentação. Existem algumas linguagens no contexto do desenvolvimento de software que não viram programas, mas são usadas por programas para outros propósitos, como é o caso do HTML, CSS e algumas IDLs como gRPC. Nenhuma dessas linguagens é transformada em código executável e não é possível definir um algoritmo nelas. Isso não implica que elas não tenham algoritmos próprios, o CSS por exemplo tem um algoritmo para aplicação de estilo. 🤓</p>
+
+<p>Uma linguagem de programação sempre será de dois tipos, ou ela é declarativa ou imperativa. Uma Linguagem Declarativa é usada para declarar qual a forma que um problema deve ser resolvido, essas linguagens são em muitos casos funcionais (LISP, Erlang ou Haskell). SQL e HTML também são consideradas linguagens declarativas para problemas específicos como consulta a base de dados e criação de telas, respectivamente.</p>
+
+<h1 id="definindo-algoritmos">Definindo Algoritmos</h1>
+
+<p>O <a href="https://www.oxfordlearnersdictionaries.com/definition/english/algorithm">Dicionário Oxford</a> define algoritmo como:</p>
+
+<blockquote>
+  <p>Um conjunto de regras que devem ser seguidas para resolver um problema em particular.</p>
+</blockquote>
+
+<p>Qualquer programa de computador é desenvolvido para resolver um problema. <em>Ou para criar um problema… sem estresse</em> 😉</p>
+
+<p>Mas um programa <strong>DEVE</strong> segui uma receita, isto é, o seu algoritmo. Isto é onipresente em qualquer sistema computacional e nenhum programa consegue fugir do seu algoritmo. É importante entender isso até para desmentir algumas péssimas matérias que tentam passar a ideia que estamos perto de alcançar a singularidade, isto é, o momento que computadores serão superior ao seres humanos podendo inclusive se reprogramar. Algum tempo atrás saiu uma matéria dizendo que a Meta havia desligado uma IA porque ela estava criando uma linguagem nova, isso é uma mentira contada usando fatos. O que, provavelmente, aconteceu foi que a IA se degenerou mais rapidamente do que se imaginava e por isso o experimento foi terminado. O experimento não terminou por medo de se criar uma nova <em>Skynet</em>, mas porque se decidiu não investir mais tempo em tentar criar um chatbot autônomo. No fim, o chatbot estava fazendo exatamente aquilo para qual ele foi desenvolvido, ele não saiu do conjunto de regras para o qual foi desenvolvido. <strong>Todo programa respeita o seu algoritmo, o que acontece é que ou o algoritmo está errado ou há um erro na implementação dele</strong>.</p>
+
+<p><img src="/assets/images/fakes/facebook-desliga-ia.PNG" alt="Noticia falsa &quot;Facebook desliga inteligência artificial que criou sua própria linguagem&quot;" /></p>
+
+<p>A origem do termo algoritmo é incerta, alguns acreditam que ela descende do termo antigo <em>algorismo</em> que significa <strong>o processo de fazer aritmética usando algarismos arábicos</strong>. Durante a idade médica, os cálculos eram feitos através de ábacos usando algoritmos. Na Renascença esse termo foi colocado em dúvida porque alguns linguistas consideraram ele a junção de <em>algiros</em> (doloroso) + <em>arithmos</em> (números). Mas também pode vir do nome do autor <em>Abu Abdalá Maomé ibne Muça ibne Alcuarismi</em> que escreveu <a href="https://pt.wikipedia.org/wiki/Livro_da_Restaura%C3%A7%C3%A3o_e_do_Balanceamento"><strong>Livro da Restauração e do Balanceamento</strong></a>. Essa foi a primeira obra a reunir algoritmos para resolução de um conjunto de problemas, e o nome algoritmo deriva da pronuncia do nome do autor <em>al-Khwarizmi</em>.</p>
+
+<p><img src="/assets/images/books/algoritmo-livro-arabe.jpg" alt="Capa do Livro da Restauração e do Balanceamento" /></p>
+
+<p>Durante o tempo, o termo árabe se degenerou e acabou misturado com um termo grego que tem sua raiz em aritmética. Por volta de 1950 o termo algoritmo era facilmente associado ao Algoritmo de Euclides, que é o processo matemático para se encontrar o máximo divisor comum de dois inteiros.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Algoritmo E (Algoritmo de Euclides). Dado dois inteiros positivos m e n, encontre seu maior divisor comum, isto é, o maior inteiro positivo que divide tanto m e n.
+
+E1. [Encontrar resto] Divida m por n e assuma r como o resto da divisão. (0 ≤ r &lt; n)
+E2. [Igual a zero?]   Se r = 0, o algoritmo termina; n é a resposta
+e3. [Reduz]           Assuma m ← n, n ← r, e volte para o passo E1.
+</code></pre></div></div>
+
+<h1 id="características-de-um-algoritmo">Características de um algoritmo</h1>
+
+<p>Um algoritmo é uma receita, mas receitas de bolo não são algoritmos. Porque? A resposta é simples e já falamos dela quando descrevemos um computador. Você consegue entender uma receita de bolo, mas um computador não consegue entender. Você é infinitamente mais esperto que um computador.</p>
+
+<p>Para que um conjunto de passos seja um algoritmo, ele deve ter as seguintes características:</p>
+
+<ol>
+  <li>Finitude</li>
+  <li>Definitividade</li>
+  <li>Entrada</li>
+  <li>Saída</li>
+  <li>Eficácia</li>
+</ol>
+
+<h2 id="1-finitude">1. Finitude</h2>
+
+<p>Um algoritmo <strong>DEVE</strong> sempre terminar depois de um conjunto finito de passos.</p>
+
+<p>Existem algoritmos que buscam indefinitivamente por um valor ótimo. Mesmos esses algoritmos devem terminar depois de um número finito de interações ou ao encontrar um <strong>valor estável</strong>. Esse é o caso do algoritmo de treinamento de redes neurais, o algoritmo não está buscando por uma valor exato, mas por um valor aproximado baseado na entrada.</p>
+
+<h2 id="2-definitividade">2. Definitividade</h2>
+
+<p>Cada passo de um algoritmo <strong>DEVE</strong> ser precisamente definido.</p>
+
+<p>Você pode fazer</p>
+
+<p>Você pode fazer suposições sobre algo que lê, mas um computador não pode fazer suposições. Cada passo deve ser preciso.</p>
+
+<p><a href="https://www.monkeyuser.com/2019/determinism/"><img src="/assets/images/monkeyuser/148-determinism.png" alt="Tirinha do site monkeyuser.com chamada &quot;Determinism&quot;, na descrição o site usa &quot;As suposições são a mãe de todas as merdas!&quot;" /></a></p>
+
+<p>Volte para o <strong>Algoritmo E</strong> e procure espaços para duvida nos passos, se houver qualquer dúvida o algoritmo não pode ser implementado ou mesmo executado manualmente.</p>
+
+<h2 id="3-entrada">3. Entrada</h2>
+
+<p>Um algoritmo tem dados de entrada, eles são parte da definição do algoritmos. No caso do <strong>Algoritmo E</strong> são os números inteiros <code class="language-plaintext highlighter-rouge">m</code> e <code class="language-plaintext highlighter-rouge">n</code>.</p>
+
+<h2 id="4-output">4. Output</h2>
+
+<p>Um algoritmo tem dados de saída, eles são parte da definição do algoritmos. No caso do <strong>Algoritmo E</strong> é o valor do máximo divisor comum de <code class="language-plaintext highlighter-rouge">m</code> e <code class="language-plaintext highlighter-rouge">n</code>.</p>
+
+<h2 id="5-eficácia">5. Eficácia</h2>
+
+<p>Todos os passos precisam ser efetivos, isto significa que devem ser simples o suficiente para serem executados sem nenhum outro conhecimento. Passos complexos podem ser encapsulados em algoritmos, por exemplo, se um outro algoritmo precisar encontrar o máximo divisor comum de dois números, este pode ser encapsulado através de um passo simples <code class="language-plaintext highlighter-rouge">mdc ← E(m, n)</code>, onde <code class="language-plaintext highlighter-rouge">E(m, n)</code> significa a execução do <strong>Algoritmo E</strong>.</p>
+
+<h1 id="notação">Notação</h1>
+
+<p>Para escrever um algoritmo, precisamos:</p>
+
+<ul>
+  <li><strong>Passos numerados</strong>: Devemos poder nos referir aos passos</li>
+  <li><strong>Pseudocódigo</strong>: Devemos ser capazes de traduzir o algoritmo em qualquer linguagem de programação</li>
+  <li><strong>Dados de entrada</strong></li>
+  <li><strong>Dados de saída</strong></li>
+  <li><strong>Atribuições</strong>: Representa quando uma variável assume um novo valor. Normalmente usamos a notação <code class="language-plaintext highlighter-rouge">x ← y</code> onde significa que <code class="language-plaintext highlighter-rouge">x</code> será atribuído o valor de <code class="language-plaintext highlighter-rouge">y</code>.</li>
+</ul>
+
+<p>No <strong>Algoritmo E</strong> temos todas essas características.</p>
+
+<h1 id="ordenando-um-array">Ordenando um array</h1>
+
+<p>Como podemos ordenar um array? Existe uma série de algoritmos que são bastante estudados, o mais simples dele é o <a href="https://pt.wikipedia.org/wiki/Selection_sort"><em>Selection sort</em></a> que consiste basicamente de selecionar cada posição a partir do inicio do array e procurar o menor valor nas posições seguintes. Abaixo definimos ele como <strong>Selection Sort</strong>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Dado:
+    v    → O array de entrada contendo números inteiros
+    n    → O tamanho de v
+    x[i] → O valor armazenada na posição i do array x
+
+INICIO:
+  S1: PARA CADA i EM [0, n - 2]:
+  S2:   min_index ← i
+  S3:   PARA CADA j EM [i + 1, n - 1]:
+  S4:     SE v[j] &lt; v[min_index]?
+  S5:       min_index ← j
+  S6:   SE v[i] != v[min_index]?
+  S7:     aux ← v[min_index]
+  S8:     v[min_index] ← v[i]
+  S9:     v[i] ← aux
+</code></pre></div></div>
+
+<p>Sobre este algoritmo podemos perguntar:</p>
+
+<ol>
+  <li><strong>É finito?</strong> Sim, ele irá iterar sobre o array.</li>
+  <li><strong>É definitivo?</strong> Sim, cada passo pode ser feito sem qualquer suposição.</li>
+  <li><strong>Qual é a entrada?</strong> A matriz e seu comprimento.</li>
+  <li><strong>Qual é a saída?</strong> A mesma matriz já que o algoritmo altera os valores de entrada.</li>
+  <li><strong>É eficaz?</strong> Sim, classificará qualquer array.</li>
+</ol>
+
+<h2 id="executando-manualmente">Executando manualmente</h2>
+
+<p>Todo algoritmo pode ser executado manualmente, não é fácil mas, ao executar, podemos ver como dos dados são transformados por ele e compreender o seu funcionamento. Abaixo vemos a execução do <strong>Selection Sort</strong> para o vetor <code class="language-plaintext highlighter-rouge">[5, 100, -6, 98, -111, 0]</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DADO: 
+  v = [5, 100, -6, 98, -111, 0]
+  n = 6
+
+  S1: i ← 0                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S2: min_index ← 0                        v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S3: j ← 1                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S4: v[1] &lt; v[0] ? (100 &lt; 5)    NO        v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S3: j ← 2                                v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S4: v[2] &lt; v[0] ? (-6 &lt; 5)     YES       v = [5, 100, -6, 98, -111, 0]   min_index = 0   aux = 0
+  S5: min_index ← 2                        v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S3: j ← 3                                v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S4: v[3] &lt; v[2] ? (98 &lt; -6)    NO        v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S3: j ← 4                                v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S4: v[4] &lt; v[2] ? (-111 &lt; -6)  YES       v = [5, 100, -6, 98, -111, 0]   min_index = 2   aux = 0
+  S5: min_index ← 4                        v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S3: j ← 5                                v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S4: v[5] &lt; v[4] ? (0 &lt; -111)   NO        v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = 0
+  S6: v[0] != v[4] ? (5 != -111) YES       v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = -111
+  S7: aux ← -111                           v = [5, 100, -6, 98, -111, 0]   min_index = 4   aux = -111
+  S8: v[4] ← 5                             v = [5, 100, -6, 98, 5, 0]      min_index = 4   aux = -111
+  S9: v[0] = -111                          v = [-111, 100, -6, 98, 5, 0]   min_index = 4   aux = -111
+  S1: i ← 1                                v = [-111, 100, -6, 98, 5, 0]   min_index = 4   aux = -111
+  S2: min_index ← 1                        v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S3: j ← 2                                v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S4: v[2] &lt; v[1] ? (-6 &lt; 100)   YES       v = [-111, 100, -6, 98, 5, 0]   min_index = 1   aux = -111
+  S5: min_index ← 2                        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 3                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[3] &lt; v[2] ? (98 &lt; -6)    NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 4                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[4] &lt; v[2] ? (5 &lt; -6)     NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S3: j ← 5                                v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S4: v[5] &lt; v[2] ? (0 &lt; -6)     NO        v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S6: v[1] != v[2] ? (100 != -6) YES       v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -111
+  S7: aux ← -6                             v = [-111, 100, -6, 98, 5, 0]   min_index = 2   aux = -6
+  S8: v[2] ← 100                           v = [-111, 100, 100, 98, 5, 0]  min_index = 2   aux = -6
+  S9: v[1] = -6                            v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S1: i ← 2                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S2: min_index ← 2                        v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S3: j ← 3                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S4: v[3] &lt; v[2] ? (98 &lt; 100)   NO        v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S3: j ← 4                                v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S4: v[4] &lt; v[2] ? (5 &lt; 100)    YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 2   aux = -6
+  S5: min_index ← 4                        v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S3: j ← 5                                v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S4: v[5] &lt; v[4] ? (0 &lt; 5)      YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 4   aux = -6
+  S5: min_index ← 5                        v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = -6
+  S6: v[2] != v[5] ? (100 != 0)  YES       v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = -6
+  S7: aux ← 0                              v = [-111, -6, 100, 98, 5, 0]   min_index = 5   aux = 0
+  S8: v[5] ← 100                           v = [-111, -6, 100, 98, 5, 100] min_index = 5   aux = 0
+  S9: v[2] = 0                             v = [-111, -6, 0, 98, 5, 100]   min_index = 5   aux = 0
+  S1: i ← 3                                v = [-111, -6, 0, 98, 5, 100]   min_index = 2   aux = 0
+  S2: min_index ← 3                        v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S3: j ← 4                                v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S4: v[4] &lt; v[3] ? (5 &lt; 98)     YES       v = [-111, -6, 0, 98, 5, 100]   min_index = 3   aux = 0
+  S5: min_index ← 4                        v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S3: j ← 5                                v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S4: v[5] &lt; v[4] ? (100 &lt; 5)    NO        v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S6: v[3] != v[4] ? (98 != 5)   YES       v = [-111, -6, 0, 98, 5, 100]   min_index = 4   aux = 0
+  S7: aux ← 5                              v = [-111, -6, 0, 98, 5, 100]   min_index = 5   aux = 5
+  S8: v[4] ← 98                            v = [-111, -6, 0, 98, 98, 100]  min_index = 5   aux = 5
+  S9: v[3] = 5                             v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S1: i ← 4                                v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S2: min_index ← 4                        v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S3: j ← 5                                v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+  S4: v[5] &lt; v[4] ? (100 &lt; 98)   NO        v = [-111, -6, 0, 5, 98, 100]   min_index = 5   aux = 5
+</code></pre></div></div>
+
+<p>Como podemos ver, dada a entrada <code class="language-plaintext highlighter-rouge">[5, 100, -6, 98, -111, 0]</code>, retorna a saída <code class="language-plaintext highlighter-rouge">[-111, -6, 0, 5, 98, 100]</code>. Portanto, na saída não há valor <code class="language-plaintext highlighter-rouge">v[i]</code> e <code class="language-plaintext highlighter-rouge">v[j]</code> onde <code class="language-plaintext highlighter-rouge">i &lt; j</code> e <code class="language-plaintext highlighter-rouge">v[i] &gt; v[j]</code>, isso significa que o array está ordenado.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Agora sabemos o que algoritmos são similares a receitas, mas não são receitas. Se você ver um passo em uma receita dizendo “adicione sal”, você vai saber o que fazer, mas um computador não pode fazer nada porque ele não conseguirá definir a quantidade de sal necessária. Ou se houver um passo “deixe no forno até dourar”, o computador pode não entender que o forno deve estar ligado e nem quanto tempo é necessário para dourar uma carne.</p>
+
+<p>Receitas são avaliadas pelo seu resultado, se é agradável ao paladar ou não. Já algoritmos são avaliados pelo número de passos que ele tem ou pelos próprios passos. Um algoritmo que executa menos passos até chegar um resultado é mais rápido que outro que executa mais passos, mas um algoritmo que executa menos passo pode em determinados cenários executar mais passos. Quando avaliamos a performance de um algoritmo devemos levar em conta o caso médio, ou quantos passos são necessários para se encontrar uma resposta para um problema de tamanho <code class="language-plaintext highlighter-rouge">n</code>, temos o contexto de <em>analise de algoritmos</em>. Em Análise de Algoritmos, são estudados como os algoritmos performam sob determinadas circunstâncias afim de tentar entender a melhor forma de usar eles.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Algoritmo" /><category term="Ciência da Computação" /><summary type="html"><![CDATA[O que é um algoritmo? O que define um algoritmo?]]></summary></entry></feed>

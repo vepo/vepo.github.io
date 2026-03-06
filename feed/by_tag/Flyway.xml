@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Flyway.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-03-06T18:17:09+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Flyway.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Acessando Bancos de Dados Relacionais em Java: JDBC, JPA, Hibernate e mais</title><link href="https://blog.vepo.dev/posts/banco-de-dados-relacional-em-java" rel="alternate" type="text/html" title="Acessando Bancos de Dados Relacionais em Java: JDBC, JPA, Hibernate e mais" /><published>2026-02-26T00:00:00+00:00</published><updated>2026-02-26T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/13-12-00-sql-no-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/banco-de-dados-relacional-em-java"><![CDATA[<div class="paragraph">
+<p>Depois de entender como modelar e usar um banco de dados relacional, chegou a hora de aprender como integrá-lo a uma aplicação Java. A seguir, apresentamos as principais bibliotecas e frameworks disponíveis, seus princípios de design e como escolher a melhor opção para o seu projeto.</p>
+</div>
+<div class="paragraph">
+<p>Podemos dividir as ferramentas de acesso a dados em Java em quatro grandes categorias: <strong>acesso direto</strong>, <strong>mapeamento objeto-relacional (ORM)</strong>, <strong>gerenciamento de transações</strong> e <strong>migração de esquema</strong>. Cada categoria atende a diferentes necessidades e níveis de abstração.</p>
+</div>
+<div class="sect1">
+<h2 id="_visão-geral-das-categorias">Visão geral das categorias</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Visão por categorias</caption>
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2858%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Categoria</th>
+<th class="tableblock halign-left valign-top">Propósito</th>
+<th class="tableblock halign-left valign-top">Frameworks</th>
+<th class="tableblock halign-left valign-top">Nível de abstração</th>
+<th class="tableblock halign-left valign-top">Controle sobre SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Acesso direto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Executar SQL manualmente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC, jOOQ, Spring Data JDBC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Baixo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ORM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mapear objetos para tabelas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JPA, Hibernate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Alto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Médio</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Abstrações de repositório</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilitar o uso de ORMs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JPA, Quarkus Panache, Jakarta Data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Muito alto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Baixo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Transações</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Garantir consistência em operações</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jakarta Transaction, Spring @Transactional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Migração</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Versionar o esquema do banco</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flyway, Liquibase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_1-acesso-direto-ao-banco-de-dados">1. Acesso direto ao banco de dados</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jdbc-java-database-connectivity">JDBC (Java Database Connectivity)</h3>
+<div class="paragraph">
+<p>O JDBC é a API padrão do Java para acesso a bancos de dados relacionais. Lançado em 1997 como parte do Java SE 1.1, ele fornece uma interface uniforme para conectar-se a diferentes bancos através de drivers específicos.</p>
+</div>
+<div class="paragraph">
+<p>Com JDBC, o desenvolvedor tem controle total sobre as consultas SQL, a gestão de conexões e o tratamento de resultados. Isso oferece máxima flexibilidade, mas também exige mais código e cuidado com boas práticas como fechamento de recursos e tratamento de exceções.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo básico de consulta com JDBC</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="k">try</span> <span class="o">(</span><span class="nc">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="nc">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
+     <span class="nc">Statement</span> <span class="n">stmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
+     <span class="nc">ResultSet</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="s">"SELECT * FROM usuarios"</span><span class="o">))</span> <span class="o">{</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"nome"</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O JDBC é recomendado para:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Projetos simples ou protótipos</p>
+</li>
+<li>
+<p>Casos onde o desempenho máximo é crítico</p>
+</li>
+<li>
+<p>Situações que exigem consultas SQL altamente otimizadas</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jooq">jOOQ</h3>
+<div class="paragraph">
+<p>O jOOQ é uma biblioteca que oferece uma abordagem mais fluida para construir consultas SQL em Java. Ele gera código a partir do esquema do banco, permitindo escrever consultas de forma programática, mas ainda com controle total sobre o SQL gerado. O jOOQ é especialmente útil para projetos que precisam de consultas complexas, mas querem evitar o boilerplate do JDBC.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta com jOOQ</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">userName</span> <span class="o">=</span> <span class="s">"postgres"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">password</span> <span class="o">=</span> <span class="s">"Password123"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"jdbc:postgresql://localhost:5432/postgres"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">create</span> <span class="o">=</span> <span class="no">DSL</span><span class="o">.</span><span class="na">using</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span> <span class="nc">SQLDialect</span><span class="o">.</span><span class="na">POSTGRES</span><span class="o">);</span>
+<span class="nc">Result</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="na">select</span><span class="o">()</span>
+                              <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">)</span>
+                              <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">.</span><span class="na">NOME</span><span class="o">.</span><span class="na">like</span><span class="o">(</span><span class="s">"A%"</span><span class="o">))</span>
+                              <span class="o">.</span><span class="na">fetch</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="nc">Record</span> <span class="n">r</span> <span class="o">:</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">.</span><span class="na">NOME</span><span class="o">));</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spring-data-jdbc">Spring Data JDBC</h3>
+<div class="paragraph">
+<p>O Spring Data JDBC é uma abstração sobre o JDBC que elimina grande parte do código boilerplate, mantendo o controle sobre as consultas SQL. Ele oferece mapeamento automático entre linhas do resultado e objetos Java, além de repositórios com métodos prontos para operações comuns.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Table</span><span class="o">(</span><span class="s">"tb_users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+  <span class="nd">@Id</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">id</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastname</span><span class="o">;</span>
+
+  <span class="c1">// getters e setters</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">UserRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findUserNoArgumentsBy</span><span class="o">();</span>
+  <span class="nc">Page</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findPageOfUsersByLastnameStartingWith</span><span class="o">(</span><span class="nc">String</span> <span class="n">lastname</span><span class="o">,</span> <span class="nc">Pageable</span> <span class="n">page</span><span class="o">);</span>
+  <span class="nd">@Query</span><span class="o">(</span><span class="s">"select * from User u where lower(username) = lower(?1)"</span><span class="o">)</span>
+  <span class="nc">User</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">);</span>
+  <span class="nc">User</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Diferentemente do JPA, o Spring Data JDBC não faz cache de primeiro ou segundo nível nem gerenciamento automático de mudanças. Cada operação resulta em uma consulta SQL explícita.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2-mapeamento-objeto-relacional-orm">2. Mapeamento objeto-relacional (ORM)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jpa-jakarta-persistence-api">JPA (Jakarta Persistence API)</h3>
+<div class="paragraph">
+<p>O JPA é uma especificação que define como mapear objetos Java para tabelas relacionais. Em vez de escrever SQL manualmente, o desenvolvedor trabalha com entidades e relacionamentos, e o provedor JPA gera as consultas automaticamente.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Usuario</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O JPA oferece recursos avançados como:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Mapeamento de herança</p>
+</li>
+<li>
+<p>Cache de segundo nível</p>
+</li>
+<li>
+<p>Carregamento lazy ou eager de relacionamentos</p>
+</li>
+<li>
+<p>Consultas com JPQL (Java Persistence Query Language)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>A versão mais recente é a <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2">JPA 3.2</a>, lançada em 2024 como parte do Jakarta EE.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hibernate">Hibernate</h3>
+<div class="paragraph">
+<p>O Hibernate é a implementação mais popular do JPA, mas também oferece funcionalidades além da especificação, como:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Suporte a auditoria com Hibernate Envers</p>
+</li>
+<li>
+<p>Tipos personalizados</p>
+</li>
+<li>
+<p>Filtros dinâmicos</p>
+</li>
+<li>
+<p>Cache de segundo nível com integração a provedores como Ehcache</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Na prática, a maioria dos projetos utiliza o Hibernate através das anotações padrão do JPA, aproveitando sua maturidade e desempenho.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3-abstrações-e-facilitadores">3. Abstrações e facilitadores</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_spring-data-jpa">Spring Data JPA</h3>
+<div class="paragraph">
+<p>O Spring Data JPA integra o JPA ao ecossistema Spring, reduzindo significativamente a quantidade de código necessário. Com ele, é possível criar repositórios apenas declarando interfaces:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UsuarioRepository</span> <span class="kd">extends</span> <span class="nc">JpaRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNomeContainingIgnoreCase</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">);</span>
+
+    <span class="nd">@Query</span><span class="o">(</span><span class="s">"SELECT u FROM Usuario u WHERE u.email LIKE %:dominio"</span><span class="o">)</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">buscarPorDominioEmail</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"dominio"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">dominio</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Spring Data JPA implementa automaticamente os métodos da interface, incluindo consultas derivadas do nome do método e consultas personalizadas com <code>@Query</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_quarkus-panache">Quarkus Panache</h3>
+<div class="paragraph">
+<p>No universo Quarkus, o Panache oferece uma abordagem ainda mais simples para persistência. Duas estratégias estão disponíveis:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Usuario</span> <span class="kd">extends</span> <span class="nc">PanacheEntity</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">list</span><span class="o">(</span><span class="s">"nome"</span><span class="o">,</span> <span class="n">nome</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Usuario</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">){</span>
+        <span class="k">return</span> <span class="nf">find</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">name</span><span class="o">).</span><span class="na">firstResult</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PanacheRepository (estilo repositório):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsuarioRepository</span> <span class="kd">implements</span> <span class="nc">PanacheRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">list</span><span class="o">(</span><span class="s">"nome"</span><span class="o">,</span> <span class="n">nome</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Usuario</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">){</span>
+        <span class="k">return</span> <span class="nf">find</span><span class="o">(</span><span class="s">"email"</span><span class="o">,</span> <span class="n">email</span><span class="o">).</span><span class="na">firstResult</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Panache elimina a necessidade de getters, setters e muitas anotações, priorizando produtividade e desempenho em ambientes nativos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jakarta-data">Jakarta Data</h3>
+<div class="paragraph">
+<p>O Jakarta Data é uma especificação recente que busca unificar o acesso a dados em Java, sejam eles relacionais, NoSQL ou até serviços REST. Inspirado no Spring Data, ele permite definir repositórios com métodos de consulta baseados em convenções de nomenclatura.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UsuarioRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">);</span>
+
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Por ser uma especificação, existem múltiplas implementações disponíveis, incluindo Hibernate, Eclipse JNoSQL e Open Liberty.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_4-gerenciamento-de-transações">4. Gerenciamento de transações</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jakarta-transaction">Jakarta Transaction</h3>
+<div class="paragraph">
+<p>Operações que envolvem múltiplas etapas no banco de dados precisam ser atômicas: ou todas executam com sucesso, ou nenhuma delas é aplicada. O <a href="https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0">Jakarta Transaction</a> (antigo JTA) é a especificação para gerenciamento declarativo de transações em Java.</p>
+</div>
+<div class="paragraph">
+<p>Em aplicações Spring, o gerenciamento é simplificado com a anotação <code>@Transactional</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsuarioService</span> <span class="o">{</span>
+
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">criarUsuarioComPedido</span><span class="o">(</span><span class="nc">Usuario</span> <span class="n">usuario</span><span class="o">,</span> <span class="nc">Pedido</span> <span class="n">pedido</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">usuarioRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">usuario</span><span class="o">);</span>
+        <span class="n">pedidoRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">pedido</span><span class="o">);</span>
+        <span class="c1">// Se algo falhar aqui, ambas as operações são desfeitas</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Em ambientes Jakarta EE, utiliza-se <code>@Transactional</code> da própria especificação, com comportamento similar.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_5-migração-de-esquema">5. Migração de esquema</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_flyway">Flyway</h3>
+<div class="paragraph">
+<p>Manter o esquema do banco de dados sincronizado entre diferentes ambientes (desenvolvimento, teste, produção) é um desafio comum. O Flyway resolve esse problema através de migrações versionadas.</p>
+</div>
+<div class="paragraph">
+<p>Cada migração é um arquivo SQL com um número de versão único:</p>
+</div>
+<hr>
+<div class="paragraph">
+<p>Para usar bancos de dados relacionais em Java, podemos usar:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="txt">V0.0.1__criar_tabela_usuarios.sql
+U0.0.2__adicionar_coluna_telefone.sql
+V0.0.2__adicionar_coluna_telefone.sql
+V0.0.3__criar_tabela_pedidos.sql</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Além do Flyway, existe também o Liquibase, que oferece formato XML/YAML/JSON para definição das mudanças.</p>
+</div>
+<div class="listingblock">
+<div class="title">Integração com Spring Boot:</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">spring.flyway.enabled</span><span class="p">=</span><span class="s">true</span>
+<span class="py">spring.flyway.locations</span><span class="p">=</span><span class="s">classpath:db/migration</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Flyway pode também ser usado em projetos Quarkus, para isso basta adicionar a extensão <code>quarkus-flyway</code> e colocar os scripts de migração na pasta <code>src/main/resources/db/migration</code>.</p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-escolher-a-abordagem-certa">Como escolher a abordagem certa?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não existe bala de prata. A escolha depende de vários fatores:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 66.6666%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Cenário</th>
+<th class="tableblock halign-left valign-top">Abordagem recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Projeto pequeno, controle total sobre SQL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC puro ou jOOQ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aplicação Spring, deseja produtividade</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JPA</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microsserviço com Quarkus, performance nativa</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quarkus Panache</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Banco não relacional ou múltiplas fontes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jakarta Data</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controle sobre SQL, mas com menos código</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JDBC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sistema legado ou requisitos muito específicos</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate nativo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Qualquer projeto em equipe</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flyway ou Liquibase</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>É possível também combinar abordagens: usar JPA para 80% das operações simples e JDBC para consultas complexas que exigem otimização manual.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O ecossistema Java oferece opções para todos os gostos e necessidades quando o assunto é persistência de dados. Desde o controle fino do JDBC até a produtividade extrema do Panache, passando pela flexibilidade do JPA e a segurança das migrações com Flyway, o desenvolvedor tem liberdade para escolher a ferramenta adequada a cada contexto.</p>
+</div>
+<div class="paragraph">
+<p>O importante é compreender as diferenças entre acesso direto, ORM, abstrações, transações e migração, e como cada peça se encaixa no quebra-cabeça do desenvolvimento de aplicações robustas e escaláveis.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="JDBC" /><category term="JPA" /><category term="Hibernate" /><category term="Spring Data" /><category term="Banco de Dados" /><category term="Flyway" /><summary type="html"><![CDATA[Conheça as principais bibliotecas e frameworks para acesso a dados em Java: JDBC, jOOQ, JPA, Hibernate, Spring Data, Flyway e muito mais. Aprenda as diferenças entre cada abordagem e como escolher a melhor para seu projeto.]]></summary></entry></feed>
