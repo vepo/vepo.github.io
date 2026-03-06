@@ -490,3 +490,111 @@ footer {
     padding: 0.5rem 1rem;
     border: solid 1px #AAAAAA;
 }
+
+/* Estatísticas discretas estilo jornal - versão abaixo do título */
+.page-info {
+    margin: 0.5rem auto 1.5rem auto;
+    padding: 0.75rem 0;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background-color: transparent;
+    font-family: TNYAdobeCaslonPro, Times New Roman, Times, serif;
+    max-width: 500px;
+    position: relative;
+    opacity: 0.85;
+}
+
+/* Container interno para as estatísticas */
+.page-info > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+}
+
+/* Cada item de estatística */
+.page-info .stat-item {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.25rem;
+}
+
+/* Separador sutil entre itens */
+.page-info .stat-item:not(:last-child)::after {
+    content: "|";
+    color: #ccc;
+    font-weight: 300;
+    margin-left: 1rem;
+    font-size: 0.8rem;
+}
+
+/* Estilo para labels (títulos das estatísticas) */
+.page-info .label {
+    font-family: Irvin-Heading, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    font-weight: 400;
+}
+
+/* Estilo para valores (números/estatísticas) */
+.page-info .value {
+    font-family: TNYAdobeCaslonPro, Times New Roman, Times, serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #333;
+    font-style: normal;
+}
+
+/* Versão inline para quando está abaixo do título */
+.page-info.inline-stats {
+    display: inline-block;
+    width: auto;
+    border: none;
+    border-left: 2px solid #ddd;
+    border-right: 2px solid #ddd;
+    padding: 0.25rem 1rem;
+    margin: 0 auto 1rem auto;
+}
+
+/* Estilo mais minimalista ainda */
+.page-info.minimal {
+    border: none;
+    border-top: 1px dashed #ddd;
+    border-bottom: 1px dashed #ddd;
+    background: transparent;
+    font-size: 0.8rem;
+}
+
+.page-info.minimal .label {
+    color: #888;
+    font-size: 0.6rem;
+}
+
+.page-info.minimal .value {
+    color: #444;
+    font-weight: 500;
+}
+
+/* Para telas pequenas */
+@media (max-width: 480px) {
+    .page-info > div {
+        gap: 0.25rem 0.75rem;
+    }
+    
+    .page-info .stat-item:not(:last-child)::after {
+        margin-left: 0.5rem;
+    }
+    
+    .page-info .label {
+        font-size: 0.6rem;
+    }
+    
+    .page-info .value {
+        font-size: 0.8rem;
+    }
+}
