@@ -6,7 +6,7 @@ description: Exemplo de como receber uma mensagem para um broker Kafka
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]
 series: Entendendo o Kafka
 publish_date: 2020-02-07 16:01:26 +0300
-cover_image: "https://dev-to-uploads.s3.amazonaws.com/i/9qhf82wsvoi0ibnsi1gb.jpg"
+cover_image: /assets/images/capas/postal.jpg
 original: "https://dev.to/vepo/recebendo-mensagens-15b5"
 ---
 

@@ -4,7 +4,7 @@ permalink: /posts/como-criar-uma-linguagem-usando-antlr4-e-java
 published: true
 description: Nesse post ensinarei como criar uma linguagem, não de programação, usando ANTLR4 em Java.
 tags: [Java, Parser, ANTLR4, Tutorial]
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/uy5s6zeks2rt6gmyni63.png
+cover_image: /assets/images/capas/compiler.png
 publish_date: 2020-04-13 20:44:31 +0300
 original: "https://dev.to/vepo/como-criar-uma-linguagem-usando-antlr4-e-java-56g2"
 ---
