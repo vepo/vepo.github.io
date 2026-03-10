@@ -1,13 +1,13 @@
 ---
 title: Mal Cheiros em Mapeamento Objeto Relacional (ORM)
 published: false
-description: | 
+description: |
   O JDBC é uma API que permite a comunicação entre aplicações Java e bancos de dados. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões. Nesse post, vamos explorar os principais componentes do JDBC e como utilizá-los para interagir com um banco de dados.
 tags: [Java, JDBC, Banco de Dados]
 cover_image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
 permalink: /posts/entendendo-o-jdbc
-publish_date: 2026-02-26 18:29:00 +0300
+publish_date: 2026-03-10 10:44:00 +0300
 ---
 
 https://github.com/spgroup/ORM-Smells-Catalog
@@ -41,7 +41,7 @@ Os Bad Smells mais comuns são:
 
 Sim! Existe pesquisa na área de Engenharia de Software que se dedica a identificar e catalogar os bad smells específicos relacionados ao uso de frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink. Esses catálogos estão disponíveis em artigos acadêmicos, livros e recursos online. Nesse post, https://github.com/spgroup/ORM-Smells-Catalog[vamos explorar 8 dos bad smells publicados por um grupo de pesquisa da UFPE].
 
-São eles: 
+São eles:
 
 1. Eager como estratégia de busca nos relacionamentos a nível de classe
 2. Recuperação de dados sem projeção para somente leitura
@@ -70,7 +70,7 @@ public class Aluno {
     private Long id;
 
     private String nome;
-    
+
     @ManyToMany
     @JoinTable(
         name = "tb_aluno_curso",
@@ -91,7 +91,7 @@ public class Curso {
     private Long id;
 
     private String nome;
-    
+
     @ManyToMany(mappedBy = "cursos")
     private Set<Aluno> alunos;
 
@@ -111,7 +111,7 @@ public class Professor {
     private Long id;
 
     private String nome;
-    
+
     @OneToMany(mappedBy = "professor")
     private Set<Curso> cursos;
 }
@@ -199,7 +199,7 @@ public class AlunoComFoto {  // Essa versão pode coexistir com a versão sem fo
     private Long id;
 
     private String nome;
-    
+
     @Lob
     private byte[] foto; // Atributo pesado que armazena a foto do aluno
 }
@@ -250,7 +250,7 @@ public void atualizarNomeAluno(Long id, String novoNome) {
 }
 ----
 
-O trecho de código acima terá um resultado equivalente ao trecho anterior, mas com um desempenho superior, uma vez que apenas o campo `nome` será atualizado, evitando a atualização desnecessária do campo `foto`. 
+O trecho de código acima terá um resultado equivalente ao trecho anterior, mas com um desempenho superior, uma vez que apenas o campo `nome` será atualizado, evitando a atualização desnecessária do campo `foto`.
 
 == Falta de paginação quando não necessário todo o resultado
 
@@ -306,10 +306,9 @@ public Curriculo integralizar(long alunoId) {
 }
 ----
 
-O resultado da execução acima é que cada vez que o processo passa pelos marcadores `[1]` e `[2]` uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o JOIN FETCH na operação de consulta ou adicionando a anotação `@BatchSize` para reduzir o número de vezes que a execução fiquei bloqueada para chamar o banco de dados.
+O resultado da execução acima é que cada vez que o processo passa pelos marcadores `[1]` e `[2]` uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o `JOIN FETCH` na operação de consulta ou adicionando a anotação `@BatchSize` para reduzir o número de vezes que a execução fiquei bloqueada para chamar o banco de dados.
 
-
-No exemplo abaixo, o método 
+No exemplo abaixo, o método `findByIdWithCursos` já retorna todos os cursos associados ao aluno, o que evitaria que novas consultas fossem realizadas em `[2]`.
 
 [source,java]
 ----
@@ -322,3 +321,114 @@ public Curriculo integralizar(long alunoId) {
     }
 }
 ----
+
+E no exemplo abaixo, podemos mapear a class `Aluno` com a possibilidade de consultas dos cursos em batch, o que não evitaria uma segunda consulta, mas reduziria o número de consultas feitas ao banco. É preciso lembrar que a anotação https://docs.hibernate.org/orm/6.6/javadocs/org/hibernate/annotations/BatchSize.html[`BatchSize`] é especifica do Hibernate.
+
+.Modelo de dados para exemplificar os Bad Smells
+[source,java]
+----
+@Entity
+@Table(name = "tb_alunos")
+public class Aluno {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+
+    @ManyToMany
+    @JoinTable(
+        name = "tb_aluno_curso",
+        joinColumns = @JoinColumn(name = "aluno_id"),
+        inverseJoinColumns = @JoinColumn(name = "curso_id")
+    )
+    @BatchSize(size = 5) // Especifico do Hibernate
+    private Set<Curso> cursos;
+}
+----
+
+== @OneToMany unilateral com uso inadequado de coleções
+
+Quando se mapeia o relacionamento unidirecional, sem o correspondente `@ManyToOne`, o framework não consegue identificar todas as relações e não consegue verificar as diferenças quando atualizações acontecem. Por exemplo, caso a classe `Curso` não mapeasse os alunos matriculados, a simples adição de um curso faria com que todos os cursos fossem removidos e adicionados da relação alunos.
+
+[source,java]
+----
+var aluno = entityManager.find(Aluno.class, alunoId);
+aluno.getCursos().add(new Curso("MC-102", 2002));
+entityManager.persist(aluno);
+----
+
+Essa alteração vai gerar uma série de alterações desnecessárias pois removerá e atualizará todos os valores em cursos.
+
+== Não uso de consultas somente leitura
+
+Para entender esse mal cheiro, é preciso entender que toda entidade retornada pelo JPA é gerenciada. O JPA pode retornar objetos não gerenciados, mas para isso é preciso que seja declarado na consulta e isso pode ser feito de 2 formas
+
+1. Declarando na consulta JPQL a instanciação dessa entidade
+2. Declarando a consulta como Read-Only
+
+O primeiro caso é muito útil quando se deseja retornar objetos que não estão armazenados no banco. Vamos supor que precisamos de estatisticas de alunos e essas estatisticas são bem simples como o id e número de cursos matriculados. Para isso criamos a classe estatistica e declaramos ela na consulta JPQL, como no exemplo abaixo.
+
+[source,java]
+----
+public class record AlunoMatriculas(long id, List<String> cursos) {
+    public AlunoMatriculas(Object id, Object cursos) {    // Infelizmente o Hibernate precisa disso
+        this((Long) id, (List<String>) cursos);
+    }
+}
+
+public List<AlunoMatriculas> buildAlunoMatriculas() {
+    return entityManager.createQuery("""
+                                     SELECT new AlunoMatriculas(aluno.id,
+                                                                aluno.cursos.nome)
+                                     FROM Aluno
+                                     """, AlunoMatriculas.class)
+                        .getResultList();
+}
+----
+
+A outra opção é declarar a consulta como somente leitura (_read-only_) e para isso podemos usar os "hints", como feito abaixo.
+
+[source,java]
+----
+public List<AlunoMatriculas> buildAlunoMatriculas() {
+    return entityManager.createQuery("FROM Aluno", Aluno.class)
+                        .setHint("org.hibernate.readOnly", true)
+                        .getResultStream()
+                        .map(aluno -> new AlunoMatriculas(aluno))
+                        .toList();
+
+}
+----
+
+O hint pode também ser declarado com _Named Querys_, conforme o exemplo abaixo.
+
+[source,java]
+----
+@Entity
+@Table(name = "tb_alunos")
+@NamedQuery(name = "findAll",
+            query = "FROM Aluno")
+@NamedQuery(name = "findAllReadOnly",
+            query = "FROM Aluno",
+            hints = @QueryHint(name = QueryHints.READ_ONLY, value = "true"))
+public class Aluno {
+    // define os campos do aluno
+}
+
+public List<AlunoMatriculas> buildAlunoMatriculas() {
+    return entityManager.createNamedQuery("findAllReadOnly", Aluno.class)
+                        .getResultStream()
+                        .map(aluno -> new AlunoMatriculas(aluno))
+                        .toList();
+
+}
+----
+
+Apesar de retornar mais dados, essa opção pode ser feita de forma inteligente quando esses dados dados são realmente necessários para a lógica da aplicação, mas nenhuma alteração é necessária.
+
+== Conclusão
+
+Consulta ao banco de dados são demoradas, por isso devem ser feitas de forma eficiente e inteligente. O JPA nos dá a possibilidade de não escrever consultas SQL, mas isso pode vir com um preço caro em termos de memória, CPU e tempo de execução. Em muitos casos, o sistema pode cair só de acessar algunas entidades na base de dados.
+
+É importante estar ciente das consultas SQL geradas e isso pode ser feito em desenvolvimento, configurando o framework a registrar todas as consultas geradas no log, através da propriedade `quarkus.hibernate-orm.log.sql` para o Quarkus e `spring.jpa.show-sql` no Spring.
