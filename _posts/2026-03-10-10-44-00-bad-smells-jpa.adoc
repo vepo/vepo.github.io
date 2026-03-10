@@ -1,16 +1,16 @@
 ---
 title: Mal Cheiros em Mapeamento Objeto Relacional (ORM)
-published: false
+published: true
 description: |
-  O JDBC é uma API que permite a comunicação entre aplicações Java e bancos de dados. Ele fornece um conjunto de classes e interfaces que facilitam a execução de operações de banco de dados, como consultas, inserções, atualizações e exclusões. Nesse post, vamos explorar os principais componentes do JDBC e como utilizá-los para interagir com um banco de dados.
-tags: [Java, JDBC, Banco de Dados]
+    Frameworks ORM como JPA e Hibernate são poderosos, mas seu uso inadequado pode gerar "bad smells" que afetam desempenho e manutenibilidade. Este post explora os principais anti-padrões em mapeamento objeto-relacional e como evitá-los.
+tags: [JPA, Hibernate, ORM, Bad Smells, Banco de Dados]
 cover_image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
-permalink: /posts/entendendo-o-jdbc
+permalink: /posts/bad-smells-em-orm
 publish_date: 2026-03-10 10:44:00 +0300
 ---
 
-https://github.com/spgroup/ORM-Smells-Catalog
+// https://github.com/spgroup/ORM-Smells-Catalog
 
 Os frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink são amplamente utilizados para facilitar a interação entre aplicações Java e bancos de dados relacionais. No entanto, o uso inadequado desses frameworks pode levar a uma série de "bad smells" (maus cheiros) que indicam problemas de design ou implementação. Neste post, vamos explorar alguns dos principais bad smells relacionados ao uso de JPA e como evitá-los para garantir um código mais limpo e eficiente.
 
@@ -41,16 +41,16 @@ Os Bad Smells mais comuns são:
 
 Sim! Existe pesquisa na área de Engenharia de Software que se dedica a identificar e catalogar os bad smells específicos relacionados ao uso de frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink. Esses catálogos estão disponíveis em artigos acadêmicos, livros e recursos online. Nesse post, https://github.com/spgroup/ORM-Smells-Catalog[vamos explorar 8 dos bad smells publicados por um grupo de pesquisa da UFPE].
 
-São eles:
+Neste post, vamos explorar 8 bad smells comuns em aplicações JPA:
 
-1. Eager como estratégia de busca nos relacionamentos a nível de classe
-2. Recuperação de dados sem projeção para somente leitura
-3. Atualização desnecessária de toda a entidade
-4. Falta de paginação quando não necessário todo o resultado
-5. Falta de Join Fetch: estratégia de busca Eager
-6. Acesso um por um: estrutura de repetição e estratégia de busca Lazy
-7. @OneToMany unilateral com uso inadequado de coleções
-8. Não uso de consultas somente leitura
+1. **Eager Fetching em nível de classe** - Carregar relacionamentos desnecessariamente
+2. **Ausência de projeção** - Recuperar entidades completas quando apenas alguns campos são necessários
+3. **Atualização de entidades inteiras** - Modificar apenas alguns campos mas atualizar todos
+4. **Paginação em memória** - Implementar paginação no código em vez da query
+5. **N+1 por falta de JOIN FETCH** - Múltiplas consultas onde uma bastaria
+6. **Acesso Lazy em loops** - Consultas repetidas em iterações
+7. **Relacionamento unilateral sem @ManyToOne** - Mapeamento incompleto
+8. **Ignorar consultas read-only** - Não otimizar consultas que não modificam dados
 
 Mas antes de entrar em cada Bad Smell, temos que entender quais problemas eles podem nos trazer. Esse artigo também apresenta uma série de problemas relacionados a cada um dos bad smells, como:
 
@@ -178,7 +178,7 @@ public class AlunoRepository {
     }
 
     public Optional<Aluno> findAlunoComFoto(Long id) {
-        return entityManager.createQuery("FROM Aluno id = :id", Aluno.class) // Todos os campos serão carregados, incluindo a foto
+        return entityManager.createQuery("FROM Aluno WHERE id = :id", Aluno.class) // Todos os campos serão carregados, incluindo a foto
                             .setParameter("id", id)
                             .getResultStream() // Evita que a exceção NoResultException seja lançada
                             .findFirst();
@@ -282,7 +282,7 @@ public List<Aluno> alunosMatriculados(int pagina, int limite) {
 
 == Falta de Join Fetch: estratégia de busca Eager
 
-O uso excessivo do Eager pode levar a um problema mais complexo do que o já detalhado em "Eager como estratégia de busca nos relacionamentos a nível de classe", o problema do *N + 1*. Quando aplicações usam massivamente o modo Eager para Fetch, o JPA retornará todas as antidades relacionadas a entidade desejada, e isso pode acarretar na necessidade constante de se recuperar mais entidades até que todo o grafo de entidades seja carregada em memória.
+O uso excessivo do Eager pode levar a um problema mais complexo do que o já detalhado em "Eager como estratégia de busca nos relacionamentos a nível de classe", o problema do *N + 1*. Quando aplicações usam massivamente o modo Eager para Fetch, o JPA retornará todas as entidades relacionadas a entidade desejada, e isso pode acarretar na necessidade constante de se recuperar mais entidades até que todo o grafo de entidades seja carregada em memória.
 
 Eu já conheci aplicações em que esse problema só apareceu depois de anos de uso, quando o grafo de entidades se tornou gigantesco pela adição de um simples relacionamente entre duas redes já grande de relacionamentos.
 
@@ -306,7 +306,7 @@ public Curriculo integralizar(long alunoId) {
 }
 ----
 
-O resultado da execução acima é que cada vez que o processo passa pelos marcadores `[1]` e `[2]` uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o `JOIN FETCH` na operação de consulta ou adicionando a anotação `@BatchSize` para reduzir o número de vezes que a execução fiquei bloqueada para chamar o banco de dados.
+O resultado da execução acima é que cada vez que o processo passa pelos marcadores `[1]` e `[2]` uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o `JOIN FETCH` na operação de consulta ou adicionando a anotação `@BatchSize` para reduzir o número de vezes que a execução fique bloqueada para chamar o banco de dados.
 
 No exemplo abaixo, o método `findByIdWithCursos` já retorna todos os cursos associados ao aluno, o que evitaria que novas consultas fossem realizadas em `[2]`.
 
@@ -371,7 +371,7 @@ O primeiro caso é muito útil quando se deseja retornar objetos que não estão
 
 [source,java]
 ----
-public class record AlunoMatriculas(long id, List<String> cursos) {
+public record AlunoMatriculas(long id, List<String> cursos) {
     public AlunoMatriculas(Object id, Object cursos) {    // Infelizmente o Hibernate precisa disso
         this((Long) id, (List<String>) cursos);
     }
@@ -429,6 +429,6 @@ Apesar de retornar mais dados, essa opção pode ser feita de forma inteligente 
 
 == Conclusão
 
-Consulta ao banco de dados são demoradas, por isso devem ser feitas de forma eficiente e inteligente. O JPA nos dá a possibilidade de não escrever consultas SQL, mas isso pode vir com um preço caro em termos de memória, CPU e tempo de execução. Em muitos casos, o sistema pode cair só de acessar algunas entidades na base de dados.
+Consultas ao banco de dados são demoradas, por isso devem ser feitas de forma eficiente e inteligente. O JPA nos dá a possibilidade de não escrever consultas SQL, mas isso pode vir com um preço caro em termos de memória, CPU e tempo de execução. Em muitos casos, o sistema pode cair só de acessar algunas entidades na base de dados.
 
 É importante estar ciente das consultas SQL geradas e isso pode ser feito em desenvolvimento, configurando o framework a registrar todas as consultas geradas no log, através da propriedade `quarkus.hibernate-orm.log.sql` para o Quarkus e `spring.jpa.show-sql` no Spring.
