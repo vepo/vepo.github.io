@@ -5,7 +5,7 @@ published: true
 description: Um Sênior de Verdade sabe construir software resilientes! Mas o que significa um Software Resiliente?
 tags: [Desenvolvimento de Software, Programação, TDD, Carreira]
 series: Coisas que todo Sênior deve saber
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/r0c1v42fgwn0oufuo4u6.jpg
+cover_image: /assets/images/capas/flor.jpg
 publish_date: 2020-05-08 17:05:31 +0300
 original: "https://dev.to/vepo/construindo-softwares-resilientes-3d65"
 ---

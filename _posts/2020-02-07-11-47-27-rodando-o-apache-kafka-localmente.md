@@ -5,7 +5,7 @@ published: true
 description: Nesse artigo, vou mostrar como rodar localmente o Kafka em uma Máquina Windows.
 tags: [Apache Kafka, Messaging, Middleware, Microsserviços]
 series: Entendendo o Kafka
-cover_image: "https://dev-to-uploads.s3.amazonaws.com/i/vjb2xa2hwzvtgdks1x9v.png"
+cover_image: /assets/images/capas/originals/kafka-log.png
 publish_date: 2020-02-07 11:47:27 +0300
 original: "https://dev.to/vepo/rodando-o-apache-kafka-localmente-412i"
 ---

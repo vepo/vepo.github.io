@@ -1,0 +1,15 @@
+{% if post.id %}
+<div class="page-info minimal">
+    <div>
+        <span class="stat-item">
+            <span class="label">Leitura</span> 
+            <span class="value">{{ post.content | count_words | divided_by: 200 | plus: 1 }} min</span>
+        </span>
+        {% if post.publish_date %}
+        <span class="stat-item">
+            <span class="value">{{ post.publish_date | localize: '%d/%b/%Y' }}</span>
+        </span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
