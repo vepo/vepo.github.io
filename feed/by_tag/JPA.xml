@@ -1,0 +1,1444 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/JPA.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-03-12T19:18:21+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/JPA.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Mal Cheiros em Mapeamento Objeto Relacional (ORM)</title><link href="https://blog.vepo.dev/posts/bad-smells-em-orm" rel="alternate" type="text/html" title="Mal Cheiros em Mapeamento Objeto Relacional (ORM)" /><published>2026-03-10T00:00:00+00:00</published><updated>2026-03-10T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/10-44-00-bad-smells-jpa</id><content type="html" xml:base="https://blog.vepo.dev/posts/bad-smells-em-orm"><![CDATA[<div class="paragraph">
+<p>Os frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink são amplamente utilizados para facilitar a interação entre aplicações Java e bancos de dados relacionais. No entanto, o uso inadequado desses frameworks pode levar a uma série de "bad smells" (maus cheiros) que indicam problemas de design ou implementação. Neste post, vamos explorar alguns dos principais bad smells relacionados ao uso de JPA e como evitá-los para garantir um código mais limpo e eficiente.</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-são-mau-cheiros-bad-smells">O que são mau cheiros (bad smells)?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nem todo código é bem escrito. Existem códigos bem elaborados, elegantes e que são fáceis de compreender, mas existem códigos que são complexos e difíceis de compreender. Mas saindo dessa questão meramente estética, existem códigos que além do desafio da compreensão, possuem problemas de design que impactam no desempenho da aplicação e, como consequência, são mais custosos de se manter em produção, ao requerer mais memória ou capacidade de processamento, ou ainda, mais custosos ao apresentar erros que impactem diretamente no negócio.</p>
+</div>
+<div class="paragraph">
+<p>Em <a href="https://engsoftmoderna.info/cap9.html#code-smells">Engenharia de Software</a>, se usa uma sinestesia para explicar esse tipo de código, que apesar de aparentar bem escrito, possui problemas de design. Dizemos que o código possui um "mau cheiro" (bad smell, em inglês), que é uma metáfora para indicar que algo está errado, mesmo que não seja imediatamente visível. Assim como um mau cheiro pode indicar a presença de algo podre ou sujo, um código com mau cheiro pode indicar a presença de problemas de design, como acoplamento excessivo, falta de coesão, duplicação de código, entre outros.</p>
+</div>
+<div class="paragraph">
+<p>Os pesquisadores em Engenharia de Software costuma elaborar catálogos de Bad Smells, que são listas de padrões de código que indicam a presença de problemas de design. Fazendo com que os desenvolvedores possam identificar esses padrões em seu código e tomar medidas para corrigi-los, melhorando a qualidade do software e facilitando a manutenção a longo prazo.</p>
+</div>
+<div class="paragraph">
+<p>Os Bad Smells mais comuns são:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Duplicação de código: quando o mesmo código é repetido em vários lugares, o que pode levar a erros e dificultar a manutenção.</p>
+</li>
+<li>
+<p>Acoplamento excessivo: quando as classes ou módulos estão fortemente acoplados, o que pode dificultar a reutilização e a manutenção do código.</p>
+</li>
+<li>
+<p>Falta de coesão: quando as classes ou módulos não têm uma única responsabilidade clara, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Nomes de variáveis ou métodos confusos: quando os nomes não são claros ou não refletem a funcionalidade do código, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Metodos longos: quando os métodos têm muitas linhas de código, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Classes grandes: quando as classes têm muitas linhas de código, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Feature Envy: quando um trecho de código em uma classe faz uso excessivo de métodos ou atributos de outra classe, indicando que o código pode estar mais relacionado à outra classe do que à sua própria classe.</p>
+</li>
+<li>
+<p>Métodos com muitos parâmetros: quando um método tem muitos parâmetros, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Variáveis globais: quando as variáveis são acessíveis em todo o código, o que pode levar a problemas de concorrência e dificultar a manutenção do código.</p>
+</li>
+<li>
+<p>Obsessão por Tipos Primitivos: quando o código faz uso excessivo de tipos primitivos, em vez de usar objetos ou classes, o que pode dificultar a compreensão e a manutenção do código.</p>
+</li>
+<li>
+<p>Objetos Mutáveis: quando os objetos são mutáveis, o que pode levar a problemas de concorrência e dificultar a manutenção do código.</p>
+</li>
+<li>
+<p>Código Comentado: quando o código contém muitos comentários, o que pode indicar que o código é difícil de entender ou que os comentários estão sendo usados para explicar um código mal escrito.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_existe-um-catálogo-de-bad-smells-para-orm">Existe um Catálogo de Bad Smells para ORM?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sim! Existe pesquisa na área de Engenharia de Software que se dedica a identificar e catalogar os bad smells específicos relacionados ao uso de frameworks de mapeamento objeto-relacional (ORM) como JPA, Hibernate e EclipseLink. Esses catálogos estão disponíveis em artigos acadêmicos, livros e recursos online. Nesse post, <a href="https://github.com/spgroup/ORM-Smells-Catalog">vamos explorar 8 dos bad smells publicados por um grupo de pesquisa da UFPE</a>.</p>
+</div>
+<div class="paragraph">
+<p>Neste post, vamos explorar 8 bad smells comuns em aplicações JPA:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Eager Fetching em nível de classe</strong> - Carregar relacionamentos desnecessariamente</p>
+</li>
+<li>
+<p><strong>Ausência de projeção</strong> - Recuperar entidades completas quando apenas alguns campos são necessários</p>
+</li>
+<li>
+<p><strong>Atualização de entidades inteiras</strong> - Modificar apenas alguns campos mas atualizar todos</p>
+</li>
+<li>
+<p><strong>Paginação em memória</strong> - Implementar paginação no código em vez da query</p>
+</li>
+<li>
+<p><strong>N+1 por falta de JOIN FETCH</strong> - Múltiplas consultas onde uma bastaria</p>
+</li>
+<li>
+<p><strong>Acesso Lazy em loops</strong> - Consultas repetidas em iterações</p>
+</li>
+<li>
+<p><strong>Relacionamento unilateral sem @ManyToOne</strong> - Mapeamento incompleto</p>
+</li>
+<li>
+<p><strong>Ignorar consultas read-only</strong> - Não otimizar consultas que não modificam dados</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Mas antes de entrar em cada Bad Smell, temos que entender quais problemas eles podem nos trazer. Esse artigo também apresenta uma série de problemas relacionados a cada um dos bad smells, como:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Dados em excesso: quando a aplicação recupera mais dados do que o necessário, o que pode levar a problemas de desempenho e consumo de memória.</p>
+</li>
+<li>
+<p>N + 1: quando a aplicação faz uma consulta para recuperar uma entidade e, em seguida, faz consultas adicionais para recuperar as entidades relacionadas, o que pode levar a problemas de desempenho.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para descrever os Bad Smells, vamos imaginar um modelo de dados que propõe três entidades: aluno, professor e curso. O aluno tem um relacionamento muitos para muitos com o curso, e o professor tem um relacionamento um para muitos com o curso. O código abaixo apresenta a entidade Aluno, que possui um relacionamento muitos para muitos com a entidade Curso.</p>
+</div>
+<div class="listingblock">
+<div class="title">Modelo de dados para exemplificar os Bad Smells</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_alunos"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Aluno</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span>
+    <span class="nd">@JoinTable</span><span class="o">(</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">"tb_aluno_curso"</span><span class="o">,</span>
+        <span class="n">joinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"aluno_id"</span><span class="o">),</span>
+        <span class="n">inverseJoinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"curso_id"</span><span class="o">)</span>
+    <span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Curso</span><span class="o">&gt;</span> <span class="n">cursos</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_cursos"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Curso</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"cursos"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="n">alunos</span><span class="o">;</span>
+
+    <span class="nd">@ManyToOne</span>
+    <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"professor_id"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Professor</span> <span class="n">professor</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_professores"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Professor</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+
+    <span class="nd">@OneToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"professor"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Curso</span><span class="o">&gt;</span> <span class="n">cursos</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_eager-como-estratégia-de-busca-nos-relacionamentos-a-nível-de-classe">Eager como estratégia de busca nos relacionamentos a nível de classe</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando se decide usar o método de busca Eager (ansiosa) para um relacionamento a nível de classe, o framework ORM irá carregar automaticamente as entidades relacionadas sempre que a entidade principal for carregada. Isso pode levar a problemas de desempenho, especialmente quando há muitos relacionamentos ou quando as entidades relacionadas possuem muitos dados.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, no caso acima, se a classe <code>Aluno</code> tiver o relacionamento <code>cursos</code> configurado como Eager, toda vez que um aluno for carregado, o framework ORM irá carregar automaticamente todos os cursos relacionados a esse aluno. Se um aluno estiver matriculado em muitos cursos, isso pode resultar em uma grande quantidade de dados sendo carregados desnecessariamente, o que pode levar a problemas de desempenho e consumo de memória.</p>
+</div>
+<div class="paragraph">
+<p>Muitos desenvolvedores por uma ansiedade de escrever menos código para evitar código possivelmente duplicado, acabam evitando escrever métodos de consulta específicos para cada caso de uso, e acabam configurando o relacionamento como Eager, o que pode levar a problemas de desempenho. Por isso, é importante avaliar cuidadosamente a necessidade de usar Eager como estratégia de busca e considerar outras opções, como Lazy (preguiçosa), que permite carregar as entidades relacionadas somente quando necessário.</p>
+</div>
+<div class="paragraph">
+<p>A solução para esse problema é criar métodos que retornem apenas os dados desejados, como no exemplo abaixo onde o método <code>findAlunoWithCursos</code> retorna os dados do aluno e dos cursos relacionados, enquanto o método <code>findAluno</code> retorna apenas os dados do aluno sem os cursos relacionados.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de código para evitar o uso de Eager como estratégia de busca</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlunoRepository</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">EntityManager</span> <span class="n">entityManager</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="kd">public</span> <span class="nf">AlunoRepository</span><span class="o">(</span><span class="nc">EntityManager</span> <span class="n">entityManager</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">entityManager</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">findAluno</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno WHERE id = :id"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span> <span class="c1">// Evita que a exceção NoResultException seja lançada</span>
+                            <span class="o">.</span><span class="na">findFirst</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">findAlunoWithCursos</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno a JOIN FETCH a.cursos WHERE a.id = :id"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span> <span class="c1">// Evita que a exceção NoResultException seja lançada</span>
+                            <span class="o">.</span><span class="na">findFirst</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_recuperação-de-dados-sem-projeção-para-somente-leitura">Recuperação de dados sem projeção para somente leitura</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando a aplicação recupera entidades do banco de dados sem usar projeção para somente leitura, o framework ORM irá carregar todos os dados da entidade, mesmo que apenas uma parte desses dados seja desnecessária para a operação em questão. Isso pode levar a problemas de desempenho e consumo de memória, especialmente quando as entidades possuem muitos atributos ou atributos que sejam lentos para leitura como grandes objetos binários (BLOBs) ou grandes objetos de texto (CLOBs).</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, vamos supor que a entidade Aluno tenha um atributo <code>foto</code> que armazena uma imagem em formato BLOB. Se a aplicação recuperar um aluno usando o método <code>findAluno</code>, o framework ORM irá carregar automaticamente a foto do aluno, mesmo que a aplicação não precise dessa informação para a operação em questão. Isso pode resultar em uma grande quantidade de dados sendo carregados desnecessariamente, o que pode levar a problemas de desempenho e consumo de memória.</p>
+</div>
+<div class="paragraph">
+<p>Existem duas formas de se resolver esse problema. A primeira é fazer a projeção dos dados na consulta JPQL e a segunda é criar um mapeamento especifico que inclua o atributo mais pesado.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de código para evitar a recuperação de dados sem projeção para somente leitura usando a query JPQL</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlunoRepository</span> <span class="o">{</span>
+    <span class="c1">// [...]</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">findAluno</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"SELECT id, nome FROM Aluno WHERE id = :id"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// Somente os campos id e nome serão carregados</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span> <span class="c1">// Evita que a exceção NoResultException seja lançada</span>
+                            <span class="o">.</span><span class="na">findFirst</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">findAlunoComFoto</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno WHERE id = :id"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// Todos os campos serão carregados, incluindo a foto</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span> <span class="c1">// Evita que a exceção NoResultException seja lançada</span>
+                            <span class="o">.</span><span class="na">findFirst</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="c1">// [...]</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de código para evitar a recuperação de dados sem projeção para somente leitura usando um mapeamento específico</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_alunos"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AlunoComFoto</span> <span class="o">{</span>  <span class="c1">// Essa versão pode coexistir com a versão sem foto, e pode ser usada para consultas específicas que necessitem da foto do aluno</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+
+    <span class="nd">@Lob</span>
+    <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">foto</span><span class="o">;</span> <span class="c1">// Atributo pesado que armazena a foto do aluno</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_atualização-desnecessária-de-toda-a-entidade">Atualização desnecessária de toda a entidade</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Esse code smell descreve a situação quando apenas alguns campos de uma entidade precisam ser atualizados, mas a aplicação atualiza toda a entidade, o framework ORM irá gerar uma consulta de atualização que inclui todos os campos da entidade, mesmo aqueles que não foram modificados. Isso pode levar a problemas de desempenho e consumo de recursos, especialmente quando as entidades possuem muitos atributos ou quando a operação de atualização é realizada com frequência.</p>
+</div>
+<div class="paragraph">
+<p>Vamos voltar ao exemplo do <code>AlunoComFoto</code>, no exemplo abaixo onde apenas o nome do aluno é atualizado, a consulta de atualização atualizará todos os campos, mesmo que eles não seja atualizados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">atualizarNomeAluno</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <span class="nc">String</span> <span class="n">novoNome</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Aluno</span> <span class="n">aluno</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">AlunoComFoto</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">aluno</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">aluno</span><span class="o">.</span><span class="na">setNome</span><span class="o">(</span><span class="n">novoNome</span><span class="o">);</span> <span class="c1">// Apenas o nome do aluno é atualizado</span>
+        <span class="n">entityManager</span><span class="o">.</span><span class="na">merge</span><span class="o">(</span><span class="n">aluno</span><span class="o">);</span> <span class="c1">// A consulta de atualização irá incluir todos os campos da entidade, mesmo aqueles que não foram modificados</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nf">EntityNotFoundException</span><span class="o">(</span><span class="s">"Aluno com id "</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">" não encontrado"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A consulta gerada pelo framework ORM para atualizar o nome do aluno pode ser algo como:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">UPDATE</span> <span class="n">tb_alunos</span>
+<span class="k">SET</span> <span class="n">nome</span> <span class="o">=</span> <span class="o">?</span><span class="p">,</span> <span class="n">foto</span> <span class="o">=</span> <span class="o">?</span>
+<span class="k">WHERE</span> <span class="n">id</span> <span class="o">=</span> <span class="o">?</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O problema dessa consulta é que o valor armazenado no campo <code>foto</code> pode ser longo e demorado para atualizar, uma operação desnecessária.</p>
+</div>
+<div class="paragraph">
+<p>Para resolver esse problema, é possível usar consultas de atualização específicas que atualizam apenas os campos necessários, como no exemplo abaixo onde a consulta de atualização é feita usando JPQL para atualizar apenas o nome do aluno.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">atualizarNomeAluno</span><span class="o">(</span><span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <span class="nc">String</span> <span class="n">novoNome</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">rows</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"UPDATE AlunoComFoto SET nome = :novoNome WHERE id = :id"</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"novoNome"</span><span class="o">,</span> <span class="n">novoNome</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">id</span><span class="o">)</span>
+                            <span class="o">.</span><span class="na">executeUpdate</span><span class="o">();</span> <span class="c1">// A consulta de atualização irá incluir apenas o campo nome, evitando a atualização desnecessária do campo foto</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">rows</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">EntityNotFoundException</span><span class="o">(</span><span class="s">"Aluno com id "</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">" não encontrado"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O trecho de código acima terá um resultado equivalente ao trecho anterior, mas com um desempenho superior, uma vez que apenas o campo <code>nome</code> será atualizado, evitando a atualização desnecessária do campo <code>foto</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_falta-de-paginação-quando-não-necessário-todo-o-resultado">Falta de paginação quando não necessário todo o resultado</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Esse code smell descreve a situação onde um consulta é feita, mas a paginação dos resultados não é implementada na consulta do banco de dados, mas em código da aplicação.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, vamos olhar no código abaixo que pode ser parte de uma listagem de alunos matriculados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">alunosMatriculados</span><span class="o">(</span><span class="kt">int</span> <span class="n">pagina</span><span class="o">,</span> <span class="kt">int</span> <span class="n">limite</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">offset</span> <span class="o">=</span> <span class="o">(</span><span class="n">pagina</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">*</span> <span class="n">limite</span><span class="o">;</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="n">alunos</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno"</span><span class="o">)</span>
+                                           <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">alunos</span><span class="o">.</span><span class="na">subList</span><span class="o">(</span><span class="n">offset</span><span class="o">,</span> <span class="nc">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">limite</span><span class="o">,</span> <span class="n">alunos</span><span class="o">.</span><span class="na">size</span><span class="o">()));</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nesse trecho todos os alunos registrados na base de dados são carregados e apenas alguns são retornados. É uma consulta ineficiente tanto no uso de memória quanto no tempo de execução. Ela poderia ser melhorada se a paginação fosse levada até a consulta JPQL, como no código abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Aluno</span><span class="o">&gt;</span> <span class="nf">alunosMatriculados</span><span class="o">(</span><span class="kt">int</span> <span class="n">pagina</span><span class="o">,</span> <span class="kt">int</span> <span class="n">limite</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno LIMIT :limite OFFSET :offset"</span><span class="o">)</span>
+                             <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"limite"</span><span class="o">,</span> <span class="n">limite</span><span class="o">)</span>
+                             <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"offset"</span><span class="o">,</span> <span class="o">(</span><span class="n">pagina</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">*</span> <span class="n">limite</span><span class="o">)</span>
+                             <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_falta-de-join-fetch-estratégia-de-busca-eager">Falta de Join Fetch: estratégia de busca Eager</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O uso excessivo do Eager pode levar a um problema mais complexo do que o já detalhado em "Eager como estratégia de busca nos relacionamentos a nível de classe", o problema do <strong>N + 1</strong>. Quando aplicações usam massivamente o modo Eager para Fetch, o JPA retornará todas as entidades relacionadas a entidade desejada, e isso pode acarretar na necessidade constante de se recuperar mais entidades até que todo o grafo de entidades seja carregada em memória.</p>
+</div>
+<div class="paragraph">
+<p>Eu já conheci aplicações em que esse problema só apareceu depois de anos de uso, quando o grafo de entidades se tornou gigantesco pela adição de um simples relacionamente entre duas redes já grande de relacionamentos.</p>
+</div>
+<div class="paragraph">
+<p>O modo Eager deve ser usado cautelosamente e prefira usar consultas JPQL com Join Fetch.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_acesso-um-por-um-estrutura-de-repetição-e-estratégia-de-busca-lazy">Acesso um por um: estrutura de repetição e estratégia de busca Lazy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Um padrão um pouco diferente do mesmo problema é a opção pelo modo Lazy, mas quando necessário usar os valores eles serem consultados um a um. Em algumas situações, nós precisamos consultar uma entidade e processar valores nos campos relacionados. Vamos supor que precisamos de uma funcionalidade de integralização de curriculo e todos os cursos devem ser consultados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">Curriculo</span> <span class="nf">integralizar</span><span class="o">(</span><span class="kt">long</span> <span class="n">alunoId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Aluno</span> <span class="n">aluno</span> <span class="o">=</span> <span class="n">alunoRepository</span><span class="o">.</span><span class="na">findById</span><span class="o">(</span><span class="n">alunoId</span><span class="o">)</span>   <span class="c1">// [1]</span>
+                                 <span class="o">.</span><span class="na">orElseThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">NotFoundException</span><span class="o">(</span><span class="s">"Aluno não encontrado! alunoId=%d"</span><span class="o">.</span><span class="na">formatted</span><span class="o">(</span><span class="n">alunoId</span><span class="o">)));</span>
+    <span class="nc">Curriculo</span> <span class="n">curriculo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Curriculo</span><span class="o">(</span><span class="n">aluno</span><span class="o">);</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Cursor</span> <span class="nl">curso:</span> <span class="n">aluno</span><span class="o">.</span><span class="na">getCursos</span><span class="o">())</span> <span class="o">{</span>          <span class="c1">// [2]</span>
+      <span class="c1">// preenche as informações do curriculo</span>
+      <span class="c1">// Seria melhor que isso fosse feito dentro do construtor,</span>
+      <span class="c1">// mas por motivos didáticos, coloquei o loop fora</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O resultado da execução acima é que cada vez que o processo passa pelos marcadores <code>[1]</code> e <code>[2]</code> uma nova consulta SQL é executada. Esse comportamento pode ser resolvido de duas formas distintas: usando o <code>JOIN FETCH</code> na operação de consulta ou adicionando a anotação <code>@BatchSize</code> para reduzir o número de vezes que a execução fique bloqueada para chamar o banco de dados.</p>
+</div>
+<div class="paragraph">
+<p>No exemplo abaixo, o método <code>findByIdWithCursos</code> já retorna todos os cursos associados ao aluno, o que evitaria que novas consultas fossem realizadas em <code>[2]</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">Curriculo</span> <span class="nf">integralizar</span><span class="o">(</span><span class="kt">long</span> <span class="n">alunoId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Aluno</span> <span class="n">aluno</span> <span class="o">=</span> <span class="n">alunoRepository</span><span class="o">.</span><span class="na">findByIdWithCursos</span><span class="o">(</span><span class="n">alunoId</span><span class="o">)</span>   <span class="c1">// [1] Executa a consulta com JOIN FETCH</span>
+                                 <span class="o">.</span><span class="na">orElseThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">NotFoundException</span><span class="o">(</span><span class="s">"Aluno não encontrado! alunoId=%d"</span><span class="o">.</span><span class="na">formatted</span><span class="o">(</span><span class="n">alunoId</span><span class="o">)));</span>
+    <span class="nc">Curriculo</span> <span class="n">curriculo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Curriculo</span><span class="o">(</span><span class="n">aluno</span><span class="o">);</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Cursor</span> <span class="nl">curso:</span> <span class="n">aluno</span><span class="o">.</span><span class="na">getCursos</span><span class="o">())</span> <span class="o">{</span>                     <span class="c1">// [2] A lista de cursos não será LAZY</span>
+      <span class="c1">// A construção do curriculo é feita sem bloqueios</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E no exemplo abaixo, podemos mapear a class <code>Aluno</code> com a possibilidade de consultas dos cursos em batch, o que não evitaria uma segunda consulta, mas reduziria o número de consultas feitas ao banco. É preciso lembrar que a anotação <a href="https://docs.hibernate.org/orm/6.6/javadocs/org/hibernate/annotations/BatchSize.html"><code>BatchSize</code></a> é especifica do Hibernate.</p>
+</div>
+<div class="listingblock">
+<div class="title">Modelo de dados para exemplificar os Bad Smells</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_alunos"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Aluno</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span>
+    <span class="nd">@JoinTable</span><span class="o">(</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">"tb_aluno_curso"</span><span class="o">,</span>
+        <span class="n">joinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"aluno_id"</span><span class="o">),</span>
+        <span class="n">inverseJoinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"curso_id"</span><span class="o">)</span>
+    <span class="o">)</span>
+    <span class="nd">@BatchSize</span><span class="o">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">5</span><span class="o">)</span> <span class="c1">// Especifico do Hibernate</span>
+    <span class="kd">private</span> <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">Curso</span><span class="o">&gt;</span> <span class="n">cursos</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_onetomany-unilateral-com-uso-inadequado-de-coleções">@OneToMany unilateral com uso inadequado de coleções</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Quando se mapeia o relacionamento unidirecional, sem o correspondente <code>@ManyToOne</code>, o framework não consegue identificar todas as relações e não consegue verificar as diferenças quando atualizações acontecem. Por exemplo, caso a classe <code>Curso</code> não mapeasse os alunos matriculados, a simples adição de um curso faria com que todos os cursos fossem removidos e adicionados da relação alunos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">aluno</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">alunoId</span><span class="o">);</span>
+<span class="n">aluno</span><span class="o">.</span><span class="na">getCursos</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nc">Curso</span><span class="o">(</span><span class="s">"MC-102"</span><span class="o">,</span> <span class="mi">2002</span><span class="o">));</span>
+<span class="n">entityManager</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">aluno</span><span class="o">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Essa alteração vai gerar uma série de alterações desnecessárias pois removerá e atualizará todos os valores em cursos.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_não-uso-de-consultas-somente-leitura">Não uso de consultas somente leitura</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para entender esse mal cheiro, é preciso entender que toda entidade retornada pelo JPA é gerenciada. O JPA pode retornar objetos não gerenciados, mas para isso é preciso que seja declarado na consulta e isso pode ser feito de 2 formas</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Declarando na consulta JPQL a instanciação dessa entidade</p>
+</li>
+<li>
+<p>Declarando a consulta como Read-Only</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>O primeiro caso é muito útil quando se deseja retornar objetos que não estão armazenados no banco. Vamos supor que precisamos de estatisticas de alunos e essas estatisticas são bem simples como o id e número de cursos matriculados. Para isso criamos a classe estatistica e declaramos ela na consulta JPQL, como no exemplo abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">record</span> <span class="nf">AlunoMatriculas</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">cursos</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nf">AlunoMatriculas</span><span class="o">(</span><span class="nc">Object</span> <span class="n">id</span><span class="o">,</span> <span class="nc">Object</span> <span class="n">cursos</span><span class="o">)</span> <span class="o">{</span>    <span class="c1">// Infelizmente o Hibernate precisa disso</span>
+        <span class="k">this</span><span class="o">((</span><span class="nc">Long</span><span class="o">)</span> <span class="n">id</span><span class="o">,</span> <span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;)</span> <span class="n">cursos</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">AlunoMatriculas</span><span class="o">&gt;</span> <span class="nf">buildAlunoMatriculas</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"""
+                                     SELECT new AlunoMatriculas(aluno.id,
+                                                                aluno.cursos.nome)
+                                     FROM Aluno
+                                     """</span><span class="o">,</span> <span class="nc">AlunoMatriculas</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A outra opção é declarar a consulta como somente leitura (<em>read-only</em>) e para isso podemos usar os "hints", como feito abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">AlunoMatriculas</span><span class="o">&gt;</span> <span class="nf">buildAlunoMatriculas</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM Aluno"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">setHint</span><span class="o">(</span><span class="s">"org.hibernate.readOnly"</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">aluno</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">AlunoMatriculas</span><span class="o">(</span><span class="n">aluno</span><span class="o">))</span>
+                        <span class="o">.</span><span class="na">toList</span><span class="o">();</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O hint pode também ser declarado com <em>Named Querys</em>, conforme o exemplo abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_alunos"</span><span class="o">)</span>
+<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"findAll"</span><span class="o">,</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s">"FROM Aluno"</span><span class="o">)</span>
+<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"findAllReadOnly"</span><span class="o">,</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="s">"FROM Aluno"</span><span class="o">,</span>
+            <span class="n">hints</span> <span class="o">=</span> <span class="nd">@QueryHint</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="nc">QueryHints</span><span class="o">.</span><span class="na">READ_ONLY</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"true"</span><span class="o">))</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Aluno</span> <span class="o">{</span>
+    <span class="c1">// define os campos do aluno</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">AlunoMatriculas</span><span class="o">&gt;</span> <span class="nf">buildAlunoMatriculas</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createNamedQuery</span><span class="o">(</span><span class="s">"findAllReadOnly"</span><span class="o">,</span> <span class="nc">Aluno</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">getResultStream</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">aluno</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">AlunoMatriculas</span><span class="o">(</span><span class="n">aluno</span><span class="o">))</span>
+                        <span class="o">.</span><span class="na">toList</span><span class="o">();</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Apesar de retornar mais dados, essa opção pode ser feita de forma inteligente quando esses dados dados são realmente necessários para a lógica da aplicação, mas nenhuma alteração é necessária.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Consultas ao banco de dados são demoradas, por isso devem ser feitas de forma eficiente e inteligente. O JPA nos dá a possibilidade de não escrever consultas SQL, mas isso pode vir com um preço caro em termos de memória, CPU e tempo de execução. Em muitos casos, o sistema pode cair só de acessar algunas entidades na base de dados.</p>
+</div>
+<div class="paragraph">
+<p>É importante estar ciente das consultas SQL geradas e isso pode ser feito em desenvolvimento, configurando o framework a registrar todas as consultas geradas no log, através da propriedade <code>quarkus.hibernate-orm.log.sql</code> para o Quarkus e <code>spring.jpa.show-sql</code> no Spring.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="JPA" /><category term="Hibernate" /><category term="ORM" /><category term="Bad Smells" /><category term="Banco de Dados" /><summary type="html"><![CDATA[Frameworks ORM como JPA e Hibernate são poderosos, mas seu uso inadequado pode gerar "bad smells" que afetam desempenho e manutenibilidade. Este post explora os principais anti-padrões em mapeamento objeto-relacional e como evitá-los.]]></summary></entry><entry><title type="html">Entendendo o Jakarta Persistence API (JPA)</title><link href="https://blog.vepo.dev/posts/entendendo-o-jpa" rel="alternate" type="text/html" title="Entendendo o Jakarta Persistence API (JPA)" /><published>2026-02-27T00:00:00+00:00</published><updated>2026-02-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/14-50-00-entendendo-o-jpa</id><content type="html" xml:base="https://blog.vepo.dev/posts/entendendo-o-jpa"><![CDATA[<div class="paragraph">
+<p>Continuando nossa série de posts sobre introdução a bases de dados, hoje vamos falar sobre o Jakarta Persistence API (JPA), uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional. O JPA é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados, e é amplamente utilizado em frameworks como Spring e Quarkus.</p>
+</div>
+<div class="sect1">
+<h2 id="_quando-surgiu-o-jpa-e-qual-a-relação-com-o-hibernate">Quando surgiu o JPA? E qual a relação com o Hibernate?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O Hibernate foi criado em 2001 por Gavin King como uma alternativa ao Entity EJB, que era a solução de persistência de dados oferecida pelo Java EE na época. O objetivo original era proporcionar uma maneira mais simples e eficiente de mapear objetos Java para tabelas de banco de dados, sem a complexidade e as limitações do Entity EJB.</p>
+</div>
+<div class="paragraph">
+<p>O Hibernate foi o primeiro framework de mapeamento objeto-relacional (ORM) amplamente adotado na comunidade Java, e seu sucesso levou à criação do JPA. A primeira versão do JPA foi lançada em 2006, mas não houve consenso na comunidade Java sobre a adoção do JPA, e o Hibernate continuou a ser amplamente utilizado como uma solução de persistência de dados. No entanto, depois do lançamento do JPA 2.0 em 2009, o JPA se tornou a especificação de persistência de dados mais popular na comunidade Java, e muitos frameworks, incluindo o Spring e o Quarkus, adotaram o JPA como a solução de persistência de dados padrão. O Hibernate continua a ser uma implementação popular do JPA, mas existem outras implementações disponíveis, como EclipseLink e OpenJPA.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quais-são-os-principais-funcionalidades-do-jpa">Quais são os principais funcionalidades do JPA?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O JPA oferece uma série de funcionalidades que facilitam o desenvolvimento de aplicações Java que interagem com bancos de dados. Algumas das principais funcionalidades do JPA incluem:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mapeamento objeto-relacional: O JPA permite mapear objetos Java para tabelas em um banco de dados relacional, facilitando a persistência de dados e a recuperação de informações.</p>
+</li>
+<li>
+<p>Consulta de dados: O JPA fornece uma linguagem de consulta chamada JPQL (Java Persistence Query Language) que permite consultar dados usando uma sintaxe semelhante ao SQL, mas orientada a objetos.</p>
+</li>
+<li>
+<p>Gerenciamento de transações: O JPA oferece suporte ao gerenciamento de transações, permitindo que os desenvolvedores controlem o início, a confirmação e o rollback de transações de forma eficiente.</p>
+</li>
+<li>
+<p>Cache de segundo nível: O JPA suporta um cache de segundo nível que pode melhorar o desempenho da aplicação, armazenando em cache os dados recuperados do banco de dados para evitar consultas repetidas.</p>
+</li>
+<li>
+<p>Suporte a herança: O JPA permite mapear hierarquias de classes Java para tabelas em um banco de dados relacional, facilitando o uso de herança em aplicações Java.</p>
+</li>
+<li>
+<p>Suporte a relacionamentos: O JPA suporta relacionamentos entre entidades, como um-para-um, um-para-muitos e muitos-para-muitos, facilitando a modelagem de dados complexos em aplicações Java.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Para essa série, vamos focar no Mapeamento objeto-relacional e na consulta de dados usando JPQL e Criteria API, que são as funcionalidades mais comuns e essenciais do JPA para o desenvolvimento de aplicações Java que interagem com bancos de dados.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_porque-mapear-uma-tabela-em-uma-entidade-jpa">Porque mapear uma tabela em uma entidade JPA?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mapear uma tabela em uma entidade JPA é importante porque permite que os desenvolvedores trabalhem com objetos Java em vez de lidar diretamente com tabelas e colunas em um banco de dados relacional. Isso torna o código mais legível, fácil de manter e menos propenso a erros, além de permitir que os desenvolvedores se concentrem na lógica de negócios da aplicação, em vez de se preocupar com detalhes de persistência de dados.</p>
+</div>
+<div class="paragraph">
+<p>Quando pensamos em uma aplicação mais baixo nível, toda a lógica de recuperação dos dados e construção das consultas SQL é facilitado pelo mapeamento objeto-relacional, que abstrai a complexidade do acesso ao banco de dados e permite que os desenvolvedores trabalhem com objetos Java de forma mais natural.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, na consulta abaixo, todos os usuários inativos são recuperados usando uma consulta SQL e carregados em objetos usando JDBC.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando JDBC</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">getInactiveUsers</span><span class="o">()</span> <span class="kd">throws</span> <span class="nc">SQLException</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="n">sql</span> <span class="o">=</span> <span class="s">"SELECT * FROM tb_users WHERE active = false"</span><span class="o">;</span>
+    <span class="nc">PreparedStatement</span> <span class="n">statement</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="n">sql</span><span class="o">);</span>
+    <span class="nc">ResultSet</span> <span class="n">resultSet</span> <span class="o">=</span> <span class="n">statement</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">inactiveUsers</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+        <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+        <span class="n">user</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getLong</span><span class="o">(</span><span class="s">"id"</span><span class="o">));</span>
+        <span class="n">user</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"username"</span><span class="o">));</span>
+        <span class="n">user</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"email"</span><span class="o">));</span>
+        <span class="n">user</span><span class="o">.</span><span class="na">setActive</span><span class="o">(</span><span class="n">resultSet</span><span class="o">.</span><span class="na">getBoolean</span><span class="o">(</span><span class="s">"active"</span><span class="o">));</span>
+        <span class="n">inactiveUsers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">inactiveUsers</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Através do mapeamento objeto-relacional, a mesma consulta pode ser realizada de forma mais simples e eficiente usando JPQL, sem a necessidade de escrever SQL diretamente ou lidar com detalhes de persistência de dados.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando JPA</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">getInactiveUsers</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="n">jpql</span> <span class="o">=</span> <span class="s">"SELECT u FROM User u WHERE u.active = false"</span><span class="o">;</span>
+    <span class="nc">TypedQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">query</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="n">jpql</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="na">getResultList</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Caso um novo campo seja adicionado à tabela "tb_users", como "last_login", o desenvolvedor deve alterar todas as consultas SQL que recuperam dados da tabela "tb_users" para incluir o novo campo, além de atualizar o código que mapeia os resultados para objetos Java. Com o JPA, o desenvolvedor só precisa adicionar um novo campo na entidade Java correspondente e o mapeamento objeto-relacional cuidará do resto, sem a necessidade de alterar as consultas JPQL ou o código de mapeamento.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-mapear-uma-tabela-em-uma-entidade-jpa">Como mapear uma tabela em uma entidade JPA?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O mapeamento de uma tabela em uma entidade JPA é feito usando anotações. A anotação <code>@Entity</code> é usada para marcar uma classe Java como uma entidade JPA, e a anotação @Table é usada para especificar o nome da tabela no banco de dados que a entidade representa. Além disso, as anotações <code>@Id</code> e <code>@GeneratedValue</code> são usadas para indicar a chave primária da entidade e como ela deve ser gerada. A anotação <code>@Column</code> é usada para mapear os campos da entidade para as colunas da tabela no banco de dados. Aqui está um exemplo de como mapear uma tabela "users" para uma entidade JPA:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span> <span class="c1">// [1] Define que a classe é uma entidade JPA</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_users"</span><span class="o">)</span> <span class="c1">// [2] Especifica o nome da tabela no banco de dados</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+
+    <span class="nd">@Id</span> <span class="c1">// [3] Indica que o campo é a chave primária da entidade</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span> <span class="c1">// [4] Especifica que o valor da chave primária deve ser gerado automaticamente pelo banco de dados</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// [5] Especifica que a coluna "username" não pode ser nula e deve ser única</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// [6] Especifica que a coluna "email" não pode ser nula e deve ser única</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"last_login"</span><span class="o">)</span> <span class="c1">// [7] Especifica o nome da coluna no banco de dados para o campo "lastLogin"</span>
+    <span class="kd">private</span> <span class="nc">LocalDateTime</span> <span class="n">lastLogin</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ao se alterar a definição de uma entidade, o JPA automaticamente atualiza todas as consultas que são realizadas usando JPQL, garantindo que as mudanças sejam refletidas em toda a aplicação sem a necessidade de modificar o código de consulta.</p>
+</div>
+<div class="sect2">
+<h3 id="_como-definir-relacionamentos-entre-entidades-jpa">Como definir relacionamentos entre entidades JPA?</h3>
+<div class="paragraph">
+<p>O JPA suporta diferentes tipos de relacionamentos entre entidades, como um-para-um, um-para-muitos e muitos-para-muitos. Para definir um relacionamento entre entidades, são usadas anotações específicas, como <code>@OneToOne</code>, <code>@OneToMany</code>, <code>@ManyToMany</code>, <code>@JoinColumn</code> e <code>@JoinTable</code>. Essas anotações permitem que os desenvolvedores definam a natureza do relacionamento entre as entidades e como elas devem ser mapeadas para o banco de dados. Aqui estão alguns exemplos de como definir relacionamentos entre entidades JPA:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de definição de relacionamentos entre entidades JPA</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@OneToOne</span> <span class="c1">// [1] Define um relacionamento um-para-um com a entidade Profile</span>
+    <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"profile_id"</span><span class="o">)</span> <span class="c1">// [2] Especifica a coluna de junção para o relacionamento um-para-um</span>
+    <span class="kd">private</span> <span class="nc">Profile</span> <span class="n">profile</span><span class="o">;</span>
+
+    <span class="nd">@OneToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"user"</span><span class="o">)</span> <span class="c1">// [3] Define um relacionamento um-para-muitos com a entidade Post</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Post</span><span class="o">&gt;</span> <span class="n">posts</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span> <span class="c1">// [4] Define um relacionamento muitos-para-muitos com a entidade Role</span>
+    <span class="nd">@JoinTable</span><span class="o">(</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">"tb_user_roles"</span><span class="o">,</span>  <span class="c1">// [5] Especifica a tabela de junção e as colunas de junção para o relacionamento muitos-para-muitos</span>
+        <span class="n">joinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"user_id"</span><span class="o">),</span>
+        <span class="n">inverseJoinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"role_id"</span><span class="o">)</span>
+    <span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Role</span><span class="o">&gt;</span> <span class="n">roles</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No primeiro caso, o campo <code>profile</code> na entidade <code>User</code> é mapeado para a entidade <code>Profile</code> usando um relacionamento um-para-um, e a coluna de junção é especificada usando a anotação <code>@JoinColumn</code>. No segundo caso, o campo <code>posts</code> na entidade <code>User</code> é mapeado para a entidade <code>Post</code> usando um relacionamento um-para-muitos, e o atributo <code>mappedBy</code> é usado para indicar que o relacionamento é bidirecional e está definido na entidade <code>Post</code>. No terceiro caso, o campo <code>roles</code> na entidade <code>User</code> é mapeado para a entidade <code>Role</code> usando um relacionamento muitos-para-muitos, e a tabela de junção e as colunas de junção são especificadas usando a anotação <code>@JoinTable</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-definir-constraints-e-validações-em-entidades-jpa">Como definir constraints e validações em entidades JPA?</h3>
+<div class="paragraph">
+<p>O JPA permite definir constraints e validações em entidades usando a anotação <code>@Column</code>. Essa anotação pode ser usada para especificar restrições de nulidade, unicidade, comprimento e outros atributos relacionados à coluna no banco de dados.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de definição de constraints e validações em entidades JPA</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// [1] Especifica que a coluna "username" não pode ser nula e deve ser única</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// [2] Especifica que a coluna "email" não pode ser nula e deve ser única</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">length</span> <span class="o">=</span> <span class="mi">255</span><span class="o">)</span> <span class="c1">// [3] Especifica o comprimento máximo da coluna "password"</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">password</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-executar-consultas-usando-o-jpa">Como executar consultas usando o JPA?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O JPA oferece duas formas principais de executar consultas: usando JPQL (Java Persistence Query Language) e usando a Criteria API. O JPQL é uma linguagem de consulta orientada a objetos que permite consultar entidades usando uma sintaxe semelhante ao SQL, mas com foco em objetos Java. A Criteria API, por outro lado, é uma API de construção de consultas que permite criar consultas de forma programática usando uma abordagem orientada a objetos.</p>
+</div>
+<div class="sect2">
+<h3 id="_como-executar-consultas-usando-jpql">Como executar consultas usando JPQL?</h3>
+<div class="paragraph">
+<p>Para executar consultas usando JPQL, os desenvolvedores podem usar o método <code>createQuery</code> do <code>EntityManager</code>, passando a consulta JPQL como uma string e a classe da entidade como um parâmetro. Aqui está um exemplo de como executar uma consulta JPQL para recuperar todos os usuários inativos:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando JPQL</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span> <span class="c1">// [1] Define que a classe é um bean CDI de escopo de aplicação</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserRepository</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">EntityManager</span> <span class="n">entityManager</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span> <span class="c1">// [2] Injeta o EntityManager usando CDI</span>
+    <span class="kd">public</span> <span class="nf">UserRepository</span><span class="o">(</span><span class="nc">EntityManager</span> <span class="n">entityManager</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">entityManager</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">getInactiveUsers</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM User u WHERE u.active = false"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// [3] Cria uma consulta JPQL para recuperar todos os usuários inativos</span>
+                            <span class="o">.</span><span class="na">getResultList</span><span class="o">();</span> <span class="c1">// [4] Executa a consulta e retorna os resultados como uma lista de objetos User</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quando a consulta JPQL é escrita, devem ser usados os nomes das entidades e os seus atributos, em vez dos nomes das tabelas e colunas do banco de dados. O JPA se encarrega de traduzir a consulta JPQL para a consulta SQL correspondente, garantindo que as mudanças na estrutura do banco de dados sejam refletidas automaticamente nas consultas JPQL sem a necessidade de modificar o código da aplicação.</p>
+</div>
+<div class="paragraph">
+<p>Outra facilidade é que o JPA se encarrega automaticamente de gerenciar as relações entre as entidades, permitindo que os desenvolvedores recuperem dados relacionados usando consultas JPQL sem a necessidade de escrever consultas SQL complexas ou lidar com detalhes de persistência de dados. Por exemplo, se um usuário tiver um perfil associado, o JPA permitirá que os desenvolvedores recuperem o perfil do usuário usando uma consulta JPQL simples, sem a necessidade de escrever uma consulta SQL com junções complexas.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando JPQL para recuperar dados relacionados</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">User</span> <span class="nf">getUserWithProfile</span><span class="o">(</span><span class="nc">Long</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"FROM User u WHERE u.profile.enable = true"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// [1] Cria uma consulta JPQL para recuperar um usuário com seu perfil ativo</span>
+                        <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span> <span class="c1">// [2] Executa a consulta e retorna o resultado como um objeto User</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-definir-se-as-entidades-relacionadas-fazem-parte-da-consulta-ou-não">Como definir se as entidades relacionadas fazem parte da consulta ou não?</h3>
+<div class="paragraph">
+<p>O JPA oferece dois modos de carregamento de entidades relacionadas: Eager Loading e Lazy Loading. O Eager Loading carrega as entidades relacionadas imediatamente quando a entidade principal é carregada, enquanto o Lazy Loading carrega as entidades relacionadas somente quando elas são acessadas pela primeira vez. O modo de carregamento pode ser definido usando a anotação <code>@OneToOne</code>, <code>@OneToMany</code> ou <code>@ManyToMany</code>, especificando o atributo <code>fetch</code> com os valores <code>FetchType.EAGER</code> ou <code>FetchType.LAZY</code>. Aqui está um exemplo de como definir o modo de carregamento para uma entidade relacionada:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de definição do modo de carregamento para entidades relacionadas</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="nc">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="nd">@OneToOne</span><span class="o">(</span><span class="n">fetch</span> <span class="o">=</span> <span class="nc">FetchType</span><span class="o">.</span><span class="na">EAGER</span><span class="o">)</span> <span class="c1">// [1] Define um relacionamento um-para-um com a entidade Profile e especifica que o carregamento deve ser Eager</span>
+    <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"profile_id"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">Profile</span> <span class="n">profile</span><span class="o">;</span>
+
+    <span class="nd">@OneToMany</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">"user"</span><span class="o">,</span> <span class="n">fetch</span> <span class="o">=</span> <span class="nc">FetchType</span><span class="o">.</span><span class="na">LAZY</span><span class="o">)</span> <span class="c1">// [2] Define um relacionamento um-para-muitos com a entidade Post e especifica que o carregamento deve ser Lazy</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Post</span><span class="o">&gt;</span> <span class="n">posts</span><span class="o">;</span>
+
+    <span class="nd">@ManyToMany</span> <span class="c1">// [3] Define um relacionamento muitos-para-muitos com a entidade Role e usa o modo de carregamento padrão (Lazy)</span>
+    <span class="nd">@JoinTable</span><span class="o">(</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">"tb_user_roles"</span><span class="o">,</span>
+        <span class="n">joinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"user_id"</span><span class="o">),</span>
+        <span class="n">inverseJoinColumns</span> <span class="o">=</span> <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"role_id"</span><span class="o">)</span>
+    <span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Role</span><span class="o">&gt;</span> <span class="n">roles</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Quando o JPA carrega uma entidade, ele verifica o modo de carregamento definido para as entidades relacionadas e decide se deve carregar as entidades relacionadas imediatamente (Eager Loading) ou somente quando elas são acessadas pela primeira vez (Lazy Loading). O Eager Loading pode ser útil quando as entidades relacionadas são frequentemente acessadas junto com a entidade principal, enquanto o Lazy Loading pode ser mais eficiente quando as entidades relacionadas são acessadas com menos frequência ou quando a carga de dados é grande.</p>
+</div>
+<div class="paragraph">
+<p>Caso uma consulta seja feita usando Lazy Loading, o JPA irá carregar a entidade principal e, quando as entidades relacionadas forem acessadas pela primeira vez, o JPA irá executar uma consulta adicional para recuperar os dados relacionados do banco de dados. Erros podem ocorrer se o contexto de persistência for fechado antes que as entidades relacionadas sejam acessadas, resultando em uma exceção <code>LazyInitializationException</code>. Para evitar esse tipo de erro, os desenvolvedores podem optar por usar Eager Loading para as entidades relacionadas ou garantir que o contexto de persistência esteja aberto quando as entidades relacionadas forem acessadas.</p>
+</div>
+<div class="paragraph">
+<p>O Eager Loading também pode ser especificado na consulta JPQL, mesmo que o modo de carregamento padrão para a entidade relacionada seja Lazy. Isso pode ser feito usando a cláusula <code>JOIN FETCH</code> na consulta JPQL, que instrui o JPA a carregar as entidades relacionadas imediatamente, independentemente do modo de carregamento definido na entidade. Aqui está um exemplo de como usar <code>JOIN FETCH</code> em uma consulta JPQL:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando JOIN FETCH para carregar entidades relacionadas</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">User</span> <span class="nf">getUserWithProfile</span><span class="o">(</span><span class="nc">Long</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="s">"SELECT u FROM User u JOIN FETCH u.profile WHERE u.id = :userId"</span><span class="o">,</span> <span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">// [1] Cria uma consulta JPQL que usa JOIN FETCH para carregar o perfil do usuário imediatamente</span>
+                        <span class="o">.</span><span class="na">setParameter</span><span class="o">(</span><span class="s">"userId"</span><span class="o">,</span> <span class="n">userId</span><span class="o">)</span> <span class="c1">// [2] Define o parâmetro da consulta</span>
+                        <span class="o">.</span><span class="na">getSingleResult</span><span class="o">();</span> <span class="c1">// [3] Executa a consulta e retorna o resultado como um objeto User</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-executar-consultas-usando-a-criteria-api">Como executar consultas usando a Criteria API?</h3>
+<div class="paragraph">
+<p>A Criteria API é uma API de construção de consultas que permite criar consultas de forma programática usando uma abordagem orientada a objetos. Para usar a Criteria API, os desenvolvedores precisam criar um <code>CriteriaBuilder</code> a partir do <code>EntityManager</code>, e então usar o <code>CriteriaBuilder</code> para construir a consulta de forma fluente. Aqui está um exemplo de como executar uma consulta usando a Criteria API para realizar a busca de usuários baseado em diversos parâmetros:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta usando a Criteria API</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">search</span><span class="o">(</span><span class="nc">UserSearchCriteria</span> <span class="n">criteria</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">CriteriaBuilder</span> <span class="n">criteriaBuilder</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">getCriteriaBuilder</span><span class="o">();</span> <span class="c1">// [1] Cria um CriteriaBuilder a partir do EntityManager</span>
+    <span class="nc">CriteriaQuery</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">criteriaQuery</span> <span class="o">=</span> <span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span> <span class="c1">// [2] Cria um CriteriaQuery para a entidade User</span>
+    <span class="nc">Root</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">userRoot</span> <span class="o">=</span> <span class="n">criteriaQuery</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span> <span class="c1">// [3] Define a raiz da consulta como a entidade User</span>
+
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Predicate</span><span class="o">&gt;</span> <span class="n">predicates</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">disabled</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">disabled</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">predicates</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">isTrue</span><span class="o">(</span><span class="n">userRoot</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"disabled"</span><span class="o">)));</span> <span class="c1">// [4] Adiciona um predicado para filtrar usuários desativados</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">predicates</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">isFalse</span><span class="o">(</span><span class="n">userRoot</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"disabled"</span><span class="o">)));</span> <span class="c1">// [5] Adiciona um predicado para filtrar usuários ativados</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">name</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">criteria</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">isBlank</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">predicates</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">like</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">lower</span><span class="o">(</span><span class="n">userRoot</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"name"</span><span class="o">)),</span>
+                                            <span class="s">"%%%s%%"</span><span class="o">.</span><span class="na">formatted</span><span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">())));</span> <span class="c1">// [6] Adiciona um predicado para filtrar usuários pelo nome, usando uma comparação case-insensitive e permitindo correspondências parciais</span>
+    <span class="o">}</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">email</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">criteria</span><span class="o">.</span><span class="na">email</span><span class="o">.</span><span class="na">isBlank</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">predicates</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">like</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">lower</span><span class="o">(</span><span class="n">userRoot</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"email"</span><span class="o">)),</span>
+                                            <span class="s">"%%%s%%"</span><span class="o">.</span><span class="na">formatted</span><span class="o">(</span><span class="n">criteria</span><span class="o">.</span><span class="na">email</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">())));</span> <span class="c1">// [7] Adiciona um predicado para filtrar usuários pelo email, usando uma comparação case-insensitive e permitindo correspondências parciais</span>
+    <span class="o">}</span>
+
+    <span class="k">if</span> <span class="o">(!</span><span class="n">predicates</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">criteriaQuery</span><span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">and</span><span class="o">(</span><span class="n">predicates</span><span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="k">new</span> <span class="nc">Predicate</span><span class="o">[</span><span class="mi">0</span><span class="o">])));</span> <span class="c1">// [8] Adiciona os predicados à consulta usando a cláusula WHERE, combinando-os com o operador AND</span>
+    <span class="o">}</span>
+
+    <span class="n">criteriaQuery</span><span class="o">.</span><span class="na">orderBy</span><span class="o">(</span><span class="n">criteriaBuilder</span><span class="o">.</span><span class="na">asc</span><span class="o">(</span><span class="n">userRoot</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"name"</span><span class="o">)));</span> <span class="c1">// [9] Adiciona uma cláusula ORDER BY para ordenar os resultados pelo nome do usuário em ordem crescente</span>
+    <span class="k">return</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">createQuery</span><span class="o">(</span><span class="n">criteriaQuery</span><span class="o">).</span><span class="na">getResultList</span><span class="o">();</span>  <span class="c1">// [10] Executa a consulta e retorna os resultados como uma lista de objetos User</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_e-as-entidades-são-apenas-objetos-java-que-representam-os-dados-do-banco-de-dados">E as Entidades são apenas objetos Java que representam os dados do banco de dados?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não! Um entidade não só representa o dado recuperado do banco de dados, mas eles representam uma ligação com o estado do banco de dados. Uma entidade JPA possui um ciclo de vida que é gerenciado pelo contexto de persistência do JPA, o que significa que as entidades podem estar em diferentes estados como Transitório, Gerenciado, Removido e Desanexado. O JPA se encarrega de sincronizar o estado das entidades com o banco de dados, garantindo que as mudanças feitas nas entidades sejam refletidas no banco de dados quando as transações forem confirmadas.</p>
+</div>
+<div class="paragraph">
+<div class="title">Ciclo de vida de uma entidade JPA</div>
+<p><span class="image"><img src="/assets/images/databases/jpa-lifecycle.png" alt="jpa lifecycle"></span></p>
+</div>
+<div class="sect2">
+<h3 id="_estado-transitório">Estado Transitório</h3>
+<div class="paragraph">
+<p>O estado transitório é o estado inicial de uma entidade, quando ela é criada usando o operador <code>new</code> e ainda não está associada a um contexto de persistência. Nesse estado, a entidade não tem um identificador atribuído e não está sendo gerenciada pelo JPA.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="s">"john.doe"</span><span class="o">,</span> <span class="s">"John"</span><span class="o">,</span> <span class="s">"Doe"</span><span class="o">,</span> <span class="s">"john.doe@example.com"</span><span class="o">);</span> <span class="c1">// [1] A entidade user é criada pelo operador new, e não possui um identificador</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span> <span class="c1">// [2] O identificador da entidade user ainda é null, pois ela ainda não foi associada a um contexto de persistência</span>
+<span class="n">entityManager</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">user</span><span class="o">);</span> <span class="c1">// [3] A entidade user é persistida e deixa o estado transitório, passando a ser gerenciada</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span> <span class="c1">// [4] O identificador da entidade user é atribuído pelo JPA, e agora a entidade está em estado gerenciado</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_estado-gerenciado">Estado Gerenciado</h3>
+<div class="paragraph">
+<p>O estado gerenciado é o estado em que a entidade está associada a um contexto de persistência e é gerenciada pelo JPA. Nesse estado, as mudanças feitas na entidade podem ser sincronizadas com o banco de dados quando as transações forem confirmadas.</p>
+</div>
+<div class="paragraph">
+<p>É importante não alterar os valores dos campos caso não deseje que este seja atualizado no banco de dados, pois o JPA irá sincronizar as mudanças feitas na entidade com o banco.</p>
+</div>
+<div class="paragraph">
+<p>Outro ponto importante é que entidades no estado gerenciado são usadas como cache, evitando chamadas repetidas no banco de dados.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">user</span> <span class="o">=</span> <span class="n">entityMananger</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span> <span class="c1">// [1] A entidade user é recuperada do banco de dados e passa a ser gerenciada</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span> <span class="c1">// [2] O nome do usuário é acessado,</span>
+<span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">"John Doe"</span><span class="o">);</span> <span class="c1">// [3] O nome do usuário é alterado, e a entidade user permanece em estado gerenciado</span>
+<span class="kt">var</span> <span class="n">updatedUser</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span> <span class="c1">// [4] A entidade user não é recuperada novamente do banco de dados, pois como ela já está em estado gerenciado, o JPA retorna a mesma instância em cache, refletindo a mudança feita no nome do usuário</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">updatedUser</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span> <span class="c1">// [5] O nome do usuário é acessado novamente, e a mudança feita anteriormente é refletida, mesmo sem a necessidade de sincronizar explicitamente as mudanças com o banco de dados</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_estado-removido">Estado Removido</h3>
+<div class="paragraph">
+<p>O estado removido é o estado em que a entidade foi marcada para remoção, mas ainda não foi removida do banco de dados. Nesse estado, a entidade ainda está associada a um contexto de persistência, mas as mudanças feitas na entidade não serão sincronizadas com o banco de dados.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_estado-desanexado">Estado Desanexado</h3>
+<div class="paragraph">
+<p>O estado desanexado é o estado em que a entidade não está mais associada a um contexto de persistência, mas ainda existe como um objeto Java. Nesse estado, as mudanças feitas na entidade não serão sincronizadas com o banco de dados, e a entidade não pode ser gerenciada pelo JPA até que seja associada a um novo contexto de persistência.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_então-é-fácil-usar-o-jpa-há-algo-com-que-se-preocupar">Então é fácil usar o JPA? Há algo com que se preocupar?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Apesar do JPA ser muito fácil de ser usado, ele traz diversos problemas aos desenvolvedores que não se atentam as consultas que estão sendo realizadas. Como as consultas SQL são geradas automaticamentes, em muitos casos problemas podem acontecer. No proximo post, vamos falar sobre os problemas mais comuns que podem ocorrer ao usar o JPA e como evitá-los para garantir que as aplicações Java sejam eficientes e robustas ao interagir com bancos de dados.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O JPA é uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional, oferecendo funcionalidades como mapeamento objeto-relacional, consulta de dados e outras facilidades para o desenvolvimento de aplicações Java que interagem com bancos de dados. O JPA é amplamente utilizado em frameworks como Spring e Quarkus, e é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados. Entender o JPA e suas funcionalidades é essencial para qualquer desenvolvedor Java que deseja criar aplicações robustas e eficientes que interagem com bancos de dados.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="JPA" /><category term="ORM" /><category term="JDBC" /><category term="Banco de Dados" /><summary type="html"><![CDATA[O JPA é uma especificação Java que facilita o mapeamento de objetos Java para tabelas em um banco de dados relacional. Ele é amplamente utilizado em frameworks como Spring e Quarkus, e é uma parte fundamental do ecossistema Java para desenvolvimento de aplicações que interagem com bancos de dados. Neste post, vamos explorar os principais componentes do JPA e como utilizá-los para interagir com um banco de dados.]]></summary></entry><entry><title type="html">Acessando Bancos de Dados Relacionais em Java: JDBC, JPA, Hibernate e mais</title><link href="https://blog.vepo.dev/posts/banco-de-dados-relacional-em-java" rel="alternate" type="text/html" title="Acessando Bancos de Dados Relacionais em Java: JDBC, JPA, Hibernate e mais" /><published>2026-02-26T00:00:00+00:00</published><updated>2026-02-26T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/13-12-00-sql-no-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/banco-de-dados-relacional-em-java"><![CDATA[<div class="paragraph">
+<p>Depois de entender como modelar e usar um banco de dados relacional, chegou a hora de aprender como integrá-lo a uma aplicação Java. A seguir, apresentamos as principais bibliotecas e frameworks disponíveis, seus princípios de design e como escolher a melhor opção para o seu projeto.</p>
+</div>
+<div class="paragraph">
+<p>Podemos dividir as ferramentas de acesso a dados em Java em quatro grandes categorias: <strong>acesso direto</strong>, <strong>mapeamento objeto-relacional (ORM)</strong>, <strong>gerenciamento de transações</strong> e <strong>migração de esquema</strong>. Cada categoria atende a diferentes necessidades e níveis de abstração.</p>
+</div>
+<div class="sect1">
+<h2 id="_visão-geral-das-categorias">Visão geral das categorias</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Visão por categorias</caption>
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 14.2858%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Categoria</th>
+<th class="tableblock halign-left valign-top">Propósito</th>
+<th class="tableblock halign-left valign-top">Frameworks</th>
+<th class="tableblock halign-left valign-top">Nível de abstração</th>
+<th class="tableblock halign-left valign-top">Controle sobre SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Acesso direto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Executar SQL manualmente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC, jOOQ, Spring Data JDBC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Baixo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ORM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mapear objetos para tabelas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JPA, Hibernate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Alto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Médio</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Abstrações de repositório</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilitar o uso de ORMs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JPA, Quarkus Panache, Jakarta Data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Muito alto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Baixo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Transações</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Garantir consistência em operações</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jakarta Transaction, Spring @Transactional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Migração</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Versionar o esquema do banco</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flyway, Liquibase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_1-acesso-direto-ao-banco-de-dados">1. Acesso direto ao banco de dados</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jdbc-java-database-connectivity">JDBC (Java Database Connectivity)</h3>
+<div class="paragraph">
+<p>O JDBC é a API padrão do Java para acesso a bancos de dados relacionais. Lançado em 1997 como parte do Java SE 1.1, ele fornece uma interface uniforme para conectar-se a diferentes bancos através de drivers específicos.</p>
+</div>
+<div class="paragraph">
+<p>Com JDBC, o desenvolvedor tem controle total sobre as consultas SQL, a gestão de conexões e o tratamento de resultados. Isso oferece máxima flexibilidade, mas também exige mais código e cuidado com boas práticas como fechamento de recursos e tratamento de exceções.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo básico de consulta com JDBC</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="k">try</span> <span class="o">(</span><span class="nc">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="nc">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
+     <span class="nc">Statement</span> <span class="n">stmt</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">createStatement</span><span class="o">();</span>
+     <span class="nc">ResultSet</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">(</span><span class="s">"SELECT * FROM usuarios"</span><span class="o">))</span> <span class="o">{</span>
+
+    <span class="k">while</span> <span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">rs</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"nome"</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O JDBC é recomendado para:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Projetos simples ou protótipos</p>
+</li>
+<li>
+<p>Casos onde o desempenho máximo é crítico</p>
+</li>
+<li>
+<p>Situações que exigem consultas SQL altamente otimizadas</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jooq">jOOQ</h3>
+<div class="paragraph">
+<p>O jOOQ é uma biblioteca que oferece uma abordagem mais fluida para construir consultas SQL em Java. Ele gera código a partir do esquema do banco, permitindo escrever consultas de forma programática, mas ainda com controle total sobre o SQL gerado. O jOOQ é especialmente útil para projetos que precisam de consultas complexas, mas querem evitar o boilerplate do JDBC.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de consulta com jOOQ</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">userName</span> <span class="o">=</span> <span class="s">"postgres"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">password</span> <span class="o">=</span> <span class="s">"Password123"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">url</span> <span class="o">=</span> <span class="s">"jdbc:postgresql://localhost:5432/postgres"</span><span class="o">;</span>
+<span class="kt">var</span> <span class="n">create</span> <span class="o">=</span> <span class="no">DSL</span><span class="o">.</span><span class="na">using</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span> <span class="nc">SQLDialect</span><span class="o">.</span><span class="na">POSTGRES</span><span class="o">);</span>
+<span class="nc">Result</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">create</span><span class="o">.</span><span class="na">select</span><span class="o">()</span>
+                              <span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">)</span>
+                              <span class="o">.</span><span class="na">where</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">.</span><span class="na">NOME</span><span class="o">.</span><span class="na">like</span><span class="o">(</span><span class="s">"A%"</span><span class="o">))</span>
+                              <span class="o">.</span><span class="na">fetch</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="nc">Record</span> <span class="n">r</span> <span class="o">:</span> <span class="n">result</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">r</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="no">USUARIOS</span><span class="o">.</span><span class="na">NOME</span><span class="o">));</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spring-data-jdbc">Spring Data JDBC</h3>
+<div class="paragraph">
+<p>O Spring Data JDBC é uma abstração sobre o JDBC que elimina grande parte do código boilerplate, mantendo o controle sobre as consultas SQL. Ele oferece mapeamento automático entre linhas do resultado e objetos Java, além de repositórios com métodos prontos para operações comuns.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Table</span><span class="o">(</span><span class="s">"tb_users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+  <span class="nd">@Id</span>
+  <span class="kd">private</span> <span class="nc">Integer</span> <span class="n">id</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">username</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">name</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastname</span><span class="o">;</span>
+
+  <span class="c1">// getters e setters</span>
+<span class="o">}</span>
+
+<span class="kd">interface</span> <span class="nc">UserRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findUserNoArgumentsBy</span><span class="o">();</span>
+  <span class="nc">Page</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findPageOfUsersByLastnameStartingWith</span><span class="o">(</span><span class="nc">String</span> <span class="n">lastname</span><span class="o">,</span> <span class="nc">Pageable</span> <span class="n">page</span><span class="o">);</span>
+  <span class="nd">@Query</span><span class="o">(</span><span class="s">"select * from User u where lower(username) = lower(?1)"</span><span class="o">)</span>
+  <span class="nc">User</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">);</span>
+  <span class="nc">User</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Diferentemente do JPA, o Spring Data JDBC não faz cache de primeiro ou segundo nível nem gerenciamento automático de mudanças. Cada operação resulta em uma consulta SQL explícita.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2-mapeamento-objeto-relacional-orm">2. Mapeamento objeto-relacional (ORM)</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jpa-jakarta-persistence-api">JPA (Jakarta Persistence API)</h3>
+<div class="paragraph">
+<p>O JPA é uma especificação que define como mapear objetos Java para tabelas relacionais. Em vez de escrever SQL manualmente, o desenvolvedor trabalha com entidades e relacionamentos, e o provedor JPA gera as consultas automaticamente.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Entity</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Usuario</span> <span class="o">{</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="c1">// getters e setters</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O JPA oferece recursos avançados como:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Mapeamento de herança</p>
+</li>
+<li>
+<p>Cache de segundo nível</p>
+</li>
+<li>
+<p>Carregamento lazy ou eager de relacionamentos</p>
+</li>
+<li>
+<p>Consultas com JPQL (Java Persistence Query Language)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>A versão mais recente é a <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2">JPA 3.2</a>, lançada em 2024 como parte do Jakarta EE.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hibernate">Hibernate</h3>
+<div class="paragraph">
+<p>O Hibernate é a implementação mais popular do JPA, mas também oferece funcionalidades além da especificação, como:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Suporte a auditoria com Hibernate Envers</p>
+</li>
+<li>
+<p>Tipos personalizados</p>
+</li>
+<li>
+<p>Filtros dinâmicos</p>
+</li>
+<li>
+<p>Cache de segundo nível com integração a provedores como Ehcache</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Na prática, a maioria dos projetos utiliza o Hibernate através das anotações padrão do JPA, aproveitando sua maturidade e desempenho.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3-abstrações-e-facilitadores">3. Abstrações e facilitadores</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_spring-data-jpa">Spring Data JPA</h3>
+<div class="paragraph">
+<p>O Spring Data JPA integra o JPA ao ecossistema Spring, reduzindo significativamente a quantidade de código necessário. Com ele, é possível criar repositórios apenas declarando interfaces:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UsuarioRepository</span> <span class="kd">extends</span> <span class="nc">JpaRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNomeContainingIgnoreCase</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">);</span>
+
+    <span class="nd">@Query</span><span class="o">(</span><span class="s">"SELECT u FROM Usuario u WHERE u.email LIKE %:dominio"</span><span class="o">)</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">buscarPorDominioEmail</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"dominio"</span><span class="o">)</span> <span class="nc">String</span> <span class="n">dominio</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Spring Data JPA implementa automaticamente os métodos da interface, incluindo consultas derivadas do nome do método e consultas personalizadas com <code>@Query</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_quarkus-panache">Quarkus Panache</h3>
+<div class="paragraph">
+<p>No universo Quarkus, o Panache oferece uma abordagem ainda mais simples para persistência. Duas estratégias estão disponíveis:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Usuario</span> <span class="kd">extends</span> <span class="nc">PanacheEntity</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="n">nome</span><span class="o">;</span>
+    <span class="nd">@Column</span><span class="o">(</span><span class="n">unique</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="n">email</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">list</span><span class="o">(</span><span class="s">"nome"</span><span class="o">,</span> <span class="n">nome</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">Usuario</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">){</span>
+        <span class="k">return</span> <span class="nf">find</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">name</span><span class="o">).</span><span class="na">firstResult</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>PanacheRepository (estilo repositório):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsuarioRepository</span> <span class="kd">implements</span> <span class="nc">PanacheRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">list</span><span class="o">(</span><span class="s">"nome"</span><span class="o">,</span> <span class="n">nome</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Usuario</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">){</span>
+        <span class="k">return</span> <span class="nf">find</span><span class="o">(</span><span class="s">"email"</span><span class="o">,</span> <span class="n">email</span><span class="o">).</span><span class="na">firstResult</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Panache elimina a necessidade de getters, setters e muitas anotações, priorizando produtividade e desempenho em ambientes nativos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jakarta-data">Jakarta Data</h3>
+<div class="paragraph">
+<p>O Jakarta Data é uma especificação recente que busca unificar o acesso a dados em Java, sejam eles relacionais, NoSQL ou até serviços REST. Inspirado no Spring Data, ele permite definir repositórios com métodos de consulta baseados em convenções de nomenclatura.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UsuarioRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByNome</span><span class="o">(</span><span class="nc">String</span> <span class="n">nome</span><span class="o">);</span>
+
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Usuario</span><span class="o">&gt;</span> <span class="nf">findByEmail</span><span class="o">(</span><span class="nc">String</span> <span class="n">email</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Por ser uma especificação, existem múltiplas implementações disponíveis, incluindo Hibernate, Eclipse JNoSQL e Open Liberty.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_4-gerenciamento-de-transações">4. Gerenciamento de transações</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jakarta-transaction">Jakarta Transaction</h3>
+<div class="paragraph">
+<p>Operações que envolvem múltiplas etapas no banco de dados precisam ser atômicas: ou todas executam com sucesso, ou nenhuma delas é aplicada. O <a href="https://jakarta.ee/specifications/transactions/2.0/jakarta-transactions-spec-2.0">Jakarta Transaction</a> (antigo JTA) é a especificação para gerenciamento declarativo de transações em Java.</p>
+</div>
+<div class="paragraph">
+<p>Em aplicações Spring, o gerenciamento é simplificado com a anotação <code>@Transactional</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UsuarioService</span> <span class="o">{</span>
+
+    <span class="nd">@Transactional</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">criarUsuarioComPedido</span><span class="o">(</span><span class="nc">Usuario</span> <span class="n">usuario</span><span class="o">,</span> <span class="nc">Pedido</span> <span class="n">pedido</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">usuarioRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">usuario</span><span class="o">);</span>
+        <span class="n">pedidoRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">pedido</span><span class="o">);</span>
+        <span class="c1">// Se algo falhar aqui, ambas as operações são desfeitas</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Em ambientes Jakarta EE, utiliza-se <code>@Transactional</code> da própria especificação, com comportamento similar.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_5-migração-de-esquema">5. Migração de esquema</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_flyway">Flyway</h3>
+<div class="paragraph">
+<p>Manter o esquema do banco de dados sincronizado entre diferentes ambientes (desenvolvimento, teste, produção) é um desafio comum. O Flyway resolve esse problema através de migrações versionadas.</p>
+</div>
+<div class="paragraph">
+<p>Cada migração é um arquivo SQL com um número de versão único:</p>
+</div>
+<hr>
+<div class="paragraph">
+<p>Para usar bancos de dados relacionais em Java, podemos usar:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="txt">V0.0.1__criar_tabela_usuarios.sql
+U0.0.2__adicionar_coluna_telefone.sql
+V0.0.2__adicionar_coluna_telefone.sql
+V0.0.3__criar_tabela_pedidos.sql</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Além do Flyway, existe também o Liquibase, que oferece formato XML/YAML/JSON para definição das mudanças.</p>
+</div>
+<div class="listingblock">
+<div class="title">Integração com Spring Boot:</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">spring.flyway.enabled</span><span class="p">=</span><span class="s">true</span>
+<span class="py">spring.flyway.locations</span><span class="p">=</span><span class="s">classpath:db/migration</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O Flyway pode também ser usado em projetos Quarkus, para isso basta adicionar a extensão <code>quarkus-flyway</code> e colocar os scripts de migração na pasta <code>src/main/resources/db/migration</code>.</p>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-escolher-a-abordagem-certa">Como escolher a abordagem certa?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não existe bala de prata. A escolha depende de vários fatores:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 66.6666%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Cenário</th>
+<th class="tableblock halign-left valign-top">Abordagem recomendada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Projeto pequeno, controle total sobre SQL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC puro ou jOOQ</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aplicação Spring, deseja produtividade</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JPA</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microsserviço com Quarkus, performance nativa</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quarkus Panache</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Banco não relacional ou múltiplas fontes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Jakarta Data</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Controle sobre SQL, mas com menos código</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spring Data JDBC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sistema legado ou requisitos muito específicos</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hibernate nativo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Qualquer projeto em equipe</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flyway ou Liquibase</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>É possível também combinar abordagens: usar JPA para 80% das operações simples e JDBC para consultas complexas que exigem otimização manual.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O ecossistema Java oferece opções para todos os gostos e necessidades quando o assunto é persistência de dados. Desde o controle fino do JDBC até a produtividade extrema do Panache, passando pela flexibilidade do JPA e a segurança das migrações com Flyway, o desenvolvedor tem liberdade para escolher a ferramenta adequada a cada contexto.</p>
+</div>
+<div class="paragraph">
+<p>O importante é compreender as diferenças entre acesso direto, ORM, abstrações, transações e migração, e como cada peça se encaixa no quebra-cabeça do desenvolvimento de aplicações robustas e escaláveis.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="JDBC" /><category term="JPA" /><category term="Hibernate" /><category term="Spring Data" /><category term="Banco de Dados" /><category term="Flyway" /><summary type="html"><![CDATA[Conheça as principais bibliotecas e frameworks para acesso a dados em Java: JDBC, jOOQ, JPA, Hibernate, Spring Data, Flyway e muito mais. Aprenda as diferenças entre cada abordagem e como escolher a melhor para seu projeto.]]></summary></entry></feed>

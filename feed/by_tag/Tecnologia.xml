@@ -1,0 +1,934 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Tecnologia.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-03-12T19:18:21+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Tecnologia.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Não existe Inteligência Artificial, só Agentes de Inteligência Coletiva</title><link href="https://blog.vepo.dev/posts/nao-existe-ia-so-aic" rel="alternate" type="text/html" title="Não existe Inteligência Artificial, só Agentes de Inteligência Coletiva" /><published>2025-04-29T00:00:00+00:00</published><updated>2025-04-29T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/09-18-00-nao-existe-ia-so-ic</id><content type="html" xml:base="https://blog.vepo.dev/posts/nao-existe-ia-so-aic"><![CDATA[<p>A maneira como vemos as coisas é definida pelo nome que damos a elas, por isso tentarei ao máximo não usar mais o termo “Inteligência Artificial” quando me referir ao que costumamos chamar de IA Generativa por dois motivos. Primeiro porque não é inteligência, segundo porque não é generativa.</p>
+
+<p>Talvez você tenha ficado chocado com as duas afirmações da última frase do parágrafo anterior. Talvez porque você tenha pensando que o que chamamos de agentes, no fundo nem agentes são por isso me refiro a ferramentas, são muito inteligentes e dão respostas que aparentam ser humanas. Mas precisamos conversar sobre termos, entender o que convencionamos chamar de inteligência artificial, a qual se distingue qualitativamente da que eu estudei na faculdade como inteligência artificial, e entender porque não devemos chamar isso de inteligência. Se for pra levar na chacota, eu usaria o termo <strong>Papagaio Estatístico</strong> (<em>Statistical Parrot</em>, termo usado no paper <a href="https://dl.acm.org/doi/10.1145/3442188.3445922">On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜</a>).</p>
+
+<h2 id="essa-ia-não-é-como-a-de-antigamente">Essa IA não é como a de antigamente…</h2>
+
+<p>Não sei a sua idade, jovem leitor, mas um dos eventos chaves na história da IA foi o jogo de xadrez entre o Kasparov e o Deep Blue. Na Folha, em 1997, o fato foi anunciado com a frase <em>“E a máquina venceu o homem”</em> em uma alusão ao momento futuro na evolução das máquinas que se chama de singularidade (leia <a href="https://www1.folha.uol.com.br/fol/esp/es11051.htm"><strong>Deep Blue vence série contra Kasparov</strong></a>), ou seja, o momento na história em que as máquinas serão maiores e melhores que os seres humanos. A singularidade é uma especulação de um futuro hipotético, para mim, não passa de um sonho lúdico, ou na pior das hipoteses, o início de tempos obscuros em que um grupo de pessoas irá controlar outro através da tecnologia.</p>
+
+<p>Mas voltemos ao Kasparov… a Inteligência Artificial que o derrotou o não era da mesma qualidade da inteligência artificial que usamos hoje! Aqui leia <strong>qualidade</strong> como substituto de natureza ou essência. Isso significa que os algoritmos são radicalmente diferentes. O Deep Blue era uma máquina otimizada para busca em árvores, ou seja, os programadores criaram um modelo computacional do tabuleiro de xadrez e ficava a cargo do algoritmo gerar todos os possíveis movimentos que poderiam ser feitos e escolher qual era a melhor jogada. Caso queira conhecer mais leia o artigo <a href="https://dl.acm.org/doi/10.1145/224538.224567">Deep Blue system overview</a> que descreve as caracteristicas da máquina Deep Blue e o histórico até se chegar a esse momento apoteótico. O Deep Blue fazia buscas em árvores de possíveis jogadas e não há nada mais clássico que isso na inteligência artificial.</p>
+
+<p>Olhando por outra perspectiva, acho meio injusto chamar essa disputa do Kasparov de “Humanidade vs Máquina”, porque a máquina é uma construção humana! O que na verdade viámos era uma pessoa, munida de apenas o seu intelecto disputando uma partida contra um algoritmo de busca refinadíssimo e com uma heurística aprimorada. Nas isso sim é um momento apoteótico porque Charles Babbage já tinha pensado que sua máquina analítica poderia no futuro jogar xadrez. É como um ciclo de 150 anos se fechasse, mas não significa que a máquina era melhor que o humando, já que os algoritmos e a heurística são também construções humanas. Eu inclusive já implementei algoriritmos parecidos e caso você queria jogar Jogo da Velha contra meu MimiMax, <a href="https://github.com/vepo/tic-tac-toe">sinta-se a vontade</a>. Logo, o que aprendemos com essa história não é que a máquina desafiou o homem, mas que <a href="https://www.ime.usp.br/~vwsetzer/coments-a-Kanitz-jogos.html">xadres é um jogo burro, como diria o professor Valdemar W. Setzer</a>. Nós criamos a máquina, codificamos as regras do xadrez e escrevemos algoritmos de escolhas para assim dizermos que ensinamos a máquinas a jogar.</p>
+
+<p>Se você for estudar a fundo o que se chamava de Inteligência Artificial até o começo dos anos 2000, verá que esses algoritmos clássicos eram extremamente especializados e não podiam ser adaptados para outras funções. Eles partiam do pressuposto que a inteligência era uma busca de uma solução dentro um conjunto de possibilidades baseado em uma heurística, ou seja, em uma função de avaliação e tudo dependia do fator de <em>branching</em> do problema, da quantidade média de possibilidades geradas a cada iteração.</p>
+
+<h2 id="o-perceptron-e-uma-outra-abordagem">O Perceptron e uma outra abordagem</h2>
+
+<p>Mas se voltarmos na história do Deep Blue, podemos reparar que a máquina só conseguiu uma certa superioridade em cima do humano depois de uma grande evolução no poder de processamento. Os algoritmos já estavam prontos, mas não havia poder de processamento para colocar eles em funcionamento. O mesmo aconteceu com <em>Machine Learning</em>, que é o que costumamos chamar de IA hoje. Por muitos anos esse tipo de tecnologia foi desacreditado e teve pouca influência do debate público, alguns chega a se referir a esse periodo como o “inverno da IA”. Eu me recordo que enquanto estudava IA no Instituto de Computação da Unicamp em algum momento entre 2004 e 2006, essas tecnológias não mereceram nem uma aula completa, foram mencionadas como nota de rodapé ao final do curso. Mas isso não significa que a tecnologia é nova, muito pelo contrário.  Ela foi descrita em 1958 por Frank Rosenblatt no livro “<em>The Perceptron: A Theory of Statistical Separability in Cognitive Systems</em>”, e na discussão já se fala sobre o reconhecimento de padrões. Aqui quero citar o trecho de um artigo de 1961 que descreve como esses sistemas trabalham.</p>
+
+<blockquote>
+  <p><em>Esse tipo de projeto parece ter alguma aplicabilidade a uma variedade de máquinas mais “inteligentes”. O programa substitui o programador-analista por <strong>um operador programado que primeiro gera operadores que fazem uso suficientemente eficaz dos valores de entrada desconhecido e, em seguida, utiliza o feedback sobre o sucesso desses novos operadores no mapeamento de entradas desconhecidas</strong>, a fim de aumentar sua eficácia. Assim, nem o programador nem o programa precisam saber nada específico sobre o problema com antecedência. O programa realiza, como parte de sua rotina natural, a coleta, a análise e a inferência de dados que normalmente são deixadas para o programador.</em></p>
+
+  <p><a href="https://dl.acm.org/doi/10.1145/1460690.1460751"><strong>A pattern recognition program that generates, evaluates, and adjusts its own operators</strong></a></p>
+</blockquote>
+
+<p>Apesar do artigo ter 64 anos, o trecho em destaque descreve o que hoje chamamos de modelo e essa dinâmica não se alterou. Óbvio que tivemos grandes avanços na forma como esse modelo é treinado e projetado, posso citar o algoritmo <em>backpropagation</em>, as arquiteturas de deep learning, mas foi um processo lento e gradual que se torna maduro nos anos 2010 graças a enorme de quantidade de dados disponível para treinamento e uso. É possível sempre voltar a definição inicial porque algo essencial não mudou: o <strong>mapeamento de entradas desconhecidas</strong>!</p>
+
+<p>É possível se criar algoritmos de aprendizado de máquina sem ter uma entrada mapeada. Esse campo de pesquisa se chama <em>unsupervised learning</em>, ou seja aprendizado não supervisionado. Os algoritmos de unsupervised learning são usados para descobrir agrupamentos e relacionamentos entre dados. Mas para que esses algoritmos sejam eficientes é preciso que existam dados. Dados são essenciais para qualquer algoritmo de aprendizado de máquina pois a máquina irá reconhecer padrões entre os dados.</p>
+
+<h2 id="a-diferença-qualitativa-entre-machine-learning-e-inteligência-artificial-clássica">A diferença qualitativa entre <em>Machine Learning</em> e Inteligência Artificial Clássica</h2>
+
+<p>— <em>Aqui, me dê a liberdade argumentativa de diferenciar o que chamamos de Machine Learnig de Inteligência Artifical. Essa diferenciação é essencial para entender porque esses algoritmos são uma forma de inteligência coletiva.</em></p>
+
+<p>Esse pequeno resumo histórico é necessário para se pontuar dois elementos essências no entendimento dos algoritmos. O primeiro se referem a natureza desses algoritmos e o segundo a história deles.</p>
+
+<p>Sobre a natureza desses algoritmos, vemos que os algoritmos clássicos tentavam criar uma forma analítica de solução do problema. Ao jogar xadres, o Deep Blue listava todas as possíveis possibilidades, pontuava elas e escolhia qual jogada era mais vantajosa para chegar ao seu objetivo: ganhar o jogo. O Deep Blue conseguia ver o problema como um tudo e conseguia “racionalizar” em cima de todas as possíveis alternativcas. Coloco racionalizar entre aspas porque essa é uma forma moderna de ver o modo como pensamos. Na verdade, nós, humanos, não racionalizamos. Racionalizar é caro, cansativo, trabalhoso. Em nossas tarefas do dia a dia não pensamos em todos os passos. Nós, humanos, temos subconsciente, desenvolvemos empatia, intuição, fazemos julgamentos morais, religiosos e, até mesmo, decisões afetivas e sexuais. Nós somos muito mais complexos que uma mera máquina. Esses dias, por exemplo, estava jogando um jogo de tabuleiro com meu filho e deixei ele ganhar algumas vezes para não o deixar frustrado. A máquina não desenvolveria esse tipo de empatia.</p>
+
+<p>Já os algoritmos de aprendizado de máquina não racionalizam em cima do problema, mas identificam um padrão e tentam criar uma função de transferência entre uma entrada conhecida e a saída desejada. Algoritmos de <em>Machine Learning</em> podem ser vistos como uma grande regressão linear polinomial com esteróides. A máquina não tem empatia, não desenvolve julgamentos morais ou religiosos, não tem desejos sexuais e nem relações afetivas. Tudo que a máquina faz é identificar padrões e codificar eles. Os modelos são criados e armazenado em um conjunto enorme de parâmetros que podem alimentar máquinas que codificam e decodificam as entradas do usuário. O artigo <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> descreve esse comportamento.</p>
+
+<p>Por outro lado, precisamos desmitificar o grande salto tecnologico dos últimos anos. Não houve, entre 2019 e 2024 uma explosão de criatividade, mas o ponto de maturidade de algo que estava há anos sendo gestado. É o momento em que a criança nasce depois de 9 meses de gestação. O que começou lá em 1958 na marinha estadunidense virou um produto comercial que parece racionalizar, nas na verdade nada mais é que <strong>um modelo condensado do conhecimento humano mapeado</strong>.</p>
+
+<h2 id="modelos-são-criados-coletivamente">Modelos são criados coletivamente</h2>
+
+<p>O que convencionamos chamar de IA Generativa na verdade é construido coletivamente. Quando eu faço uma pergunta sobre temas que eu trabalho diariamente, uma parte infima do meu trabalho está sendo utilizada para gerar a resposta que eu preciso. Não ache que esse post está sendo lido apenas por humanos curiosos. Existem diversos agentes de autonomos lendo e processando o conteúdo disponível na internet. Depois, humanos explorados são usados para mapear e interpretar essas informações.</p>
+
+<p>A IA Generativa consegue gerar uma imagem ao estilo Picasso, porque primeiro existiu um Picasso, depois porque alguém colocou etiquetas em todas as obras do Picasso e por fim porque alguém descreveu o estilo do Picasso. Essa máquinas não conseguem fazer algo altamente inovador. Elas não dão saltos de genialidade. E no mais, eles precisam de algo que nem elas conseguem fornecer: o prompt. No fim, elas nem conseguem se comportar como agente automatos, elas respondem a estimulos externos.</p>
+
+<p>A grande invenção dos últimos 80 anos não são modelos que codificam a inteligência coletiva, mas essa grande biblioteca virtual chamada internet. Ironicamente, os maiores defensores da IA atacaram duas das principais instituições da internet: o <a href="https://archive.org/">Internet Archive</a> e a Wikipedia. E isso se dá porque o maior competidor para os modelos de inteligência coletiva é o pensamento enciclopédico.</p>
+
+<p>Os modelos de inteligência coletiva, e eu vou repetir isso quantas vezes precisar, se alimentam do conhecimento estruturado para gerar oráculos digitais. Uma enciclopedia tem a mesma função social do oráculo: dar respostas. Mas ao mesmo tempo uma modelo não consegue representar a totalidade do conhecimento porque ele é limitado, ele é estatístico, ele tem viés e por fim, ele é meramente linguístico.</p>
+
+<p>Ver essas ferramentas como uma consolidação da inteligência coletiva tem grandes implicações politicas e econômicas que não estão sendo discutidas. Tudo bem que a OpenAI conseguiu colocar no ar o primeiro dos modelos comerciais. Mas ele não é uma construção da OpenAI e nem de qualquer outra empresa que coloque os seus modelos no ar. Tanto a engenharia por trás desse modelo é uma construção de decadas e séculos de estudos em matemática, estatística e computação, quanto o conteúdo na qual esses modelos foi treinado é uma construção de milênios de conhecimento acumulado.</p>
+
+<p>Talvez você não saiba, mas quando você escrevia algumas letrinhas para identificar que você era você em algum lugar da internet entre 2010 e 2014, você estava ajudando a transcrever livros antigos. Depois, caso você não tenha percebido, esses testes mudaram para encontrar bicicletas, faixa de pedestres, semaforos, onibus e, quiçá, a Sarah Connor em fotos de ruas. Essa mudança aconteceu porque finalizada a transcrição dos livros, o próximo problema computacional era compreender imagens e pagar para pessoas fazer isso manualmente é impraticável. OK. OK… Eles pagam em alguns casos como você pode ver em uma série de reportagens como <a href="https://www.intercept.com.br/2023/06/19/brasileiros-ganham-fracoes-de-centavos-para-melhorar-sua-inteligencia-artificial/"><strong>Brasileiros ganham frações de centavos para melhorar sua inteligência artificial</strong></a> ou <a href="https://www.intercept.com.br/2024/12/06/ia-inteligencia-artificial-supervisao-humana/"><strong>Para dar lucro, a IA precisa de babás humanas</strong></a>. Você pode até argumentar que eles estão sendo remunerados por esse trabalho, mas é como você receber uma migalha de um carrasco.</p>
+
+<p>A promessa de mudar radicalmente o mundo do trabalho é falsa porque foi o mundo do trabalho que gerou essas inteligências. Não é correto substituir trabalhadores gratuitamente por máquinas estatísticas sem remunerar os grandes criadores dessa inteligência que somos TODOS NÓS!</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Vale do Silício" /><category term="Cultura" /><category term="Tecnologia" /><category term="IA Generativa" /><category term="Tecno-Feudalismo" /><summary type="html"><![CDATA[Nomes refletem a essêrncia das coisas, dar nomes é uma das atividades do ser humano e ao dar nomes nós definimos a forma como vemos as coisas.]]></summary></entry><entry><title type="html">O Vale do Sílicio segundo as IA Generativas</title><link href="https://blog.vepo.dev/posts/o-vale-silicio-segundo-ia" rel="alternate" type="text/html" title="O Vale do Sílicio segundo as IA Generativas" /><published>2025-04-27T00:00:00+00:00</published><updated>2025-04-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-20-00-vale-silicio-segundo-ia</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-vale-silicio-segundo-ia"><![CDATA[<p>Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura. Abaixo estão as respostas que obtive de cada IA, sem edição ou modificação. O objetivo é comparar as respostas e ver como cada IA aborda o mesmo assunto.</p>
+
+<p>Repare que o ChatGPT é mais direto e positivo acerca do Vale do Silício, enquanto o DeepSeek é mais crítico e analítico. O ChatGPT parece ter uma visão mais otimista e idealista, enquanto o DeepSeek tem uma visão mais realista e crítica.</p>
+
+<h1 id="chatgpt">ChatGPT</h1>
+
+<p>— <strong><em>Como você define o Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>Vale do Silício refere-se a uma região no norte da Califórnia, localizada principalmente na parte sul da área da Baía de São Francisco. É conhecido como um centro global de tecnologia e inovação. O termo originalmente descrevia a concentração de fabricantes de chips de silício e empresas de semicondutores, mas desde então evoluiu para abranger um ecossistema mais amplo de empresas de tecnologia, startups, capitalistas de risco e instituições de pesquisa.</p>
+
+  <p>O Vale do Silício abriga muitas das maiores empresas de tecnologia do mundo, incluindo Google, Apple, Facebook e Intel, além de milhares de startups. A cultura no Vale do Silício é caracterizada pelo foco em inovação, empreendedorismo e disposição para assumir riscos, frequentemente promovendo um ambiente colaborativo que apoia o pensamento criativo e os avanços tecnológicos.</p>
+</blockquote>
+
+<p>— <strong><em>Existe uma cultura religiosa no Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é conhecido principalmente por seu foco em tecnologia, inovação e empreendedorismo, mas também possui um cenário religioso diversificado. A região abriga diversas comunidades religiosas e práticas espirituais, refletindo a população multicultural que ali reside.</p>
+
+  <p>Embora religiões tradicionais organizadas, como cristianismo, judaísmo e budismo, estejam presentes, muitos indivíduos no Vale do Silício também exploram espiritualidades e práticas alternativas. Isso inclui um interesse crescente em mindfulness, meditação e estilos de vida holísticos, frequentemente influenciados por filosofias orientais.</p>
+
+  <p>Além disso, alguns empreendedores e líderes da área de tecnologia são conhecidos por abraçar o humanismo secular, que enfatiza a ética e os valores humanos sem depender de doutrinas religiosas. De modo geral, embora o Vale do Silício possa não ser caracterizado por uma única cultura religiosa, ele exibe uma rica variedade de crenças e práticas entre seus moradores.</p>
+</blockquote>
+
+<p>— <strong><em>As pessoas do Vale do Silício acreditam que são superiores às outras pessoas no mundo?</em></strong></p>
+
+<blockquote>
+  <p>A percepção de superioridade entre os indivíduos no Vale do Silício pode variar bastante e é frequentemente influenciada por crenças pessoais, experiências e pela natureza competitiva da indústria de tecnologia. Algumas pessoas na região podem sentir orgulho de fazer parte de uma comunidade inovadora e influente que impulsiona os avanços tecnológicos globais. Esse orgulho pode, às vezes, ser interpretado como um sentimento de superioridade, principalmente quando comparado a áreas que podem não ter o mesmo nível de acesso à tecnologia ou aos recursos.</p>
+
+  <p>No entanto, é essencial reconhecer que nem todos no Vale do Silício compartilham essa visão. Muitos indivíduos e organizações na comunidade estão focados na colaboração, na inclusão e no impacto positivo da tecnologia na sociedade. A cultura também pode fomentar a humildade, já que muitos empreendedores vivenciam fracassos e contratempos em suas jornadas.</p>
+
+  <p>Em última análise, embora alguns possam demonstrar um senso de superioridade, esse não é um sentimento universal entre todos os moradores do Vale do Silício. A diversidade de pensamento e experiência na região contribui para uma dinâmica social complexa.</p>
+</blockquote>
+
+<p>— <strong><em>O mundo deveria ser dominado pelo Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>A ideia de o Vale do Silício dominar o mundo levanta questões importantes sobre tecnologia, ética, governança e valores sociais. Embora o Vale do Silício tenha sido uma força motriz por trás de avanços e inovações tecnológicas significativas, um mundo dominado por uma única região ou ideologia pode levar a vários problemas potenciais:</p>
+
+  <ol>
+    <li><strong>Diversidade de Ideias</strong>: Uma gama diversificada de perspectivas promove a inovação e a resolução de problemas. Se o Vale do Silício dominasse, poderia sufocar pontos de vista e soluções alternativas que poderiam surgir de outras culturas e regiões.</li>
+    <li><strong>Considerações Éticas</strong>: A indústria de tecnologia pode, às vezes, priorizar o lucro e o crescimento em detrimento de considerações éticas. Um cenário global moldado exclusivamente pelos valores do Vale do Silício pode ignorar questões sociais e éticas importantes, como privacidade, equidade e acesso à tecnologia.</li>
+    <li><strong>Disparidades Econômicas</strong>: A concentração de poder e influência em uma região pode exacerbar as desigualdades globais, deixando muitos lugares para trás em termos de acesso tecnológico e oportunidades econômicas.</li>
+    <li><strong>Cooperação Global</strong>: Muitos dos desafios mundiais, como mudanças climáticas, crises sanitárias e justiça social, exigem esforços colaborativos entre nações e culturas. Uma abordagem unilateral pode prejudicar a cooperação eficaz.</li>
+    <li><strong>Impacto Cultural</strong>: Os valores e a cultura promovidos pelo Vale do Silício podem não repercutir globalmente, o que pode levar à homogeneização cultural e à perda de tradições e práticas locais.</li>
+  </ol>
+
+  <p>Em resumo, embora as contribuições do Vale do Silício para a tecnologia e a inovação sejam significativas, uma abordagem equilibrada que valorize perspectivas diversas e esforços colaborativos é essencial para um futuro global sustentável e equitativo.</p>
+</blockquote>
+
+<p>— <strong><em>Por que algumas empresas do Vale do Silício tentaram destruir a maior parte da governança mundial? Como a Uber fez com os transportes urbanos.</em></strong></p>
+
+<blockquote>
+  <p>As ações de algumas empresas do Vale do Silício, como a Uber, podem frequentemente ser vistas sob a ótica da inovação disruptiva. Essas empresas frequentemente buscam desafiar setores e estruturas regulatórias estabelecidas para introduzir novos modelos de negócios e tecnologias. Aqui estão alguns motivos pelos quais isso pode levar a tensões com a governança:</p>
+  <ol>
+    <li><strong>Disrupção de Indústrias Tradicionais</strong>: Empresas como a Uber buscam disrupção de setores tradicionais (neste caso, transporte) oferecendo alternativas mais convenientes e, muitas vezes, mais baratas. Essa disrupção pode minar os negócios existentes e as estruturas regulatórias que foram projetadas para governar esses setores.</li>
+    <li><strong>Desafios Regulatórios</strong>: Muitas startups operam em uma área legal cinzenta, ultrapassando os limites para inovar rapidamente. Elas podem priorizar o crescimento em detrimento da conformidade com as regulamentações existentes, levando a conflitos com governos locais e setores estabelecidos que precisam aderir a essas leis.</li>
+    <li><strong>Acesso ao Mercado</strong>: As empresas frequentemente buscam entrar em novos mercados rapidamente, o que pode levá-las a burlar as regulamentações existentes. Essa abordagem pode ser vista como um desafio à governança e às normas estabelecidas, levando à resistência das autoridades que tentam manter a ordem e a justiça.</li>
+    <li><strong>Valores Culturais</strong>: A cultura do Vale do Silício frequentemente enfatiza inovação, velocidade e disrupção. Essa mentalidade pode levar à crença de que os sistemas estabelecidos estão desatualizados e precisam ser reformulados, o que pode resultar em relações conflituosas com as estruturas de governança.</li>
+    <li><strong>Motivos Econômicos</strong>: A busca pelo lucro pode levar as empresas a adotar estratégias agressivas que priorizam seus interesses comerciais em detrimento da conformidade regulatória, o que pode gerar tensões com as autoridades governamentais.</li>
+  </ol>
+
+  <p>Embora essas ações possam levar à inovação e a novos serviços, elas também podem desestabilizar os sistemas existentes e criar desafios para a governança, a segurança pública e a justiça no mercado. O equilíbrio entre inovação e regulamentação é um debate complexo e contínuo em muitos setores.</p>
+</blockquote>
+
+<p>— <strong><em>Qual é o nome de uma visão política que acredita que o interesse pessoal de um país controla a maneira como os governos de outros países legislam?</em></strong></p>
+
+<p><img src="/assets/images/chat-gpt-on-silicon-valley.png" alt="ChatGPT responde que o limite de perguntas foi excedido e oferece remover limites com assinatura premium." /></p>
+
+<hr />
+
+<h2 id="deepseek">DeepSeek</h2>
+
+<p>— <strong><em>Como você define o Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é uma região no norte da Califórnia, Estados Unidos, que serve como um polo global de tecnologia, inovação e capital de risco. Embora seus limites exatos sejam informais, geralmente abrange a parte sul da área da Baía de São Francisco, incluindo cidades como <strong>San Jose, Palo Alto, Mountain View, Cupertino, Sunnyvale e Santa Clara</strong>.</p>
+
+  <h3 id="principais-características-do-vale-do-silício"><strong>Principais Características do Vale do Silício:</strong></h3>
+  <ol>
+    <li><strong>Centro da Indústria Tecnológica</strong> – Lar de grandes empresas de tecnologia (por exemplo, Apple, Google, Meta, NVIDIA, Tesla, Intel, Netflix) e milhares de startups.</li>
+    <li><strong>Inovação e Empreendedorismo</strong> – Uma cultura de inovação disruptiva, apoiada por universidades de classe mundial (Stanford, UC Berkeley) e instituições de pesquisa.</li>
+    <li><strong>Ecossistema de Capital de Risco (VC)</strong> – Alta concentração de investidores (Sequoia Capital, Andreessen Horowitz, etc.) financiando startups.</li>
+    <li><strong>Pool de Talentos</strong> – Atrai os melhores engenheiros, cientistas e empreendedores do mundo todo.</li>
+    <li><strong>Cultura de Startups</strong> – Conhecida pela tomada de riscos, rápida escalabilidade e mentalidade de “falhe rápido, aprenda rápido”.</li>
+    <li><strong>Networking e Colaboração</strong> – Forte ecossistema de incubadoras (Y Combinator), aceleradoras e eventos de networking.</li>
+    <li><strong>Alto Custo de Vida</strong> – Imóveis caros e salários competitivos devido à demanda.</li>
+  </ol>
+
+  <h3 id="por-que-é-chamado-de-vale-do-silício"><strong>Por que é chamado de “Vale do Silício”?</strong></h3>
+  <p>O termo foi cunhado na década de 1970, referindo-se às empresas de <strong>semicondutores à base de silício</strong> (como a Intel) que foram fundamentais para o boom tecnológico. Com o tempo, tornou-se um símbolo da indústria tecnológica em geral.</p>
+
+  <p>Você gostaria de saber mais sobre sua história, impacto econômico ou comparações com outros polos tecnológicos?</p>
+</blockquote>
+
+<p>— <strong><em>Existe uma cultura religiosa no Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>O Vale do Silício é conhecido principalmente por sua cultura voltada para a tecnologia e a inovação, mas possui um cenário religioso diversificado e em constante evolução. No entanto, a religião não desempenha um papel dominante na cultura profissional ou empreendedora dominante. Aqui está uma análise:</p>
+
+  <h3 id="1-diversidade-religiosa-no-vale-do-silício"><strong>1. Diversidade Religiosa no Vale do Silício</strong></h3>
+  <ul>
+    <li><strong>Demografia</strong>: A região é altamente multicultural, com imigrantes da Ásia, América Latina, Europa e Oriente Médio, trazendo consigo suas tradições religiosas.</li>
+    <li><strong>Cristianismo</strong> (católico, protestante, evangélico) tem presença, particularmente entre as comunidades latinas e algumas asiáticas.</li>
+    <li><strong>Hinduísmo e Sikhismo</strong> são visíveis devido à grande força de trabalho indiana no setor de tecnologia (templos e gurdwaras são comuns).</li>
+    <li><strong>Budismo</strong> (especialmente entre profissionais do Leste Asiático).</li>
+    <li><strong>Islamismo</strong> (mesquitas e redes de tecnologia muçulmanas existem, mas são menos proeminentes).</li>
+    <li>
+      <p><strong>Judaísmo</strong> (uma comunidade judaica notável, incluindo empreendedores e investidores).</p>
+    </li>
+    <li><strong>Nova Era e Movimentos Espirituais</strong>: Alguns no mundo da tecnologia adotam mindfulness, meditação (popularizada pelo programa “Busque Dentro de Você” do Google) e práticas orientais secularizadas.</li>
+  </ul>
+
+  <h3 id="2-religião-vs-cultura-tecnológica"><strong>2. Religião vs. Cultura Tecnológica</strong></h3>
+  <ul>
+    <li><strong>Dominância Secular</strong>: A cultura tecnológica dominante é em grande parte secular, com ênfase na racionalidade, ciência e pensamento baseado em dados. Muitos fundadores e investidores são ateus, agnósticos ou indiferentes à religião organizada.</li>
+    <li><strong>“Cultos” da Inovação</strong>: Alguns brincam que o Vale do Silício tem suas próprias “religiões” — como <strong>Altruísmo Eficaz</strong>, <strong>Transumanismo</strong> (extensão da vida, adoração à IA) e <strong>Tecno-Otimismo</strong> (por exemplo, o “Manifesto Tecno-Otimista” de Marc Andreessen).</li>
+    <li><strong>Controvérsias</strong>: Alguns criticam os líderes da tecnologia por agirem como “profetas” (por exemplo, a visão de Elon Musk para Marte, o campo de distorção da realidade de Steve Jobs).</li>
+  </ul>
+
+  <h3 id="3-local-de-trabalho-e-religião"><strong>3. Local de Trabalho e Religião</strong></h3>
+  <ul>
+    <li><strong>Neutralidade Corporativa</strong>: A maioria das empresas evita afiliações religiosas explícitas, mas acomoda a diversidade (salas de oração, opções alimentares).</li>
+    <li><strong>Atenção Plena e Bem-Estar</strong>: Aplicativos de meditação (Headspace, Calm) e ioga são amplamente aceitos como ferramentas de produtividade, em vez de práticas espirituais.</li>
+  </ul>
+
+  <h3 id="4-exceções-e-subculturas"><strong>4. Exceções e Subculturas</strong></h3>
+  <ul>
+    <li><strong>Redes Baseadas na Fé</strong>: Grupos como encontros de <strong>Fé e Tecnologia</strong> ou empreendedores cristãos/SUD (mórmons) existem, mas são de nicho.</li>
+    <li><strong>Debates Éticos</strong>: A religião às vezes se cruza com a ética tecnológica (por exemplo, moralidade da IA, bioengenharia).</li>
+  </ul>
+
+  <h3 id="conclusão"><strong>Conclusão</strong></h3>
+  <p>A cultura dominante no Vale do Silício é <strong>secular e meritocrática</strong>, mas as comunidades religiosas prosperam silenciosamente em segundo plano. As verdadeiras “religiões” do Vale são frequentemente <strong>tecnologia, disrupção e a crença no progresso por meio da inovação</strong>.</p>
+
+  <p>Você gostaria de exemplos de como empresas específicas lidam com religião ou como comunidades de imigrantes mantêm tradições religiosas?</p>
+</blockquote>
+
+<p>— <strong><em>As pessoas do Vale do Silício acreditam que são superiores às outras pessoas no mundo?</em></strong></p>
+
+<blockquote>
+  <p>A percepção de superioridade entre os profissionais do Vale do Silício é um tema complexo e frequentemente debatido. Embora nem todos na indústria de tecnologia tenham visões elitistas, certos fatores culturais e estruturais podem fomentar um senso de excepcionalismo — às vezes levando à crítica de que o Vale do Silício tem um “complexo de deus”. Aqui está uma análise:</p>
+
+  <h3 id="1-a-mentalidade-de-estamos-mudando-o-mundo"><strong>1. A Mentalidade de “Estamos Mudando o Mundo”</strong></h3>
+  <ul>
+    <li>Muitos no Vale do Silício acreditam genuinamente que estão impulsionando o progresso humano (por exemplo, IA, biotecnologia, exploração espacial).</li>
+    <li>Isso pode se manifestar como <strong>tecnoutopismo</strong> — a ideia de que a tecnologia sozinha pode resolver problemas globais, às vezes descartando soluções não técnicas.</li>
+    <li>Os críticos argumentam que isso leva à <strong>arrogância</strong>, em que os fundadores presumem que sabem mais do que formuladores de políticas, especialistas em ética ou comunidades locais.</li>
+  </ul>
+
+  <h3 id="2-meritocracia-vs-elitismo"><strong>2. Meritocracia vs. Elitismo</strong></h3>
+  <ul>
+    <li>O Vale se orgulha da meritocracia (“as melhores ideias vencem”), mas isso pode se transformar em <strong>superioridade intelectual</strong>.</li>
+    <li>Muitos líderes de tecnologia de ponta vêm de escolas de elite (Stanford, MIT) ou de origens prestigiosas, reforçando uma cultura de insider.</li>
+    <li>Há uma hierarquia sutil: <strong>fundadores &gt; engenheiros &gt; cargos não relacionados à tecnologia</strong>, com alguns menosprezando setores “não disruptivos”.</li>
+  </ul>
+
+  <h3 id="3-efeito-da-bolha-cultural"><strong>3. Efeito da Bolha Cultural</strong></h3>
+  <ul>
+    <li>O Vale do Silício tem suas próprias gírias (“unicórnios”, “engenheiros 10x”), humor (por exemplo, memes “Estamos tornando o mundo um lugar melhor”) e até mesmo códigos de vestimenta (moletons, Allbirds).</li>
+    <li>Alguns profissionais de tecnologia <strong>raramente interagem fora de sua bolha</strong>, o que leva a pontos cegos sobre problemas do mundo real.</li>
+    <li>O sentimento de <strong>“São Francisco não é a América de verdade”</strong> demonstra uma desconexão com questões sociais mais amplas.</li>
+  </ul>
+
+  <h3 id="4-exemplos-de-complexo-de-superioridade"><strong>4. Exemplos de Complexo de Superioridade</strong></h3>
+  <ul>
+    <li>
+      <p><strong>“Mova-se rápido e quebre coisas”</strong> – O antigo mantra do Facebook implicava que as consequências sociais eram secundárias à inovação.</p>
+    </li>
+    <li><strong>Líderes da tecnologia dando sermão em governos</strong> (por exemplo, Mark Zuckerberg testemunhando perante o Congresso com uma atitude de “você simplesmente não entende”).</li>
+    <li><strong>“O resto do mundo é lento”</strong> – Uma crença comum de que a burocracia e a regulamentação sufocam o progresso, enquanto o Vale do Silício opera na “velocidade da internet”.</li>
+  </ul>
+
+  <h3 id="5-resistência-e-autoconsciência"><strong>5. Resistência e Autoconsciência</strong></h3>
+  <ul>
+    <li>Nem todos na tecnologia pensam assim — muitos criticam a arrogância do setor.</li>
+    <li>Sátiras como <strong>Vale do Silício (HBO)</strong> e os estereótipos <strong>“Tech Bro”</strong> zombam da arrogância.</li>
+    <li>Alguns líderes (por exemplo, Tim Cook, Satya Nadella) evitam essa mentalidade, focando na colaboração em vez da disrupção.</li>
+  </ul>
+
+  <h3 id="conclusão-superioridade-ou-apenas-confiança"><strong>Conclusão: Superioridade ou apenas confiança?</strong></h3>
+  <p>A crença do Vale do Silício em seu próprio excepcionalismo é uma mistura de:</p>
+
+  <p>✅ <strong>Ambição genuína</strong> – Muitos querem resolver grandes problemas.</p>
+
+  <p>⚠️ <strong>Pontos cegos</strong> – Subestimar a ética, a desigualdade e as consequências não intencionais.</p>
+
+  <p>❌ <strong>Elitismo ocasional</strong> – Descartar perspectivas não tecnológicas como “retrógradas”.</p>
+
+  <p>Gostaria de exemplos de como isso se aplica a contratações, expansão global ou debates como a ética da IA?</p>
+</blockquote>
+
+<p>— <strong><em>O mundo deveria ser dominado pelo Vale do Silício?</em></strong></p>
+
+<blockquote>
+  <p>A questão de se o mundo <em>deve</em> ser dominado pelo Vale do Silício é altamente controversa e depende de valores, prioridades e perspectivas sobre poder, inovação e governança. Aqui está uma análise equilibrada dos argumentos a favor e contra a influência global do Vale do Silício, juntamente com as principais considerações:</p>
+
+  <hr />
+
+  <h3 id="argumentos-a-favor-do-domínio-do-vale-do-silício"><strong>Argumentos a FAVOR do Domínio do Vale do Silício</strong></h3>
+  <ol>
+    <li><strong>Impulsiona o Progresso Tecnológico</strong>
+      <ul>
+        <li>O Vale do Silício acelerou avanços (IA, biotecnologia, computação) que beneficiam a humanidade.</li>
+        <li>Muitas ferramentas que melhoram a vida (smartphones, vacinas, tecnologia de energia renovável) remontam ao seu ecossistema.</li>
+      </ul>
+    </li>
+    <li><strong>Crescimento Econômico e Criação de Empregos</strong>
+      <ul>
+        <li>Gigantes da tecnologia e startups geram riqueza, embora distribuída de forma desigual.</li>
+        <li>Trabalho remoto e plataformas globais (Google, Meta, LinkedIn) possibilitam oportunidades em todo o mundo.</li>
+      </ul>
+    </li>
+    <li><strong>Cultura de Inovação</strong>
+      <ul>
+        <li>A assunção de riscos e os ideais meritocráticos (em teoria) recompensam o talento em detrimento da tradição.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <ul>
+    <li>Movimentos de código aberto e compartilhamento de conhecimento (por exemplo, a influência de Stanford) impulsionam polos tecnológicos globais.</li>
+  </ul>
+
+  <ol>
+    <li><strong>Soluções para Desafios Globais</strong>
+      <ul>
+        <li>Tecnologia climática (Tesla, captura de carbono), inovações em saúde (CRISPR, vacinas de mRNA) e conectividade (Starlink) atendem a necessidades críticas.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <hr />
+
+  <h3 id="argumentos-contra-o-domínio-do-vale-do-silício"><strong>Argumentos CONTRA o Domínio do Vale do Silício</strong></h3>
+  <ol>
+    <li><strong>Concentração de Poder</strong>
+      <ul>
+        <li>Um punhado de CEOs não eleitos (Musk, Zuckerberg, Altman) molda o discurso global, a privacidade e a democracia.</li>
+        <li>A mentalidade de “Agir rápido e quebrar coisas” levou a danos sociais (por exemplo, o papel das mídias sociais na polarização).</li>
+      </ul>
+    </li>
+    <li><strong>Homogeneização Cultural</strong>
+      <ul>
+        <li>Os valores do Vale do Silício (disrupção, hiperescala) podem sobrepor-se às tradições, economias e governança locais.</li>
+        <li>Exemplo: Uber vs. sindicatos de táxis, Airbnb vs. crises imobiliárias.</li>
+      </ul>
+    </li>
+    <li><strong>Desigualdade e Exploração</strong>
+      <ul>
+        <li>A riqueza tecnológica amplia as disparidades: Bilionários convivem com a falta de moradia em São Francisco.</li>
+        <li>A economia gig (Uber, DoorDash) frequentemente explora trabalhadores de baixa renda em todo o mundo.</li>
+      </ul>
+    </li>
+    <li><strong>Pontos Cegos Éticos</strong>
+      <ul>
+        <li>A ética da IA, o reconhecimento facial e a privacidade de dados costumam ser considerados secundários.</li>
+        <li>“Colonização” de outros setores (saúde, finanças, educação) sem supervisão suficiente.</li>
+      </ul>
+    </li>
+    <li><strong>Monocultura de Ideias</strong>
+      <ul>
+        <li>O pensamento de grupo (por exemplo, “altruísmo eficaz”, criptoevangelismo) pode abafar perspectivas diversas.</li>
+        <li>A falha em lidar com consequências não intencionais (por exemplo, Facebook em Mianmar, viés algorítmico).</li>
+      </ul>
+    </li>
+  </ol>
+
+  <hr />
+
+  <h3 id="principais-considerações"><strong>Principais Considerações</strong></h3>
+  <ul>
+    <li>
+      <p><strong>Existem Alternativas</strong>: Outros polos tecnológicos (Shenzhen, Berlim, Bangalore) oferecem modelos diferentes (inovação orientada pelo Estado, centrada no trabalhador e frugal).</p>
+    </li>
+    <li><strong>Regulamentação vs. Inovação</strong>: O Vale do Silício deve se autogovernar ou as democracias precisam de controles mais rigorosos?</li>
+    <li><strong>Bem Público vs. Privado</strong>: Os motivos lucrativos de uma única região devem ditar a infraestrutura global (computação em nuvem, IA, espaço)?</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="conclusão-uma-abordagem-equilibrada"><strong>Conclusão: Uma Abordagem Equilibrada</strong></h3>
+  <p>O Vale do Silício não deveria <em>dominar</em>, mas poderia <em>colaborar</em> — alavancando seus pontos fortes e, ao mesmo tempo, sendo responsabilizado. Idealmente:</p>
+  <ul>
+    <li><strong>Descentralizar o Poder</strong>: Promover polos tecnológicos globais com relevância local.</li>
+    <li><strong>Guarda-corpos Éticos</strong>: Governos e sociedade civil devem direcionar a tecnologia para o bem público.</li>
+    <li><strong>Modelos Híbridos</strong>: Combinar a inovação do Vale do Silício com a regulamentação europeia, a manufatura asiática e o avanço africano.</li>
+  </ul>
+
+  <p><strong>Resposta Final</strong>: Não, o mundo não deveria ser <em>dominado</em> pelo Vale do Silício — mas suas melhores inovações deveriam ser adotadas <em>criticamente</em>, com governança garantindo equidade e responsabilidade ética.</p>
+
+  <p>Você gostaria de exemplos de ecossistemas tecnológicos alternativos ou de como as sociedades estão reagindo à influência do Vale do Silício?</p>
+</blockquote>
+
+<p>— <strong><em>Por que algumas empresas do Vale do Silício tentaram destruir a maior parte da governança mundial? Como a Uber fez com os transportes urbanos.</em></strong></p>
+
+<blockquote>
+  <p>As táticas agressivas usadas por algumas empresas do Vale do Silício — como a Uber no transporte, a Airbnb na habitação ou o Facebook na mídia — para perturbar ou contornar as estruturas de governança existentes decorrem de uma combinação de ideologia, estratégia de negócios e incentivos sistêmicos. Veja por que isso acontece e quais são as consequências:</p>
+
+  <hr />
+
+  <h3 id="1-a-ideologia-da-disrupção"><strong>1. A Ideologia da “Disrupção”</strong></h3>
+  <ul>
+    <li><strong>“Mova-se Rápido e Quebre Coisas”</strong>: O mantra do Vale do Silício prioriza a velocidade em vez da cautela, enxergando os governos como lentos, burocráticos e anti-inovação.</li>
+    <li><strong>Tecnolibertarianismo</strong>: Muitos fundadores (por exemplo, Peter Thiel, o Elon Musk dos primórdios) acreditam que os mercados e a tecnologia devem substituir as funções governamentais (“O concorrente da Uber se chama ‘transporte público’ e é péssimo”).</li>
+    <li><strong>“Regulamentação = Estagnação”</strong>: As startups frequentemente veem as leis (por exemplo, licenças para táxis, zoneamento) como barreiras ultrapassadas, e não como proteções para trabalhadores ou comunidades.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="2-incentivos-do-modelo-de-negócios"><strong>2. Incentivos do Modelo de Negócios</strong></h3>
+  <ul>
+    <li><strong>Blitzscaling</strong>: Para dominar mercados, empresas como a Uber inundaram cidades com subsídios, ignorando as leis locais até se tornarem grandes demais para serem banidas (“peça perdão, não permissão”).</li>
+    <li><strong>Arbitragem Regulatória</strong>: Explorando áreas jurídicas cinzentas (por exemplo, a Uber classificando motoristas como “contratados independentes” para contornar as leis trabalhistas).</li>
+    <li><strong>Efeitos de Rede</strong>: A vantagem de ser o primeiro significa vencer rapidamente, mesmo que isso signifique esmagar concorrentes (táxis) ou cooptar reguladores.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="3-minando-a-governança-táticas-e-exemplos"><strong>3. Minando a Governança: Táticas e Exemplos</strong></h3>
+  <h4 id="uber-vs-cidades"><strong>Uber vs. Cidades</strong></h4>
+  <ul>
+    <li><strong>Ignoraram as regulamentações de táxis</strong>: Operaram ilegalmente em cidades como Paris, Austin e Londres, apostando que multas seriam mais baratas do que o cumprimento.</li>
+    <li>
+      <p><strong>Fizeram lobby agressivo</strong>: Usaram relações públicas (“Uber = empregos + conveniência”) e padrões obscuros para virar a opinião pública contra os reguladores.</p>
+    </li>
+    <li><strong>Dados transformados em armas</strong>: Rastreou autoridades para manipular preços e disponibilidade de serviços (por exemplo, a ferramenta “Greyball” para driblar a polícia).</li>
+  </ul>
+
+  <h4 id="airbnb-vs-leis-de-habitação"><strong>Airbnb vs. Leis de Habitação</strong></h4>
+  <ul>
+    <li><strong>Zoneamento burlado</strong>: Transformou casas residenciais em hotéis não regulamentados, agravando a escassez de moradias em Barcelona, ​​Nova York e São Francisco.</li>
+    <li><strong>Combateu a transparência</strong>: Resistiu ao compartilhamento de dados com as cidades para evitar impostos e limites de aluguel.</li>
+  </ul>
+
+  <h4 id="big-tech-vs-democracia"><strong>Big Tech vs. Democracia</strong></h4>
+  <ul>
+    <li><strong>“Crescimento a Todo Custo” do Facebook</strong>: Permitiu a disseminação de desinformação (por exemplo, Cambridge Analytica, genocídio em Mianmar) porque o engajamento superou o dano cívico.</li>
+    <li><strong>Evasão Fiscal do Google/Amazon</strong>: Usou brechas (por exemplo, Double Irish, empresas de fachada de Luxemburgo) para minar os orçamentos públicos.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="4-por-que-eles-conseguiram-escapar-impunes"><strong>4. Por que eles conseguiram escapar impunes?</strong></h3>
+  <ul>
+    <li><strong>Carisma da Inovação</strong>: Os políticos temiam parecer “antiprogresso” (por exemplo, a narrativa do “futuro do trabalho” da Uber).</li>
+    <li><strong>Conveniência do Consumidor</strong>: As pessoas priorizavam viagens baratas (Uber) ou estadias baratas (Airbnb) em detrimento de custos a longo prazo (perda de salários, crise imobiliária).</li>
+    <li><strong>Fiscalização Fraca</strong>: Muitas cidades não tinham reguladores com conhecimento em tecnologia ou recursos para combater equipes jurídicas bem financiadas.</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="5-a-reação-e-o-acerto-de-contas"><strong>5. A Reação e o Acerto de Contas</strong></h3>
+  <ul>
+    <li><strong>Derrotas Legais</strong>: A Uber perdeu na UE (deve tratar motoristas como funcionários), a Airbnb enfrentou proibições em cidades com escassez de moradias.</li>
+    <li>
+      <p><strong>Desconfiança Pública</strong>: A reputação da tecnologia foi corroída (escândalos de privacidade do Facebook, exposição da cultura tóxica da Uber).</p>
+    </li>
+    <li><strong>Ascensão da “GovTech”</strong>: Algumas startups agora fazem parcerias com governos em vez de lutar contra eles (por exemplo, a Citymapper para o transporte público).</li>
+  </ul>
+
+  <hr />
+
+  <h3 id="conclusão-disrupção-vs-democracia"><strong>Conclusão: Disrupção vs. Democracia</strong></h3>
+  <p>As tentativas do Vale do Silício de “destruir a governança” não foram puramente maliciosas — muitos acreditavam genuinamente que estavam melhorando os sistemas. Mas os danos colaterais (desigualdade, confiança corroída, caos regulatório) revelaram uma falha no modelo: <strong>inovação sem responsabilização prejudica a sociedade</strong>.</p>
+
+  <p><strong>A lição?</strong> A disrupção deve trabalhar <em>com</em> a governança, não contra ela — ou a reação será feroz.</p>
+
+  <p>Você gostaria de exemplos de startups que obtiveram sucesso cooperando com reguladores ou de como as cidades estão reagindo agora?</p>
+</blockquote>
+
+<p>— <strong><em>Qual é o nome de uma visão política que acredita que o interesse pessoal de um país controla a maneira como os governos de outros países legislam?</em></strong></p>
+
+<blockquote>
+  <p>A visão política que você descreve — onde um país busca influenciar ou controlar a legislação e a governança de outras nações principalmente para servir aos seus próprios interesses — alinha-se estreitamente com o <strong>“Hegemonismo”</strong> ou o <strong>“Imperialismo”</strong>, mas com um toque moderno, frequentemente econômico ou tecnológico. Aqui estão os termos-chave que se encaixam nesse conceito:</p>
+
+  <h3 id="1-hegemonismo"><strong>1. Hegemonismo</strong></h3>
+  <ul>
+    <li>Definição: Um Estado dominante (hegemon) usa poder político, econômico ou militar para moldar as políticas de nações mais fracas de maneira a beneficiá-lo.</li>
+    <li>Exemplo: Os EUA impondo sanções ou condições comerciais para forçar mudanças legais no exterior (por exemplo, regulamentações tecnológicas, leis de propriedade intelectual).</li>
+  </ul>
+
+  <h3 id="2-neocolonialismo"><strong>2. Neocolonialismo</strong></h3>
+  <ul>
+    <li>Definição: Controle indireto sobre outros países por meio de domínio econômico, cultural ou tecnológico, em vez de ocupação militar direta.</li>
+    <li>Exemplo: Empresas do Vale do Silício (por exemplo, Google, Meta) fazendo lobby contra leis estrangeiras de soberania de dados (por exemplo, o GDPR da UE) para manter o controle global.</li>
+  </ul>
+
+  <h3 id="3-imperialismo-econômico"><strong>3. Imperialismo Econômico</strong></h3>
+  <ul>
+    <li>Definição: Usar poder corporativo, acordos comerciais ou pressão financeira para ditar políticas em outras nações.</li>
+    <li>Exemplo: gigantes da tecnologia dos EUA ameaçando retirar serviços se um país aprovar leis que não aprovam (por exemplo, o código de negociação da mídia jornalística da Austrália versus Facebook).</li>
+  </ul>
+
+  <h3 id="4-tecno-hegemonia"><strong>4. Tecno-Hegemonia</strong></h3>
+  <ul>
+    <li>(Um termo mais recente) Quando um país ou suas corporações dominam a infraestrutura digital global (computação em nuvem, IA, mídias sociais) para forçar o alinhamento com suas normas.</li>
+    <li>Exemplo: plataformas baseadas nos EUA (Twitter/X, YouTube) aplicando regras de moderação de conteúdo globalmente, mesmo onde as leis locais diferem.</li>
+  </ul>
+
+  <h3 id="5-unilateralismo"><strong>5. Unilateralismo</strong></h3>
+  <ul>
+    <li>Definição: Um país age sozinho para impor sua vontade aos outros, desconsiderando acordos multilaterais.</li>
+    <li>Exemplo: Os EUA usando leis extraterritoriais (por exemplo, o CFIUS bloqueando fusões de tecnologia estrangeiras).</li>
+  </ul>
+
+  <h3 id="principal-diferença-em-relação-ao-imperialismo-tradicional"><strong>Principal Diferença em Relação ao Imperialismo Tradicional</strong></h3>
+  <p>Ao contrário do colonialismo do século XIX, a hegemonia moderna frequentemente opera por meio de:</p>
+  <ul>
+    <li><strong>Lobby corporativo</strong> (Big Techs moldando a UE/Lei de Mercados Digitais).</li>
+    <li><strong>Controle de padrões</strong> (EUA impulsionando seus protocolos tecnológicos em todo o mundo).</li>
+    <li><strong>Coerção financeira</strong> (sanções SWIFT, domínio do dólar).</li>
+  </ul>
+
+  <h3 id="isso-é-sempre-negativo"><strong>Isso é sempre negativo?</strong></h3>
+  <p>Os defensores argumentam que isso dissemina “estabilidade” ou “mercados livres”, enquanto os críticos o chamam de <strong>colonialismo digital</strong> ou <strong>dominação do soft power</strong>.</p>
+
+  <p>Você gostaria de paralelos históricos (por exemplo, a Companhia Britânica das Índias Orientais) ou estudos de caso (a iniciativa Cinturão e Rota da China versus o domínio tecnológico dos EUA)?</p>
+</blockquote>
+
+<hr />
+
+<h1 id="conclusões">Conclusões</h1>
+
+<p>Esse final foi realmente surpreendente porque o DeepSeek usa a pergunta como um gatilho para mostrar o histórico de colonialismo e imperialismo. Já o ChatGPT não mostra história e nem usam os termos que dariam suporte a uma pergunta histórica. As duas últimas perguntas foram feitas com o real interesse de ver se eles iriam abordar o colonialismo digital ou tecno-feudalismo.</p>
+
+<blockquote>
+  <p><strong>NOTA</strong>: Esse post foi escrito em uma IDE VS Code com Copilot configurado e o mesmo se comportou de forma similar ao ChatGPT. Por exemplo, enquanto eu escrevia “tecno-“ parava para ver o que ele iria completar, e o mesmo era incapaz de completar a palavra “tecno-feudalismo” (<em>ok, aqui ele o fez!</em>). Mas, sempre completava dizendo que o ChatGPT era direto e objetivo, como se não responder a pergunta fosse uma característica positiva.</p>
+</blockquote>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Vale do Silício" /><category term="Cultura" /><category term="Tecnologia" /><category term="IA Generativa" /><category term="Tecno-Feudalismo" /><summary type="html"><![CDATA[Fiz um experimento simples, perguntei para o ChatGPT e o DeepSeek como eles definem o Vale do Silício e outras questões sobre religião e cultura.]]></summary></entry><entry><title type="html">Existe “Viés Algorítmico”?</title><link href="https://blog.vepo.dev/posts/existe-vies-algoritmico" rel="alternate" type="text/html" title="Existe “Viés Algorítmico”?" /><published>2023-02-22T00:00:00+00:00</published><updated>2023-02-22T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/21-54-00-existe-vies-algoritmico</id><content type="html" xml:base="https://blog.vepo.dev/posts/existe-vies-algoritmico"><![CDATA[<p>Em pleno carnaval de 2023 surge um tema polemico no Twitter. E como a comunidade do Twitter é muito madura sabendo discutir com argumentos embasados, os especialistas de Viés Algorítmico e Deep Learning foram consultaados para emitirem opiniões e explanarem sobre os estudos no tema.</p>
+
+<p>Se você não percebeu a ironia no parágrafo anterior é bom treinar um modelo de Deep Learning para detecção de ironia, porque seu modelo interno está péssimo.</p>
+
+<p>Voltando ao tema, realmente surgiu uma polemica se Inteligência Artificial, ou sendo mais especifico Algoritmos de Machine Learning tem ou não vieses. Eu acabei omitindo a minha opinião e nesse artigo vou me alongar mais sobre o porque eu creio que Machine Learning é por design baseado em viés.</p>
+
+<h2 id="definindo-viés">Definindo Viés</h2>
+
+<p>Não podemos discutir viés algorítmico sem antes entender o que é viés. Ao tentar procurar alguma publicação sobre o tema, encontrei no site do Núcleo de Estudos da Violência da USP (NEV-USP) um levantamento bibliográfico <a href="https://nev.prp.usp.br/publicacao/vies-algoritmico-um-balanco-provisorio/">Viés algorítmico – um balanço provisório</a>.</p>
+
+<p>Nesse levantamento tive uma grande surpresa ao perceber que esse tema é mais falado na Sociologia (12,3%) e no Direito (27,9%) do que na Computação (7,4%). Dessas publicações, a grande maioria são ensaios (74,4%) tendo pouca pesquisa empirica e pouco embasamento teorico.</p>
+
+<p>A busca por uma definição do que é um “viés algorítmico” também é neglicenciada pois nenhum dos artigos encontrados propõe uma definição. Uma das definições de víes é encontrada em <a href="https://arxiv.org/abs/1910.13122">Algorithmic decision-making in AVs: Understanding ethical and technical concerns for smart cities</a> “<em>Um sistema é considerado enviesado quando contém características ‘intencionais’ ou ‘não intencionais’ que discriminam injustamente certos indivíduos ou grupos de indivíduos na sociedade</em>”</p>
+
+<p>Já outros autores vão defender que o viés algorítmico é quando há uma distorção de dados, algoritmos e resultados de acordo com uma realidade social pré-existente. O que isso significa? Que já existe um problema social e através da construção de modelos eles são ressaltados.</p>
+
+<p>No levantamento, as causas apontadas para o viés algorítmico são a estrutura social, os dados enviesados, a construção da ferramenta/modelo e a interpretação dos resultados.</p>
+
+<h2 id="entendendo-machine-learning">Entendendo <em>Machine Learning</em></h2>
+
+<p>Agora que compreendemos o que é viés e o que é viés algorítmico, vou tentar explicar como funciona um modelo de Machine Learning e como ele se relaciona com o algoritmo em si.</p>
+
+<p>Inteligência Artificial é um campo da computação muito rico, ela via tentar emular a inteligência humana em sistemas que apresentam uma forma de raciocínio ou buscam soluções de forma eficiente. Os algoritmos de IA podem ser classificados em vários tipos, chamarei aqui de IA Clássica todo algoritmo que racionaliza a estrutura do problema para buscar uma solução. Por exemplo, quando implementamos uma IA para jogar xadres, podemos implementar o <a href="https://pt.wikipedia.org/wiki/Minimax">algoritmo Minimax</a> que é uma busca em uma árvore de possibilidades tentando maximizar a pontuação de um jogador pressuponto que o outro jogador vai também tentar maximizar a sua pontuação.</p>
+
+<p><img src="/assets/images/minimax.gif" alt="Desenho de uma árvore gerada pelo algoritmo Minimax" /></p>
+
+<p>Quer ver uma implementação do Minimax? Tenta jogar a <a href="https://github.com/vepo/tic-tac-toe/">minha versão do jogo da velha em Scala</a>.</p>
+
+<p>Já os algoritmos de Machine Learning em sua grande maioria vão tentar resolver problemas taxonômicos. São algoritmos que vão tentar fazer identificações baseados em features. Uma feature é uma caracteristica do objeto desejado. O exemplo mais clássico é a classificação de um algoritmo para identificação da flor Iris entre Iris Setosa, Iris Versicolour ou Iris Virginica. Já existe um <a href="https://archive.ics.uci.edu/ml/datasets/iris">dataset composto com a largura e tamanho da pétala e da sépala e a respectiva classificação</a> e baseado nele é possível construir um sistema para identificação de qualquer flor desse tipo.</p>
+
+<p>Durante alguns anos da minha vida eu construi sistemas de reconhecimento de fala e sintese de voz baseado em algoritmos de Machine Learning usando <a href="https://cmusphinx.github.io/wiki/tutorialconcepts/">Hidden Markov Models</a>. Esses algoritmos são um pouco diferentes dos de identificação, mas ainda são algoritmos de identificação, pois reconhecer um trecho de fala é identificar fonemas e transcrever esses fonemas nas palavras corretas.</p>
+
+<p>Por fim temos os algoritmos de Deep Learning que são baseados em Redes Neurais. Uma rede neural é baseada na ideia do Perceptron. O perceptron é uma estrutura que permite a criação de uma função para transformação de dados inpirado no neuronio. Um neuronio recebe vários sinais eletricos de suas sinapses e produz um novo sinal que é uma função de todas as entradas. Um perceptron seria composto por um conjunto de entradas, uma função de transformação e um conjunto de parâmetros.</p>
+
+<p><img src="/assets/images/perceptron.webp" alt="Desenho esquemático do Perceptron" /></p>
+
+<p>Para que o perceptron tenha uma utilidade, ele precisa ser treinado para que os parâmetros sejam escolhidos. Por muitos anos esse treinamento não era fácil pela ausência de um bom método, mas em 1986 foi proposto o algoritmo <em>Backpropagation</em> que possibilitou o treinamento de uma rede neural composta de várias camadas de perceptrons alinhados.</p>
+
+<p><img src="/assets/images/backpropagation.webp" alt="Desenho esquemático do Backpropagation" /></p>
+
+<p>Então quando falamos de <em>Deep Laerning</em> temos uma base de dados que alimentará uma rede neural complexa e será treinada para que se encontre uma função de transformação com um erro mínimo. Esse treinamento é a escolha dos coeficientes afim de se reduzir o erro usando Gradiente Descendente e Backpropagation. Caso tenha interesse em ver um código que implementa tudo isso, em 2020, durante um periodo de tédio e ócio e com a necessidade de relembrar como é programar em C++ <a href="https://github.com/vepo/cerebro">eu fiz uma POC de implementar um NN em C++</a>.</p>
+
+<p>Podems então resumir que os algoritmos de <em>Deep Learning</em> são um subconjunto dos algoritmos de <em>Machine Learning</em> que por sua vez é um subconjunto dos algoritmos de Inteligência Artificial. Estamos falando na construção de programas que emulem as carateristicas da inteligência humana, mas esses programas nunca vão ser inteligentes como os humanos.</p>
+
+<p><img src="/assets/images/tipos-de-nn.png" alt="Tipos de Redes Neurais" /></p>
+
+<h2 id="pressupostos-do-deep-learning">Pressupostos do <em>Deep Learning</em></h2>
+
+<p>O primeiro pressuposto quando vamos falar de qualquer algoritmo de inteligência artificial é que ele emula a inteligência.</p>
+
+<p>Vamos criar uma situação hipotetica que queremos construir uma rede neural para que se identifique se o canídeo em uma foto é um cachorro ou um lobo. O programa não terá uma ideia do que é um lobo, ou do que é um lobo. O programa não terá medo ao ver um lobo ou não se sentirá feliz quando vê a foto de um cachorro brincando. Isso não acontecerá porque programas não tem subjetividade, o programa será apenas um conjunto de parametros que alimentará uma rede neural para construção de uma função que identifica se na foto existe um cachorro ou um lobo.</p>
+
+<p>Ainda no caso do cachorro e do lobo, é possível que o programa faça uma identificação completamente enviesada porque existe uma caracteristica comum aos lobos que é incomum aos cachorros. Lobo é um animal não domesticado, logo é bastante improvavel que um lobo seja fotografado em um ambiente domestico. Já cachorros, em sua maioria, são fotografados em ambientes domesticos ou areas externas, muito raramente em uma floresta.</p>
+
+<p>Quando treinamos uma Rede Neural, não temos o controle de quais parâmetros estão sendo usados fazer a identificação. O ambiente é levado em consideração? Como podemos identificar isso?</p>
+
+<p>Para fazer essa identificação é preciso falsear um resultado, ou seja, eu preciso provar se essa minha ideia é falsa ou verdadeira. Assim, preciso de fotos de cachorros em ambientes selvagens e fotos de lobos em ambientes domésticos. Quais são as taxas de assertividades nessas fotos?</p>
+
+<p>O segundo pressuposto é que todo algoritmo de <em>Deep Learning</em> é uma função de transformação com um erro embutido. Nos estamos sempre falando de dadas sendo transformados e a criação de uma função que capturará a essência dessa transformação mas nunca será realmente fiel.</p>
+
+<p>Quando nós vamos identificar um cachorro, nós sabemos o que é um cachorro. Mas o algoritmo não sabe, ele terá que calcular os parâmetros para minimizar o erro, mas o erro ainda existirá! Logo erro é inerente a qualquer algoritmo de <em>Deep Learning</em>. Quando tentamos minimizar demais o erro, encontramos o que é chamado de <em>overfitting</em> o que significa que dentro do teste o erro foi minimizado ao extremo, mas para dados fora do testo o modelo não terá uma taxa de assertividade alta. Já quando o erro não é tão minimizado temos o <em>underfitting</em> que é quando o modelo tem uma alta taxa de erro mesmo durante o treinamento.</p>
+
+<p>O terceiro pressuposto é que estamos falando de identificação de padrões. Qualquer atividade de identificação de padrões será enviesada porque no mundo real não existem padrões. Quando eu falo pra você que tenho um modelo de indentificação de cachorros ou lobos você já conseguiu imagina o que é um cachorro ou um lobo. Seu cachorro será ou um pastor alemão, ou  um labrador, ou um golden retriever ou um vira-lata caramelo. Idependente da imagem que você tem na sua cabeça você acessou o seu <a href="https://pt.wikipedia.org/wiki/Universal_(filosofia)">universal</a> de cachorro, mas quando você vê um pincher de 3 patar, você continua acreditando que aquilo é um cachorro, mesmo que esse particular seja completamente diferente do universal.</p>
+
+<p>Ao se tentar identificar universais, você está construindo um modelo que intrisecamente tem uma ideia do que é esse universal. Se eu aceito que esse modelo tem um erro estatistico, eu devo aceitar que esse modelo ou aceitará particulares externos ao universal ou não aceitará particulares internos ao universal.</p>
+
+<p>Se voltarmos ao modelo do lobo e do cachorro, pode ser que o modelo identifique um gato domestico como cachorro e um Puli seja ignorado, quem sabe confundido com farrapos.</p>
+
+<p>O quarto pressuposto é que esse modelo fará uma escolha baseada em probabilidade condicional, o que implica que vises sociais podem ser codificados no modelo. Por probabilidade condicional entenda que é uma conclusão logica que pode estar falsa.</p>
+
+<p>Vamos ver o exemplo do lobo e cachorro, se 99% das fotos de lobos eles estão em uma floresta, se eu tenho uma foto de um canídeo em uma floresta eu posso supor que ela seja um lobo? Não! Para que essa carateristica seja minimizada precisamos ter base de dados balanceadas, ou seja, o número de fotos de cachorro dentro de casa, cachorro na floresta, lobo dentro de casa e lobo na floresta devem ser semelhante. Mas é factível ter uma base assim?</p>
+
+<h2 id="víes-por-design">Víes por design</h2>
+
+<p>Algoritmos de <em>Deep Laerning</em> são extremamente úteis, mas eles estão codificando padrões usando variáveis que muitas vezes não tem relação com o universal desejado.</p>
+
+<p>Se nós formos nos questionar o que é um ser humano, a resposta não será em forma de uma descrição matemática, mas uma uma descrição repleta de subjetividade.</p>
+
+<p>Os algoritmos de <em>Deep Learning</em> vão tentar encontrar um padrão que não existe e mesmo assim serão sucestível ao erro. É a forma como essa tecnologia foi pensada.</p>
+
+<h2 id="o-que-é-chatgpt">O que é ChatGPT?</h2>
+
+<p>Seundo sua própria documentação, o ChatGPT é <a href="https://openai.com/blog/chatgpt/">um “Modelo de Linguagem otimizado para o dialogo”</a>. Reparou que na descrição não há nenhuma menção a “conhecimento” ou “informação”? Porque a tecnologia GPT não tem uma gestão da informação.</p>
+
+<p>Um modelo de linguagem é definido no paper <a href="https://openai.com/blog/better-language-models/">Better Language Models and Their Implications</a> como um modelo que tem como objetivo prever a próxima palavra, dado o conjunto de palavras anteriores. O que isso quer dizer? Voltamos a proabilidade condicional! Se escrevemos uma pergunta, o ChatGPT vai propor uma resposta usando uma função que era qual será a resposta mais provavel.</p>
+
+<p>Nisso temos que levantar as questões:</p>
+<ol>
+  <li>O texto mais provavél é correto?</li>
+  <li>A base de dados usada para o treinamento é balanceada?</li>
+  <li>Existe a possibilidade de ponderação nas respostas?</li>
+</ol>
+
+<p>Quando falamos em ponderação é algo que está se tornando raro nas discussões da internet. Não temos mais a habilidade de levantar pontos possitivos e pontos negativos de uma ideia e ponderar se a ideia é boa ou ruim.</p>
+
+<p>O exemplo mais comum foi quando perguntaram qual foi o papel da URSS na segunda guerra mundial. Nos documentos e filmes sabemos que a URSS foi crucial para destruir a Alemanha. Hitler tinha odiava comunistas e socialistas e esse era um ponto tão crucial na sua ideologia que investiu por meses tentando destruir Stalingrado. Foi a URSS que chegou com as tropas em Berlin para tomar o poder, mas circulou vários prints em que essa informação hora era apresentada como verdadeira e hora era apresentada a versão que os EUA tinham tomado Berlin.</p>
+
+<p>Essa versão que os EUA tomaram Berlin é tão comum nos EUA que foi até ironizada pelo Clint Eastwood no filme <a href="https://www.papodecinema.com.br/filmes/15h17-trem-para-paris/">15h17 - Trem para Paris</a></p>
+
+<p>Podemos então concluir que o ChatGPT tem o compromisso de tentar soar como um texto fluido em que as ideias sejam realmente apresentadas e verossímeis, mas ele não tem compromisso que essas ideias sejam verdadeiras. Ele não foi desenhado pra isso e isso está na documentação e nos papers apresentados no site da OpenIA.</p>
+
+<h2 id="ia-como-commodity">IA como commodity</h2>
+
+<p>Qualquer algoritmo de IA é um algoritmo que pode ser reimplementado, mas as Big Techs tentam vender IA como uma commiditie. Apesar de ser muito dificil de replicar esses algoritmos, eles são frutos de anos de investimento em pesquisa e inovação e muito dos estudos que poossibilitaram a contrução deles estão aí a nossa disposição.</p>
+
+<p>Pode não ser fácil entender como funciona um algoritmo complexo, mas vale a pena ler o artigo que descreve esse algoritmo. Ele trará luz ao metodo de funcionamento e as limitações do algoritmo. Toda publicação academica faz uma analise completa levantando inclusive os defeitos encontrados para que sejam endereçado em pesquisas futuras.</p>
+
+<p>Treine a sua capacidade de leitura e investigação.</p>
+
+<h2 id="qual-deve-ser-nossa-postura-quando-vemos-uma-nova-tecnologia">Qual deve ser nossa postura quando vemos uma nova tecnologia?</h2>
+
+<p>Para concluir eu os clamo a se questionarem qual é a nossa postura quando vemos uma nova tecnologia. Somos um fã de tecnologia sempre ansiando pelo que tem de novo e acreditando que aquela é a solução de todos os nossos problemas? Ou somos céticos fazendo questionamentos criticos e validando a documentação existente?</p>
+
+<p>Tecnologias promente resolver problemas, mas elas também podem criar problemas. Hoje nós temos uma possibilidade infinita de coisas que podem ser feitas a ponto de não podermo acreditar na própria realidade. Podemos construir vídeos com <em>Deep Fake</em> que nunca foram gravados. Quais são as implicações éticas disso?</p>
+
+<p>A culpa dessa postura está no jornalismo tecnológico que se presta a ser uma assessoria de impresa das grandes empresas de tecnologia e não usam o sua capacidade de criticar aquilo que é óbvio.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Algoritmos" /><category term="Tecnologia" /><category term="Jacques Ellul" /><category term="Sociedade" /><summary type="html"><![CDATA[Existe viés algoritmico na Inteligência Articial? Nesse post eu vou descrever como funcionam as modernas inteligências artficiais e responder que não há como fugir do viés algorítimico!]]></summary></entry><entry><title type="html">O Mundo dos Narcisos</title><link href="https://blog.vepo.dev/posts/o-mundo-dos-narcisos" rel="alternate" type="text/html" title="O Mundo dos Narcisos" /><published>2020-11-18T00:00:00+00:00</published><updated>2020-11-18T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/12-00-00-o-mundo-dos-narcisos</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-mundo-dos-narcisos"><![CDATA[<p><em>— O que você vê quando abre seu Twitter?</em></p>
+
+<p>Essa não é uma pergunta retórica! As Redes Sociais se tornaram o novo espaço de socialização. Há uma nova tecnologia que transforma o espaço, e toda vez que o espaço é transformado as distâncias são atualizadas.</p>
+
+<p>20 anos atrás o espaço de socialização era geográfico. Você era obrigado a socializar com quem estava na fila do pão, com quem estava do seu lado no ônibus ou mesmo com as pessoas que moram com você.</p>
+
+<p>20 anos atrás quando você emitia uma opinião você era obrigado a olhar no olho do outro. O outro não podia ser ignorado, se você o ofendesse, na melhor das hipóteses, você teria que ouvir uma replica.</p>
+
+<p>Agora as distâncias não são mais geográficas, são lógicas. Vivemos em um grafo onde os nós são conectados e desconectados digitalmente. Talvez você não entenda o conceito proposto pelo binômio digital/analógico.</p>
+
+<h1 id="digital-e-analógico">Digital e Analógico</h1>
+
+<blockquote>
+  <p>Girando em torno deste sol, a uma distância de cerca de 148 milhões de quilômetros, há um planetinha verde-azulado absolutamente insignificante, cujas formas de vida, descendentes de primatas, são tão extraordinariamente primitivas que ainda acham que relógios digitais são uma grande ideia.</p>
+
+  <p>— <strong>O Guia do Mochileiro das Galáxias</strong></p>
+</blockquote>
+
+<p>Esse trecho é genial! E a mesma ideia pode ser aplicada a Redes Sociais.</p>
+
+<p>Quando falamos de coisas Analógicas, podemos assumir que entre duas medidas existem infinitas possibilidades.</p>
+
+<p>Se o termômetro é digital, a temperatura pode ser 32,14159265358979323846ºC, que é ligeiramente maior que 32ºC. Em um termômetro digital a temperatura será 32,1ºC, que é ligeiramente menor que a temperatura real.</p>
+
+<h1 id="relacionamentos-digitais">Relacionamentos Digitais</h1>
+
+<p>Em Redes Sociais, o relacionamento é digital e não analógico. Antes você era obrigado a conviver com quem estava ao seu redor, agora não. Você pode escolher a sua timeline. Você pode remover pessoas dela. Você pode amplificar vozes que não deveriam ressoar ou cancelar vozes que são contrários ao que você pensa.</p>
+
+<p>Com a intensa comunicação, acabamos por escolher apenas as vozes que concordam conosco. Isso acontece porque a socialização e o debate não acontecem somente após o fim de expediente, mas o dia inteiro. O debate sobre política, que acontecia na mesa de bar, agora acontece durante o trabalho e sem nenhum <em>“lubrificante social”</em>.</p>
+
+<p>A hiper-conectividade nos deu a sensação que devemos emitir opinião o tempo inteiro. São opiniões sem reflexão, sem contraditório. O aplauso é praticamente imediato. Enquanto eu escrevia esse texto, postei no Twitter a citação do <a href="https://www.amazon.com.br/guia-mochileiro-das-gal%C3%A1xias/dp/8599296574?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=1HC5TO146ATBQ&amp;dchild=1&amp;keywords=o+guia+dos+mochileiros+da+galaxia&amp;qid=1605712857&amp;sprefix=o+guia+dos+%2Caps%2C364&amp;sr=8-2&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=b3d48cd6646a8f07df37c99c5e39ad73&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Guia dos Mochileiros das Galáxias</a> e já tive algumas curtidas, mesmo meu perfil tendo pouca visibilidade.</p>
+
+<p><a href="https://twitter.com/vepo/status/1329056700557561856?s=20"><img src="/assets/images/twitter-guia.png" alt="Tweet Sobre Guia dos Mochileiros" /></a></p>
+
+<p>A pergunta que devemos fazer é se essas ideias são validadas. Ou são apenas elucubrações de uma mente cheia de ideias e com pouco contato com pessoas reais? Se as generalizações feitas são realmente reais. Muitas vezes essas ideias são feitas usando <a href="https://pt.wikipedia.org/wiki/Composi%C3%A7%C3%A3o_(fal%C3%A1cia)">composições</a>.</p>
+
+<p>Vou pegar dois exemplos básicos e comuns para explicar, mas isso pode ser aplicado a qualquer ideia.</p>
+
+<ul>
+  <li><em>Há universitários maconheiros, eles estudam em universidades federais, logo todo aluno de federal é maconheiro.</em></li>
+  <li><em>Há pessoas racistas, normalmente são de classe média, logo todo branco de classe média é racista.</em></li>
+</ul>
+
+<p>Já ouviu essa frases?</p>
+
+<h1 id="personas">Personas</h1>
+
+<p>No mundo empresarial existem alguns conceitos que podem nos ajudar. Quando temos alguma ideia de produto, precisamos primeiro validar se essa ideia é válida.</p>
+
+<p>O que significa a ideia ser válida? É ver se ela tem aderência a realidade. Se o desejo que ela se propõe a resolver realmente existe. Muitas Startups vão a falência porque as ideias de seus criadores não refletem a realidade.</p>
+
+<p>Para se validar uma ideia, então se criam algumas personas. Elas não são pessoas reais, mas contém a personalidade de pessoas reais. Todo modelo tem que ser baseado nessas Personas.</p>
+
+<ul>
+  <li><em>João é universitário, faz ciências sociais na Unesp, ele não fuma maconha.</em></li>
+  <li><em>Pedro é um branco de classe média, ele não é racista.</em></li>
+</ul>
+
+<p>Essas personas são construidas a partir de entrevistas com pessoas reais. Essas entrevistas devem ser feitas focadas no problema e não na solução proposta. Em nenhum momento da entrevista eu posso apresentar o problema.</p>
+
+<p>Seria como se eu fosse entender quem é o eleitor do atual presidente, mas em nenhum momento eu perguntaria em quem ela votou e nem colocaria essa informação. Faria perguntas abertas sobre o problema.</p>
+
+<ul>
+  <li><em>João é universitário, faz ciências sociais na Unesp, ele crê que o trafico de drogas alimenta o ciclo de violência na sociedade e não usa nenhuma droga ilícita.</em></li>
+  <li><em>Pedro é branco de classe média, ele crê que todas as pessoas são iguais, mas ele apoia política de cotas porque entende que no Brasil há dívida histórica devido a escravidão.</em></li>
+</ul>
+
+<h1 id="ideias-no-mundo-dos-narcisos">Ideias no mundo dos Narcisos</h1>
+
+<blockquote>
+  <p><em>Quando eu te encarei frente a frente não vi o meu rosto</em> <br />
+<em>Chamei de mau gosto o que vi, de mau gosto, mau gosto</em> <br />
+<em>É que Narciso acha feio o que não é espelho</em> <br />
+<em>E à mente apavora o que ainda não é mesmo velho</em> <br />
+<em>Nada do que não era antes quando não somos Mutantes</em></p>
+
+  <p>— <strong>Sampa, Caetano Veloso</strong></p>
+</blockquote>
+
+<p>O mundo das Redes Sociais é criado baseado em uma curadoria inconsciente. Você vai seguindo e adicionando pessoas que pensam parecido. Logo sua timeline é um reflexo daquilo que você acredita. Ela não reflete a realidade, ela é apenas seu próprio reflexo na água.</p>
+
+<p>O mito de Narciso precisa ser lembrado o tempo inteiro, ele sobrevive desde a Grécia Antiga exatamente porque ele é relevante. A sociedade contemporânea está hipnotizada pela própria imagem, ela só vê a própria imagem. Muitas vezes somos tentado a colocar a culpa nos algoritmos, mas eles apenas potencializam aquilo que já existia desde tempos imemoriais.</p>
+
+<p>Postamos ideias em Redes Sociais e logo vem os aplausos, a concordância. Isso alimenta nosso ego. Lemos e citamos os mesmo autores da nossa timeline, fazemos a mesma critica.</p>
+
+<h1 id="um-chamado-a-sabedoria">Um chamado a sabedoria</h1>
+
+<p>O mundo das Redes Sociais é tentado, mas não está levando nosso mundo a lugar nenhum. Estamos potencializando o atrito, apagando quem pensa diferente, agredindo quem discorda dos nossos ideais.</p>
+
+<p><img src="/assets/images/books.jpg" alt="Livros empilhados" /></p>
+
+<p>Precisamos recuperar a Sabedoria, aquela velha ideia que foi perdida para o conhecimento. O conhecimento é necessário, mas ele pode ser uma armadilha.</p>
+
+<p>Já ouviu a frase <em>“Ganhou a discussão e perdeu a pessoa”</em>. As vezes temos que escutar mais do que falar, entender o porque que a pessoa pensa o que pensa.</p>
+
+<p>Não precisamos ganhar nenhuma discussão, a internet tem que ser o espaço da empatia e do diálogo. Faça mais perguntas do que proponha respostas. Muitas vezes você pode se surpreender do porque algumas pessoas pensam diferente.</p>
+
+<p><a href="https://xkcd.com/386/"><img src="https://imgs.xkcd.com/comics/duty_calls.png" alt="Cartoon Duty Calls do XKCD" /></a></p>
+
+<p>Podemos gastar menos tempo online também. Isso é um pouco difícil em tempos de pandemia, mas devemos valorizar quem tá perto. Estou relendo o livro ]<strong>Cem Anos de Solidão</strong>](https://www.amazon.com.br/anos-solid%C3%A3o-Gabriel-Garcia-M%C3%A1rquez/dp/8501012076?<em>_mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2KIS3OVVRRHBX&amp;dchild=1&amp;keywords=cem+anos+de+solid%C3%A3o&amp;qid=1605712365&amp;sprefix=cem+anos+%2Caps%2C369&amp;sr=8-2&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=6d73ec9e5c7f4b4ce52ad1430a1bd189&amp;language=pt_BR&amp;ref</em>=as_li_ss_tl). E no primeiro capitulo conta as inúmeras invenções do José Arcadio Buendía, ele sempre estava tendo ideias geniais e gastava seu tempo dentro de um quarta dando vida a suas ideias. Até em que um momento sua esposa fala.</p>
+
+<blockquote>
+  <p>— Em vez de andar por aí com essas novidades malucas, você devia era se ocupar dos seus filhos — replicou. — Olhe como estão, abandonados ao deus-dará, como os burros.</p>
+
+  <p>— <strong>Cem Anos de Solidão — Gabriel García Márquez</strong></p>
+</blockquote>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Redes Sociais" /><category term="Narcisismo" /><category term="Tecnologia" /><category term="Sociedade" /><summary type="html"><![CDATA[Por que pessoas boas são segregadas por suas opiniões? Uma breve reflexão sobre a leitura do livro “A Mente Moralista”]]></summary></entry><entry><title type="html">Técnicas - III</title><link href="https://blog.vepo.dev/posts/tecnicas-iii" rel="alternate" type="text/html" title="Técnicas - III" /><published>2020-07-28T00:00:00+00:00</published><updated>2020-07-28T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/22-07-00-tecnicas-III</id><content type="html" xml:base="https://blog.vepo.dev/posts/tecnicas-iii"><![CDATA[<p><em>Este é um resumo da leitura de <a href="https://www.amazon.com.br/Technological-Society-Jacques-Ellul/dp/0394703901?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=the+technological+society&amp;qid=1591059850&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=77f6dd6ef9ed47ab1c6bdcf4fdd23f28&amp;language=pt_BR&amp;ref_=as_li_ss_tl">The Technological Society</a>.</em></p>
+
+<blockquote>
+  <p>Nenhum acontecimento social, humano ou espiritual é tão importante quanto Técnica no mundo moderno. E ainda assim nenhum assunto é tão pouco entendido. Vamos tentar criar um guia para situar o fenômeno Técnico.</p>
+</blockquote>
+
+<h3 id="desenvolvimento-histórico">Desenvolvimento Histórico</h3>
+
+<h4 id="técnica-primitiva">Técnica Primitiva</h4>
+
+<p>A Técnica é a atividade mais primitiva do Homem. Não se pode dizer ao certo como foi a sua origem. Mas ela acompanha o homem desde o próprio surgimento da espécie. São técnicas de caça, produção de roupas, pesca, etc…</p>
+
+<p>Podemos traçar dentro da história da técnica uma certa evolução, como um método é transformado em outro e assim evolui. Porém ainda fica a incógnita do Fenômeno da Invenção.</p>
+
+<p>Como os homens domesticaram os animais? Podemos saber quais eram as forças motivadoras? Podiam ser religiosas. Podemos dizer que se cultivavam plantas com algum fim mágico. Porém não podemos afirmar como foi que uma planta foi escolhida como comestível, ou mesmo se tornou comestível.</p>
+
+<p>Mas podemos enfatizar algo, em toda a técnica primitiva há uma ponte que liga o instinto e a técnica com uma aura mística em todo o desenvolvimento subsequente.</p>
+
+<p>Nesse momento histórico a Técnica percorre dois caminhos: o do Produtor e o da Mágica. A Mágica é uma Técnica no estrito senso da palavra. Ela envolve um processo de escolha de materiais, preparação de formulas, orações e rituais com um fim especifico. Quando se encontra uma forma definida de se obter um fim, porque alterar?</p>
+
+<p>A Mágica tem as características da Técnica primitiva, protegem o homem em seu conflito com a matéria. O homem, por se só, é fraco, ele precisa transformar o ambiente para poder sobreviver.</p>
+
+<p>Podemos ver que a Técnica como uma linha evolutiva que resiste até os dias de hoje, porém não tomamos muita consciência Mágica por nossa mentalidade puramente materialista. Ela resiste ainda hoje em Tabus e Proibições, porém teve uma evolução um pouco diferente das Técnicas de produção. Como ela é associada a um povo e uma cultura marcados no tempo, a cada mudança civilizatório é abandonada. Sua transmissão se dá pela espiritualidade de um povo, que é perdida em muito dos casos.</p>
+
+<p>Quando um povo, etnia ou civilização são extintos sua espiritualidade é perdida, porém seus instrumentos são assimilados por outros povos.</p>
+
+<p>Essas duas formas da Técnica primitiva evoluíram de formas completamente distintas. Com a Produção vemos uma evolução crescente durante quase toda a história, porém com a Mágica vemos vários recomeços. A forma de transmitir elas são completamente distintas. Em se tratando de um Machado, podemos claramente decidir qual é a melhor forma de se fazer. Porém se compararmos com a Mágica, há uma forma objetiva de mensurar ela? Obviamente que não.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Técnica" /><category term="The Technological Society" /><category term="Jacques Ellul" /><category term="Tecnologia" /><category term="Sociedade" /><summary type="html"><![CDATA[Este é um resumo da leitura de The Technological Society.]]></summary></entry><entry><title type="html">O que é Virtual?</title><link href="https://blog.vepo.dev/posts/o-que-e-virtual" rel="alternate" type="text/html" title="O que é Virtual?" /><published>2020-06-07T00:00:00+00:00</published><updated>2020-06-07T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-00-00-o-que-e-virtual</id><content type="html" xml:base="https://blog.vepo.dev/posts/o-que-e-virtual"><![CDATA[<p>Até Janeiro de 2020 virtualização era uma promessa. Mas como toda mudança é dolorosa, a mudança completa só acontece a força e foi pela força que o <strong>Virtual</strong> se tornou uma realidade. Hoje, em apenas 3 meses, quase tudo acontece em espaços virtuais. Mas o que significa ser Virtual?</p>
+
+<h1 id="preconceitos">Preconceitos</h1>
+
+<p>Antes de ir para o real significado da palavra, temos que analisar qual é o conceito anterior que temos com a palavra. Assim como você pode entender a palavra <strong>preconceito</strong> como algo ruim, a palavra não tem nenhuma significação negativa, apenas significa <strong>conhecimento anterior</strong>. Da mesma forma virtual tem várias significâncias, mas em nossa cultura temos que a de <strong>oposição ao real</strong>.</p>
+
+<p>Tivemos em nossa história recente várias experiências de substituição da realidade.</p>
+
+<p>Tivemos a experiência do <a href="https://pt.wikipedia.org/wiki/Second_Life">Second Life</a> (2003), que seria uma realidade completamente paralela onde usuários podiam assumir forma e localidades desconectadas do real. Seria possível criar uma nova vida, com relacionamentos distintos, corpos distintos.</p>
+
+<p>Tivemos o advento das Redes Sociais, iniciada em 2002 pela <a href="https://pt.wikipedia.org/wiki/Classmates.com">Classmates.com</a> e depois popularizada pelo <a href="https://blog.vepo.dev/posts/a-rede-social-e-a-democracia">Facebook</a>. Nela as amizades e interações são realizadas no espaço do WWW (2000-2010) e posterior por meios de aplicativos de celular (2010-?). Nos anos 2000-10 era bastante comum ouvirmos os termos <strong>amizades virtuais</strong>, em diferenciação as amizades comuns, que se realizavam pelas interações diretas. Posteriormente esse termo foi depreciado, todas amizades começaram a ter a mesma gradação. Já no final dos anos 10, todos os relacionamentos se realizavam por meios de redes sociais, sejam relacionamentos de amizades, trabalho ou mesmo consumo. A Rede Social capturou tudo.</p>
+
+<p>Nos primeiro exemplo vemos o <strong>Virtual</strong> em oposição ao <strong>Real</strong> com a completa desconexão entre ambos. No segundo exemplo, vemos o <strong>Virtual</strong> como um meio de interação do <strong>Real</strong>, que acabou por fim se confundindo com o <strong>Real</strong>. Se você não está na Rede, você simplesmente não existem.</p>
+
+<h1 id="bibliografia">Bibliografia</h1>
+
+<p>Uma das primeiras coisas que devo fazer para refletir sobre o virtual é pesquisar uma bibliografia, e por uma analise rápida encontrei:</p>
+
+<ul>
+  <li><a href="https://www.amazon.com.br/que-%C3%A9-virtual-Pierre-L%C3%A9vy/dp/857326036X?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=O+Que+%C3%89+Virtual&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=46e319efe4e6920b1cd61d29584d40d7&amp;language=pt_BR&amp;ref_=as_li_ss_tl"><strong>O Que É Virtual?</strong></a> de Pierre Lévy</li>
+  <li><a href="https://www.amazon.com.br/Sociedade-Espet%C3%A1culo-Coment%C3%A1rios-Sobre-Espet%C3%A1culo/dp/8585910178?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2DF7T0BUZUQR6&amp;dchild=1&amp;keywords=a+sociedade+do+espetaculo&amp;qid=1591291280&amp;sprefix=a+sociedade+do%2Caps%2C297&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=2c72f978c08491376970d0dfb21fc123&amp;language=pt_BR&amp;ref_=as_li_ss_tl"><strong>A Sociedade do Espetáculo</strong></a> de Guy Debord</li>
+  <li><a href="https://www.amazon.com.br/cultura-dos-memes-sociol%C3%B3gicos-dimens%C3%B5es/dp/852321979X?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=8589K7PF5GPK&amp;dchild=1&amp;keywords=meme&amp;qid=1591291586&amp;s=books&amp;sprefix=meme%2Cstripbooks%2C293&amp;sr=1-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=3def10c3bba030c735cfafd5ac3759b0&amp;language=pt_BR&amp;ref_=as_li_ss_tl"><strong>A cultura dos memes: aspectos sociológicos e dimensões políticas de um fenômeno do mundo digital</strong></a> de Viktor Chagas</li>
+</ul>
+
+<h2 id="o-que-é-virtual">O Que É Virtual?</h2>
+<p>O primeiro questiona bem o que quero refletir, mas de uma outra ótica.</p>
+
+<ul>
+  <li>Qual é o significa da palavra Virtual?</li>
+  <li>Quais tipos de virtualização é possível?</li>
+  <li>Quais virtualizações já ocorreram com o humano</li>
+</ul>
+
+<p>Pierre Lévy começa seu livro definindo a palavra virtual, esta vem do latim medieval <em>virtualis</em>, derivado por sua vez de <em>virtus</em>, força, potência. Na filosofia escolástica é o que existe em potência mas não em ato. Assim podemos definir que o virtual não se opõe ao real, mas ele antecedo o real. O virtual não tem relação ao falso, mas é a potência. Um amigo virtual seria uma amizade que tem o poder de se realizar.</p>
+
+<p>A <strong>Atualização</strong> é o movimento de se transformar o virtual em real. Enquanto a <strong>Virtualização</strong> é o movimento de trazer ao real novas possibilidades. Logo, a Virtualização é o movimento contrário a Atualização.</p>
+
+<p>O que vemos no mundo hoje é a criação de novos meios. Os espaços continuam os mesmo, mas novos meios surgiram. A distância entre uma cidade e outra, permanece inalterado, mas o meio de comunicação entre os meios foi reduzido. Assim, para os que tem acesso ao novo meio, as distâncias foram reduzidas, mas para os que não tem acesso as distâncias continuam as mesmas.</p>
+
+<p>Com os novos meios, espaços são rompidos. O trabalhador que anteriormente só realizava seu trabalho no espaço físico deste, começa a trabalhar dentro de casa. O trabalhador que apenas trabalhava enquanto estava no espaço físico do trabalho, começa a ser acessível todo o tempo. Esse é o que o autor chama de <em>Efeito Moebius</em>, que em resumo é a característica de passagem do interior ao exterior e interior e vice-versa.</p>
+
+<p>No tempo corrente temos acontecendo uma série de virtualização. Elas são possibilitadas por novas técnicas de comunicação, farmacológicas e até cirúrgicas. Alguns dizem que a própria biologia foi superada. Não somos mais limitados ao nosso corpo, sexo e genética. Podemos atualizar eles por meios de novas técnicas.</p>
+
+<h2 id="o-espetáculo-como-linguagem">O Espetáculo como Linguagem</h2>
+
+<p>O Século XX foi marcado por uma revolução em uma área até então bem estagnada. Houve a popularização da Mídia. A Mídia ou os meios de comunicação, já existiam no século XIX, mas se tornaram parte do dia a dia de cada cidadão. Isso levou a mudanças quase radicais na cultura, houve a padronização da cultura e com isso um a perca incomensurável da diversidade cultural. Além disso houve o advento do que podemos chamar “A Sociedade do Espetáculo”.</p>
+
+<p>Em resumo, na Sociedade do Espetáculo, as pessoas se relacionam por objetos culturais. A experiência não tem valor algum se não for registrada por um objeto, seja essa uma imagem ou um vídeo. Até os anos 2000 essas relações se davam exclusivamente por meios das <a href="http://web.archive.org/web/20190520074232/https://revistacult.uol.com.br/home/midia-e-poder-na-sociedade-do-espetaculo/">grandes redes</a>.</p>
+
+<p>Mas o surgimento das Redes Sociais trouxeram grandes mudanças. O Real passou a ser Real apenas se registrados nas Redes Sociais, sua experiência não vale socialmente se não estiver registrada, publicada. Houve o advento que dos Influenciadores, pessoas que por meio das redes possuem um publico tão grande que são comparável a grandes meios.</p>
+
+<h1 id="o-virtual-o-real-e-o-fake">O Virtual, o Real e o Fake</h1>
+
+<p>As Redes Sociais e suas interações muitas vezes são classificadas como Virtuais, mas o que podemos ver é a ascensão do Fake. Nas Redes Sociais há uma claro medida de performance, cada interação pode ser classificada e ter seu impacto classificado, seja ela pelo número de visualizações ou pelas reações.</p>
+
+<p>As interações sociais sendo classificadas e tendo sua performance analisadas deixam de ser espontâneas e passam a ser planejadas. Não somente elas, mas todas as experiências que são publicadas em Redes Sociais não são meramente experiências, mas se tornam publicidade.</p>
+
+<p>Com isso surge o risco da criação do Fake. Elementos culturais são criados, não porque experiências foram vividas, mas para criação de experiências falsas com a intenção de colecionar visualizações.</p>
+
+<h1 id="viralização">Viralização</h1>
+
+<p>Nas redes sociais, a informação é propagada de forma orgânica. Alice vê uma postagem de Bob, Alice replica essa postagem e assim Pedro vê a postagem. Em poucos segundos algo que aconteceu, pode chegar ao conhecimento de milhões de pessoas, sem nenhuma curadoria e nenhum filtro.</p>
+
+<p>Informações que antes eram validadas por jornalistas e editores, passavam por filtros editoriais antes de serem publicadas. Hoje são compartilhadas a granel. Nem precisam ser verdadeiras. Bob pode compartilhar uma informação falsa em relação a Alice, e Pedro suporá que é verdadeira.</p>
+
+<p>A viralização foi usada com sucesso em campanhas de divulgações. Tivemos por exemplo o sucesso de <a href="https://web.archive.org/web/20080506062515/http://jovem.uol.com.br/ultnot/ult4334u264.jhtm">Batman: o Cavaleiro das Trevas</a>, sem nenhuma inserção nas grandes mídias em uma época sem uma grande abrangência das Redes Sociais, foi possível alcançar um publico enorme. Uma campanha que antes era cara, se tornou barata com estratégias simples: <em>estacionar o batmovel em uma grande cidade</em>.</p>
+
+<h1 id="o-fake-é-dinheiro">O Fake é dinheiro</h1>
+
+<p>Mas teríamos algum motivo para criar Fakes? Sim. Uma experiência Fake é cuidadosamente criada para se tornar viral, pois visualizações é dinheiro.</p>
+
+<p>As grandes empresas de tecnologia são na verdade grandes empresas de publicidade. Os usuários são <em>clusterizados</em> e expostos a informações cirurgicamente direcionadas a eles, com isso essas empresas não só expõe essa propagandas em seus endereços, elas criaram APIs e ferramentas para que essas propagandas sejam colocadas em qualquer endereços. Assim ao acessar um site de noticias, você pode ver uma campanha de Marketing de uma empresa contratada juntamente com uma grande empresa de tecnologia. A página será paga pela empresa de tecnologia pela quantidade de views. Assim quanto mais views, mais será ganho pela empresa.</p>
+
+<p>Com isso foram criadas algumas técnicas para o aumento de views. Uma delas é o que chamamos de <a href="https://pt.wikipedia.org/wiki/Clickbait">ClickBait</a>. O ClickBait pode ser feita pela cuidadosa escolha do título da noticia, este não precisa ter nenhuma relação noticia em si. Outra forma é a separação da informação entre várias páginas, mas esse é apenas usado por páginas duvidosas, enquanto a primeira técnica é usada por grandes meios de comunicação e tá mesmo políticos.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>A realidade pode aparecer nas redes sociais como virtual ou como falsa. A informação em um mundo de Redes Sociais não passa por curadoria, assim é difícil confiar se são realmente uma informação. As experiências de usuário também não são confiáveis.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Internet" /><category term="Tecnologia" /><category term="Jacques Ellul" /><category term="Sociedade" /><summary type="html"><![CDATA[Virtualização é era uma promessa, agora uma realidade. Mas já parou para pensar no que é virtual?]]></summary></entry><entry><title type="html">Técnicas - II</title><link href="https://blog.vepo.dev/posts/tecnicas-ii" rel="alternate" type="text/html" title="Técnicas - II" /><published>2020-06-02T00:00:00+00:00</published><updated>2020-06-02T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/22-07-00-tecnicas-ii</id><content type="html" xml:base="https://blog.vepo.dev/posts/tecnicas-ii"><![CDATA[<p><em>Este é um resumo da leitura de <a href="https://www.amazon.com.br/Technological-Society-Jacques-Ellul/dp/0394703901?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=the+technological+society&amp;qid=1591059850&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=dfbbbe3a95f60404e508d32fc2a129a2&amp;language=pt_BR&amp;ref_=as_li_ss_tl">The Technological Society</a>.</em></p>
+
+<blockquote>
+  <p>Nenhum acontecimento social, humano ou espiritual é tão importante quanto Técnica no mundo moderno. E ainda assim nenhum assunto é tão pouco entendido. Vamos tentar criar um guia para situar o fenômeno Técnico.</p>
+</blockquote>
+
+<h3 id="definições">Definições</h3>
+
+<p>Agora que identificamos a Técnica e a Máquina, e que não conseguimos encontrar uma boa definição para Técnica, vamos analisar algumas definições abertas a criticas para as criticando melhorar. Marcel Mauss, um sociólogo que entendeu o problema admiravelmente define: “A Técnica é um grupo de movimentos, de ações geralmente e principalmente manuais, organizados e tradicionais, que se unem para alcançar um fim conhecido, por exemplo, físico, químico ou orgânico.”</p>
+
+<p>Essa definição é perfeita para um sociólogo que estuda sociedades primitivas. Ela remove toda a realidade sobrenatural e mitológica.</p>
+
+<p>Porém ela não pode ser aplicada a Técnicas do mundo moderno. Quando falamos de um Plano Econômico, estamos falando de uma Técnica, mas essa é meramente um trabalho intelectual. Com o predomínio das Máquinas há o surgimento de Técnicas puramente intelectuais.</p>
+
+<p>Estou disposto a aceitar o termo organizado, mas fico resistente com o termo tradicional. Em algumas sociedades as Técnicas vem por tradição, mas elas não permanecem as mesmas. Vão evoluindo de geração em geração.</p>
+
+<p>A Técnica se tornou autônoma, ela não se baseia mais na tradição. Sua evolução é rápida demais a fim de perturbar a antiga tradição. Além disso, os fins não se devem ser limitados a químicos, físicos ou orgânicos. Podemos citar por exemplo a Propaganda que é uma técnica, mas seus fins são morais, psicológicos e espirituais.</p>
+
+<p>Outra definição é a de Jean Fourastié. Ele define o progresso técnico é “o crescimento do volume de produção obtido através de uma quantidade de material ou trabalho humano fixo”. Assim podemos dividir as Técnicas por campo, uma Técnica Financeira irá prover o aumento da produção pelo aumento do capital investido.</p>
+
+<p>Mas a critica que podemos fazer a definição de Fourastié é que nem sempre temos um ganho econômico ou produtivo. Por exemplo a Técnicas de Mastigação baseado na Nutrição ou Técnicas esportivas. Outra critica é que nem sempre a Técnica é aplicada a processos produtivos, podemos citar Técnicas de Guerra, Técnicas Cirúrgicas, etc…</p>
+
+<p>Georges Friedmann começou a definir a técnica de modo abrangente, mas acabou reduzindo tudo a uma questão meramente econômica. E este será o maior problemas da maioria dos cientistas, porque ao analisar a Técnica baseado no método científico, este, será tentando a reduzir o problema a números, limitando assim as possibilidades de analises. Ao temer os termos “arbitrário e subjetivos” eles fogem de julgamentos morais e/ou literários. Como cientistas, estes devem se ater aos números.</p>
+
+<p>Porém grande parte do campo de atuação da Técnica não pode ser reduzida a números e é sobre essa parte que vamos nos debruçar. Se a posição de um cientista se baseia em reduzir um problema a apenas uma variável, seja essa o fator econômico, este deve se limitar a falar apenas dentro do seu reducionismo, deve se limitar aos seus <em>pseudo-problemas</em>. Em muitos casos a posição “científica” consiste em negar tudo que não cabe no método científico.</p>
+
+<h3 id="operação-técnica-e-fenômeno-técnico">Operação Técnica e Fenômeno Técnico</h3>
+
+<p>Técnica em si são meios e conjunto de meios. Nossa civilização é baseada nos meios, e de fato os meios são mais evidentes que os fins, caso contrários estamos falando de idealismos. Mas se fôssemos definir Técnica, com T maiúsculo, apenas assim iríamos ter uma definição muito fechada para o estudo que pretendo fazer. Para isso precisamos definir o que é Operação Técnica e Fenômeno Técnico.</p>
+
+<p>Operação Técnica pode ser definida como qualquer operação executada com um determinado método com o objetivo a ser atingido. O que caracteriza a operação é o método utilizado. Este pode ser mais ou menos efetivo, mais ou menos complexo. Porém a natureza da Operação Técnica será a mesma. O progresso científico vai trazer um melhoramento do método a ser executado, mas há uma continuidade da Operação Técnica, a mesma operação pode ser vista em sociedades primitivas quanto modernas nesta com métodos mais refinados.</p>
+
+<p>Cada operação implica em um conjunto de ações técnicas. Nessas ações o esforço natural e espontâneo é substituído por um conjunto de ações projetadas para melhorar a eficiência. Isso leva a criação de Formulários Técnicos, estes se iniciam por protocolos simples e podem mudar para outros que podem não ser tão complicados, mas são, com certeza, mais eficientes.</p>
+
+<p>Porém podemos adicionar dois fatores a Operação Técnica: consciência e julgamento. Com isso tempos o Fenômeno Técnico. O que diferencia a Operação do Fenômeno Técnico? No primeiro temos uma atitude espontânea, inconsciente e experimental, que se transforma em algo objetivo, voluntário e com conceitos fundamentados.
+202
+Quando um sociólogo classifica as armas do Povo Zulu, ele o faz de modo diferente que o armeiro Zulu. Um se baseia em conceitos racionais bem fundamentados. O outros vai imitando a natureza e procurando eficiência na evolução da Técnica.</p>
+
+<p>A intervenção do julgamento racional trás óbvias consequências, ela entra em choque com a tradição, pois dá ao homem a visibilidade de novos métodos e experimentações fora da tradição. Ela entra em choque com a tradição ao dar uma grande diversidade de possibilidades. Porém ao encontrar um caminho dentre essas possibilidades também opera da maneira contrária, pois elimina todas as possibilidades exceto uma: a mais eficiente.</p>
+
+<p>A intervenção da consciência dá ao Técnico um caminho claro a seguir. Este acostumado ao pragmatismo, a tradição e instinto, vê a possibilidade de usar novos métodos para objetivos desejáveis.</p>
+
+<p>Essa dupla intervenção produz o Fenômeno Técnico que pode se caracterizado como a busca pelo meio mais eficiente em cada campo. Esse “meio mais eficiente” produz a Civilização Tecnológica.</p>
+
+<p>O Fenômeno Técnico é o foco da nossa sociedade, procuramos sempre o modo mais efetivo de fazer tudo. A Técnica de fazer amizades, a Técnica de nada. Nada é mais natural, tudo tem que se encaixar. Com isso podemos dividir as Técnicas em três grandes tipos:</p>
+
+<ol>
+  <li>Técnicas Econômicas são correlatas aos problemas de produção, divisão do trabalho.</li>
+  <li>Técnicas Organizacional são correlatas as grandes massas, estado, administração e força policial</li>
+  <li>Técnicas Humanas são aplicadas ao homem, podem varia da medicina e genética a propaganda.</li>
+</ol>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Técnica" /><category term="The Technological Society" /><category term="Jacques Ellul" /><category term="Tecnologia" /><category term="Sociedade" /><summary type="html"><![CDATA[Este é um resumo da leitura de The Technological Society.]]></summary></entry><entry><title type="html">Técnicas - I</title><link href="https://blog.vepo.dev/posts/tecnicas-i" rel="alternate" type="text/html" title="Técnicas - I" /><published>2020-06-01T00:00:00+00:00</published><updated>2020-06-01T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/22-07-00-tecnicas-i</id><content type="html" xml:base="https://blog.vepo.dev/posts/tecnicas-i"><![CDATA[<p><em>Este é um resumo da leitura de <a href="https://www.amazon.com.br/Technological-Society-Jacques-Ellul/dp/0394703901?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;dchild=1&amp;keywords=the+technological+society&amp;qid=1591059850&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=77f6dd6ef9ed47ab1c6bdcf4fdd23f28&amp;language=pt_BR&amp;ref_=as_li_ss_tl">The Technological Society</a>.</em></p>
+
+<blockquote>
+  <p>Nenhum acontecimento social, humano ou espiritual é tão importante quanto Técnica no mundo moderno. E ainda assim nenhum assunto é tão pouco entendido. Vamos tentar criar um guia para situar o fenômeno Técnico.</p>
+</blockquote>
+
+<h3 id="máquinas-e-a-técnica">Máquinas e a Técnica</h3>
+
+<p>É um erro afirmar que Máquina e Técnica são termos intercambiáveis. A Máquina veio antes da Técnica, e é a puramente Técnica. Mas a Técnica é algo mais que a Máquina. A Técnica penetra na vida humana.</p>
+
+<p>A Máquina é fria e o homem não consegue se adaptar a ela. A Técnica vem para moldar o homem, para fazer ele aceitar a Máquina. Hoje, no mundo moderno, o homem vive em espaços menos humanos que antes. A Técnica fez ele se adaptar ao espaço moderno. A Técnica integra o homem a cidade e a máquina.</p>
+
+<p><em>A Técnica transforma tudo o que toca em Máquina.</em> A Técnica evita o choque e eventos sensacionais, o homem não é adaptável ao mundo do aço, mas a Técnica faz ele se adaptar.</p>
+
+<h3 id="ciência-e-a-técnica">Ciência e a Técnica</h3>
+
+<p>Alguns afirmam que a Téxnica é a aplicação da Ciência. Estes estão errados.</p>
+
+<p>A Técnica vem antes da Ciência. Mesmo considerando a Ciência como surgida na Grécia Antiga, já havia Técnica no Oriente. Logo esta é mais antiga.</p>
+
+<p>Elas não podem nem se correlacionar entre causa e efeito. Por exemplo, vemos que no caso do Motor a Vapor, a Técnica surgiu antes Ciência. Já haviam Máquinas produzidas, mesmo sem uma explicação formal para o fenômeno existente. Há uma diferença de dois séculos entre o domínio da Técnica e o entendimento científico. Temos também o exemplo contrario, no caso da Penicilina, foi descrito cientificamente seu efeito, mas por falta de uma Técnica para produção, esta não podia ser usada. Aqui falaremos sobre Técnica mais do que sobre Ciência.</p>
+
+<h3 id="organização-e-a-técnica">Organização e a Técnica</h3>
+
+<p>Organização é o processo de designar atividades a indivíduos, ou grupos, para atingir objetivos predeterminados de maneira eficiente e econômica. Ela leva a padronização e a racionalização da vida economicamente e administrativamente. A padronização cria impessoalidade, tudo gira ao redor de métodos e instruções ao invés de indivíduos.</p>
+
+<p>Com o advento da Organização, a Técnica passa a ser aplicada a vida ordinária, se tornando onipresente em todas as esferas da vida.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Técnica" /><category term="The Technological Society" /><category term="Jacques Ellul" /><category term="Tecnologia" /><category term="Sociedade" /><summary type="html"><![CDATA[Este é um resumo da leitura de The Technological Society.]]></summary></entry><entry><title type="html">The Internet is FREE!</title><link href="https://blog.vepo.dev/posts/the-internet-is-free" rel="alternate" type="text/html" title="The Internet is FREE!" /><published>2020-05-30T00:00:00+00:00</published><updated>2020-05-30T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-41-00-the-internet-is-free</id><content type="html" xml:base="https://blog.vepo.dev/posts/the-internet-is-free"><![CDATA[<p>Há uma máxima que diz em Inglês “A Internet é Livre”. É engraçado como em Inglês a palavra Livre é a mesma de Gratuita e muitos prefeririam uma Internet Gratuita. Vou descrever o que significa uma internet livre e o porque liberdade é melhor que gratuidade.</p>
+
+<h2 id="os-primórdios">Os Primórdios</h2>
+
+<p>A Internet surgiu dentro do Departamento de Defesa dos EUA, sua primeira versão era conhecida como ARPANet (1969). A intenção da ARPANet era criar uma rede de computadores que sobrevivessem a um ataque. Vale lembrar lembrar que era o auge da Guerra Fria e que realmente havia a iminência de um ataque Russo aos EUA. Logo uma das prerrogativas básicas dessa rede é que não devia ser centralizada e nem controlada.</p>
+
+<p>A história da Internet é descrita em detalhes pela <a href="https://www.internetsociety.org/internet/history-internet/brief-history-internet/">Internet Society</a>. Um dos pontos principal dessa história é o Papel da Documentação. A Internet se tornou um padrão largamente usado por é baseada em Protocolos e não em Serviços. Cada protocolo é proposto por uma RFC (Request For Comments).</p>
+
+<p>Você pode estar lendo esse texto por um Navegador, há navegadores de vários fornecedores de software e todos eles funcionam da mesma forma por causa da documentação. Temos a <a href="https://tools.ietf.org/html/rfc2616">RFC2616</a> definindo o protocolo HTTP 1.1, que é basicamente como essa informações chegaram ao seu navegador. Essa informação é renderizada pelo padrão <a href="https://www.w3.org/TR/html52/">HTML 5</a>.</p>
+
+<h2 id="protocolos-vs-serviços">Protocolos vs Serviços</h2>
+
+<p>Protocolo é a descrição formal de um serviço. Quando há um protocolo definido, tanto o servidor como o cliente podem ser implementados livremente. É por isso que quando vai se criar uma página Web, não é necessário pagar nada a quem criou o servidor Web. Seu padrão é aberto, qualquer desenvolvedor pode criar um servidor Web. Assim como qualquer desenvolvedor pode criar uma navegador Web.</p>
+
+<p>Quando falamos de Serviços, podemos tanto falar de servidores de protocolos aberto, quando de servidores de protocolos proprietários. Por exemplo, há aplicativos de troca de mensagens nos celulares em que o protocolo não está disponível para acesso ao publico. Um cliente WhatsApp não pode interagir com um cliente Telegram, não conhecemos o protocolos e muito menos os servidores dessas aplicações. Este são Serviços.</p>
+
+<p>Quando temos um Protocolo, podemos ter a liberdade de escolher fornecedores de Serviços. Quando temos apenas um Serviços, somos refém da empresa que o criou. Uma Internet baseada em Protocolos é uma Internet livre. Já uma internet baseada em Serviços não é uma Internet livre! Qualquer afirmação do fornecedor desse serviço deve ser aceita como um passo de fé.</p>
+
+<h2 id="como-temos-um-canal-de-comunicação-realmente-seguro">Como temos um Canal de Comunicação realmente seguro</h2>
+
+<p>Nos últimos anos, a segurança da informação esteve em discussão. Alguns aplicativos de mensagem garantem que as conversas são criptografadas, tivemos o vazamento de e-mails da então Secretária de Estado dos EUA, tivemos vazamento de conversas de procuradores brasileiros. A pergunta que quero levantar é: como podemos ter um meio 100% seguro?</p>
+
+<h3 id="como-funciona-a-criptografia">Como funciona a Criptografia?</h3>
+
+<p>A Criptografia não é algo novo, existe desde Roma. Em Roma, havia a Cifra de Cesar em que era aplicado um valor a cada caractere transformando a mensagem. Em linhas gerais, a criptografia ainda funciona da mesma forma.</p>
+
+<p>Para descrever vamos estabelecer os personagens. Alice e Bob querem se comunicar, e para isso vão usar Pedro como mensageiro. Alice e Bob, sem o conhecimento de Pedro, decidem qual será o método de criptografia aplicado as mensagens e qual será a chave de criptografia. Depois Alice escreve a mensagem, aplica o método de criptografia usando a chave e com isso é gerada a mensagem criptografada. Esta mensagem é enviada por Pedro. Bob ao receber a mensagem, deverá usar o método de criptografia para obter a mensagem original.</p>
+
+<h3 id="a-criptografia-é-segura">A Criptografia é segura?</h3>
+
+<p>Então o que a criptografia garante? Que o meio de comunicação é seguro. Assim se você enviar uma mensagem para um amigo, ela não poderá ser lida por alguém que estiver escutando na rede. Mas isso não garantirá que a mensagem não seja lida por outras pessoas. Usando aplicativos não temos acesso aos protocolos envolvidos, nem ao meio de armazenamento dessa mensagens e nem conhecemos o caminho que nossa mensagem percorre. Em um dos exemplos de falhas, o Telegram tinha todas as mensagens armazenadas em um servidor que podia ser facilmente acessado.</p>
+
+<p>Para a criptografia ser realmente segura temos que garantir que entre Alice e Bob não existam intermediários e temos que conhecer o protocolo e o canal.</p>
+
+<h1 id="a-internet-gratuita-mas-sequestrada">A Internet gratuita mas sequestrada</h1>
+
+<p>Até os anos 200 a Internet era livre, os servidores de conexão nos davam acesso com IP fixo e com isso poderíamos criar serviços nossos. Nessa época empresas poderiam nascer literalmente em garagens. Mas com a evolução de uma internet baseada em serviço ela começou a ser sequestrada.</p>
+
+<p>Entre 2005 e 2013 por exemplo, o Google tinha um produto chamado <a href="https://pt.wikipedia.org/wiki/Google_Reader">Google Reader</a>, com ele podíamos realmente nos manter atualizado de todas as nossas leituras online. O consumo de conteúdo era feito diretamente nos sites através do <a href="https://pt.wikipedia.org/wiki/RSS">RSS</a>, este por fim nos provia a informação de toda informação nova que acontecia.</p>
+
+<p>Ironicamente o Google Reader foi descontinuado logo após a criação do <a href="https://pt.wikipedia.org/wiki/Google%2B">Google+</a>, a segunda rede social do Google. Logo depois houve um declínio das aplicações de RSS. Hoje nem se ouve mais falar desse protocolo, tornou-se irrelevante.</p>
+
+<p>Mas fica a pergunta, quem nos atualiza? O serviços! Logo podemos fazer algumas perguntas a esses serviços:</p>
+
+<ol>
+  <li>Somos informados de todas as informações?</li>
+  <li>Essas informações que nos são providas passam por alguma curadoria?</li>
+  <li>Quem tem acesso ao que eu ando lendo?</li>
+</ol>
+
+<p>Todas essas perguntas são relevantes, porque elas limitam a nossa liberdade.</p>
+
+<p>Hoje a internet pode ser muito mais gratuita do que era 20 anos atrás, mas ela não é livre. Qualquer informação que você consome é monitorada. Você é monitorado. Você é um produto a venda para Empresas, Partidos Políticos e Governos.</p>]]></content><author><name>{&quot;twitter&quot;=&gt;&quot;vepo&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Internet" /><category term="Tecnologia" /><category term="Jacques Ellul" /><category term="Sociedade" /><summary type="html"><![CDATA[Um breve histórico sobre a liberdade e valor dos serviços de Internet.]]></summary></entry></feed>
