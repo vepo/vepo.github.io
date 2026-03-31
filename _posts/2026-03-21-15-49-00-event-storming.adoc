@@ -9,17 +9,109 @@ permalink: /posts/o-que-e-event-storming
 publish_date: 2026-03-10 10:44:00 +0300
 ---
 
-_Event Storming_ ou Tempestade de Eventos é uma técnica desenvolvida por Alberto Brandolini que é um exercicio colaborativo para explorar o modelo domínio de aplicações. Quando falamos de domínio, estamos nos referindo ao _Domain-Driven Design_ (DDD, em tradução livre Projeto Orientado ao Domínio). 
+Quando falamos de desenvolvimento de software, é comum imaginarmos pessoas sentadas em frente ao computador, escrevendo código. Também costumamos pensar que o mais produtivo é que todos estejam focados nessa atividade, sem interrupções e sem distrações. Afinal, o código é o entregável mais importante, certo? Errado!
 
-O _Event Storming_ é um _brainstorming_ que além de trazer ideias a mesa alinha a expectativas quando a necessidade de informação e e os fluxos de trabalhos de uma aplicação. É um exercicio colaborativo e não individual. Ao trazer pessoas de diversas áreas do dominio para uma mesma sala e fazer elas pensarem sobre os processos, a elaboração de design ganha uma visão holística que só é possível pela colaboração e crítica mutua.
+Na verdade, desenvolver software é a arte de traduzir processos do mundo real para dentro de sistemas. Isso envolve entender esses processos, criar modelos, codificá-los e, por fim, validar se eles entregam valor real às pessoas envolvidas no negócio.
 
-Processo começa com os participantes identificando os "Eventos de Domínio". Esses eventos representam fatos que acontecem no sistema que interessam ao participante e devem ser registrados em notas adesivas laranja. 
+Se não ficou claro: escrever programas é, antes de tudo, um exercício de tradução. Nessa arte, há duas atividades altamente subjetivas e desafiadoras: compreender o mundo real e se comunicar com ele. Por isso, buscar objetividade e mecanização excessivas nesse processo pode ser prejudicial — corremos o risco de criar produtos que não se adequam à realidade dos clientes e não entregam valor.
 
-Depois esses participantes devem identificar os "comandos que fazem esses eventos aconteceram. "Comandos" são decisões tomadas por seres humanos, um usuário do software. O objetivo é identificar os usuários e as fronteiras do sistema com o usuário. Os "comandos" são registrados em notas azuis.
+É aí que entra o Projeto Guiado pelo Domínio (em inglês, _Domain-Driven Design_, ou DDD). Essa abordagem coloca o negócio no centro da lógica do projeto, garantindo que o software seja construído a partir do que realmente importa: o domínio — ou seja, o campo de conhecimento ou atividade ao qual o sistema se destina. Para que isso aconteça, o domínio precisa ser conhecido, explorado e, sobretudo, compreendido em seus limites.
 
-Os participantes não técnicos deve ter liberdade para interromper e falar sobre os eventos cobrindo informações faltantes ou incorretas. É importante lembrar que no Domain-Driven Design o domínio é o coração do projeto e por isso tudo deve sempre ir e voltar do domínio. Conceitos novos podem ser criados, mas eles tem que ser aprovados pelos profissionais do domínio, eles tem que fazer sentido para o domínio.
+Para ajudar nessa tarefa, a comunidade DDD desenvolveu uma série de workshops colaborativos. Neste post, vamos falar de um deles: o _Event Storming_, ou Tempestade de Eventos. Criado por Alberto Brandolini, essa técnica é um exercício colaborativo que tem como objetivo explorar o modelo de domínio de uma aplicação de forma ágil e envolvente.
 
-Quando os eventos são registrados, podemos identificar os agregados e registra-los em notas amarelas. Por exemplo, se há o evento de "Pedido Feito", isso significa que existe um agregado "Pedido" que possui um ciclo de vida com o estado "Feito". Quais são os outros possíveis estados desse ciclo de vida?
+== Outros Técnicas do Domain-Driven Design
 
-Quando um agregado é identificado, os comandos e eventos que são referentes a esse agredados devem ser movidos para perto dele. Isso fará com que os contextos delimitados apareçam e será possível ver as relações entre os mesmos. Normalmente os contextos delimitados refletem a estrutura organizacional das empresas e essa dinâmica ajuda a entender como a informação e os eventos fluem dentro do processo organizacional de uma empresa.
+Antes de falarmos do _Event Storming_, vamos conhecer outras técnicas do Domain-Driven Design que podem nos ajudar a conhecer mais o domínio e especificar o nosso software?
 
+* **User Story Mapping**: criado por Jeff Patton, essa técnica vai além do simples backlog de histórias de usuário. Em vez de listar requisitos de forma isolada, ela organiza as funcionalidades em uma linha do tempo que revela a jornada completa do usuário. O resultado é uma visão mais clara do que realmente importa para entregar valor, ajudando times a priorizar com consciência do todo.
+* **Domain Storytelling**: essa abordagem usa pictogramas simples para contar histórias sobre o domínio. O foco está nas pessoas, nos seus papéis e nas interações entre elas ao longo de um fluxo de trabalho. Diferente de métodos que privilegiam apenas o caminho principal, o _Domain Storytelling_ abraça a complexidade do mundo real, capturando tanto os fluxos felizes quanto aqueles caminhos tortuosos que ninguém gosta de lembrar, mas que sempre aparecem.
+
+O que diferencia o _Event Storming_ é sua abordagem centrada em eventos (fatos que acontecem) e sua capacidade de escalar para explorar não apenas o fluxo "feliz", mas também exceções, regras de negócio complexas e a estrutura organizacional como um todo.
+
+== Um pouco de história 
+
+O _Event Storming_ foi criado por Alberto Brandolini, um consultor de software italiano. Inicialmente, a técnica se chamava "Event-based Modelling", nome inspirado no livro Implementando Domain-Driven Design, de Vaughn Vernon. Quando Brandolini foi convidado para ministrar uma palestra sobre o assunto, ele resolveu dar um novo formato à ideia, e batizou a abordagem de Event Storming. O resultado foi uma técnica dinâmica e visual que se propõe a modelar processos de negócio e extrair requisitos de software de forma colaborativa.
+
+O _Event Storming_ é, antes de tudo, um workshop, não apenas uma técnica isolada. Por isso, para que ele aconteça de forma eficaz, é preciso considerar os elementos que compõem qualquer boa oficina colaborativa: materiais adequados, as pessoas certas, um espaço apropriado e tempo suficiente para que o grupo possa explorar o domínio com profundidade. Então vamos entender alguns conceitos relevantes do DDD?
+
+== Conceitos Relevantes do DDD 
+
+Para extrair o máximo valor do Event Storming, é útil ter uma noção de alguns conceitos fundamentais do Domain-Driven Design. Eles serão as peças-chave que você irá organizar durante o workshop:
+
+* **Domínio**: É a esfera de conhecimento e atividade sobre a qual o software atua. Em um sistema bancário, o domínio é o "negócio bancário".
+* **Evento de Domínio**: Um fato que ocorre e que é relevante para os especialistas do negócio. Ex: `ContaBloqueada`, `PedidoEnviado`, `EstoqueBaixo`. É um verbo no passado.
+* **Comando**: É uma intenção, uma ação iniciada por um usuário ou um sistema que desencadeia um ou mais eventos. Ex: `Bloquear Conta`, `Enviar Pedido`. Ele representa a decisão de agir.
+* **Agregado**: É um cluster de objetos de domínio que pode ser tratado como uma unidade única. Ele garante a consistência das regras de negócio. Por exemplo, um `Pedido` (que contém itens, endereço de entrega e status) é um agregado.
+* **Contexto Delimitado** (_**Bounded Context**_): É a fronteira explícita onde um modelo de domínio é definido e aplicado. É a forma de evitar que conceitos como "Cliente" tenham significados diferentes (ex: cliente de vendas vs. cliente de cobrança) se misturem.
+
+== Material Necessário e Papéis dos Participantes
+
+Um workshop de Event Storming é de baixa tecnologia e alta colaboração. Você vai precisar de:
+
+* **Material**:
+** Uma **parede grande** ou uma **sala com paredes de vidro/quadro branco**.
+** **Post-its** nas seguintes cores (as cores são importantes para a técnica):
+*** **Laranja**: Eventos de Domínio.
+*** **Azul**: Comandos.
+*** **Amarelo**: Agregados.
+*** **Rosa**: Atores (usuários/sistemas externos).
+*** **Verde**: Políticas (regras de negócio que disparam novos comandos).
+*** **Roxo**: Perguntas ou pontos de atenção.
+** **Pilotos de ponta fina** (canetinhas) para garantir legibilidade.
+* **Papéis dos Participantes**:
+** **Especialistas do Domínio (o negócio)**: São os mais importantes. Eles detêm o conhecimento sobre o fluxo, as regras e as exceções do negócio. Devem ser de diferentes áreas para trazer visões holísticas.
+** **Facilitador**: Não é o dono do conhecimento, mas o guardião do tempo e do processo. Seu papel é fazer as perguntas certas ("O que acontece depois?", "Quem faz isso?") e garantir que todos sejam ouvidos.
+** **Desenvolvedores e Arquitetos**: Observam, aprendem e começam a pensar em termos de modelos, APIs e restrições técnicas sem interromper o fluxo do negócio.
+** **Product Manager / PO**: Ajuda a validar a visão de produto e a alinhar as descobertas com os objetivos estratégicos.
+---
+
+== Dinâmica do Workshop
+
+A dinâmica é dividida em etapas, começando pelo caos organizado e evoluindo para a estrutura. A ordem aqui é crucial.
+
+=== Fase 1: Chovendo Eventos (Post-its Laranja)
+
+**Ação**: O facilitador pergunta: "O que acontece no sistema?". Os participantes começam a escrever eventos em post-its laranja (sempre no passado: PagamentoConfirmado, não Confirmar Pagamento) e colam na parede, sem se preocupar com ordem.
+
+**Papel**: Especialistas dominam a fase. Facilitador mantém o ritmo.
+
+=== Fase 2: Ordenando a Linha do Tempo
+
+**Ação**: O grupo começa a organizar os eventos cronologicamente, da esquerda para a direita. É nesse momento que lacunas aparecem. "Se `PedidoRealizado` leva a `PagamentoProcessado`, o que acontece no meio?".
+
+**Papel**: Facilitador guia a ordenação. Especialistas validam a lógica.
+
+=== Fase 3: Disparando Comandos (Post-its Azuis)
+
+**Ação**: Para cada evento, o grupo pergunta: "O que fez esse evento acontecer?". A resposta é um comando (verbo no infinitivo: `Autorizar Pagamento`). Coloca-se o post-it azul à esquerda do evento que ele causa.
+
+**Papel**: Identificar atores (post-its rosa) que executam esses comandos.
+
+=== Fase 4: Identificando Agregados (Post-its Amarelos)
+
+**Ação**: Agora o grupo busca por "nomes". Quando falamos de `PedidoFeito`, `PedidoCancelado`, `PedidoPago`, estamos falando de um agregado chamado "Pedido". Agrupe os comandos e eventos em torno do post-it amarelo que representa o agregado.
+
+**Papel**: Desenvolvedores e arquitetos começam a atuar mais fortemente, identificando as raízes de consistência.
+
+=== Fase 5: Contextos Delimitados e Políticas
+
+**Ação**: Com os agregados formados, o grupo observa como eles se comunicam. Se o agregado "Pagamento" interage com "Pedido", há uma relação. Círculos desenhados na parede ajudam a delimitar os Contextos Delimitados. Use post-its verdes para Políticas (ex: "Se `PedidoPago`, então `IniciarPreparacao`"), que mostram reações automáticas do sistema.
+
+
+== Resultado
+
+Ao final do workshop, você terá produzido muito mais do que uma série de post-its na parede. Os resultados tangíveis são:
+
+. **Um Mapa Visual do Domínio**: Uma representação de ponta a ponta do fluxo do negócio, mostrando eventos, comandos, atores, agregados e as fronteiras entre contextos.
+. **Descoberta de Lacunas**: Exceções, fluxos alternativos e regras de negócio esquecidas são reveladas durante o exercício.
+. **Glossário Ubíquo**: A base de uma linguagem comum entre técnicos e negócio, capturada nos nomes dos eventos e agregados.
+. **Identificação de Pontos de Complexidade**: Post-its roxos ("perguntas") sinalizam onde a complexidade está e o que precisa ser explorado mais a fundo.
+. **Um Esboço Arquitetural**: Os contextos delimitados começam a sugerir como o sistema pode ser modularizado ou decomposto em microsserviços.
+
+A técnica surgiu da frustração com reuniões de modelagem tradicionais, que frequentemente eram lentas, dominadas por diagramas complexos e que falhavam em capturar a verdadeira essência do negócio.
+
+== Conclusão
+
+O Event Storming é muito mais do que uma técnica de brainstorming; é um exercício de alinhamento e exploração profunda do domínio. Ele quebra as barreiras entre o "nós" (tecnologia) e "eles" (negócio), promovendo uma visão holística que só é possível através da colaboração e da crítica mútua.
+
+Ao investir algumas horas nesse processo, você evita meses de retrabalho e incertezas. O código se torna uma consequência natural de um domínio bem compreendido, e não uma tentativa de adivinhar o que o negócio realmente precisa. Se você está enfrentando complexidade, silos de informação ou requisitos nebulosos, coloque a parede, pegue os post-its e convide seus especialistas para uma tempestade. O resultado é um design de software mais resiliente, focado no que realmente importa: o coração do seu negócio.
