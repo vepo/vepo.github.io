@@ -72,3 +72,47 @@ Um ponto interessante desse paper é o problema proposto que reflete a realidade
 > Dado um tabuleiro de xadrez 8 x 8 e 8 rainhas que são hostis uma as outras. Encontre a posição para cada rainha (uma configuração) tal qual nenhuma rainha pode ser tomada por outra rainha (ou seja, cada linha, coluna e diagonal deve conter apenas uma rainha).
 
 Eu li esse exemplo como uma grande metáfora da modularidade. Quando criamos um módulo e garantimos que ele funciona corretamente, não precisamos mais nos preocupar com possíveis falhas que ele tenha. Ele é um subproblema dentro do meu problema complexo que eu separo, especifico, valido e depois integro como algo confiável.
+
+## Aspectos de distribuição de informações da metodologia de projeto
+
+Esse artigo do David Parnas parece ser uma pedra fundamental no design de código, mesmo ele sendo escrito em um mundo em que linguagem de máquina, mapeamento de memória e informações de hardware eram muito relevante ao se escrever programas. É um artigo sobre filosofia da complexidade de programas, pois define termos importantes como "**módulos**" e "**conexões**". Se pensarmos em Arquitetura de Software, esses termos ainda são usados, mas como "componentes" e "conectores" como eu citei no meu vídeo [Conversas Sobre Arquitetura](/posts/o-que-e-arquitetura-de-software). Conectores é o termo usando para módulos externos, enquanto o livro [A Philosophy of Software Design](https://amzn.to/3NH4m0Y) usa o termo módulo para qualquer porção de código, como está no artigo.
+
+Mas vamos as definições segundo o texto...
+
+_Um módulo seria qualquer forma de se dividir a estrutura de um sistema de forma que seja capaz de se atribuir caracteristicas a esse módulo_. É uma descrição bem genérica e não podemos cobrar muito de um artigo de 1971. Achei curioso que o termo interface não é usado para se descrever a fronteira do módulo e creio que isso ainda era uma limitação dos sistemas. A palavra interface é usada para se descrever interações como sistemas externos, para controle do sistema operacional e a interface com o usuário. Como interface não aparece no texto, o que entendemos por interface hoje é chamado de conexões.
+
+No texto, conexões são suposições que um módulo faz de outro. Ou seja, um modulo interage com outro através de uma conexão.
+
+Outro ponto relevante no texto é a documentação. Creio que aqui é bom entendermos documentação como uma necessidade de complexos sistemas implementados em linguagens de baixa capacidade expressiva. Vamos pensar em um grande sistema implementado em Assembly? Como os desenvolvedores fariam para se comunicar? Documentação. Ao ler o texto, o papel da documentação foi absorvido pela interface expressa em código. 
+
+Por exemplo, hoje quando vou desenvolver tenho acesso a toda documentação da biblioteca padrão do Java acessando o Javadoc ou apenas pressionando **CTRL + Espaço** na minha IDE. Isso não era possível antigamente. Algum tempo atrás, desenvolvedores C no Linux só tinham acesso a documentação das chamadas de sistemas usando o comando `man`, tenta executar `man open` e você terá acesso.
+
+Mas essas definições não são a principais contribuição do artigo. Ele reflete sobre acoplamento, mesmo que essa palavra não seja citada no texto. O autor afirma que quanto mais informações um módulo expõe, mais outros módulos vão usar essas informações no desenvolvimento o que pode fazer com que o módulo fique engessado na implementação.
+
+O texto ainda classifica programadores em três tipos: o bom, o mal e o mediocre. O bom desenvolvedor é aquele que faz uso de toda informação que tem disponível para si. O mal desenvolvedor é aquele faz uso de toda informação disponível e causa mal funcionamento em outro módulos, seja proposital ou não. Já o programador mediocre falha ao usar a informação por não perceber ela ou não saber como usa-la, ele faz as coisas de forma porca por não explorar a forma mais interessante de se fazer o que precisa ser feito.
+
+Dessa forma, o texto traz uma grande pergunta: que informação precisamos expor do nossos módulos? Devemos expor a informação de forma que os desenvolvedores seja capaz de fazer um bom uso dos nossos sistemas e que nossa implementação não fique dependente de uma informação que já foi exposta. Reter informação é uma desição de projeto muito importante!
+
+É a partir dessa discussão que as linguagens evoluíram para prover mecanismos de segurança da implementação. Quando você coloca um campo como privado em uma classe, você está indiretamente acompanhando a discussão que o David Parnas iniciou em 1971. Decidir usar uma classe como [Sealed](https://docs.oracle.com/en/java/javase/17/language/sealed-classes-and-interfaces.html) por exemplo, é restringir informação, uma vez que você não autoriza outras implementações.
+
+Eu acho essa discussão interessantíssima e a primeira vez que li sobre ela foi no livro [A Philosophy of Software Design](https://amzn.to/3NH4m0Y) e tomei a decisão de expor o mínimo de informação possíveis sobre os módulos que escrevo. Aliás, preciso atualizar a definição de módulo: qualquer porção de código que possui uma interface e expõe funcionalidades.
+
+## Estruturas Hierárquicas de Programas 
+
+
+Um tipo é uma classe de valor. Associado a um tipo existem operações que podem ser efetuadas a esses valores.
+Uma variável é uma classe de valores de um determinado tipo em uma sequência temporal. As operações que uma variável podem ter são acessar e atribuir.
+Um array é uma classe de valores ordenados em um padrão espacial. A operação associada é a subscrição.
+
+O sistema dinâmico é construído e compreendido em termos de conceitos de alto nível, que por sua vez são construídos e compreendidos em termos de conceitos de nível inferior, e assim por diante.
+
+A construção de conceitos adequados a uma determinada situação é um processo criativo que muitas vezes requer insights obtidos em estágios posteriores da construção do sistema.
+
+
+Qualquer projeto é um processo iterativo doloroso de construção e revisão em cada estágio. Cada conceito diz respeito necessariamente a um aspecto limitado do sistema e deve corresponder a um trecho de programa obtido pela decomposição do programa total. Uma boa decomposição significa que cada componente pode ser programado independentemente e revisado sem, ou com pouquíssimas, implicações para o restante do sistema.
+
+Um conceito tem um grau de generalidade e uma classe de instâncias especializadas.
+
+Podemos também definir um outro conceito, o bloco. Um bloco é uma entidade de código que contém propriedades e executa ações. Um bloco podem conter e referenciar outros blocos, da mesma forma como pode ser referenciado e dividido em blocos. Um bloco não representa apenas uma unidade de código, mas uma classe de unidades que podem ser ativada com propriedades diferentes. Um bloco é também um elemento da linguagem. A execução de blocos podem ser administradas como pilhas simples e um _garbage collector_ com operações de _scan-mark_ para remover trechos de memória não utilizados.
+
+Um processo é capaz de gerar blocos que sobrevivem a execução de si mesmo, que são chamados classes, instâncias de execução são os objetos dessa classe. Atributos são variáveis locais dessa classe. A classe possui uma função geradora que cria e retorna instância dos objetos. A instância do objeto tem que ser armazenada em variáveis para ser  utilizada.
