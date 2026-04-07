@@ -3,7 +3,7 @@ title: A very simple Test Driven Development Tutorial
 published: true
 description: Some small tips for who wants to beggan with TDD
 tags: [Testing, Java, Test, TDD]
-cover_image: https://thepracticaldev.s3.amazonaws.com/i/jkocbutap8qvhdod7jbv.jpg
+image: https://thepracticaldev.s3.amazonaws.com/i/jkocbutap8qvhdod7jbv.jpg
 series: Thoughts on TDD
 publish_date: 2019-07-24 15:32:22 +0300
 original: "https://dev.to/vepo/a-very-simple-test-driven-development-tutorial-3309"

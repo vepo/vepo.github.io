@@ -3,7 +3,7 @@ title: Breve Introdução ao Java
 published: true
 description: O que eu preciso saber para começar a desenvolver Java? Quais são algumas bibliotecas interessantes para se usar em projetos Java?
 tags: [Youtube, Java]
-cover_image: /assets/computacao-critica/capa-video-10.png
+image: /assets/computacao-critica/capa-video-10.png
 permalink: /computacao-critica/breve-introducao-ao-java
 redirect_from:
   - /posts/youtube-breve-introducao-ao-java

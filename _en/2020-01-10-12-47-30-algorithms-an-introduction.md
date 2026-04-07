@@ -3,7 +3,7 @@ title: Algorithms - An introduction
 published: true
 description: What is an algorithm? How can we define an algorithm?
 tags: [Algorithms, Computer Science]
-cover_image: /assets/images/pexels-artem-beliaikin-5456314.avif
+image: /assets/images/pexels-artem-beliaikin-5456314.avif
 publish_date: 2020-01-09 12:47:30 +0300
 permalink: /en/algorithms-an-introduction
 redirect_from:

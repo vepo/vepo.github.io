@@ -5,7 +5,7 @@ published: true
 description: Todo sênio deve saber lidar com valores monetários em seu código. Não sabe? Tem ensino! 😀
 tags: [Java, Floating Point, Money, Beginners]
 series: Coisas que todo Sênior deve saber
-cover_image: /assets/images/capas/dinheiro.jpg
+image: /assets/images/capas/dinheiro.jpg
 publish_date: 2020-05-05 16:10:09 +0300
 original: https://dev.to/vepo/trabalhando-com-dinheiro-52g1
 ---

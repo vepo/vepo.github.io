@@ -4,7 +4,7 @@ permalink: /posts/backend-o-desenvolvedor-invisivel
 published: false
 description: Apresentação do que é ser um desenvolvedor Backend e um histórico dos papeis dentro do mundo do desenvolvimento de Software
 tags: [Desenvolvimento de Software, Backend, Histórico]
-cover_image: /assets/images/backend/clint-eastwood-the-good-the-bad-and-the-ugly.jpg
+image: /assets/images/backend/clint-eastwood-the-good-the-bad-and-the-ugly.jpg
 series: Backend Roadmap
 publish_date: 2020-12-06 17:00:00 +0300
 ---

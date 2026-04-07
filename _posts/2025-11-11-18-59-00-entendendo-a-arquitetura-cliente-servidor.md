@@ -4,7 +4,7 @@ published: true
 description: | 
     Esse é o quinto post da série **Conversas sobre Arquitetura**. Nele, mergulhamos no estilo arquitetural fundamental para a web: a **arquitetura Cliente-Servidor**. Você vai entender como se define os papéis de cliente e servidor, como a comunicação entre eles funciona na prática e quais são as implicações dessa relação — desde protocolos de rede até o impacto na disponibilidade do sistema.
 tags: [Arquitetura de Software]
-cover_image: /assets/images/capas/caderno-caneta.jpg
+image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/entendendo-a-arquitetura-cliente-servidor
 series: Conversas sobre Arquitetura
 publish_date: 2025-11-11 18:50:00 +0300

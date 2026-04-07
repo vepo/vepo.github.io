@@ -8,7 +8,7 @@ description: |
 tags: [Java, SOAP, Web Services, XML, JAX-WS, Tutorial]
 publish_date: 2025-12-16 11:00:00 -0300
 permalink: /tutorial/como-criar-um-servico-usando-soap
-cover_image: /assets/images/capas/chaplin-modern-times.webp
+image: /assets/images/capas/chaplin-modern-times.webp
 ---
 
 ### Introdução

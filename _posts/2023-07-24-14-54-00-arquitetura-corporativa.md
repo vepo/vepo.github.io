@@ -3,7 +3,7 @@ title: Arquitetura Corporativa
 published: false
 #description: Como funciona o gerenciamento de memória com Java? Nesse post vou descrever como funciona a memória de um programa Java e comparar ele com de outros programas. Depois vou mostrar quais os principais desafios do gerenciamento de memória em programas Java. A ideia desta série é criar um tutorial Java onde mostrarei todos os segredos da linguagem e do ecossistema.
 tags: [Arquitetura]
-cover_image: /assets/images/java/duke-paper.webp
+image: /assets/images/java/duke-paper.webp
 #series: Java 101
 permalink: /posts/arquitetura-corporativa
 publish_date: 2023-07-24 15:55:00 +0300

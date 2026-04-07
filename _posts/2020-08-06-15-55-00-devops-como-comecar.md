@@ -6,7 +6,7 @@ description: Este é um pequeno roteiro sobre um primeiro passo para o DevOps. F
 tags: [Devops, Java, Maturity, Programação]
 series: Coisas que todo Sênior deve saber
 publish_date: 2020-08-06 15:55:00 +0300
-cover_image: /assets/images/capas/mapa.jpg
+image: /assets/images/capas/mapa.jpg
 original: https://dev.to/vepo/devops-como-comecar-54gk
 ---
 

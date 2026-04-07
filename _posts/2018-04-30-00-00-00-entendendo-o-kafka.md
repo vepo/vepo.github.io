@@ -12,7 +12,7 @@ description: |
     
     Ideal para desenvolvedores e arquitetos que buscam escalabilidade, resiliência e flexibilidade em sistemas distribuídos. 🚀
 tags: [Apache Kafka, Message Broker, Microsserviços, Pub/Sub, Arquitetura Orientada a Eventos, Data Stream Processing, Java, Microservices]
-cover_image: /assets/images/rio-fluindo-100-42.webp
+image: /assets/images/rio-fluindo-100-42.webp
 publish_date: 2018-04-30 12:00:00 +0300
 last_modified_at: 2023-09-25 23:00:00 +0300
 original: "https://medium.com/@vepo/entendendo-o-kafka-bf64169e421f"

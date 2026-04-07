@@ -5,7 +5,7 @@ published: true
 description: Um Sênior deve saber fazer troubleshooting. Aqui vão algumas dicas.
 series: Coisas que todo Sênior deve saber
 tags: [Troubleshooting, Debugging, Logging]
-cover_image: /assets/images/capas/crime.jpg
+image: /assets/images/capas/crime.jpg
 publish_date: 2020-05-29 12:02:56 +0300
 original: "https://dev.to/vepo/debugando-ou-troubleshooting-pco"
 ---

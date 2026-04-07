@@ -4,7 +4,7 @@ permalink: /posts/as-alegrias-da-arte
 published: true
 description: A melhor descrição do meu trabalho que eu já li!
 tags: [Programação, O Mítico Homem-Mês]
-cover_image: /assets/images/tar-pit.jpg
+image: /assets/images/tar-pit.jpg
 publish_date: 2021-08-22 16:55:00 +0300
 ---
 

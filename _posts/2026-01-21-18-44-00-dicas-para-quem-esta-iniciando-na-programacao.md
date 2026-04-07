@@ -4,7 +4,7 @@ published: true
 description: | 
     Um guia prático com dicas essenciais para quem está começando na programação, desde entender o que é programar até escolher a IDE certa e evitar armadilhas comuns. Baseado em anos de experiência e observações de iniciantes nas redes sociais.
 tags: [Como aprender a programar, Dicas para iniciantes, Java, Comunidade]
-cover_image: /assets/images/capas/criancas-escola.jpg
+image: /assets/images/capas/criancas-escola.jpg
 permalink: /posts/dicas-para-quem-esta-iniciando-na-programacao
 publish_date: 2026-01-21 18:44:00 +0300
 ---

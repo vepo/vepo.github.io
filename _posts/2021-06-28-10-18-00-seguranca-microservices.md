@@ -3,7 +3,7 @@ title: Segurança em Microsserviços
 published: false
 description: Pequeno estudo sobre segurança de microsserviços
 tags: [Microsserviços, Segurança]
-cover_image: /assets/images/pexels-negative-space-169573.jpg
+image: /assets/images/pexels-negative-space-169573.jpg
 publish_date: 2021-05-22 18:13:00 +0300
 permalink: /posts/seguranca-de-microsservicos
 ---

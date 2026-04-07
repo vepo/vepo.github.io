@@ -4,7 +4,7 @@ permalink: /posts/deixando-rastros-ou-como-usar-log
 published: true
 description: Um Sênior precisa saber usar log... minto! Qualquer desenvolvedor precisar saber usar log. Aqui apresento como usar o SLF4J em Java.
 series: Coisas que todo Sênior deve saber
-cover_image: /assets/images/capas/passos.jpg
+image: /assets/images/capas/passos.jpg
 tags: [Desenvolvimento de Software, logging, Java, SLF4J]
 publish_date: 2020-05-14 12:46:54 +0300
 original: https://dev.to/vepo/deixando-rastros-ou-como-usar-log-peg

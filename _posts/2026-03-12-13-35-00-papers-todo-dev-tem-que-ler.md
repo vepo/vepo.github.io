@@ -3,7 +3,7 @@ title: Artigos que todo "programador" deveria ler
 published: false
 description:
 tags: [JPA, Hibernate, ORM, Bad Smells, Banco de Dados]
-cover_image: /assets/images/capas/disquete-100-42.jpg
+image: /assets/images/capas/disquete-100-42.jpg
 series: Introdução a Bases de Dados
 permalink: /posts/bad-smells-em-orm
 publish_date: 2026-03-10 10:44:00 +0300

@@ -3,7 +3,7 @@ title: A Filosofia do Design de Código
 published: true
 description: Uma introdução da palestra que farei sobre Filosofia do Design de Código no TheDevConf 2021.
 tags: [Complexidade, Design de Código, Programação]
-cover_image: /assets/images/peanuts.jpg
+image: /assets/images/peanuts.jpg
 publish_date: 2021-07-21 12:00:00 +0300
 permalink: /posts/a-filosofia-do-design-de-codigo
 original: "https://vepo.medium.com/a-filosofia-do-design-de-c%C3%B3digo-ffb137cef9c2?source=friends_link&sk=2f150acfb6c8a30370475f78f7168a5b"

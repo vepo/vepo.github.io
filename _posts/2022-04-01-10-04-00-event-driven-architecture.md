@@ -4,7 +4,7 @@ published: true
 permalink: /posts/event-driven-architecture
 description: Nesse post vamos fazer uma pequena introdução do que é uma Arquitetura Event-Driven (EDA) e o que a diferencia de uma arquitetura Cliente-Servidor.
 tags: [Event-Driven Architecture, Apache Kafka, Arquitetura]
-cover_image: /assets/images/entrega-mensagem.avif
+image: /assets/images/entrega-mensagem.avif
 publish_date: 2022-04-01 11:00:00 +0300
 ---
 

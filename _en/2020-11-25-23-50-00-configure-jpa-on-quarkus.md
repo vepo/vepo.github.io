@@ -3,7 +3,7 @@ title: Configure JPA on Quarkus.io
 published: true
 description: A minimal how-to of how to configure JPA on Quarkus.io
 tags: [Quarkus, Java, JPA, Hibernate]
-cover_image: /assets/images/data-center.jpg
+image: /assets/images/data-center.jpg
 series: Quarkus Tutorial
 publish_date: 2020-11-25 23:50:00 +0300
 permalink: /en/configure-jpa-on-quarkus

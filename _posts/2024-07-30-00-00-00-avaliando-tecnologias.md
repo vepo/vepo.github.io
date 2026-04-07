@@ -3,7 +3,7 @@ title: Avaliando Tecnologias
 published: true
 description: Existe uma forma de se analisar uma Tecnologia? Como podemos racionalizar em cima da Hype?
 tags: [Técnica]
-cover_image: /assets/images/mesa-trabalho-100-42.webp
+image: /assets/images/mesa-trabalho-100-42.webp
 permalink: /posts/avaliando-tecnologias
 publish_date: 2024-07-31 16:00:00 +0300
 ---

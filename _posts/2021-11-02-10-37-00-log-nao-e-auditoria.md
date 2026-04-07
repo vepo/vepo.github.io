@@ -5,7 +5,7 @@ published: true
 description: Log e Auditoria são duas funcionalidades diferentes. Objetivos de negócio diferentres, vamos ver?
 tags: [Logging, Auditoria, Produto]
 series: Coisas que todo Sênior deve saber
-cover_image: /assets/images/backend/clint-eastwood-the-good-the-bad-and-the-ugly.jpg
+image: /assets/images/backend/clint-eastwood-the-good-the-bad-and-the-ugly.jpg
 publish_date: 2021-11-03 10:37:00 +0300
 ---
 

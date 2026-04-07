@@ -6,7 +6,7 @@ description: Qual é a relação entre a Lei de Conway e Microsserviços?
 tags: [Citações, Microsserviços, Desenvolvimento]
 publish_date: 2019-07-27 10:30:35 +0300
 original: "https://dev.to/vepo/microservicos-e-fordismo-1fhp"
-cover_image: /assets/images/capas/fordismo.jpg
+image: /assets/images/capas/fordismo.jpg
 ---
 
 _A Lei de Conway Reversa também significa que os desenvolvedores serão, em muitos aspectos como Microsserviços: eles serão capazes de fazer uma tarefa e (espera-se) fazer essa tarefa muito bem, mas eles estarão isolados (em termos de responsabilidade, conhecimento do domínio e experiência) do resto do ecossistema. Quando considerados juntos, todos os desenvolvedores trabalhando **coletivamente** dentro de um ecossistema de Microsserviços saberão tudo que há pra saber sobre ele, mas individualmente eles serão extremamente especializados, conhecendo apenas as partes do ecossistema pelas  quais são responsáveis._

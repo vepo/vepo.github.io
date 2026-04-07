@@ -3,7 +3,7 @@ title: Outras formas de pensar código
 published: false
 description: Talvez você fale de programação funcional, orientação a objetos, etc... Mas na verdade muitas vezes falamos desses paradigmas, mas continuamos usando a velha, e não boa, programação procedural.
 tags: [Programação Orientada a Objetos, Programação Funcional]
-cover_image: /assets/images/java/duke-paper-100-42.webp
+image: /assets/images/java/duke-paper-100-42.webp
 permalink: /posts/outras-formas-de-pensar-codigo
 publish_date: 2025-04-24 14:08:00 +0300
 ---

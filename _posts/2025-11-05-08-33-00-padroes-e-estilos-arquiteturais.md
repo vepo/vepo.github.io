@@ -4,7 +4,7 @@ published: true
 description: | 
     Esse é o quarto post da série **Conversas sobre Arquitetura**. Nele, exploramos a diferença entre padrões e estilos arquiteturais, mostrando como cada um se aplica na construção de sistemas. Enquanto os padrões, como MVC e Hexagonal, focam em resolver problemas específicos de organização interna, os estilos, como REST e Event-Driven, definem como os componentes interagem entre si para alcançar atributos de qualidade. Descubra como combinar essas abordagens pode resultar em soluções mais flexíveis, testáveis e alinhadas aos objetivos do negócio.
 tags: [Arquitetura de Software]
-cover_image: /assets/images/capas/caderno-caneta.jpg
+image: /assets/images/capas/caderno-caneta.jpg
 permalink: /posts/padroes-e-estilos-arquiteturais
 series: Conversas sobre Arquitetura
 publish_date: 2025-11-05 08:33:00 +0300

@@ -4,7 +4,7 @@ permalink: /posts/anatomia-de-um-topico
 published: true
 description: Uma breve descrição de como funciona um Tópico do Kafka. Como garantir replicação e ordenação
 tags: [Apache Kafka, Java, Messaging, Microsserviços]
-cover_image: /assets/images/capas/escritos.jpg
+image: /assets/images/capas/escritos.jpg
 series: Entendendo o Kafka
 publish_date: 2020-05-15 20:05:21 +0300
 original: "https://dev.to/vepo/anatomia-de-um-topico-25da"

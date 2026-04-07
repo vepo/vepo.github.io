@@ -3,7 +3,7 @@ title: Arquitetura Hexagonal
 published: true
 description: Nesse vídeo vou passer pela definição de middleware para tentar explicar o que é uma mensageria. Depois vou mostrar como podemos caracterizar as mensagerias existentes de forma que isso pode te ajudar a entender melhor o que está acontecendo.
 tags: [Youtube, Message-Oriented Middleware]
-cover_image: /assets/computacao-critica/capa-video-09.png
+image: /assets/computacao-critica/capa-video-09.png
 permalink: /computacao-critica/mensageria-ou-mom
 redirect_from:
   - /posts/youtube-mensageria-ou-mom

@@ -4,7 +4,7 @@ published: false
 description: | 
     Nomes refletem a essêrncia das coisas, dar nomes é uma das atividades do ser humano e ao dar nomes nós definimos a forma como vemos as coisas.
 tags: [Vale do Silício, Cultura, Tecnologia, IA Generativa, Tecno-Feudalismo]
-cover_image: /assets/images/capa-maquina-escrever-ao-sol.jpg
+image: /assets/images/capa-maquina-escrever-ao-sol.jpg
 permalink: /posts/nao-antropomorfize-ia
 series: Inteligência Coletiva
 publish_date: 2025-11-06 11:06:00 +0300

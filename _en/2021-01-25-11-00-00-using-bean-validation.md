@@ -3,7 +3,7 @@ title: Using Bean Validation on Quarkus.io
 published: true
 description: A minimal how-to of how to use Bean Validation on Quarkus.io
 tags: [Quarkus, Java, Bean Validation, Hibernate]
-cover_image: /assets/images/data-center.jpg
+image: /assets/images/data-center.jpg
 series: Quarkus Tutorial
 publish_date: 2021-01-25 11:00:00 +0300
 permalink: /en/using-bean-validation-on-quarkus

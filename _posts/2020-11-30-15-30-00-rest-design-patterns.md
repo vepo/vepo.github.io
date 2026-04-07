@@ -4,7 +4,7 @@ permalink: /posts/rest-api-design-patterns
 published: false
 description: Existem Padrões de Projetos para APIs REST? Fui procurar uma resposta para essa pergunta
 tags: [API, REST, Design Patterns, Arquitetura de Software]
-cover_image: /assets/images/biblioteca.jpg
+image: /assets/images/biblioteca.jpg
 series: Backend Roadmap
 publish_date: 2020-11-30 09:14:00 +0300
 ---

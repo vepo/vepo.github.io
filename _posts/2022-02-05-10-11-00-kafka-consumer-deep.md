@@ -5,7 +5,7 @@ permalink: /posts/log-cleanup-no-kafka
 description: As vezes o consumer não pode ser tão simples como os que já detalhamos, para isso precisamos conhecer como ele funciona e como podemos usar suas funcionalidades ao máximo.
 tags: [Kafka, Apache Kafka, Consumer]
 series: Entendendo o Kafka
-cover_image: https://dev-to-uploads.s3.amazonaws.com/i/1os85b4rmdpauz3yjbsu.jpg
+image: https://dev-to-uploads.s3.amazonaws.com/i/1os85b4rmdpauz3yjbsu.jpg
 publish_date: 2022-02-05 11:00:00 +0300
 ---
 

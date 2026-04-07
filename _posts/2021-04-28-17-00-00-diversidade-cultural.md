@@ -3,7 +3,7 @@ title: Diversidade Cultural
 published: true
 description: Diversidade cultural realmente importa? Um esboço do que vou falar no TDC Connections 2021
 tags: [Sociedade, Cultura]
-cover_image: /assets/images/1277px-Ponte_Metalica_Teresina.jpg
+image: /assets/images/1277px-Ponte_Metalica_Teresina.jpg
 publish_date: 2021-04-28 17:00:00 +0300
 permalink: /posts/diversidade-cultural
 ---
