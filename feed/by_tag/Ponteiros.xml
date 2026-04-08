@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Ponteiros.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-04-08T20:36:45+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Ponteiros.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Ponteiro de Schrödinger</title><link href="https://blog.vepo.dev/posts/ponteiro-de-schrodinger" rel="alternate" type="text/html" title="Ponteiro de Schrödinger" /><published>2026-03-05T00:00:00+00:00</published><updated>2026-03-05T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-10-00-ponteiro-de-schrodinger</id><content type="html" xml:base="https://blog.vepo.dev/posts/ponteiro-de-schrodinger"><![CDATA[<div class="paragraph">
+<p>Alguns anos atrás eu vi um tweet dizendo algo mais ou menos assim "não importa a sua linguagem, ela tem ponteiros" e me lembro que esse tweet viralizou na falecida rede. Foi um tormento que eu enfrentei com um aperitivo num sábado de manhã. Surfei a onda, criei uma lista de bloqueio para evitar pessoas que não sabia interpretar um post em uma rede de MICROblogging, mas não estamos aqui para falar da toxicidade das redes, isso é papo <a href="/posts/o-mundo-dos-narcisos">para outros posts</a>.</p>
+</div>
+<div class="paragraph">
+<p>O quero falar aqui do <strong>Ponteiro de Schrödinger</strong>. Mas você deve estar se perguntando o que é o tal <strong>Ponteiro de Schrödinger</strong> uma vez que nunca deve ter ouvido esse termo porque eu acabei de inventar. Isso porque por mais que as pessoas falem que "ponteiro não existe na minha linguagem", (i) ele pode realmente não existir, (ii) o conceito dele pode existir mas a linguagem gerencia isso de forma eficiente E (iii) as pessoas podem recriar ponteiro e fazer códigos tão esdruxulos que fariam Ada Lovelace desistir desse negócio de programação e se dedicar a poesia e a bohemia como o pai dela.</p>
+</div>
+<div class="verseblock">
+<pre class="content">Bebe enquanto puderes; quando tu e os teus
+Já tiverdes partido, uma outra gente
+Possa te redimir da terra que abraçar-te,
+E festeje com o morto e a própria rima tente.</pre>
+<div class="attribution">
+&#8212; Lord Byron
+</div>
+</div>
+<div class="paragraph">
+<p>Então vamos comecar por cada um desses pontos</p>
+</div>
+<div class="sect1">
+<h2 id="_i-ponteiros-realmente-não-existem-na-sua-linguagem">(i) Ponteiros realmente não existem na sua linguagem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Eu trabalho com Java e a última vez que vi um ponteiro foi antes de 2015 enquanto trabalhava com C e C++. Em Java e em muitas das linguagens modernas, o conceito de ponteiro faz parte do dia a dia de um desenvolvedor. Quer dizer&#8230;&#8203; Na verdade faz, mas a linguagem faz de tudo pra esquecer isso e é preciso.</p>
+</div>
+<div class="paragraph">
+<p>Java é uma linguagem que surgiu em uma época que Orientação a Objetos era a panaceia para todos os problemas na computação. Se falava de Objetos Distribuídos como se eles fossem a solução de problemas arquiteturais e o último Design Pattern a existir (<em>ok, Design Patterns ainda estavam engatinhando</em>). Por isso Orientação a Objetos tem um lugar central na sua linguagem e por isso que existe uma exception chamada <code>NullPointerException</code>.</p>
+</div>
+<div class="paragraph">
+<p>Apesar de existir a exceção, as linguagens fizeram ao máximo para esconder a realidade dos ponteiros. As vezes usam outro nome como <code>TypeError</code>, as vezes criam o conceito de <strong>classe</strong> e <strong>instância</strong>, criam a abstração chamada <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html">Optional</a>, mas elas fazem de tudo para esconder a triste realidade que tudo é um endereço de memória cheia de 1 e 0.</p>
+</div>
+<div class="paragraph">
+<div class="title">Pointeiros existem em Javascript e eu posso provar!</div>
+<p><span class="image"><img src="/assets/images/design-patterns/npe-javascript.png" alt="npe javascript"></span></p>
+</div>
+<div class="paragraph">
+<p>Toda a discussão sobre ponteiros se dá porque precisamos discutir se (i) existe um valor e (ii) se, caso esse valor exista, dois valores são iguais ou não. Java abstraiu isso criando métodos dentro da classe (um conceito não criado pelo Java) que as vezes precisamos nos preocupar.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, quando precisamos implementar os métodos <code>hashCode</code> e <code>equals</code> para que nossa classe possa ser eficientemente gerenciada em um <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html">Map</a> ou um <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html">Set</a>, isso não é um preciosismo ou uma frescura. É uma necessidade. Em alguns casos, valores que são lidos em locais diferentes são iguais e precisamos identificar isso.</p>
+</div>
+<div class="paragraph">
+<p>Dessa forma quem criou as linguagens com certeza se deparou com o dilema entre igualdade e identidade. Dois objetos idênticos podem ser iguais? E dois iguais podem não ser idênticos?</p>
+</div>
+<div class="paragraph">
+<p>Essa questão é muito facilmente resolvida se eu perguntar: <em>os funcionários A e B ganham um salário X, se eu aumentar o salário de B eu aumento o salário de A?</em> Observa que essa igualdade não é identidade. Os salários são iguais, mas não são os mesmos. Logo esse valor não pode ser armazenado na mesma linha de um banco de dados ou em um mesmo objeto. Eles são iguais, mas não são idênticos.</p>
+</div>
+<div class="paragraph">
+<p>Mas há a grande falha no design das linguagens que é a questão da ausência. Programador é muito bom com a lógica booleana ao pensar na conceito de verdadeiro ou falso, mas a lógica computacional possui também o conceito de ausente (que é diferente de inexistente, ou <em>undefined</em>). Por exemplo, um valor booleano pode ser <code>true</code>, <code>false</code> ou <code>null</code>. E como representamos o nulo sem dizer que o nulo existe? Por isso ainda usamos o <code>null</code> que vem do C, vem do baixo nível e é tão difícil de ser compreendido.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ii-o-conceito-de-ponteiro-existe-mas-ele-é-gerenciado-pela-linguagem">(ii) O Conceito de Ponteiro existe, mas ele é gerenciado pela linguagem</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O conceito de <code>null</code> vem da história da computação, mais especificamente do <a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/">ALGOL, criado 1965</a>. Eu não diria que foi um erro, mas uma má ideia e há explicação para isso.</p>
+</div>
+<div class="paragraph">
+<p>Para entender o conceito de <code>null</code> é preciso entender como a memória funciona e abstrações surgiram na programação. Eu entendo bem disso porque fiz Engenharia de Computação e grande parte do curso eu programei Assembly, não recomendo.</p>
+</div>
+<div class="paragraph">
+<p>Sendo bem genérico, um computador é uma unidade de processamento ligada a um barramento que acessa dispositivos. A CPU possui uma memória interna (cache e registradores), mas ela sempre acessa a memória e outros dispositivos. Se você deseja criar um dispositivo IoT que lerá um sensor, ele se comportará como uma posição de memória e você acessará ele, mas para isso precisa construir um driver para expor isso em "alto nível". Essa é uma discussão muito interessante, mas limitante, fica complicado demais falar de design de código pensando no baixo nível.</p>
+</div>
+<div class="paragraph">
+<p>Vamos pensar em termos de Strings. A palavra String significa cadeia, ou seja, uma String é uma Cadeia de Caracteres. Dessa forma, vamos pensar na frase "<em>A CPU possui uma memória interna</em>" retirada do paragrafo anterior. Se você inspecionar a memória do seu computador ao ler esse post, verá algo como a imagem abaixo.</p>
+</div>
+<div class="paragraph">
+<div class="title">Esse post, durante a escrita, lido com o programa <code>xxd</code>.</div>
+<p><span class="image"><img src="/assets/images/design-patterns/memoria.png" alt="memoria"></span></p>
+</div>
+<div class="paragraph">
+<p>Observa que as duas referências ao trecho existem como duplicadas na memória e que ambas possuem endereço de memória diferentes (<code>0000186a</code> e <code>00001600</code>). Logo se eu pegar um objeto String com esse valor e chamar o método <code>toUpperCase()</code>, o que vai acontecer?</p>
+</div>
+<div class="paragraph">
+<div class="title">Esse post, durante a escrita, lido com o programa <code>xxd</code> sem agrupar bytes.</div>
+<p><span class="image"><img src="/assets/images/design-patterns/memoria-marcada.png" alt="memoria marcada"></span></p>
+</div>
+<div class="paragraph">
+<p>Uma nova String com o valor "<em>A CPU POSSUI UMA MEMÓRIA INTERNA</em>" será criada! Isso porque o Java não quer que o programador se preocupe com o baixo nível, o que muitas vezes pode tornar o programa menos eficiente. Em C, eu poderia implementar a função toUpperCase que seria muito mais eficiente e usaria menos memória, mas alteraria somente o valor desejado.</p>
+</div>
+<div class="listingblock">
+<div class="title">toUpperCase "in place"</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c"><span class="kt">void</span> <span class="nf">toUpperCase</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">content</span><span class="p">,</span> <span class="kt">int</span> <span class="n">offset</span><span class="p">,</span> <span class="kt">int</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">content</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="sc">'a'</span> <span class="o">&amp;&amp;</span> <span class="n">content</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="sc">'z'</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">content</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span>  <span class="n">content</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="mi">32</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="o">++</span><span class="n">index</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe como ela pode ser usada no trecho abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c"><span class="kt">char</span><span class="o">*</span> <span class="n">content</span> <span class="o">=</span> <span class="s">"o que acessa dispositivos. A CPU possui uma memória interna (cache e registradores), mas ela sempre ac"</span><span class="p">;</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">content</span><span class="p">);</span> <span class="c1">// Imprime: o que acessa dispositivos. A CPU possui uma memória interna (cache e registradores), mas ela sempre ac</span>
+<span class="n">toUpperCase</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">32</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"%s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">content</span><span class="p">);</span> <span class="c1">// Imprime: o que acessa dispositivos. A CPU POSSUI UMA MEMÓRIA INTERNA (cache e registradores), mas ela sempre ac</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Talvez você ache que eu esteja viajando, mas quero mostrar que há inúmeras discussões que uma escolha arquitetural pode eliminar. Em Java, uma String é uma cadeia de caracteres, mas ela é imutável. Dessa forma, o código abaixo é seguro, pois o desenvolvedor nem se preocupa sobre qual referência de memória o código dele está sendo executado.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kt">var</span> <span class="n">user</span> <span class="o">=</span> <span class="n">entityManager</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">userId</span><span class="o">);</span> <span class="c1">// [1] {'id': 1, 'username': 'jao', 'nome': 'João', sobrenome': 'Silva'}</span>
+<span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getUsername</span><span class="o">().</span><span class="na">toUpperCase</span><span class="o">(),</span> <span class="n">user</span><span class="o">);</span>   <span class="c1">// [2] 'JAO' → {'id': 1, 'username': 'jao', 'nome': 'João', sobrenome': 'Silva'}</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getUsername</span><span class="o">())</span>             <span class="c1">// [3] 'jao'</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Foi decidido enquanto a linguagem estava sendo definida, que Strings são valores imutáveis, e isso significa que valores alterados em uma String implica na criação de outra String. É seguro, mas em alguns casos ineficiente, por isso foi necessário criar objetos como o <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html">StringBuilder</a> e o <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuffer.html">StringBuffer</a>.</p>
+</div>
+<div class="paragraph">
+<p>Se você não é do mundo Java, provavelmente existe a mesma discussão na sua linguagem.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_iii-como-as-pessoas-reinventam-os-ponteiros-e-o-fazem-de-maneira-errada">(iii) Como as pessoas reinventam os Ponteiros <em>e o fazem de maneira errada!</em></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não é raro encontrarmos em Java pessoas reinventando ponteiros para suplantar "<strong><em>limitações</em></strong>" da linguagem. Quero já dizer aqui que isso não é uma limitação da linguagem, mas a linguagem preocupada que você não faça 💩, mas as pessoas continuam fazendo 💩 porque elas não sabem resolver o problema de um outro modo.</p>
+</div>
+<div class="paragraph">
+<p>A primeira limitação que me vem a mente é a obrigatoriedade que uma variável seja <code>final</code> ao se usar em contextos que possivelmente podem ser acessados por mais de uma <em>thread</em>. Essa limitação é imposta para que o desenvolvedor não precise se preocupar com a concorrência entre as possíveis <em>threads</em>.</p>
+</div>
+<div class="paragraph">
+<p>Para exemplificar, vou mostrar um exemplo bem tosco que já encontrei em diversas bases de código de diversas empresas. Vamos imaginar que temos uma lista de valores e queremos encontrar um valor especifico. Aí o desenvolvedor resolver usar lambdas, mas sem se dar o trabalho de ler muito a documentação da biblioteca padrão. Como ele implementa?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">getAllUsers</span><span class="o">();</span>  <span class="c1">// isso é só um exemplo</span>
+<span class="nc">User</span><span class="o">[]</span> <span class="n">primeiroUsuarioAtivo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span> <span class="c1">// Quem nunca fez isso?</span>
+<span class="n">users</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">user</span> <span class="o">-&gt;</span> <span class="o">{</span> <span class="c1">// Podia ser um loop? Podia! Mas foi o exemplo que eu pensei</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">primeiroUsuarioAtivo</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="o">.</span><span class="na">isAtivo</span><span class="o">())</span> <span class="o">{</span> <span class="c1">// Isso pode dar 💩</span>
+        <span class="n">primeiroUsuarioAtivo</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">;</span> <span class="c1">// Isso também pode dar 💩</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Primeiro usuário ativo: "</span> <span class="o">+</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">primeiroUsuarioAtivo</span><span class="o">));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O código acima compila e é sintaticamente correto, mas há diversos problemas nele! Também já quero alertar que a possibilidade de algum erro acontecer é baixa, visto que provavelmente a lista retornada por <code>getAllUsers()</code> não reimplementa o método <code>forEach</code>. Mas ninguém garante a função lambda não será executada em sequência e serialmente.</p>
+</div>
+<div class="paragraph">
+<p>A exigência que a variáveis <code>users</code> e <code>primeiroUsuarioAtivo</code> sejam <code>final</code>, e na verdade é mesmo que você não defina ela como <code>final</code> é feita para garantir que os valores não possa ser alterados por processos concorrentes. Esse código ficaria mais "correto" se fosse sincronizado, como abaixo, mas fica ruim. 🤨</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">getAllUsers</span><span class="o">();</span>  <span class="c1">// isso é só um exemplo</span>
+<span class="nc">User</span><span class="o">[]</span> <span class="n">primeiroUsuarioAtivo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span> <span class="c1">// Quem nunca fez isso?</span>
+<span class="n">users</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">user</span> <span class="o">-&gt;</span> <span class="o">{</span> <span class="c1">// Podia ser um loop? Podia! Mas foi o exemplo que eu pensei</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">primeiroUsuarioAtivo</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">primeiroUsuarioAtivo</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="o">.</span><span class="na">isAtivo</span><span class="o">())</span> <span class="o">{</span> <span class="c1">// Isso pode dar 💩</span>
+            <span class="n">primeiroUsuarioAtivo</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">;</span> <span class="c1">// Isso também pode dar 💩</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Primeiro usuário ativo: "</span> <span class="o">+</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">primeiroUsuarioAtivo</span><span class="o">));</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Isso não é nenhum problema com a linguagem Java. Essas limitações foram feitas para que você fizesse um bom design de código e escrevesse um código que comunique ao desenvolvedor a sua intenção. Então porque não reescrever ele como abaixo?</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">List</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">getAllUsers</span><span class="o">();</span>
+<span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">maybeActive</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+                                  <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="nl">User:</span><span class="o">:</span><span class="n">isAtivo</span><span class="o">)</span>
+                                  <span class="o">.</span><span class="na">findFirst</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">maybeActive</span><span class="o">.</span><span class="na">isPresent</span><span class="o">())</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Primeiro usuário ativo: "</span> <span class="o">+</span> <span class="n">maybeActive</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Nenhum usuário ativo encontrado!"</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Observe que esse código é muito mais expressivo que o anterior e também é mais eficaz! Nele não há problemas de concorrência, uma vez que isso é delegado a JVM. E não foi preciso criar um vetor para ser usado como um ponteiro informal.</p>
+</div>
+<div class="paragraph">
+<p>Mas há outras formas que o mesmo problema pode levar a se recriar ponteiros. Faz algum tempo eu implementei uma classe que se chamava <strong>SharedMaps</strong>. A função dela era garantir que mapas fossem usados e atualizados de forma assíncrona e eficiente. Essa classe usava <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/ReadWriteLock.html">ReadWriteLock</a> para garantir que leituras pudessem ser feitas em paralelo e escritas fossem feitas sincronicamente. MAS&#8230;&#8203; como a implementação foi feita há muito tempo, o uso era pontual e ela tinha apenas dois métodos. <em>Essa classe resolveu um grande problema nosso de não ver mais <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ConcurrentModificationException.html">ConcurrentModificationException</a>.</em></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SharedMaps</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ReadWriteLock</span> <span class="n">readWriteLock</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReentrantReadWriteLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Lock</span> <span class="n">writeLock</span> <span class="o">=</span> <span class="n">readWriteLock</span><span class="o">.</span><span class="na">writeLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Lock</span> <span class="n">readLock</span> <span class="o">=</span> <span class="n">readWriteLock</span><span class="o">.</span><span class="na">readLock</span><span class="o">();</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="o">?&gt;&gt;</span> <span class="n">internalMaps</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">SharedMaps</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">internalMaps</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="nf">forRead</span><span class="o">(</span><span class="nc">String</span> <span class="n">mapKey</span><span class="o">,</span> <span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="no">T</span><span class="o">&gt;&gt;</span> <span class="n">fn</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">readLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">fn</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">internalMaps</span><span class="o">.</span><span class="na">computeIfAbsent</span><span class="o">(</span><span class="n">mapKey</span><span class="o">,</span> <span class="n">__</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;()));</span>
+        <span class="o">}</span>
+        <span class="k">finally</span> <span class="o">{</span>
+            <span class="c1">// To unlock the acquired read thread</span>
+            <span class="n">readLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="nf">forWrite</span><span class="o">(</span><span class="nc">String</span> <span class="n">mapKey</span><span class="o">,</span> <span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="no">T</span><span class="o">&gt;&gt;</span> <span class="n">fn</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">writeLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">fn</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">internalMaps</span><span class="o">.</span><span class="na">computeIfAbsent</span><span class="o">(</span><span class="n">mapKey</span><span class="o">,</span> <span class="n">__</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;()));</span>
+        <span class="o">}</span>
+        <span class="k">finally</span> <span class="o">{</span>
+            <span class="c1">// To unlock the acquired write thread</span>
+            <span class="n">writeLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Com essa classe o desenvolvedor poderia usar o mapa de forma sincrona. A necessidade dessa classe era justificada e o uso também era pontual. Mas surgiram novas funcionalidades e em uma delas surgiu a necessidade de se retornar apenas um valor para leitura. Pelo meu entendimento, o desenvolvedor desejaria algum método como <code>retrieveValueOrCreate(mapKey, valueKey, this::createValue)</code> e eu implementaria ele como fiz abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="no">T</span> <span class="nf">retrieveValueOrCreate</span><span class="o">(</span><span class="nc">String</span> <span class="n">mapKey</span><span class="o">,</span> <span class="nc">String</span> <span class="n">valueKey</span><span class="o">,</span> <span class="nc">Supplier</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">supplier</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">writeLock</span><span class="o">.</span><span class="na">lock</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">internalMaps</span><span class="o">.</span><span class="na">computeIfAbsent</span><span class="o">(</span><span class="n">mapKey</span><span class="o">,</span> <span class="n">__</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;()).</span><span class="na">computeIfAbsent</span><span class="o">(</span><span class="n">valueKey</span><span class="o">,</span> <span class="n">supplier</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">finally</span> <span class="o">{</span>
+        <span class="c1">// To unlock the acquired write thread</span>
+        <span class="n">writeLock</span><span class="o">.</span><span class="na">unlock</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MAS&#8230;&#8203; o desenvolvedor que pegou essa atividade não pensou duas vezes. Não alterou a classe <strong>SharedMaps</strong> e nem conhecia mais interfaces da biblioteca padrão do Java além das básicas ensinadas em algum curso, e ignorou completamente as classes <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Supplier.html">Supplier</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Function.html">Function</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/BiFunction.html">BiFunction</a> ou mesmo o conceito de <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/FunctionalInterface.html">interface funcional</a>. Ele simplesmente usou <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/AtomicReference.html">AtomicReference</a> como um ponteiro.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">AtomicReference</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">foundUser</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">AtomicReference</span><span class="o">();</span>
+<span class="n">sharedMaps</span><span class="o">.</span><span class="na">forWrite</span><span class="o">(</span><span class="n">mapKey</span><span class="o">,</span> <span class="n">map</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="nc">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">valueKey</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">user</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">createValue</span><span class="o">();</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">valueKey</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="n">foundUser</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+<span class="o">})</span>
+<span class="nc">Objects</span><span class="o">.</span><span class="na">assertNonNull</span><span class="o">(</span><span class="n">foundUser</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+<span class="c1">// usava o foundUser</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No fundo, o código acima é complicado e ineficiente, uma vez que a variável <code>foundUser</code> é usada como um ponteiro. Ele poderia ser facilmente substituido pelo código abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">User</span> <span class="n">foundUser</span> <span class="o">=</span> <span class="n">sharedMaps</span><span class="o">.</span><span class="na">retrieveValueOrCreate</span><span class="o">(</span><span class="n">mapKey</span><span class="o">,</span> <span class="n">valueKey</span><span class="o">,</span> <span class="k">this</span><span class="o">::</span><span class="n">createValue</span><span class="o">);</span>
+<span class="c1">// usa o foundUser</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Eu ainda preciso ressaltar que o código que eu encontrei não era tão simples e que o lambda usado não era tão eficaz. Havia muita lógica dentro do lambda o que fazia com que o código ficasse sincronizado e se tornava menos eficaz. Uma interface funcional tem que ser eficaz e não pode alterar nada externo ao seu contexto, POR ISSO QUE ELA DEVE SOMENTE ACESSAR VARIÁVEIS MARCADAS COMO <code>final</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As vezes é importante saber que ponteiros existem porque eles refletem um detalhe de implementação das nossas máquinas. Esse conceito é importante para garantir eficiência e consistência dos programas, mas ele no fundo existem apenas no baixo nível. As linguagem fazem tudo para esconder esse detalhe, e o RUST deu uma importante contribuição que em breve será adotado por várias linguagem.</p>
+</div>
+<div class="paragraph">
+<p>E mesmo que não exista, ponteiros são constantemente reinventados como uma forma de falta de criatividade e conhecimento da interface padrão de diversas linguagens.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Design de Código" /><category term="Ponteiros" /><summary type="html"><![CDATA[Ponteiros não existem em Java. Ou existem? A verdade é que o conceito está lá, disfarçado de referências, NullPointerException e variáveis final. Neste artigo, exploro a fronteira entre a abstração das linguagens modernas e a realidade do hardware, passando por exemplos em C e Java, e mostrando como é fácil — e perigoso — reinventar ponteiros sem perceber. Uma reflexão sobre design de código, concorrência e as armadilhas que criamos ao ignorar a biblioteca padrão.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/livro-maquina-drink.webp" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/livro-maquina-drink.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>

@@ -1,0 +1,161 @@
+Vamos falar de Sistemas baseados em Eventos?
+
+Olá pessoas, tudo bem? Meu nome é Victor Osório e esse é o canal Computação Crítica.
+
+Quase todo dia eu faço um vídeo chamado cafezinho. Esses vídeos são sem roteiros e falo sobre temas da computação escolhidos baseado do debate de redes sociais. 
+
+Mas as vezes eu produzo vídeos mais longos e com roteiro sobre temas mais aprofundados. 
+
+Esse é um desses vídeos e vamos falar sobre Modelagem de Sistemas baseados em eventos.
+
+Primeiro eu quero deixar claro pra você como eu vou estruturar esse vídeo, já digo que há a divisão de capítulos na descrição e as referências usadas nesse vídeo.
+
+Primeiro eu vou começar respondendo a pergunta "Porque sistemas baseados em eventos?". 
+
+Depois vou responder outra pergunta importante "O que é modelagem de sistemas?" para por fim responder "como modelar sistemas baseados em eventos?
+
+Então, vamos começar?
+
+A primeira pergunta que temos que responder é "Porque Sistemas baseados em Eventos?".
+
+Você deve estar pensando... 
+
+- Qual o ganho que eu tenho ao modelar um sistema baseado em eventos?
+- Qual a diferença com um sistema tradicional?
+
+Fica calmo que nós vamos responder essas perguntas. Mas primeiro precisamos alinhar algumas expectativas.
+
+1. Eventos não trazem nenhuma nova funcionalidade. 
+
+Em muitos casos, sistemas baseados em eventos são imperceptíveis ao usuário final. Ele não vê os eventos, já que os eventos fazem parte da infraestrutura do sistema. Mas isso não significa que você não pode perceber, caso observe as particularidades do comportamento do software.
+
+2. Eventos podem fazer seu software funcionar melhor. 
+
+SIM!!! Mesmo sem ser uma funcionalidade, eventos podem trazer melhorias para o funcionamento ao mudar a forma como o seu software se comunica e como a informação é gerenciada.
+
+3. Eventos podem fazer o desenvolvimento ser mais fácil
+
+SIM!!! Ao se implementar um sistema baseado em eventos, há uma separação de processos e responsabilidades que podem melhorar a compreensão do seu sistema e a comunicação e distribuição de tarefas entre os times. Eventos criam uma fronteira entre as partes do sistema. Um componente envia evento para outro componente.
+
+Então surge a pergunta óbvia: 
+
+- Como isso acontece? 
+
+Para responder essa perguntas precisamos olhar para duas características importantes de um sistema Acoplamento e Disponibilidade. 
+
+Segundo o artigo "The Calculus of Service Availability: You’re only as available as the sum of your dependencies", quando implementamos um sistema usando dependência direta, escrevendo um código que sempre é baseado em chamadas síncronas, nós adicionamos dependências ao nosso software e com isso reduzimos a disponibilidade, aumentando o acoplamento.
+
+Para ver isso claramente, vamos pensar em um serviço REST que é dependente de diversos outros serviços. Cada vez que uma chamada é feita no serviço, essa chamada pode depender da resposta de chamadas a outros serviços.
+
+Então a pergunta é:
+
+- Podemos reescrever esse serviço de forma a remover essas dependências através do uso de eventos?
+
+SIM!!!! Qualquer sistema pode ser reescrito usando eventos como a sua base de comunicação, no que chamamos de Sistemas orientados a eventos, ou do inglês Message-oriented Systems. Aliás, existe um artigo de 1979 dizendo que um sistema pode ser tanto escrito como baseado em procedimentos, como baseado em mensagens, que aqui estamos chamando de eventos. Isso não quer dizer que existe uma forma CORRETA de implementar esses sistemas, mas que um estilo pode trazer certos benefícios, como foi mostrado pelo artigo anterior, ao analisarmos o acoplamento e a disponibilidade.
+
+Então, como podemos dizer que um sistema baseado em eventos nos ajuda a aumentar a disponibilidade e reduzir o acoplamento?
+
+Com sistemas baseados em eventos, podemos
+
+1. Reduzir a dependência sobre os sistemas
+
+Ao invés de um sistema chamar o outro diretamente, ele envia uma mensagem para um broker, e essa mensagem pode ser consumida por mais de um sistema.
+
+2. Criar um barramento distribuído
+
+Esse broker pode ser distribuído. Nos exemplos eu estou usando o Apache Kafka, que é naturalmente distribuído, mas podem ser um sistema mais simples como um RabbitMQ ou ActiveMQ
+
+3. Sem Ponto Único de Falha
+
+O seu sistema pode ter mais de uma instância que absorva a demanda por requisições, assim ele será mais disponível.
+
+4. Processamento assíncrono
+
+Em muitos casos, o seu sistema não precisa responder instantaneamente. O sistema pode delegar algum processamento para ser feito a posterior e isso vai ajudar você a reduzir o uso de infraestrutura em momentos de pico.
+
+5. Deploy independente
+
+Ao se depender de um broker de mensagens, os sistemas podem ser atualizados independentemente. Ao contrário de uma base de dados que cada atualização de schema deve refletir em todos os sistemas que usam essa base, os registros de schemas para sistemas orientados a eventos conseguem lidar com atualização dinâmica de schema. Assim é possível que um sistema envie um evento para sistemas que não são atualizados há bastante tempo.
+
+Aí nós chegamos a segunda pergunta que é muito importante "O que é modelagem de sistemas?" 
+
+E porque devemos nos preocupar com modelagem.
+
+Mas primeiro precisamos diferenciar Modelagem de Arquitetura. Em muitos casos só pensamos na arquitetura, que é uma visão de como o sistema deve ser implementado para atingir alguns objetivos de desempenho. Isso significa uma escolha de um banco, de um protocolo, etc...
+
+Quando falo de modelagem, estou falando da divisão de responsabilidades dos sistemas. Das escolhas de nomes. Do mapeamento dos eventos, as informações que contêm cada evento. Em muitos casos Modelagem e Arquitetura tem pontos de contato e se influência mutualmente, mas é possível mudar a modelagem sem mudar a arquitetura de um sistema, e vice-versa.
+
+E qual é a minha referência para modelagem?
+
+Para mim, a melhor referência é o Domain-Driven Design, que é descrito nos dois livros. Caso queira mais informações, eu tenho uma playlist onde comento o livro azul capítulo por capítulo e o link está na descrição, ou aparecendo em algum lugar da tela.
+
+- E como o Domain-Driven Design podem nos ajudar com a modelagem? 
+
+Através de alguns conceitos interessantes como Linguagem Onipresente, Modelo, Contexto e Contexto Delimitado.
+
+
+Para começar, vamos falar de domínio? Domínio é a área de conhecimento para qual o software está sendo desenvolvido. O domínio é a fonte de conhecimento do nosso software.
+
+Depois vem a Linguagem Onipresente. A linguagem que deve ser cultivada em todo o desenvolvimento do software. Ela deve unir os especialistas de domínio e os desenvolvedores possibilitando a comunicação entre todas as partes envolvidas. Sabe quando pessoal fala que os desenvolvedores tem uma linguagem que ninguém entende? Quando falamos de Domain-Driven Design os desenvolvedores devem mesclar os termos da computação com conceitos de domínio e criar termos e expressões que sejam democráticas! 
+
+A linguagem universal deve permear todos os artefatos gerados, desde documentos ao código. E isso vem através do modelo. O modelo é o conhecimento sobre o funcionamento do sistema destilado. Pode ser apenas um conjunto de frase, mas que devem obrigatoriamente refletir no código.
+
+Por fim, temos o Contexto e o Contexto delimitado. Cada área do sistema deve limitar o seu contexto, as informações que possui, que recebe e que emite. Cada sistema ou subsistema, terá modelagens diferentes porque o contexto pode mudar. E os contextos devem ser limitados, um sistema não deve saber detalhes de implementação do outro, eles devem se comunicar através de uma interface comum, uma API ou eventos!!!
+
+Para isso o Domain-Driven Design oferece uma série de padrões de objetos, como Entidades, Objetos de Valor, Agregados, Serviços, Repositório e Eventos. Asim você pode compor o seu serviço usando eventos ligados ao domínio e isso nos remete a terceira pergunta.
+
+Como modelar sistemas baseados em eventos?
+
+Para modelar um sistema baseado em eventos, precisamos de 4 importantes passos. 
+
+1. Entender a forma de Comunicação
+2. Definir os processos assíncronos
+3. Definir os eventos
+4. Dar nomes aos eventos
+
+
+A primeira coisa que precisamos entender é que a arquitetura de um sistema baseado em eventos é assíncrona. Não vamos ter aqui o REST, o HTTP, o gRPC ou o graphQL. Você manda uma mensagem e ela é recebida pelo sistema ou broker que está do outro lado. 
+
+Então, se eu fosse resumir uma arquitetura baseada em requisição e resposta, pensada no procedimento. Um sistema A que chama B teria sua disponibilidade limitada por B, A deve conhecer B, deve conhecer e depender da API de B. Isso significa que se B mudar sua interface, A deve ser atualizado. E se eu precisar adicionar um novo caso de uso, um novo sistema C, devo atualizar A, porque A faz a chamada ativa por C.
+
+Já uma arquitetura baseada em eventos, A é independente de B. A não precisa conhecer B, ou conhecer a interface de B. Tudo que A precisa conhecer é o schema da mensagem e o canal que precisa enviar. E se eu quiser adicionar um novo sistema C? Não preciso alterar A.
+
+O segundo ponto é definir o processo assíncrono.
+
+O que é um processo assíncrono? É um processo que se comunica por eventos e não fica bloqueado esperando uma resposta. Vamos pensar no caso de um marketplace que está no diagrama ao lado. Normalmente pensamos que ao finalizar uma compra, tudo deve ser feito de forma síncrona. A reserva do produto, envio de email, pagamento, envio para a logística. É muito fácil saber se um marketplace usa ou não arquitetura baseada em eventos, basta observar o que acontece quando você clica em finalizar compra. Nos pequenos marketplace, já recebemos as notificações de email e banco, mas nos grandes vemos que o email chega alguns minutos depois, a notificação do cartão de crédito pode demorar horas e o rastreador só chega no final do dia. Isso acontece porque o processo foi modelado baseado em eventos. Provavelmente eles tem sistemas independentes atuando independentemente e a infraestrutura não é sobrecarregada durante o horário de pico com atividades que podem ser postergada.
+ 
+Uma boa notação para modelar esse processo é o BPMN, Business Process Modeling Notation. Tente escrever o processo do seu produto usando BPMN e você vai ver como é mais fácil e visualizar o que está acontecendo. Cada caixinha pode ser um sistema e cada seta pode ser um evento. Tente dar nomes a esses eventos, descrever eles a nível de negócios.
+
+Com isso chegamos ao terceiro ponto, que é definir os eventos e o Domain-Driven Design pode nos ajudar com isso!
+
+Existe uma técnica no mundo do DDD chamada Event Storming. O que é o Event Storming? Imagina que você quer criar um sistema baseados em eventos, você fará isso dividindo em 3 sistemas distintos que se comunicarão com o uso de eventos. Então pega as equipes de desenvolvimento, coloca em uma sala e desenha o processo que está sendo implementado em um quadro, pode usar BPMN. Depois pede para cada time dizer o que precisa ser feito e qual evento deve iniciar o processo e qual evento será gerado durante o processo. Cada evento deve ser um post-it, e nesse post-it deve contar o fato que o evento representa e toda a informação necessária para que os outros times possa escutar e usar o evento.
+
+Por fim precisamos dar nomes aos eventos. Essa pode parecer a fase mais difícil porque dar nomes realmente é difícil, mas eu gostaria de mostrar um pequeno levantamento que fiz dos tipos de eventos nos sistemas que já implementei. 
+
+Eu classifico os eventos, ou na verdade, as mensagens em 3 tipos de mensagens.
+
+Os Eventos, onde eventos são fatos que acontecem.
+Os Comandos, que são ordens de um sistema para outro. Comandos devem ser executados.
+E os Documentos, que são dados criados. 
+
+Então um sistema pode enviar eventos baseados nesses três tipos, e devemos dar nomes descritivos. Assim, se um usuário foi criado em um evento, ele pode emitir o evento 'UsuarioCriado', pode emitir o comando 'GerarRelatórioUsuario' que algum outro processo vai escutar. Ou pode simplesmente enviar o documento 'Usuario'.
+
+Observa nos termos que eu usei nomes que descrevem bem o que aconteceu. Ao ver um evento 'UsuarioCriado', eu não tenho dúvidas que um usuário foi criado. Quando eu escrevo um sistema, defino que esses vão ser os nomes das classes, muitos me perguntam porque não usar DTO, que eles transferem dados. Porque acredito que se nomearmos bem os eventos, é desnecessário usar o prefixo. O prefixo não melhora o entendimento do software, muito pelo contrário, as vezes criamos objetos com nomes genéricos com o prefixo e acreditamos que é suficiente.
+
+
+Por fim, podemos resumir que cada evento deve possuir um nome descritivo e um schema, isso é, um formato de serialização e campos. Cada time deve conhecer esses eventos. Para sistemas simples, essa documentação pode até ser feita em páginas wikis ou markdown. 
+
+E os nomes devem ser descritivos!!!
+
+Aí você pode levantar uma última pergunta: Como documentar um sistema baseado em eventos?
+
+Tem um projeto chamado AsynAPI, que é bem similar ao OpenAPI. Com ele você pode descrever os seus eventos em formato YAML e gerar documentação.
+
+Com isso espero ter dado as bases de como se pensa um sistema baseado em eventos. 
+
+Criar sistemas baseados em eventos significa sair do óbvio, e por isso é preciso pensar de forma diferente. Somos viciados em pensar no processo como um todo, em ter o controle do processo. Quando pensamos em eventos, pensamos em processos assíncronos, processos independentes. Isso é fugir ao óbvio!
+
+Espero ter te ajudado com meu vídeo. Qualquer dúvida entre em contato comigo pelas redes sociais. Estou no Blue Sky como @victor.dev e no youtube como @victor.osorio.
+
+Obrigado por ter assistido até o fim.
+
