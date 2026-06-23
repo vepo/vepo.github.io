@@ -18,7 +18,11 @@ module Jekyll
     end
 
     def self.youtube(id)
-      "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{id}\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>"
+      <<~HTML
+        <div class="img-block">
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/#{id}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      HTML
     end
 
     def self.gist(url)
