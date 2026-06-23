@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'json'
+require 'erb'
 
 module Jekyll
   module Embeds
@@ -24,14 +25,47 @@ module Jekyll
       "<div data-gist=\"#{url}\"></div>"
     end
 
-    def self.github(_repo)
-      # API integration commented out in original plugin
-      'bla'
+    def self.github(repo)
+      repo = repo.start_with?('https://github.com/') ? repo[19..-1] : repo
+      headers = {
+        accept: 'application/vnd.github+json',
+        'x-gitHub-api-version': '2022-11-28'
+      }
+      if (github_token = ENV['MY_GITHUB_SECRET']) && !github_token.empty?
+        headers[:authorization] = "Bearer #{github_token}"
+      end
+      repo_info = JSON.parse(::RestClient.get("https://api.github.com/repos/#{repo.strip}", headers))
+      <<~HTML
+        <div class="github-repo">
+            <h2>
+                <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+                <img class="user" src="#{repo_info['owner']['avatar_url']}" loading="lazy" />
+                <span class="url">
+                    <a href="https://github.com/#{repo_info['owner']['login']}">
+                        #{repo_info['owner']['login']}
+                    </a>
+                    /
+                    <a href="https://github.com/#{repo_info['owner']['login']}/#{repo_info['name']}">
+                        #{repo_info['name']}
+                    </a>
+                </span>
+            </h2>
+        </div>
+      HTML
     end
 
-    def self.twitter(_tweet_url)
-      # oEmbed integration commented out in original plugin
-      nil
+    def self.twitter(tweet_url)
+      url = tweet_url.strip
+      oembed_url = "https://publish.twitter.com/oembed?theme=dark&align=center&url=#{ERB::Util.url_encode(url)}"
+      tweet = JSON.parse(::RestClient.get(oembed_url))
+      tweet['html']
+    rescue RestClient::Exception
+      <<~HTML
+        <blockquote class="twitter-tweet" data-theme="dark" data-align="center">
+          <a href="#{url}"></a>
+        </blockquote>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      HTML
     end
 
     def self.dev_post(article_id)
