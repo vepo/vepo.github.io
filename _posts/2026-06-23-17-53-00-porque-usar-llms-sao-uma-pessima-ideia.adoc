@@ -1,0 +1,292 @@
+---
+title: Porque usar LLMs para programar é uma péssima ideia?
+published: true
+description: |
+    Será que usar LLMs para programar é realmente uma péssima ideia? Entre a imposição do mercado, a perda do raciocínio crítico e os custos ocultos, a resposta não é tão simples quanto parece.
+tags: [Vale do Silício, Cultura, Tecnologia, IA Generativa, Tecno-Feudalismo, Engenharia de Software, Produtividade, Débito Técnico, Cursor, Tokens, Metodologia Ágil, Crítica da IA, Mercado de Trabalho]
+image: /assets/images/capa-maquina-escrever-ao-sol.jpg
+permalink: /posts/porque-usar-llms-para-programar-e-uma-pessima-ideia
+series: Inteligência Coletiva
+publish_date: 2026-03-23 17:53:00 +0300
+---
+
+NOTE: Esse texto não busca dialogar pela lógica do uso ético de LLMs. Essa é uma outra discussão.
+
+Provavelmente você já ouviu alguém dizer que o modo como programamos mudou depois do surgimento das LLMs. Confere? Esse é um argumento comum hoje em dia e as empresas, tentando sempre seguir a _hype_, estão obrigando equipes inteiras a usarem LLMs o tempo inteiro, como se fôssemos apenas "gerentes de agentes inteligentes".
+
+Além disso, as LLMs estão sendo colocadas como uma tecnologia inevitável, algo que, se alguém questiona o seu uso, é porque essa pessoa não sabe usar ou nem sequer usou. Dessa forma, antes que você continue a ler esse post, já devo avisar que **sou usuário de LLMs** há pelo menos 2 anos. Minha relação com elas, porém, não foi exatamente uma opção pessoal, se deu por uma imposição do mercado.
+
+Esse post surge justamente da experiência de usá-las diariamente para desenvolver software e, ao fazer isso, a comparação com os meus mais de 20 anos de experiência em desenvolvimento é inevitável. Hoje creio que, do ponto de vista de um **Engenheiro de Software**, o uso intensivo de LLM é um risco a médio e longo prazo dentro de um projeto de software. Por isso, listo abaixo os motivos pelos quais acredito que *forçar* o uso de LLMs como substitutas do cérebro humano é uma péssima estratégia — e um sintoma claro do tecno-feudalismo que nos rodeia.
+
+---
+
+== 1. LLMs geram muito código. Às vezes, mais que o necessário
+
+Eu costumo comparar uma LLM com um profissional júnior superproativo e extremamente descuidado. Sempre que peço para minha ferramenta do dia a dia implementar uma funcionalidade, ela vai gerar muito código e alterar classes desnecessárias para realizar a tarefa. Não pense que isso é um efeito colateral de se usar uma LLM e que todas as mudanças são necessárias. A proatividade de uma LLM é uma funcionalidade desejada pela empresa que a criou e, para entender isso, precisamos olhar para o modelo de cobrança das empresas que fornecem LLMs.
+
+Fala-se muito de _tokens_, mas você já parou para pensar no que é um _token_? Em programação, um _token_ é a menor unidade de dado com significado. Pode ser um identificador, uma palavra-chave, um operador ou um símbolo. Um _token_ representa uma série ou sequência de caracteres que não pode ser decomposta ainda mais.
+
+.LLMs geram muito código
+image::artisticas/pexels-tima-miroshnichenko-9572518.jpg[]
+
+Em LLMs, um _token_ é a menor unidade de texto que o modelo consegue ler ou gerar de uma só vez. Pode ser uma palavra inteira, parte de uma palavra (como 'pref' ou 'ixo') ou um caractere único, dependendo do tokenizador. Ao se escrever um prompt, ele é convertido em uma sequência de IDs de _tokens_, que são então transformados em _embeddings_ (vetores numéricos) e alimentados em uma rede neural. O "conhecimento" (entre muitas aspas) do modelo está armazenado como parâmetros dessa rede (ou pesos sinápticos) que, ao receber esses _embeddings_, vai gerar uma sequência de IDs que é a saída.
+
+Caso não queira confiar na minha explicação, https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them[veja como a OpenAI define o que é um Token abaixo]:
+
+[quote,OpenAI,What are tokens and how to count them?]
+____
+Tokens are the building blocks of text that OpenAI models process. They can be as short as a single character or as long as a full word, depending on the language and context. Spaces, punctuation, and partial words all contribute to token counts. This is how the API internally segments your text before generating a response.
+____
+
+O problema é que os _tokens_ são a **unidade básica de cálculo** do uso das ferramentas que usam modelos de linguagem. Isso significa que quanto mais _tokens_ forem lidos e gerados pelos modelos, mais o uso da ferramenta poderá ser cobrado.
+
+No documento citado acima, por exemplo, a OpenAI cita que o uso de sua API é cobrado por token e que o cálculo do token é feito combinando a entrada processada e a saída gerada. Isso significa que, se um modelo foi treinado para gerar respostas longas, ele será mais lucrativo para a empresa que o gerou. Ou seja, há um claro conflito de interesses se a empresa que fornece o serviço via API é a mesma que criou o modelo.
+
+Quando vamos desenvolver software, desejamos que muitas mudanças sejam pontuais, uma vez que alterações devem gerar o mínimo de impacto. Se estamos alterando uma funcionalidade, não desejamos inserir bugs em outras funcionalidades, e nem sempre é isso que vemos ao se usar LLMs.
+
+---
+
+== 2. LLMs escrevem o que você pede, mas não questionam o que você precisa. Engenheiro de Software não apenas programam!
+
+Escrever software não é somente o processo de escrever um programa que funcione.
+
+Escrever um software é compreender uma atividade do mundo real, criar um modelo para ela e codificar uma ferramenta que ajude as pessoas a executar essa atividade de forma mais eficiente.
+
+Entre as metodologias para desenvolvimento de software, existem diversas que se dedicam a traduzir esse conhecimento do mundo real em código; é isso que chamamos de modelar. Por exemplo, o _Domain-Driven Design_, ou DDD para os íntimos, é uma metodologia que coloca o domínio (ou seja, a área de conhecimento para a qual o software está sendo desenvolvido) no coração do projeto.
+
+Um bom engenheiro de software não irá somente escrever código, ou programar como muitos falam. Irá, por sua vez, explorar o modelo vendo como ele pode ser modelado enquanto descreve e sugere processos. Vai brincar com as palavras sugerindo termos que possam enriquecer até mesmo o vocabulário daqueles que trabalham há anos na área do dominio.
+
+// https://excalidraw.com/#json=DfPxMJaiihOlatCl7oZCX,kgxzaKGPkiQm-s9i-Iriuw
+
+.O modelo descreve o domínio e é refletido no código
+image::artigos/llm-pessima-ideia/modelo-e-dominio.png[]
+
+Esse é o papel da engenharia de software. Ela não deseja apenas escrever código, mas extrair requisitos e questionar se o software desejado realmente entrega valor ao cliente. É aí que mora o problema!
+
+Há muitos anos, "empreendedores" querem tirar a figura do engenheiro de software do meio do caminho, porque nós somos o choque com a realidade que muitos não desejam ver. Somos nós que dizemos que uma atividade aparentemente simples é complexa porque há riscos de segurança. Somos nós que dizemos que vamos parar de entregar funcionalidades por algumas semanas para melhorar a estrutura interna do projeto. Somos nós que gastamos alguns dias a mais para escrever testes, etc.
+
+Quem não é engenheiro de software acredita que tudo isso não "entrega valor" porque não sente, de fato, o benefício do que está sendo feito. Ninguém vê o valor de uma medida de segurança se nunca se deparou com o problema que ela está evitando.
+
+Ter um modelo bem elaborado é parte do trabalho de um bom engenheiro. Se o modelo não for bem trabalhado e o código apenas refletir o que está sendo feito, a compreensão do sistema se tornará impossível e, em pouco tempo, o projeto explodirá em complexidade.
+
+Projetos sem um bom modelo elaborado tendem a ter funcionalidades repetidas, falta de padronização nos processos, código duplicado e bugs. **Muitos bugs!**
+
+Então já existe um problema de comunicação no mercado, em que executivos querem eliminar posições por acreditarem que elas não entregam valor, e os vendedores de IAs exploram esse problema. Por exemplo, o CEO da Anthropic, Dario Amodei, falou há mais de um ano que https://finance.yahoo.com/news/anthropic-ceo-says-ai-could-193020957.html[90% do código de todas as indústrias seriam escritos por IA]. Como essa profecia não se realizou, você deve até estar imaginando que ele pediu desculpas, não é? Não! Ele dobrou a aposta e falou que https://finance.yahoo.com/news/anthropic-ceo-predicts-ai-models-233113047.html[engenheiros de software serão substituídos em suas atividades de **ponta a ponta** entre 6 e 12 meses].
+
+[quote,Anthropic CEO, Dario Amodei]
+____
+We might be 6-12 months away from models doing all of what Software Engineers do End-to-End.
+____
+
+As pessoas estão cobrando ele pelas promessas não cumprida? Não. As pessoas estão acreditando nas próximas promessas? Sim! Tudo que posso falar é que existe otário pra tudo nesse mundo e ninguém está nessa de inocente.
+
+Mas é preciso enfatizar que os agentes de IA são meras máquinas de transformar entradas de tokens em saídas. Se não houver o trabalho de elaborar eficientemente o prompt, o resultado não será o desejado. E esse é o trabalho de um engenheiro de software. Além disso, é necessário e fundamental para garantir que o software não só entregue valor, como não cause problemas legais e de imagem pública, https://www.techtudo.com.br/noticias/2025/09/sapphos-tinder-feminino-sai-do-ar-apos-grave-falha-de-seguranca-entenda-edapps.ghtml[como vazar fotos íntimas por permissões insuficientes].
+
+---
+
+== 3. O código gerado pelas LLMs não é plemante conhecido pela engenharia, o que leva a perdas de produtividade.
+
+Uma das situações mais comuns na vida de um engenheiro de software experiente é estar em uma sala de situação, ou uma war room. No meu dia a dia, é uma chamada em grupo com diversas pessoas, entre elas técnicas e uma série de gestores.
+
+Essas salas de situação são criadas quando algum problema sério acontece, e o número de gestores indica a gravidade do problema. Não pense que eles estão ali só para "fiscalizar" o trabalho dos técnicos. Já estive em salas de situação em que bons gestores conseguiram trazer pessoas que sabem resolver os problemas.
+
+Lembro-me de uma vez em que um diretor desconhecido para mim conseguiu meu contato e me ligou às 18h de uma sexta-feira. Entrei na reunião, dei uns pitacos sobre o problema e saí. Depois, discuti com meu diretor, e ele me agradeceu por ter resolvido um problema de um time sem nenhuma relação com o nosso. Isso aconteceu porque o gestor percebeu que o problema era em Kafka e foi atrás, dentro da organização, de um especialista que resolvesse o problema. Já vi também situações em que o gestor foi atrás de um especialista fora da organização.
+
+.Debugar código desconhecido é sempre estressante.
+image:artisticas/pexels-cottonbro-6804071.jpg[]
+
+Mas, naquele dia, só consegui resolver o problema porque conhecia muito bem o comportamento dos clientes do Apache Kafka. Essa minha experiência vem dos quase 9 anos de desenvolvimento usando o Apache Kafka e das diversas situações com que já tive de lidar. Quando entramos em uma sala de situação, as nossas experiências prévias servem de histórico que nos ajuda a identificar e resolver problemas.
+
+Mas essas experiências só são forjadas com o contato diário com o código, e essa é uma grande perda que o uso intensivo de LLMs traz. No último mês, usei meu projeto de uma plataforma independente de blogs como campo de experimento para melhorar meu uso de LLMs. Peguei o projeto https://github.com/vepo/contraponto[contraponto] e implementei diversas funcionalidades complexas usando o Cursor.
+
+{% github https://github.com/vepo/contraponto %}
+
+Meu intuito era entender como o Cursor poderia me ajudar a gerar código satisfatório. Mas, assim que o projeto alcançou um ponto em que entendi que ele estava satisfatório, coloquei em produção no link https://blogs.commit-mestre.dev/[blogs.commit-mestre.dev].
+
+A princípio, tive uma série de problemas com as funcionalidades implementadas que não consegui resolver imediatamente. Minha intuição estava quebrada porque, mesmo sabendo onde estava o código que implementava a funcionalidade em questão, eu não sabia os detalhes dele. 
+
+Eu não consegui ativar algo no meu cérebro que me dizia instantaneamente: _o problema está ali_. A solução para resolver esses problemas foi usar o Cursor e deixar ele resolver os bugs encontrados.
+
+Isso também não foi satisfatório, pois mesmo criando uma regra em que cada funcionalidade gerada deveria ter um teste associado e que tudo deveria ser corretamente validado, o Cursor é muito descuidado ao escrever código.
+
+Agora mesmo, ao escrever esse post, me deparei com um bug: a data de publicação de blogs integrados via git não é a data de publicação original, mas a data da integração. Até pensei: _"esse eu consigo resolver fácil!"_ Fui atrás e achei o trecho em que o código recuperava o valor de _publish__date_ que uso no meu blog, mas estava correto! Em algum lugar do código esse valor era sobrescrito e não era óbvio. Além disso, os testes não validavam datas de publicação de posts antigos. Ou seja, a funcionalidade estava implementada incorretamente e eu não tinha a mínima ideia de como resolver.
+
+No final, eu consegui resolver com a cota gratuita que me restava. Da próxima vez, quero entender corretamente o fluxo de integração para não ser surpreendido novamente. Tenho até uma nova funcionalidade em mente que será meu laboratório.
+
+Mas você deve estar se perguntando se eu não entendi o código gerado antes de integrar. Sim! Eu fiz _code review_, mas o processo de _code review_ se deteriora quando temos muito código sendo integrado. Uma coisa é eu revisar uma integração de 500 linhas, outra é ler e compreender uma integração de 2000 linhas. Por mais que estejamos revisando todos os possíveis maus usos da JDK, não conseguimos internalizar a dinâmica do código.
+
+Em uma empresa, isso gera uma dependência das ferramentas que usam LLM, e essa dependência é um custo. Muitos gestores não pensam nos desenvolvedores como coparticipantes do processo criativo e como reais engenheiros da solução. Eles, em uma visão imatura, tratam o engenheiro como uma mera mão de obra descartável, o que faz o _turnover_ de empresas ser alto e pouco do conhecimento técnico qualificado ficar na empresa. É preciso afirmar em alto e bom tom: *isso leva a uma baixa produtividade*.
+
+---
+
+== 4. O verdadeiro custo ainda é desconhecido. As contas das empresas de LLMs são sigilosas.
+
+Toda essa discussão sobre o uso de LLMs ainda é muito inicial. Apesar de já termos mais de 5 anos de debate, as empresas que fornecem essa tecnologia ainda não possuem um modelo de negócios claro e nem são empresas abertas na bolsa. Isso significa que, apesar de elas receberem continuamente ciclos de investimento, muitos deles suspeitos, não temos visibilidade se estão operando com lucro ou prejuízo. Óbvio que o contínuo ciclo de investimentos dá um claro indício de que não existe lucro, apenas uma promessa.
+
+Isso leva para um outro problema aparecendo no horizonte: *a Bolha da IA*. Por enquanto, tudo o que existe é especulação. Especula-se que elas terão um lucro absurdo e que todo mundo vai utilizar, mas também se especula que a conta não está fechando. O que, na verdade, estamos vendo é que o ciclo de investimento é cíclico. Como funciona isso? As empresas se reinvestem entre si, com apenas a Nvidia ganhando nesse jogo. Todo o resto está no escuro.
+
+{% youtube 1QMlkS53h7M %}
+
+Enquanto isso, há uma demanda crescente para que essa promessa se realize. Toda essa paranoia se baseia na ideia de que, se construirmos um modelo com parâmetros suficientes, este conseguirá se tornar consciente e atingir a tão sonhada *SINGULARIDADE*.
+
+O que é a singularidade? Seria o momento na história da humanidade em que a máquina conseguiria ter um intelecto superior ao ser humano, e a chave da inovação se inverteria. Em vez de nós desenvolvermos pesquisa, um modelo tomaria a iniciativa de pesquisar, inovar, desenvolver, etc., encontrando a solução para todos os problemas da humanidade, como a fome, as doenças e o aquecimento global. Principalmente o aquecimento global!
+
+NOTE: Leia https://www.tandfonline.com/doi/full/10.1080/08911916.2026.2616133#abstract[The U.S. Is Betting the Economy on ‘Scaling’ AI: Where Is the Intelligence When One Needs It?]
+
+Mas para chegar a esse modelo, é preciso investimentos. Investimentos na construção de _Data Centers_, no aumento da capacidade de geração de energia e na disponibilidade de recursos como terras raras. Tudo isso significa obstáculos políticos e econômicos.
+
+Data centers consomem muita energia e água, e isso significa custo. Mas, para que esse custo não seja um problema no modelo de negócios, estados e municípios estadunidenses estão subsidiando os mesmos, https://goodjobsfirst.org/data-center-shutdowns/[o que não está agravando as comunidades que veem seus custos de energia subirem]. Por isso as empresas estão https://oeco.org.br/externo/ia-para-quem-entenda-o-boom-de-data-centers-no-brasil/[procurando países como o Brasil, que possuem energia e água abundantes].
+
+{% youtube YN6BEUA4jNU %}
+
+Talvez você esteja se perguntando por que tem que ficar preocupado com tudo isso. Porque esse é um ponto central em toda a estratégia de adoção das LLMs. O que estamos vendo hoje é a ponta de um grande iceberg: o custo de tudo isso. Se hoje pagamos pouco para acessar planos que nos permitem usar _tokens_ ilimitados, isso pode mudar radicalmente em pouco tempo.
+
+O grande golpe pode ser o https://g1.globo.com/tecnologia/noticia/2026/06/08/openai-dona-do-chatgpt-entra-com-pedido-confidencial-de-ipo.ghtml[IPO (Oferta Pública Inicial de Ações) da Anthropic e da OpenAI]. Quando uma empresa abre seu capital para ser negociada na bolsa de valores, ela deve se comprometer a ter balanço de caixa público e a divulgar relatórios financeiros. Hoje não sabemos o custo de manter essa infraestrutura; tudo o que sabemos é que, no planejamento deles, espera-se que todos usem LLMs. O https://www.businessinsider.com/sam-altman-ai-utility-electricity-water-openai-2026-3[Sam Altman fala que espera que essa tecnologia seja fornecida como infraestrutura civilizacional básica, como água e energia].
+
+Em resumo, o que já temos hoje aponta que: (i) essas empresas estão no prejuízo; (ii) ainda há necessidade de investimentos bilionários; e (iii) elas não vão conseguir atingir seus objetivos financeiros. Logo, essas condições apontam para três possíveis cenários:
+
+. A bolha estoura e as empresas vão quebrar, levando toda a economia estadunidense, uma vez que 30% da economia se baseia nas 7 grandes empresas que estão investindo tudo em _Data Centers_;
+. As empresas vão aumentar o preço para cobrir todos os investimentos feitos para construir a infraestrutura existente;
+. Mesmo que os dois cenários acima não aconteçam, pode haver escassez de recursos, o que forçará o aumento do preço.
+
+[quote,Al Jazeera ,As the US stock market smashes records, some investors fear it’s overpriced]
+____
+While the market’s heavy reliance on the “Magnificent Seven” has been a source of concern for some investors – they make up about one-third of the S&P 500 – such concentration is not unprecedented.
+____
+
+Aí fica a pergunta: o que hoje é promessa de recurso barato pode se tornar escasso em um futuro próximo. Se sua empresa depender desse recurso, ela se tornará financeiramente dependente de algo que pode ter um custo inflacionário enorme.
+
+*_Vale a pena o risco?_*
+
+---
+
+== 5. LLMs produzem resultados muito rápido, mas não significa que agiliza o trabalho de desenvolvimento.
+
+O Linus Torvalds tem uma frase muito famosa _Falar é fácil, me mostre o código_. Isso é basicamente um lema para algumas pessoas, mas parece que não é um lema para as empresas que fornecem LLMs. Até agora elas tem mostrado que é muito fácil escrever código. Basta colocar um prompt e voilá, temos um programa. Mas será que estamos realmente ganhando tempo? Existe algum estudo que prova isso? _Falar é fácil, cadê as estastisticas?_
+
+Felizmente, existem dois estudos conduzidos pela METR (_Model Evaluation and Threat Research_). Mas, antes de ler o resultado dos estudos, https://metr.org/about[procurei garantir que a METR não é financiada pelas empresas envolvidas com a criação desses modelos]. Ser financiada por essas empresas não é um problema em si, mas, ao se divulgar uma avaliação, isso configura um claro conflito de interesses e o estudo não pode ser levado a sério.
+
+A METR tem dois estudos divulgados, e os resultados são bem interessantes. No primeiro estudo, de 2025, https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/[_Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity_], observou-se que o desenvolvimento de uma atividade com o uso de LLMs era, em média, 19% mais lento do que sem o uso delas. Enquanto se esperava um ganho de 24% no tempo de desenvolvimento, observou-se uma redução.
+
+A pesquisa oferece alguns insights sobre o que motivou essa lentidão:
+
+* Em menos de 44% das vezes, o código gerado pela LLM era aceito; ou seja, havia uma altíssima rejeição do código gerado.
+* As LLMs geram respostas sem contexto ou conhecimento tácito da tecnologia.
+* O desempenho em grandes projetos era pior do que a média.
+* A pesquisa foi conduzida com profissionais experientes que confiavam mais em suas habilidades do que no código gerado..
+
+
+.Resultados estatísticos encontrados na pesquisa de 2025. Enquanto o tempo estimado caía em 24%, o tempo de desenvolvimento subía em 19%.
+image::artigos/llm-pessima-ideia/core-result.png[]
+
+https://metr.org/blog/2026-02-24-uplift-update/[Já o estudo de 2026 mostrou outro cenário]: desenvolvedores não desejam trabalhar sem LLM. Mesmo com a pesquisa pagando US$ 50/hora, 50% dos desenvolvedores não queriam trabalhar sem LLMs, enquanto de 30% a 50% não quiseram realizar algumas atividades sem a possibilidade de usá-las.
+
+Esse novo cenário gerou dificuldades na condução do estudo, o que fez com que os dados de produtividade não sejam confiáveis. Agora, as pessoas que participaram do primeiro estudo tiveram um ganho de 18% de produtividade, enquanto os novos participantes tiveram um ganho de 4%. Mas esse dado não é confiável, uma vez que os participantes que aceitaram participar não submeteram as atividades de maior dificuldade.
+
+Lendo o texto, parece que não houve ganho de produtividade com o uso de LLMs, mas sim uma queda vertiginosa na capacidade de resolução de problemas sem elas. Ou, pelo menos, uma queda na disposição para resolvê-los sem esse auxílio.
+
+[quote,We are Changing our Developer Productivity Experiment Design,Selected developer quotes]
+____
+“I’m torn. I’d like to help provide updated data on this question but also I really like using AI!” — a developer from the original study early-2025 when asked to participate in the late-2025 study.
+
+“I found I am actually heavily biased sampling the issues … I avoid issues like AI can finish things in just 2 hours, but I have to spend 20 hours. I will feel so painful if the task is decided as AI-disallowed.” — a developer from the new study noting selection effects when choosing what tasks to include in the study.
+
+“my head’s going to explode if I try to do too much the old fashioned way because it’s like trying to get across the city walking when all of a sudden I was more used to taking an Uber.” — a developer from the new study noting selection effects when choosing what tasks to include in the study.
+____
+
+Essas conclusões me causam alarde, tanto como desenvolvedor quanto como cidadão. Será que vamos aceitar delegar nossa capacidade de análise e resolução de problemas para as LLMs? Se o uso delas nos deixa preguiçosos, o que será de nós em um futuro em que elas estarão cada vez mais caras?
+
+---
+
+== 6. Quanto mais complexo o projeto, mais _tokens serão utilizados.
+
+Ao usar uma ferramenta baseada em LLM, é visível a forma como elas encontraram para contornar as limitações da tecnologia. O Cursor, por exemplo, antes de executar qualquer alteração de código, tenta levantar o máximo de informações possível em um projeto. E, para que o resultado seja satisfatório, o prompt elaborado também precisa fornecer muita informação.
+
+Depois de levantar as informações, a ferramenta cria um plano de ação e o executa. Ao quebrar a atividade em pequenas tarefas com checklists, ela emula a forma de desenvolvimento de engenheiros de software experientes. É como se houvesse um desenvolvimento iterativo, no qual o prompt inicial fosse usado para gerar novos prompts mais complexos, com informações do código e das execuções passadas.
+
+Eu tenho um método de desenvolvimento bem similar. Começo entendendo o projeto; depois, vejo como executá-lo localmente, verifico se há testes e como a estrutura do código está organizada. Só então tento entender a demanda a ser implementada e executo minha atividade usando _Test-Driven Development_.
+
+Quando começo a trabalhar em um projeto com uma grande base de código, a demanda para compreendê-lo é grande, uma vez que preciso ler bastante código para entender sua estrutura. Quando o projeto é desorganizado e sem um bom design, essa carga cognitiva cresce.
+
+O mesmo acontece com as ferramentas de LLM! Quanto maior o projeto, mais código elas precisarão usar para elaborar os prompts.
+
+Isso significa que, ao serem usadas em projetos com uma grande base de código, os prompts gerados ficarão cada vez maiores. Eu vi essa dinâmica no desenvolvimento do https://github.com/vepo/contraponto/[contraponto]. O uso de tokens é proporcional ao tamanho do projeto multiplicado pela entropia dele, e isso pode ser um problema sério.
+
+== 7. LLMs alucinam e não possuem senso crítico!
+
+O útlimo argumento é o mais comum. LLMs não são confiáveis e sempre concordam com você. Eu sou um pouco reticente de afirmar que LLMs alucinam, porque alucinar é um comportamento humano.
+
+LLMs geram o _token_ mais provável e esse _token_ pode não ter um significado real. Quando estamos trabalhando com código mais comum, como fazer uma API REST por exemplo, é fácil ver que o resultado é bom. Mas quando estamos procurando resolver problemas complexos, como um bug de concorrência, o resultado se torna dificil de conseguir. _Aliás, esse é o meu desafio nessa semana que estou escrevendo esse texto e o Cursor está falhando miseravelmente._
+
+Outro problema sério é que as LLMs são treinadas para sempre concordar com a entrada. Elas não possuem senso crítico. Isso pode ser um grave problema quando se deseja questionar fatos ou avaliar análises. Quem nunca leu um _Sim, você tem razão em sua observação_ que atire a primeira pedra.
+
+.Contradizendo a LLM. LLMs sempre reformulam a resposta para concordar com o _prompt_. No caso, fui malicioso, uma vez que o Brasil já existia para os indígenas e já existiam europeus.
+image::artigos/llm-pessima-ideia/contradizendo-a-llm.png[]
+
+== Conclusão: Use como ferramenta, não substitua o seu raciocinio
+
+As conclusões a que chego são dúbias. De um lado, sou obrigado pelas condições do mercado a usar as ferramentas de geração de código assistidas por LLMs. Por outro lado, me sinto perdido ao não entender os meandros das soluções que estou construindo.
+
+Já entreguei diversas funcionalidades feitas completamente usando o Cursor e sinto uma sensação de insegurança tremenda. Sempre tento me perguntar quais são as condições de contorno, como o código está lidando com situações inesperadas, estados de concorrência, falhas de infraestrutura e dados malformados. Todas essas arestas que o modelo, ao gerar uma solução, raramente trata com a devida profundidade.
+
+A verdade é que não há como escapar da necessidade de pensar. O mercado pode nos empurrar para o uso acelerado dessas ferramentas, mas a responsabilidade final sobre o sistema entregue ainda é nossa. Substituir o raciocínio lógico pela aceitação passiva do código gerado não é produtividade; é negligência. As LLMs devem ser tratadas como assistentes de cálculo ou dicionários de sintaxe, e nunca como arquitetas do pensamento.
+
+Hoje eu uso LLMs porque sou obrigado. Mas sempre uso com a desconfiança com que se olharia para um estagiário que acabou de chegar. Reviso cada linha, duvido de cada solução e, principalmente, mantenho viva a capacidade de ler o código e entender seu comportamento. 
+
+É preciso ter em mente que a promessa de automatização total é um blefe! As empresas estão usando as LLMs para reduzir os custos com a folha de pagamento, mas isso logo vai cobrar um alto prećo. 
+
+Um engenheiro de software sempre terá seu valor dentro das organizaćões e o verdadeiro valor não está em quantas linhas ele delega a uma máquina, mas na clareza com que ele compreende e transforma a realidade ao seu redor.
+
+Termino citando o *O Guia dos Mochileiros das Galaxias* na cena que o Pensador Profundo se nega a responder porque as pessoas, na verdade ratos, não sabiam elaborar uma boa pergunta. Elaborar boas perguntas é o básico que devemos fazer.
+
+
+[quote, Douglas Adams, O Guia dos Mochileiros das Galaxias]
+____
+– Quarenta e dois! – berrou Loonquawl. – É tudo que você tem a nos
+dizer depois de sete milhões e quinhentos mil anos de trabalho?
+
+– Eu verifiquei cuidadosamente – disse o computador –, e não há
+dúvida de que a resposta é essa. Para ser franco, acho que o problema
+é que vocês jamais souberam qual é a pergunta.
+
+– Mas era a Grande Pergunta! A Questão Fundamental da Vida, o
+Universo e Tudo Mais – gritou Loonquawl.
+
+– É – disse Pensador Profundo, com um tom de voz de quem tem
+enorme paciência para aturar pessoas estúpidas –, mas qual é
+exatamente a pergunta?
+
+Um silêncio de estupefação aos poucos dominou os homens, que
+olharam para o computador e depois se entreolharam.
+
+– Bem, você sabe, é simplesmente tudo... tudo... – começou Phouchg,
+vacilante.
+
+– Pois é! – disse Pensador Profundo. – Assim, quando vocês
+souberem qual é exatamente a pergunta, vocês saberão o que significa
+a resposta.
+
+– Genial – sussurrou Phouchg, jogando o caderno para o lado e
+enxugando uma pequena lágrima.
+
+– Está bem, está bem – disse Loonquawl. – Será que dava pra você
+nos dizer qual é a pergunta?
+
+– A Pergunta Fundamental?
+
+– É!
+
+– Sobre a Vida, o Universo e Tudo Mais?
+
+– É!
+
+Pensador Profundo pensou um pouco.
+
+– Essa é fogo – disse ele.
+
+– Mas você pode descobri-la? – perguntou Loonquawl.
+
+Pensador Profundo ponderou a questão por mais algum tempo.
+
+– Não – respondeu por fim, com firmeza.
+____
