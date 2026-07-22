@@ -116,3 +116,35 @@ Um conceito tem um grau de generalidade e uma classe de instâncias especializad
 Podemos também definir um outro conceito, o bloco. Um bloco é uma entidade de código que contém propriedades e executa ações. Um bloco podem conter e referenciar outros blocos, da mesma forma como pode ser referenciado e dividido em blocos. Um bloco não representa apenas uma unidade de código, mas uma classe de unidades que podem ser ativada com propriedades diferentes. Um bloco é também um elemento da linguagem. A execução de blocos podem ser administradas como pilhas simples e um _garbage collector_ com operações de _scan-mark_ para remover trechos de memória não utilizados.
 
 Um processo é capaz de gerar blocos que sobrevivem a execução de si mesmo, que são chamados classes, instâncias de execução são os objetos dessa classe. Atributos são variáveis locais dessa classe. A classe possui uma função geradora que cria e retorna instância dos objetos. A instância do objeto tem que ser armazenada em variáveis para ser  utilizada.
+
+## Proteção em Linguagens de Programação
+
+O artigo começa endereçando o problema que quer tratar. Quando falamos de proteção, podemos imaginar segurança da informação, ataques externos, etc... mas não é disso que o artigo trata. Ele coloca claramente que "um programador deve ser capaz de provar que seu sistema funcional e que possui determinadas propriedades com apenas os seus conhecimentos". Para adicionar proteção, o artigo sugere algumas melhorias linguisticas para as linguagens de programação
+
+### 1. Procedimentos como objetos
+
+O autor sugere que para que procedimentos sejam realmentes eficientes em linguagens de programação, eles devem expor somente os efeitos do procedimento e não a forma como ele foi feito. Conhecer os detalhes de implementação podem trazer prejuizos ao uso de um procedimento e a implementação deve ser protegida. Procedimentos podem ser usados como objetos, se serem passados por parâmetros, coisa que, até aquele momento, só o LISP dava suporte.
+
+### 2. Objetos locais
+
+Objetos devem pertencer a um escopo e não estare acessíveis fora desse escopo. Objetos nesse contexto são variáveis, estruturas de dados ou procedimentos. Esses objetos podem até ser passados como parâmetros para outros procedimentos ou até serem criados e retornados pela chamada de um procedimento. Mas esses não podem ser acessados, caso não seja do interesse de quem o criou.
+
+### 3. Proteção de memória
+
+A proteção de memória segue como um corolário dos objetos locais, mas pode também ser extendido. Saindo do escopo dos objetos locais, programas possuem um espaço de memória e eles não devem ser alterados por outros programas. Isso seria uma falha de segurança grave que deve ser evitada a qualquer custo. Mesmo que um programa ou um procedimento retorne um tipo, esse tipo deve ter uma interface de comunicação, e códigos externos não devem nem conhecer e nem alterar a estrtura da memória desses objetos.
+
+### 4. Proteção de Tipos
+
+Quando programas expõe funcionalidades, ele deve proteger essas funcionalidades através de tipos. Isso deve ser feito para evitar 3 grandes problemas: (i) alteração, (ii) descoberta e (iii) personificação. Todos esses problemas podem criar estados incosistentes que causem malfuncionamento do programa. Na alteração, o objeto pode ser alterado por mecanismos externos ao seu próprio contrato. Na descoberta, mecanismo externos podem identificar como alterar esse valoes externos e altera-los. E por fim, na personificação, o objeto pode ser usado como se fosse de outro tipo, usando contratos e interfaces diferentes.
+
+Um bom progamador, para se precaver desses problemas precisar trabalhar assumir que os parametros de entrada de um procedimento são naturalmente inseguros, validado-os por completo. Isso é uma sobrecarga para o desenvolvimento e pode haver pontos cegos nessa validação.
+
+### 5. Selo
+
+A artigo prevê duas funções `Seal` e `UnSeal` que podemos traduzir como Selar e RemoverSelo. Essas funções teriam como objetivo proteger esses objetos de alterações e que os objetos pudessem ser passados como parâmetros, mas seu conteúdo e a alteração do seu estado só pudesse ser acessada quando a função `UnSeal` for chamada. O objeto dessa função é proteger o dado e fornecer um tipo de autenticação para acessar o conteúdo do objeto.
+
+### 6. Trademarks
+
+### 7. Chaves de Acesso
+
+### 8. Autenticação vs Controle de Acesso
