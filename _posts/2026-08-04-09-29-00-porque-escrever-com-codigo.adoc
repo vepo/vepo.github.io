@@ -1,0 +1,126 @@
+---
+title: Por que escrever um bom código?
+published: true
+description: |
+    Código bom não é subjetividade, é estratégia. Entenda por que a qualidade do código impacta os custos do projeto, como alinhar o conceito de "bom" com seu time e a importância do Code Review para entregar software que realmente comunica com pessoas e máquinas.
+tags: [Qualidade de Código, Boas Práticas, Code Review, Engenharia de Software, Produtividade, Manutenção de Software, Gestão de Times, Legibilidade, Desenvolvimento Profissional, Código Limpo, Arquitetura de Software, Java, Refatoração]
+image: /assets/images/capas/caderno-caneta.jpg
+permalink: /posts/por-que-escrever-com-codigo
+publish_date: 2026-08-04 11:54:00 +0300
+---
+
+Uma das grandes preocupações dos desenvolvedores brasileiros é como escrever um bom código. Eu trabalho com time de diversos países e não vejo essa preocupação em muitos deles. Na verdade vejo, mas o conceito de bom é diferente. Nós, brasileiros, queremos escrever um código que seja compreensível e didático. Nesse post, vou destacar alguns motivos do porque essa é uma grande preocupação que deveria ser universal. Todo código deve ser compreensível.
+
+== O que é bom?
+
+Então, antes de continuar, precisamos dar um passo atrás para entender o que significa um bom código. Qual é o conceito de "bom" que usamos?
+
+Palavras podem ter diversos sentidos e serem usadas de diversas formas, mas além das palavras, o entendimento delas pode também mudar de pessoa para pessoa. Há times onde o conceito de bom pode ser que o código simplesmente funciona. Há outros time que exigem que o código seja testável. Outros pedem que o código seja compreensível. E por fim, há determinados contextos que existem que o código seja otimizado para o desempenho.
+
+Para listar as várias interpretações de "bom" eu fui obrigado a associar essa palavra a "times" e "contexto". Porque a definição de um código bom pode realmente variar de times e contextos, uma vez que o grande problema é no entendimento dessa palavra. "Bom", da mesma forma que "limpo", são palavras que possuem uma grande subjetividade. Duas pessoas podem conversar e concordar que uma coisa ser boa, mas se fizessem uma analise mais detalhada da coisa discordariam de todos os pontos.
+
+_— Mas se a palavra "bom" não é objetiva, porque usar ela?_
+
+É aqui que está o pulo do gato! Times devem concordar sobre o que significa ser bom antes mesmo de avaliar se algo é bom ou ruim. Por isso quero propor aqui uma interpretação sobre o significado de bom quando usado ao nosso código.
+
+> Um código é bom quando ele atinge os requisitos de qualidade acordados com o time e adequados ao contexto do projeto.
+
+// https://excalidraw.com/#json=jUtIWjfG_S1pT9CPfFKvh,9WuSSoRdyERjPpUrQ4b6GQ
+
+.Possíveis requisitos de qualidade de um código.
+image::artigos/codigo-bom/requisitos-codigo.png[]
+
+É muito importante fazer esse alinhamento antes de qualquer coisa porque, como dizia um amigo da época de república, *não existe bom senso*.
+
+Dessa forma chegamos a segunda pergunta que temos que responder: _Por que escrever um bom código?_
+
+== Por que escrever um bom código?
+
+Agora que entendemos o que é um bom código, vamos partir para a pergunta que é o principal ponto de partida dessa conversa. Por que devemos nos preocupar em escrever um bom código?
+
+Para responder a essa pergunta, precisamos olhar para o motivo que escrevemos programas. Ele é o ponto central de tudo. *Nós escrevemos programas para entregar funcionalidade a alguém.* Para muitos, isso não é óbvio, mas como já disse antes, não existe bom senso, logo precisamos falar do óbvio. Mas um código não serve só para entregar funcionalidade para alguém, ele será executado em uma máquina. 
+
+Dessa forma, conseguimos chegar aos dois pontos principais de um código. Ele deve se comunicar com pessoas e com máquinas. Eu sempre digo que se um código servisse apenas para comunicar humano com máquina, ainda estariamos escrevendo em linguagem de máquina. Mas não, as linguagens evoluiram e continuam evoluindo para expandir a capacidade de expressão das pessoas através de código.
+
+// https://excalidraw.com/#json=f2J3Mz6ZmTARU9V0FnHXv,SNi0DoiRmNDdQZ9DSoSLmw
+image::artigos/codigo-bom/codigo-avaliar.png[]
+
+Mas uma vez que um código serve para comunicar pessoas entre si e com máquinas, devemos fazer outras duas perguntas para um código:
+
+* *É possível avaliar se a tarefa que ele está realizando está correta?*
+* *Consigo implementar novas funcionalidades nesse código?*
+
+Se para em qualquer uma dessas perguntas a resposta é não, é bem provavél que esse código esteja morto e em pouco tempo será necessário reescrevê-lo. Ou seja, ou ele é ineficaz, ou está impactando a evolução do projeto. Há um grande custo nele escondido, que é o custo da reescrita. Isso significa que por mais barato que tenha sido a escrita dele, a economia não se realizou porque o barato vai sair caro em algum momento. E isso nos leva a nossa próxima pergunta: _o bom código é caro?_
+
+== Escrever bom código é caro?
+
+Um dos grande empecilhos para os desenvolvedores escreverem um bom código é a gestão exigindo que o código seja escrito o mais rápido possível. Isso porque para um gestor _tempo é dinheiro_. Essa lógica, apesar de ser prevalente no capitalismo, não é verdadeiro. Ás vezes fazer as coisas de forma lenta e pensada é economizar dinheiro.
+
+Um código bom pode evitar problemas que inviabilizem o projeto em termos de custos. Quero citar aqui um caso conhecido, https://www.tecmundo.com.br/seguranca/406906-sapphos-tinder-para-mulheres-tem-falha-grave-denunciada-por-usuario-e-sai-do-ar.htm[o aplicativo de relacionamento Sapphos]. Muito provavelmente no curso do desenvolvimento, os investidores e os gestores do projeto decidiram que uma pessoa que tivesse formação em computação era cara e decidiram baratear o projeto fazendo eles mesmos o aplicativo usando soluções com LLM. Não quero julgar essas pessoas, porque essa era uma informação validada por muitos na época do ocorrido. Todos, inclusive muitos desenvolvedores, falavam que "qualquer pessoa pode desenvolver usando LLM". Bom, o resultado foi que o aplicativo foi ao ar sem segurança, vazando informações das usuários. Sendo bem otimista, podemos avaliar esse ocorrido como se apenas o dinheiro do desenvolvimento tivesse sido jogado fora. Se nenhuma das usuárias entrou na justiça contra o aplicativo, eles tiveram muita sorte. 
+
+Mas podemos falar de outros exemplos onde um bom código pode trazer retorno financeiro. Uma vez trabalhei em um projeto com uma grande empresa de varejo que dizia que o seu site devia ser leve, rápido e fácil de usar. O grande argumento deles era que o seu público eram pessoas que faziam compras pelo celular, com uma internet de baixa velocidade e a compra devia ser feita sem muita "burocracia". A empresa era preocupada em reduzir os empecilhos para que uma pessoa mais humilde, em condições adversas, quem sabe andando de onibus, pudessem fazer uma compra. Para que esses requisitos fossem atingidos, eles investiram em um framework web back-end que padronizasse todo o desenvolvimento.
+
+Eu acabei não participando do desenvolvimento do projeto, mas tive que aprender sobre o framework e ensinar o time a usar ele. O framework possuía um conjunto de widgets visuais que os desenvolvedores podiam usar que geravam um HTML enxuto e pouco código Javascript. Além disso as imagens usadas era pre-processadas para que tivesse o tamanho e o formato exato para serem exibidas na tela. Tudo isso pensando na experiência de um usuário usando o dispositivo bem limitado. Essa empresa tinha entendido que um bom framework gerava ganhos financeiros.
+
+Não podemos deixar de mencionar possíveis erros que impliquem na perda de usuários. Eu mesmo já inseri bugs que causou revolta em usuários e esse bug surgiu por uma falta de comunicação entre os times e um desalinhamento no código. Uma vez eu trabalhei em um aplicativo de corrida onde o desenvolvimento back-end e o mobile eram feitos por times diferentes Eu trabalhei com o time back-end e em algum momento recebi a demanda de corrigir um bug nos badges do aplicativo. Até aquele momento, o calculo dos badges recebidos era feito no aplicativo mobile, mas precisavamos trazer mais segurança e implementar eles no back-end. Para isso me juntei ao time de mobile e detalhei toda a lógica de cada badge. Implementei um a um e no momento que a funcionalidade entrou em funcionamento, as pessoas pararam de ganhar badges.
+
+Imagina você correr 20KM e não receber uma medalha por essa corrida?! O usuários ficaram muito bravos e começaram a reclamar na loja de aplicativos. A nota do aplicativo foi caindo e ao investigar o que acontecia, não encontrei nenhum erro. Até que resolvi fazer o calculo na mão. Peguei um usuário e fui olhar dos dados da corrida no servidor. Para minha surpresa, o time de desenvolvimento mobile não leu a documentação da API que dizia que o campo `duracao` deveria ser em segundos e enviava os dados como milissegundos, e isso fazia que todos corressem 1000x mais lento, o que impactava no calculo dos badges.
+
+Apesar desse problema ser um problema de comunicação, ele começou no código, pois este não era capaz de expressar aos times as unidades requeridas. Depois desse dia eu nunca mais criei um campo `duracao` ou `distancia`, mas sempre uso a unidade como sufixo pois `duracao_ms` e `duracao_s` informam ao desenvolvedor que está usando a API, ou mesmo que está acessando o banco de dados, quais as unidades a serem usadas.
+
+Se preocupar com a qualidade do código e se ele está realmente comunicando não é uma frescura. É uma necessidade de negócios que pode salvar a empresa no médio e longo prazo.
+
+== Como avaliar se um código é bom?
+
+A próxima pergunta que devemos fazer é como avaliar se um código realmente é bom? Existem formas concretas e objetivas de se ter essa resposta? Sim! Existem, mas para isso precisamos pensar em requisitos de qualidade e exigir ele durante o desenvolvimento do projeto.
+
+E quais são esses requisitos de qualidade? Quero propor alguns aqui, mas essa lista não é exaustiva. Um código pode ser:
+
+.Requisitos de qualidade de um código. Essa lista é não exaustiva, você pode adicionar vários requisitos e decidir como avaliar eles.
+[%header,cols="1,2,10"]
+|===
+| # | Requisito de qualidade | Descrição
+| 1 | Correto | O código implementa fielmente a especificação, tratando corretamente os casos de borda e produzindo os resultados esperados em todas as situações.
+| 2 | Simples | O código resolve o problema pela via mais direta e intuitiva, evitando abstrações supérfluas e caminhos desnecessários que dificultem a leitura.
+| 3 | Complexo | A complexidade aparece quando o código esconde suas interdependências e exige grande esforço mental para prever os efeitos de uma alteração. Quanto mais difícil for explicar o comportamento ou modificar uma parte sem quebrar outra, mais complexo é o sistema.
+| 4 | Didático | O código não apenas funciona, mas também ensina o leitor sobre o domínio e a lógica, usando nomes significativos e uma estrutura que revela a intenção por trás de cada passo.
+| 5 | Compreensível | O código comunica seu propósito de forma clara e autoexplicativa, permitindo que um desenvolvedor sem contexto prévio entenda o fluxo completo rapidamente.
+| 6 | Modularizado | O código é dividido em partes coesas e com baixo acoplamento, onde cada módulo ou função possui uma única responsabilidade bem definida e isolada.
+| 7 | Performático | O código utiliza os recursos computacionais (CPU, memória, I/O) de forma eficiente, entregando resposta ágil e escalável dentro da carga de trabalho esperada.
+| 8 | Testável | O código é projetado com dependências injetáveis e estados controlados, facilitando a criação de testes automatizados que validam seu comportamento de forma isolada e confiável.
+|===
+
+Esses são formas que um código pode ser classificados. Podemos, por exemplo, dizer que um código é correto, complexo e testável. Mas entre eles há requisitos que são exclusivos, não podemos por exemplo dizer que um código é simples e complexo ao mesmo tempo. 
+
+Em muitos casos, a classificação do requisito de qualidade é óbvia, pois ao ver uma classe por exemplo, você consegue definir se ela é testável ou não. Ou você consegue classificar se ela é simples ou complexa. Nós vamos falar de cada requisito mais a diante. Por enquanto precisamos responder uma outra pergunta. Como garantir que um código cumpra os requisitos de qualidade desejáveis?
+
+Quem aí já ouviu falar de _Pull Request_? _Pull Request_ é uma adaptação do processo de _code review_ (ou revisão de código no bom português) para a integração continua em git. Mas nem todo mundo gosta dessa processo. Alguns gostam de enviar código direto para o _main_ usando https://trunkbaseddevelopment.com/[_trunk based development_]. Outros não gostam de qualquer burocracia para colocar o código em produção. Mas podemos e devemos criar processos que protejam o nosso software de possíveis problemas. 
+
+Muitas vezes ouvimos esses conselhos de pessoas muito bem qualificadas e que trabalham em times de altissima qualificação. Mas a realidade deles nem sempre é a nossa. Nem sempre trabalhamos em times que podemos confiar plenamente no código do coleguinha. Por isso que estabelecer uma cultura de criar _Pull Requests_ e qualificar o time para avaliar bem o código pode trazer bons resultados.
+
+Dessa forma, eu proponho que todo código que vá para a produção seja revisado por pelo menos uma pessoa, nem que seja o proprio autor. Essa pessoa que revisa, deverá ter um checklist com requisitos de qualidades e boas perguntas a serem feitas ao código. Mas já quero avisar que é raro você encontrar uma empresa que dê isso de mão beijada. Em quase todas as empresas que eu trabalhei sempre me foi exigido revisar código, mas só na primeira eu tive acesso a um bom checklist e nem foi um recurso da empresa, mas do cliente, que na época era a marca de celulares mais vendida do mundo.
+
+Então fica a pergunta: existe um bom checklist para fazer code review? Sim. Se você jogar no google "code review checklist" você vai ver uma grande lista. Eu citarei aqui a https://www.morling.dev/blog/the-code-review-pyramid/[Pirâmide do Code Review do Gunnar Morling], que replico abaixo. Eu gosto dessa abordagem porque hierarquiza diversas preocupações que devemos ter com código iniciando no mais superficial e indo até o mais profundo.
+
+.Pirâmide do Code Review. No nível mais elevado temos as perguntas mais superficiais, na base as mais importantes.
+image::artigos/codigo-bom/code_review_pyramid.svg[]
+
+Cada time deve escolher quais são os requisitos importantes e como irá compor o seu checklist. 
+
+== Quem escreve um bom código?
+
+Agora surge outra pergunta: *Quem é a pessoa que escreve um bom código? E quem é a pessoa que escreve código ruim? Onde habitam? O que fazem? O que eles comem? Hoje, no Globo Rural.* _(Desculpa a piada!)_
+
+Alguns autores gostam de separar os bons e os maus desenvolvedores como se fosse uma caracteristica inata das pessoas. Outros afirma que quem escreve código ruim são pessoas más, acho essa abordagem imatura e pouco eficiente. A verdade todos nós podemos escrever com código e código ruim, porque a pergunta está errada. Escrever código bom ou ruim, não é uma caracteristica da pessoa, mas uma condição do contexto dela. Pode ser um desenvovledor que começou faz pouco tempo e não sabe se expressar efetivamente em código. Pode ser um projeto que foi mal especificado e houveram muitas mudanças durante o desenvolvimento. Pode até ser que tenha havido um problema na venda do projeto e muitas pessoas foram alocadas em um projeto com pouco tempo de desenvolvimento.
+
+Há inúmeras condições que fazem as pessoas escrever um código ruim e creio que não nos cabe julgar o passado. Nós como engenheiro de software só podemos aprender com o passado para que não o repitamos.
+
+Uma boa prática é fazer reuniões de retrospectivas depois de uma entrega. O time deve olhar para o que aconteceu, e sem julgamentos, ver quais atitudes devem ser tomadas para que os mesmo erros não se repitam.
+
+Outra boa prática é que as pessoas mais experientes mentorem e deem boas dicas aos iniciantes. As pessoas não nascem sabendo como escrever código e devemos ser benevolentes com aqueles que estão aprendendo: um dia nós estivemos no lugar deles e só chegamos aonde chegamos porque alguém nos ajudou.
+
+Por fim quero concluir com uma provocação: pode um bom desenvolvedor escrever código ruim?
+
+== Pode um bom desenvolvedor escrever código ruim?
+
+A resposta para essa pergunta é um sonoro sim! Como já falei, escrever código pode ser um efeito do contexto e vale lembrar que todos somos humanos. Seja benevolente com o coleguinha que trabalha no seu projeto e dê dicas positivas.
