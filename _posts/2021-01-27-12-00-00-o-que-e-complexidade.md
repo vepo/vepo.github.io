@@ -4,7 +4,7 @@ permalink: /posts/o-que-e-complexidade
 published: true
 description: O que trás complexidade a um projeto de software?
 tags: [Design de Software, Arquitetura de Software, Complexidade]
-image: /assets/images/pexels-pixabay-206685.jpg
+image: /assets/images/capas/100-days-of-coding.jpg
 series: Sobre Design de Software
 publish_date: 2021-01-27 00:00:00 +0300
 original: https://vepo.substack.com/p/sobre-design-de-software-i
