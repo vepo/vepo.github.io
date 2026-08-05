@@ -1,0 +1,60 @@
+---
+title: Camadas
+permalink: /posts/camadas
+published: true
+description: O que são camadas e quando as usar?
+tags: [Design de Software, Arquitetura de Software, Complexidade, Camadas]
+image: /assets/images/pexels-pixabay-206685.jpg
+series: Sobre Design de Software
+publish_date: 2022-11-08 00:00:00 +0300
+original: https://vepo.substack.com/p/sobre-design-de-software-iii-camadas
+---
+
+Nesse post, vamos refletir um pouco sobre o que são camadas e porque usar camadas.
+
+.Foto de https://www.pexels.com/pt-br/@mateusz-feliksik-1896604?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels[Mateusz Feliksik] no https://www.pexels.com/pt-br/foto/assado-close-vista-de-perto-prato-8023752/?utm_content=attributionCopyText&utm_medium=referral&utm_source=pexels[Pexels]
+image:software-design/lasanha.jpg[]
+
+== Histórico
+
+Praticamente todo sistema web nasce como um sistema em camadas. Isso acontece por causa da popularização da https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/ch01.html[Layered Architecture]. Sendo simplistas, um sistema em camadas se caracteriza pela separação de responsabilidades entre camadas. Você já deve ter visto vários tipos de camadas por aí, mas com certeza sabe o nome de algumas bem comuns, porque são as mais populares: apresentação, negócios, persistência e base de dados.
+
+Apesar de alguns verem essa arquitetura como antiga e ultrapassada, ela representou uma grande evolução. Antes da arquitetura em camadas, existiam poucos padrões de desenvolvimento, o que gerava um código altamente acoplado e com baixa coesão, o famoso Código Spaghetti. Na figura abaixo, vemos um representação gráfica descrevendo como esses sistemas são como massas.
+
+image:software-design/evolucao-software-architecture.png[]
+
+O uso do termo _Spaghetti Code_, não é uma ironia. Esse termo era relativamente comum no início dos anos 2000 e se referia ao código sem separação de responsabilidades, alto acoplamento e baixa coesão. Outro termo comum para esse antipadrão é o https://www.infoq.com/br/news/2010/09/big-ball-of-mud/[_Big Ball of Mud_]. _Big Ball of Mud_ (grande bola de lama em tradução livre) descreve a experiência de adicionar funcionalidades a sistemas com alto acoplamento, pois ao se alterar um trecho de código outro, aparentemente sem nenhuma relação, apresenta erro.
+
+Então o sistema em camadas veio para trazer ordem aos novos sistemas web que na sua grande maioria se resumia a uma aplicação _server-render_ com uma base de dados SQL. Como nos anos 2000 os frameworks não eram tão ricos quanto hoje, grande parte do desenvolvimento precisava ser feito pelo desenvolvedor. Por exemplo, se estivéssemos falando de um sistema legado Java sem JAX-RS e Hibernate era preciso ler todas as informações passadas pela requisição no https://javaee.github.io/servlet-spec/downloads/servlet-4.0/servlet-4_0_FINAL.pdf[Servlet], chamar a camada de negócios e depois retornar o HTML necessário.
+
+Com a evolução dos frameworks surgiram novos padrões eliminando a necessidade de escreve código. Podemos citar por exemplo o JPA e o JAX-RS que são implementados em Java EE/Jakarta EE. O JPA implementa grande parte das funcionalidades anteriormente delegadas a camada de persistência. De forma similar o JAX-RS assume algumas das responsabilidades das camadas de apresentação.
+
+Outra inovação que ajudou a desacoplar camadas é o advento das *Single-Page Applications* como uma separação de responsabilidades entre back-end e front-end. Em uma SPA podemos dizer que temos duas aplicações separadas e cada uma operando em formas de camadas distintas. Tanto o front-end quando o back-end tem camadas de apresentação, persistência e negócios.
+
+== O que são camadas?
+
+Uma das grandes dificuldades de se criar sistemas em camadas é entender o que realmente são camadas. Em um sistema de camadas bem projetado, cada camada possui sua própria abstração. Vamos exemplificar isso?
+
+Vamos supor que estamos desenhando um sistema que faz o controle de atividades. Cada atividade é um arquivo em disco que será processado por outro processo e irá gerar 3 arquivos em discos: saída, saída de erro e o resultado.
+
+Ao iniciar a atividade será criado um arquivo com o PID do processo que é responsável por ela. As atividades podem ser visualizadas por uma API REST.
+
+Logo podemos dizer que existem níveis de abstrações. Apesar de existir o conceito de atividade, ela não pode ser visualizada porque não existe uma entidade Atividade, o que existe são arquivos no sistema de arquivos.
+
+Logo, a camada mais abaixo é a camada de persistência, ela deve retornar as informações de Atividades que existem no sistema, vai operar como uma base de dados. Acima dela vai existir a camada de negócios que vai trabalhar com a abstração de Atividades. Acima da camada de negócios existirá a camada de apresentação que pode tanto ser uma interface gráfica ou uma API REST.
+
+Qual é a vantagem de se trabalhar com camadas? Isolar complexidade. No nosso exemplo, nenhuma outra camada é obrigada a saber que as atividades são salvas em arquivos, somente a camada de persistência. E caso seja preciso mudar a forma de implementação, será necessário só alterar a camada especifica, se mantendo a interface com a camada superior ou inferior intacta.
+
+image:software-design/camadas-cima-baixo.jpg[]
+
+Podemos também proteger camada inferiores de valores de ataques externos. Vamos supor que existe uma tela de consulta que recebe valores da interface gráfica, se esses valores forem levados até as camadas inferiores sem nenhuma validação podemos ter problemas sérios de segurança. Quando eu comecei a trabalhar com sistemas web, peguei uns sistemas legados que na época já tinha ao menos 10 anos, isso significa que foram implementados antes do JPA e JAX-RS e o primeiro teste de SQL/HTML Injection já identificou falhas de segurança que permitiam destruir a base de dados ou alterar a interface do usuário. Essas falhas de seguranças poderiam ser validadas usando bem o JPA ou validandos os dados que são enviados para base de dados.
+
+== Anti-Padrões
+
+Quando falamos de camadas podemos citar dois anti-padrões bem comuns: _Passthrough_ e Duplicação da Interface.
+
+Quando falamos de _passthrough_ estamos falando de camadas que não tem nenhuma funcionalidade, sua única função é chamar a camada inferior.
+
+Porque isso acontece? Ora, existem algumas razões mas vou listar apenas duas. A primeira é a exigência de ter várias camadas? Será que essa camada realmente precisa existir? Será que camadas supeiores não poderiam chamar uma camada inferior sem o intermédio dessa camada _passthrough_? O segundo problema pode ser que não exista um entendimento das abstrações e responsabilidades de cada camada. Ou seja, uma camada está assumindo responsabilidade de outra camada tornando ela anêmica.
+
+Já a Duplicação da Interface acontece quando duas camadas tem exatamente a mesma interface, o que engloba o padrão anterior, mas esse já existe um motivo especifico pois a camada é claramente anêmica porque não há diferenças de abstrações.

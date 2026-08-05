@@ -1,0 +1,141 @@
+---
+title: Como analisar um módulo?
+permalink: /posts/como-analisar-um-module
+published: true
+description: Existe uma forma objetiva de se analisar um módulo? 
+tags: [Design de Software, Arquitetura de Software, Complexidade, Modularização]
+image: /assets/images/pexels-pixabay-206685.jpg
+series: Sobre Design de Software
+publish_date: 2021-02-06 00:00:00 +0300
+original: https://vepo.substack.com/p/sobre-design-de-software-iii-como
+---
+
+== Definições
+
+Antes de qualquer coisa precisamos definir módulos. Muitos dos nossos problemas de software são originários de uma má divisão do módulos.
+
+Como desenvolvedor Java, tendo a definir módulo como pacote, e um erro bem comum parte da ideia de que módulos devem conter classes similares. Um exemplo claro é aquele projeto que dividimos os pacotes por sua função dentro do projeto. Teremos o pacote de Acesso ao Banco de Dados com todos os _Repositories_ da vida, o pacote com classes de Lógida de Negócio com todos os Services da vida. Essa metodologia não ajuda muito, as vezes os desenvolvedores partem para isso por cultura corporativa ou tradicionalismo. Infelizmente essa é uma cultura comum, EU JÁ FIZ ISSO MUITO!
+
+Para essa análise, vamos usar a definição de https://web.stanford.edu/~ouster/cgi-bin/home.php[John Ousterhout] em https://link.amazon/B09PXIpKP[A Philosophy of Software Design]. Creio que ela é a melhor que existe, porque vai na essência. 
+
+Para definir um módulo, ele começa argumentando que um desenvolvedor só consegue trabalhar com uma porção de código por vez. Isso nos lembra a definição de Complexidade que falamos no primeiro post. Para reduzir a complexidade precisamos quebrar nosso código em porções menores, isso significa Métodos, Classes, Pacotes, Bibliotecas. Qualquer porção de código é um modulo e séria ideal que um modulo não dependesse de outro. É na prática impossível de criar um projeto onde módulos não dependem entre si.
+
+== Como deve ser um Módulo?
+
+Módulos devem ser profundos e com poucas interfaces. 
+
+=== Um paralelo com psicinas
+
+Vamos fazer um paralelo com uma piscina, temos a superfície e a profundidade. Duas piscinas podem ter a mesma contidade de água, mas podem ter diferentes dimensões de superficie e profundidade. Se um módulo fosse uma piscina, ele deveria ter uma pequena superfície e uma grande profundidade, para se tornar fácil de usar. Vamos detalhar melhor.
+
+.Uma bela pisina para você admirar!
+image:software-design/piscina.jpg[]
+
+Interface de um módulo é tudo aquilo que é exposto dele. É tudo aquilo que um desenvolvedor que usa o módulo deve conhecer. Além da interface, não devemos nos basear em nada. Se há algo que dependemos sem estar na interface, provavelmente termos um erro de design. A Interface é a superfície da nossa piscina, é a porção da água que está em contato com o mundo externo.
+
+Produnfidade é a quantidade de funcionalidades e modos de operações que ele permite. Quanto mais funcionalidades mais profundo é nosso módulo, assim temos muitas possibildades de uso. Logo, para que um módulo seja ótimo, este deve ter uma pequena interface e muitas funcionalidades, se conseguimos fazer muitas coisas atráves de uma pequena interface, temos um módulo de fácil uso.
+
+=== Analisando Módulos de Leituras de Arquivos
+
+Módulos de acesso a arquivos são extremamente úteis. Mas uma coisa me chamou atenção, o livro faz um comparativo das bibliotecas de I/O do C e Java e ao ler já me veio uma fato curioso a cabeça, toda vez que vou ler um arquivo em Java, preciso procurar no Google. Enquanto em 2020 resolvi me exercitar em C e não precisei consultar o Google! Fazia uns 7 anos que não escrevia uma linha em C, mas todo o conhecimento estava ali, de fácil acesso.
+
+Vamos dar uma olhada na forma como C lê arquivos?
+
+==== Lendo Arquivos em C
+
+C é uma linguagem de baixo nível, você precisa ter conhecimentos de Alocação de Memória para trabalhar nele e muita da lógica de leitura deve ser escrita pelo desenvolvedor. Para ler arquivos, devemos usar a biblioteca stdio.h, observe que ela tem relativamente poucas funções, mas a leitura pode ser feita assim.
+
+[source,c]
+----
+#include<stdio.h>
+
+#define BUFFER_SIZE 1024
+
+int main()
+{
+    FILE *fp;              // Declarando um ponteiro para o arquivo
+    char buffer[BUFFER_SIZE]; // Declarando buffer de leitura
+    fp = fopen("file.txt", "w"); // Abrindo o arquivo
+    if (!fp)                     // Verificando erros
+        return 1;
+    // Lendo conteúdo e imprimindo na tela
+    while (fgets(buffer, BUFFER_SIZE, fp) != NULL)
+        printf("%s",buffer);
+    fclose(fp);
+    return  0;
+}
+----
+
+Observe que na prática as únicas operações diferente das operações de I/O é fopen e fclose. E para se fazer qualquer operação são poucos as funções.
+
+==== Lendo Arquivos em Java
+
+Ler um arquivo em Java também é fácil. Existem várias APIs que com poucas operações você consegue ler qualquer arquivo.
+
+[source,java]
+----
+public class ReaderExample {
+     public static void main(String[] args) throws Exception {
+         Path filePath = Paths.get("c://test.txt");
+         try {
+             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+             for (String line : lines) {
+                 System.out.println(line);
+             }
+         } catch (IOException ex) {
+             System.out.format("I/O Exception", ex);
+         }
+     }
+}
+----
+
+O problema está em **EXISTEM VÁRIAS APIS**. Se você comparar a documentação do C com, a documentação do Java mostrará vários pacotes e cada pacote com várias classes. Isso significa que temos uma superficie muito maior. São mais funcionalidades, mas a compreensão é mais difícil. Por isso é comum a reclamação que não conseguimos ler um arquivo sem procurar no Google antes.
+
+== Criando Módulos Profundos
+
+Então como lição podemos levar que precisamos criar Módulos profundos. Mas como fazer isso?
+
+Vou levantar aqui algumas questões que precisam ser endereçadas.
+
+=== 1. Faça a atividade mais comum ser o padrão
+
+Ao começar o levantamento de como seu módulo será utilizado, pense no caso de uso mais comum. Faça ele o padrão. Caso um desenvolvedor não vá utilizar aquele caso de uso, dê a posibilidade de alterar o comportamento por padrão.
+
+Documente bem como o módulo deve ser usado. Sua documentação deve ter as respostas as seguintes perguntas: _Qual é o modo de uso padrão? Quais são os outros modos existente? Como podemos exterder o uso do módulo?_ Sempre lembrando que há um padrão e outros modos de uso.
+
+=== 2. Evite Especialização
+
+Especialização é uma técnica muito boa, mas para poucos casos. Há metodos melhores do que especialização, que podem deixar seu módulo ainda mais reutilizável. 
+
+* Porque não usar https://refactoring.guru/pt-br/design-patterns/strategy[Estratégias]?
+* Porque não usar https://refactoring.guru/pt-br/design-patterns/composite[Composição]?
+
+Há inúmeras formas de se possibilitar a extensão de uma funcionalidade sem adicionar complexidade.
+
+Lembre-se de definir muito bem as interfaces e documentar. Assim seu módulo além de simples se torna muito mais extensível.
+
+=== 3. Esconda o máximo possível
+
+Ao escrever seu módulo, você terá que fazer a seguinte indagação: _quanto o desenvolvedor precisa saber para usar?_
+
+Já como resposta temos que ele não precisa saber nada que é próprio da implementação. Se houver a necessidade, já temos um erro de design.
+
+== O Perigo dos Módulos Rasos
+
+Muitas vezes somos impelidos a seguir padrões. Antigamente era bem comum construir software em Camadas, e muitas vezes erámos obrigados a usar essas camadas. Assim tinhamos Classes que na prática não faziam nada, elas apenas passavam parâmetros para outras classes. 
+
+O que fazer quando isso acontece? Antes de procurar uma solução temos que entender o problema. Isso muitas vezes acontece quando temos uma solução em Camadas. Nesses casos as camadas são na maioria das vezes:
+
+* Camada de Apresentação
+* Camada de Negócios
+* Camada de Persistência
+
+O problema pode residir quando essas camadas não são bem definidas. Devemos nos perguntar: O que a camada de Apresentação faz? O que a camada de negócios faz? E o que a camada de Persistência faz? Cada camada está realmente cumprindo seu propósito?
+
+Esse problema pode acontecer pela ausência de uma dessas camadas ou pela troca de função. Nesse caso, remover parte do código de uma camada e colocar em outra pode ser uma boa solução.
+
+== Conclusão
+
+Escrever código é difícil. Pricipalmente quando não temos parâmetros objetivos para analisar o nosso código. 
+
+Mas sabemos que quanto mais um desenvolvedor precisa saber para usar um módulo, mais é complicado o uso. Logo minimize a superficie de contato, escoda o máximo da implementação.
