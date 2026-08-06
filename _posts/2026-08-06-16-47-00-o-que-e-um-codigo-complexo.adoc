@@ -1,0 +1,580 @@
+---
+title: "Complexidade em Software: Como Identificar, Controlar e Criar Abstrações Eficientes"
+published: true
+description: |
+    Eu já rejeitei PRs só porque o código estava 'limpo' demais. Neste artigo, vou te mostrar que a verdadeira complexidade não está nas linhas, mas nas abstrações que você deixa de criar. Vamos falar sobre os sintomas que matam projetos (amplificação, carga cognitiva e os tais 'desconhecidos desconhecidos') e como um simples buffer pode salvar seu sistema.
+tags: [Complexidade de Software, Engenharia de Software, Qualidade de Código, Abstração, Clean Code, Arquitetura de Software, Java, Code Review]
+image: /assets/images/capas/kids-programming-100-42.jpg
+permalink: /posts/entendendo-a-complexidade
+publish_date: 2026-08-06 16:47:00 +0300
+---
+
+Agora que nós encontramos um meio de definir se um código é bom ou ruim, podemos partir para o segundo ponto: entender quando ele é complexo ou não. Se ele for complexo, como podemos reduzir essa complexidade. Então, como primeiro passo, vamos entender por que programas se tornam complexos.
+
+== Por que programas se tornam complexos?
+
+O programa mais simples que existe não faz absolutamente nada. Pode ser representado por um bloco vazio, seja em Java, C, C++, Python e em qualquer outra linguagem. No código abaixo, por exemplo, o programa apenas retorna o valor `0`, indicando que foi executado com sucesso. Nenhuma operação relevante é feita.
+
+.Programa que apenas retorna zero.
+[source,c]
+----
+int main()
+{
+    return 0;
+}
+----
+
+Isso não quer dizer que esse programa é inútil. Existe um comando GNU no Linux/Unix que é bem parecido e é um programa que só não é vazio porque precisa seguir o padrão Unix. Ele é bastante útil para se ignorar resultados de erros em scripts.
+
+.Manual do comando `true` do GNU
+image:artigos/codigo-bom/gnu-true-man.png[]
+
+O código fonte do `true` pode ser encontrado no https://github.com/coreutils/coreutils/blob/master/src/true.c[https://github.com/coreutils/coreutils] e está replicado abaixo. Observe que por aceitar os parâmetros `--version` e `--help`, o código passa de meras 4 linhas para 73 linhas. Ele está inerentemente mais complexo.
+
+.O mesmo programa que apenas retorna zero, mas agora com suporte aos parâmetros `--version` e `--help`.
+[source,c]
+----
+/* Exit with a status code indicating success.
+   Copyright (C) 1999-2026 Free Software Foundation, Inc.
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+#include <config.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include "system.h"
+#include "true.h"
+
+#define EXIT_STATUS (true_mode != TRUE_TRUE)
+#define PROGRAM_NAME (true_mode == TRUE_TRUE ? "true" : "false")
+
+#define AUTHORS proper_name ("Jim Meyering")
+
+void
+usage (int status)
+{
+  printf (_("\
+Usage: %s [ignored command line arguments]\n\
+  or:  %s OPTION\n\
+"),
+          program_name, program_name);
+  printf ("%s\n\n",
+          _(EXIT_STATUS == EXIT_SUCCESS
+            ? N_("Exit with a status code indicating success.")
+            : N_("Exit with a status code indicating failure.")));
+  oputs (HELP_OPTION_DESCRIPTION);
+  oputs (VERSION_OPTION_DESCRIPTION);
+  printf (USAGE_BUILTIN_WARNING, PROGRAM_NAME);
+  emit_ancillary_info (PROGRAM_NAME);
+  exit (status);
+}
+
+int
+main (int argc, char **argv)
+{
+  /* Recognize --help or --version only if it's the only command-line
+     argument.  */
+  if (argc == 2)
+    {
+      initialize_main (&argc, &argv);
+      set_program_name (argv[0]);
+      setlocale (LC_ALL, "");
+      bindtextdomain (PACKAGE, LOCALEDIR);
+      textdomain (PACKAGE);
+
+      /* Note true(1) will return EXIT_FAILURE in the
+         edge case where writes fail with GNU specific options.  */
+      atexit (close_stdout);
+
+      if (streq (argv[1], "--help"))
+        usage (EXIT_STATUS);
+
+      if (streq (argv[1], "--version"))
+        version_etc (stdout, PROGRAM_NAME, PACKAGE_NAME, Version, AUTHORS,
+                     (char *) NULL);
+    }
+
+  return EXIT_STATUS;
+}
+----
+
+Programas ficam mais complexos porque precisam implementar mais funcionalidades e padrões. No caso do `true`, a necessidade se dá por ele precisar manter o padrão dos comandos Unix. Mas em todo programa, ao se adicionar mais funcionalidades, tornamo-los mais complexos.
+
+Então talvez tenha surgido uma grande dúvida na sua cabeça. Se programas ficam mais complexos, a complexidade é um mal necessário para todo programa com diversas funcionalidades, certo? Não.
+
+== Toda complexidade é necessária?
+
+Quando paramos para pensar sobre a complexidade, podemos classificá-la como de dois tipos: complexidade *essencial* e a *acidental*. Essas duas complexidades são exploradas também pelo Fred Brooks em seu magnífico livro https://link.amazon/B03ZZae9J["O Mítico Homem-Mês"], mas especificamente no texto, que nos deu um excelente termo, "Não Existe Bala de Prata — Essência e Acidente em Engenharia de Software".
+
+[quote,Frederick P. Brooks Jr.,O mítico homem-mês: ensaios sobre engenharia de software]
+____
+Seguindo Aristóteles, eu as divido em *essência* — as dificuldades inerentes à natureza do software — e *acidentes* — aquelas dificuldades que apresentam-se hoje na sua produção, mas que não são inerentes.
+____
+
+Segundo o autor, construir software é essencialmente complexo porque softwares mudam constantemente. E para descrever essa essência, ele coloca três características que fazem o software ser complexo:
+
+* *Conformidade*: os sistemas têm que se conformar a sistemas humanos. Um software serve a um sistema humano e, por isso, quando esse muda, ele tem que se conformar, ser adaptado.
+* *Mutabilidade*: em decorrência da sua conformidade, softwares mudam constantemente. Mas mesmo que os sistemas não mudem, os usuários do software pedem novas funcionalidades. Quem pede mais funcionalidades são, em geral, aqueles que mais usam e mais gostam do sistema.
+* *Invisibilidade*: um software não é tangível, ele é abstrato. Isso faz com que não consigamos visualizá-lo como um todo, não consigamos visualmente entender a estrutura dele. E não há meios de representar um software graficamente, ou pelo menos todos os meios criados até agora são falhos.
+
+Então, nós não conseguimos construir um software que implemente funcionalidades complexas de forma simples, mas podemos atuar para que ele seja compreensível e que dentro dele tenha estruturas simples e confiáveis.
+
+Eu reinterpretaria a complexidade acidental para aquela que poderia ter sido evitada se o time tivesse tido um cuidado maior durante o desenvolvimento. É preciso deixar claro aqui que não há culpa no acidente; em muitos casos, eles acontecem por circunstâncias do desenvolvimento ou são um mero acúmulo de complexidade.
+
+Por fim, existe a complexidade e ela é inerente, mas ela pode ser controlada e reduzida em alguns lugares. Nós, como seres humanos, não conseguimos lidar com sistemas muito complexos; nós costumamos simplificá-los para entendê-los. Nós criamos abstrações e é através dessas abstrações que conseguimos entender um software.
+
+== Como podemos combater a complexidade?
+
+Tente imaginar uma estrutura de dados em formato de vetor que você já usou em algum projeto. Agora pense nas funcionalidades e tente mentalmente descrevê-las, mas sem usar os termos fila (`queue`), pilha (`stack`), lista (`list`) ou conjunto (`set`). Você verá que é extremamente difícil e complexo. Você tem que descrever como os elementos são adicionados, como é a interação, como é a ordenação, como lida com itens repetidos ou similares, etc. Agora, e se você usasse os termos fila, pilha, lista ou conjunto? Seria mais fácil? Esse é o poder da abstração. São ideias compartilhadas que usamos para descrever elementos complexos.
+
+[sidebar]
+.O que são Filas (`queue`), Pilha (`stack`), Listas (`list`) ou Conjuntos (`set`)?
+--
+Talvez você saiba que essas estruturas são bem comuns na sua linguagem. Em Java temos a https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/LinkedList.html[LinkedList], a https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/ArrayList.html[ArrayList], o https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/TreeSet.html[TreeSet], o https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/HashSet.html[HashSet]. Todos eles poderiam ser substituídos por um vetor, mas eles têm comportamentos e implementações diferentes. Podemos dizer que Pilha e Fila são diferenciados pela ordem da remoção dos elementos. Já a Lista e os Conjuntos são diferenciados pela decisão do armazenamento dos elementos.
+
+Vou definir brevemente cada um deles:
+
+* *Fila*: uma estrutura de vetor onde todos os elementos são adicionados ao início e removidos no final. Mais conhecido como _First In, First Out_ ou FIFO.
+* *Pilha*: uma estrutura de vetor onde todos os elementos são adicionados ao final e removidos do final. Mais conhecido como _Last In, First Out_ ou LIFO.
+* *Lista*: os elementos são armazenados de acordo com a sua ordem de inserção. A posição do elemento é importante e ela faz parte essencial da estrutura. Se um mesmo elemento for adicionado duas vezes, ele será contado duas vezes e ocupará duas posições.
+* *Conjunto*: os elementos são armazenados de acordo com a sua natureza. A posição não importa, o que não implica que não existam conjuntos ordenados; o que importa é que, se um elemento for adicionado duas vezes, ele será contado como um e ocupará uma posição.
+
+Vetores, Lista Ligada e Árvores são meios eficientes de se implementar essas estruturas. E é importante notar que a estrutura de dado é diferente da abstração. Podemos ter uma Fila implementada com um Vetor, uma Lista Ligada ou uma Árvore.
+--
+
+Eu não preciso dizer para você que eu tenho um graveto com uma esfera bem ajustada que solta tinta através da gravidade; eu só falo que eu tenho uma caneta. Em muitos casos, a abstração é tão presente que nós achamos que ela é concreta. Aliás, Aristóteles já falou disso uns anos atrás.
+
+Abstrações são a forma mais antiga que nós humanos usamos para combater a complexidade. Nós definimos um sistema, criamos uma abstração e estudamos ela a fundo. Isso também pode ser feito em software e, quando criamos essa abstração, nós passamos a não mais interagir com a complexidade interna dela, mas a apenas interagir com a interface que ela nos dá.
+
+== Um exemplo prático de abstração
+
+Quero citar aqui um exemplo real em que eu criei uma abstração e reduzi a complexidade de uma classe. Vou simplificá-lo, mas imagine que você tenha um consumidor Kafka. Ele faz polling de mensagens e precisa processá-las em batch através de um `Hookpoint`. Esse processamento é disparado por um timeout ou pelo número mínimo de mensagens acumuladas. Para exemplificar, escrevi uma versão sucinta na classe `MessageProcessor` abaixo. Nesse exemplo, eu ignoro questões como commit e outros parâmetros que faziam o processamento ser imediato.
+
+[source,java]
+----
+public class MessageProcessor<K,V> implements AutoCloseable {
+    private long lastReceivedMessageTimestamp = -1;
+    private final List<Record<K,V>> messages;
+    private final KafkaConsumer<K,V> consumer;
+    private final int maxBufferSize;
+    private final long processingTimeoutInNanos;
+    private final Hookpoint hookpoint;
+    private final AtomicBoolean running;
+    private final CountDownLatch doneSignal;
+
+    public MessageProcessor(int maxBufferSize, long processingTimeoutInMillis, Hookpoint hookpoint) {
+        // inicializa campos
+    }
+
+    private void processLoop() {
+        while (running.get()) {
+            var records = consumer.poll(Duration.ofMillis(500));
+
+            if (!records.isEmpty()) {
+                lastReceivedMessageTimestamp = System.nanoTime(); // [1] Atualiza timestamp da última vez que uma mensagem foi recebida
+            }
+
+            messages.addAll(records); // [2] Alimenta o buffer
+            if (messages.size() >= maxBufferSize ||  !messages.isEmpty() && System.nanoTime() - lastReceivedMessageTimestamp > processingTimeoutInNanos) {
+                hookpoint.process(messages);
+                messages.clear();   // [3] Limpa o buffer
+            }
+        }
+
+        // processar restante antes de finalizar
+        if (!messages.isEmpty()) {
+            hookpoint.process(messages);
+        }
+        doneSignal.countDown();
+    }
+
+    public void close() {
+        running.set(false);
+        doneSignal.await();
+        consumer.close();
+    }
+}
+----
+
+Qual é o problema dessa classe? O problema é que eu não consigo, de imediato, saber o que dispara o processamento. Ele é dado por uma expressão booleana complexa. Além disso, há estados internos que são atualizados em vários lugares, como nos pontos marcados com `[1]`, `[2]` e `[3]`.
+
+E como eu poderia melhorar a visibilidade dessa classe? Eu posso encapsular as partes móveis, como diz o Michael Feathers em um Tweet de 2010. E posso fazer isso com um conceito que já está no código!
+
+[quote,Michael Feathers]
+----
+A programação orientada a objetos torna o código compreensível ao encapsular as partes móveis. A programação funcional torna o código compreensível ao minimizar as partes móveis.
+----
+
+{% twitter https://twitter.com/mfeathers/status/29581296216 %} 
+
+Tente descrever o que a classe está fazendo e, em algum momento, você chegará à conclusão de que a classe `MessageProcessor` faz *um buffer de mensagens baseado no tempo da última mensagem recebida e no número máximo de mensagens que devem ser processadas*. Dessa forma, eu posso extrair esse *buffer* em uma classe auxiliar. Olha como a complexidade do código é reduzida apenas extraindo as responsabilidades para a classe Buffer.
+
+[source,java]
+----
+public class MessageProcessor<K,V> implements AutoCloseable {
+    private final Buffer<K,V> messages;
+    private final KafkaConsumer<K,V> consumer;
+    private final Hookpoint hookpoint;
+    private final AtomicBoolean running;
+    private final CountDownLatch doneSignal;
+  
+    public MessageProcessor(int maxBufferSize, long processingTimeoutInMillis, Hookpoint hookpoint) {
+        // inicializa campos
+    }
+  
+    private void processLoop() {
+        while (running.get()) {
+            buffer.feed(consumer.poll(Duration.ofMillis(500)));
+            if (buffer.isReady()) {
+                hookpoint.process(buffer.consume());
+            }
+        }        
+  
+        // processar restante antes de finalizar
+        if (!buffer.isEmpty()) {
+            hookpoint.process(buffer.consume());
+        }
+        doneSignal.countDown();
+    }
+  
+    // Nada mudou
+}
+----
+
+E a implementação dessa classe buffer pode ser simples também. Observe que ela possui uma interface clara que fornece informações em alto nível.
+
+[source,java]
+----
+public class Buffer<K,V> {
+    private List<Record<K,V>> accumulatedMessages;
+    private long lastMessageReceived;
+    private final long processingTimeout;
+    private final int maxBufferSize;
+  
+    public Buffer(int maxBufferSize, long processingTimeout) {
+        // inicializar
+    }
+  
+    public boolean isReady() {
+        return !accumulatedMessages.isEmpty() && (System.nanoTime() - lastMessageReceived > processingTimeout ||  accumulatedMessages.size() >= maxBufferSize);
+    }
+  
+    public boolean isEmpty() {
+        return accumulatedMessages.isEmpty();
+    }
+  
+    public List<Record<K,V>> consume() {
+         var consumedMessages = accumulatedMessages;
+         accumulatedMessages = new ArrayList<>();
+         return consumedMessages;
+    }
+}
+----
+
+Mas há situações em que responsabilidades são extraídas e a complexidade não é reduzida, e isso vem de umas regras que muitos pregam como se fosse o suprassumo do "código limpo" (_mas deixa o código bem sujo_): nomear métodos com EXATAMENTE o que ele faz e que TODO método deve ter até 5 linhas.
+
+== Quando as linhas de código são reduzidas, mas a complexidade aumenta
+
+Você deve ter achado bem estranho, não é? Essas são regras que muitos pregam como se fossem essenciais para se construir bom código. Mas o que essa regra não faz é treinar você a criar boas abstrações. Você não é estimulado a se perguntar quais são as responsabilidades do código e nem a se perguntar o que o código está fazendo. A regra é direta sobre código e não nos ajuda a construir modelos mentais que nos ajudem a pensar o código.
+
+Para exemplificá-la, fiz algo que vejo muito em _Code Reviews_: escrevi um código seguindo o famoso Clean Code. Cada método tem até 5 linhas e o nome dele diz EXATAMENTE o que ele faz. Tente entender a classe.
+
+[source,java]
+----
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class MessageProcessor<K, V> implements AutoCloseable {
+
+    private long lastReceivedMessageTimestamp = -1;
+    private final List<Record<K, V>> messages;
+    private final KafkaConsumer<K, V> consumer;
+    private final int maxBufferSize;
+    private final long processingTimeoutInNanos;
+    private final Hookpoint hookpoint;
+    private final AtomicBoolean running;
+    private final CountDownLatch doneSignal;
+
+    public MessageProcessor(int maxBufferSize, long processingTimeoutInMillis, Hookpoint hookpoint) {
+        // inicializa campos 
+    }
+
+    // ============================================================
+    // Métodos extraídos – cada um diz EXATAMENTE o que faz
+    // ============================================================
+
+    private void processLoop() {
+        while (running.get()) {
+            executeSinglePollingCycle();
+        }
+        processAnyRemainingMessagesBeforeClosing();
+        signalThatProcessingHasFinished();
+    }
+
+    private void executeSinglePollingCycle() {
+        var records = consumer.poll(Duration.ofMillis(500));
+        updateTimestampIfRecordsWereReceived(records);
+        addRecordsToBuffer(records);
+        flushBufferIfSizeExceedsLimitOrTimeoutElapsed();
+    }
+
+    private void updateTimestampIfRecordsWereReceived(List<Record<K, V>> records) {
+        if (!records.isEmpty()) {
+            lastReceivedMessageTimestamp = System.nanoTime();
+        }
+    }
+
+    private void addRecordsToBuffer(List<Record<K, V>> records) {
+        messages.addAll(records);
+    }
+
+    private void flushBufferIfSizeExceedsLimitOrTimeoutElapsed() {
+        if (isBufferSizeAtLeastMaximum() || isBufferWaitingTooLongSinceLastMessage()) {
+            hookpoint.process(messages);
+            messages.clear();
+        }
+    }
+
+    private boolean isBufferSizeAtLeastMaximum() {
+        return messages.size() >= maxBufferSize;
+    }
+
+    private boolean isBufferWaitingTooLongSinceLastMessage() {
+        return !messages.isEmpty() &&
+               System.nanoTime() - lastReceivedMessageTimestamp > processingTimeoutInNanos;
+    }
+
+    private void processAnyRemainingMessagesBeforeClosing() {
+        if (!messages.isEmpty()) {
+            hookpoint.process(messages);
+        }
+    }
+
+    private void signalThatProcessingHasFinished() {
+        doneSignal.countDown();
+    }
+
+    @Override
+    public void close() throws InterruptedException {
+        running.set(false);
+        doneSignal.await();
+        consumer.close();
+    }
+}
+----
+
+Observe que, a princípio, ela parece simples, mas isso porque você já teve contato com a mesma classe anteriormente. Outro ponto é que o conceito de buffer está na classe, mas não há uma separação entre a interface do buffer e a interface de consumo das mensagens. Quando eu vejo classes assim, eu tendo a rejeitar o _Pull Request_ de imediato; só não o faço por uma questão muito simples. Às vezes, as pessoas não estão cientes do que é um bom código.
+
+Nessas horas, eu recomendo à pessoa que leia algo sobre a regra "_Tell, Don't Ask_" e a extrair a classe buffer usando a interface que eu sugeri acima. Essa classe possui sérios problemas; entre eles estão a dificuldade de compreensão e a baixa testabilidade.
+
+Uma vantagem de se criar pequenos componentes com interfaces bem elaboradas é que podemos testar as interfaces e ter a certeza de que elas são seguras. Outro ponto é que, ao se criar uma abstração, deixamos de conversar sobre o que o código faz e começamos a falar sobre o que está acontecendo.
+
+O primeiro ponto é bem simples e pode ser mostrado com uma simples classe de testes. Ao se extrair a classe `Buffer`, podemos testá-la perfeitamente. A única dificuldade seria lidar com a chamada de sistema `System.nanoTime()`, mas para isso podemos também usar Orientação a Objetos e não depender diretamente da classe System, mas de uma interface chamada `ClockSupplier`. Leia a classe de teste abaixo e veja como podemos garantir que esse código está seguro para ir para a produção.
+
+[source,java]
+----
+// -------------------------------------------------------------
+// Classe de Testes
+// -------------------------------------------------------------
+class BufferTest {
+
+    // Supplier mutável que simula o relógio para os testes
+    static class MutableNanoSupplier implements ClockSupplier {
+        private long currentNanos = 0;
+
+        public void advance(long delta) {
+            this.currentNanos += delta;
+        }
+
+        @Override
+        public long timeInNanos() {
+            return currentNanos;
+        }
+    }
+
+    @Test
+    @DisplayName("Buffer vazio não está pronto para processamento")
+    void emptyBufferShouldNotBeReady() {
+        // Given um buffer recém-criado, sem nenhuma mensagem
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 1000, clock);
+
+        // Then o buffer está vazio e não está pronto
+        assertTrue(buffer.isEmpty());
+        assertFalse(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Buffer com poucas mensagens e sem timeout não fica pronto")
+    void bufferWithFewItemsAndNoTimeoutShouldNotBeReady() {
+        // Given um buffer com capacidade 5 e timeout de 500ns
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(5, 500, clock);
+
+        // When adicionamos apenas 2 mensagens (abaixo do máximo)
+        buffer.add(new Record<>("k1", "v1"));
+        buffer.add(new Record<>("k2", "v2"));
+
+        // Then o buffer não está vazio, mas ainda não está pronto
+        assertFalse(buffer.isEmpty());
+        assertFalse(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Buffer que atinge a capacidade máxima fica pronto imediatamente")
+    void bufferReachingMaxSizeShouldBeReady() {
+        // Given um buffer com capacidade máxima = 3
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(3, 1000, clock);
+
+        // When adicionamos exatamente 3 mensagens
+        buffer.add(new Record<>("k1", "v1"));
+        buffer.add(new Record<>("k2", "v2"));
+        buffer.add(new Record<>("k3", "v3"));
+
+        // Then o buffer está pronto (independente do tempo)
+        assertTrue(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Buffer com mensagens antigas que excedem o timeout fica pronto")
+    void bufferWithOldMessagesExceedingTimeoutShouldBeReady() {
+        // Given um buffer com uma mensagem e timeout de 500ns
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 500, clock);
+        buffer.add(new Record<>("k1", "v1"));
+
+        // When avançamos o relógio em 501ns (ultrapassando o limite)
+        clock.advance(501);
+
+        // Then o buffer está pronto
+        assertTrue(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Buffer com mensagens recentes dentro do timeout não fica pronto")
+    void bufferWithRecentMessagesWithinTimeoutShouldNotBeReady() {
+        // Given um buffer com uma mensagem e timeout de 500ns
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 500, clock);
+        buffer.add(new Record<>("k1", "v1"));
+
+        // When avançamos o relógio em apenas 499ns (dentro do limite)
+        clock.advance(499);
+
+        // Then o buffer NÃO está pronto
+        assertFalse(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Receber nova mensagem reseta a contagem do timeout (lastMessageReceived é atualizado)")
+    void receivingNewMessageResetsTimeoutCounter() {
+        // Given um buffer com uma mensagem antiga
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 500, clock);
+        buffer.add(new Record<>("k1", "v1"));
+        clock.advance(400); // passam 400ns
+
+        // When uma nova mensagem chega (atualiza lastMessageReceived)
+        buffer.add(new Record<>("k2", "v2"));
+
+        // Then o buffer NÃO está pronto (pois o timeout passou a contar a partir da nova mensagem)
+        assertFalse(buffer.isReady());
+
+        // And somente após 501ns a partir deste novo momento ele fica pronto
+        clock.advance(501);
+        assertTrue(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Método consume retorna a lista acumulada e esvazia completamente o buffer")
+    void consumeShouldReturnAccumulatedAndClearBuffer() {
+        // Given um buffer com 3 mensagens
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 500, clock);
+        buffer.add(new Record<>("k1", "v1"));
+        buffer.add(new Record<>("k2", "v2"));
+        buffer.add(new Record<>("k3", "v3"));
+
+        // When consumimos as mensagens
+        List<Record<String, String>> consumed = buffer.consume();
+
+        // Then a lista retornada contém as 3 mensagens e o buffer fica vazio
+        assertEquals(3, consumed.size());
+        assertTrue(buffer.isEmpty());
+        assertFalse(buffer.isReady());
+    }
+
+    @Test
+    @DisplayName("Consume retorna os registros na exata ordem de inserção")
+    void consumeShouldReturnRecordsInInsertionOrder() {
+        // Given um buffer com registros específicos
+        ClockSupplier clock = new MutableNanoSupplier();
+        Buffer<String, String> buffer = new Buffer<>(10, 500, clock);
+        Record<String, String> r1 = new Record<>("A", "1");
+        Record<String, String> r2 = new Record<>("B", "2");
+        buffer.add(r1);
+        buffer.add(r2);
+
+        // When consumimos
+        List<Record<String, String>> consumed = buffer.consume();
+
+        // Then a ordem de inserção é preservada (mesma referência)
+        assertSame(r1, consumed.get(0));
+        assertSame(r2, consumed.get(1));
+    }
+}
+----
+
+O segundo problema da abordagem é a dificuldade de compreensão pela adição de camadas. Ao se aplicar essas duas regras do _Clean Code_, ao invés de se criar abstrações, nós quebramos a lógica que já era complexa em diversas camadas. Para se compreender o que `processLoop` faz, é preciso entrar em três métodos, para depois em cada um desses entrar em mais métodos, podendo até ter loops de métodos. (_sim, eu já vi isso!_) Isso dificulta a compreensão.
+
+Agora quero chegar ao ponto final deste post. Como realmente caracterizar a complexidade? Existe uma forma fácil de se ver um código e dizer *isso está complexo*?
+
+== Quais são os sintomas da complexidade?
+
+Sim! Existe, e para isso quero falar sobre os três sintomas da complexidade que o professor *John Ousterhout* descreve no capítulo 2 de https://link.amazon/B07lKlCih[*A Philosophy of Software Design*].
+
+Um bom código é óbvio: você lê um trecho de código e ele te informa sobre o que está acontecendo no sistema, inclusive usando a linguagem que os usuários do sistema usam. Mas quando o código não é bom, ele será caracterizado por esses três sintomas:
+
+* Amplificação de Mudança
+* Carga Cognitiva
+* Desconhecidos Desconhecidos
+
+=== Amplificação de Mudança
+
+Você já viu sistemas que, para se fazer uma pequena mudança, você precisa alterar 3 ou 4 classes? Ou é preciso compilar um repositório para depois usar o resultado em outro repositório para fazer um pequeno ajuste? Isso é o que ele chama de amplificação de mudanças.
+
+Pequenas mudanças que requerem mexer em diversos artefatos são ruins para qualquer projeto de software. Isso surge muitas vezes por escolhas de design mal elaboradas ou mesmo pela falta de escolhas de design. Eu vejo muito isso quando pessoas não aplicam a regra *Tell, Don't Ask!*.
+
+Às vezes, o desenvolvedor até cria uma estrutura de dados para colocar o estado de uma informação junta, mas depois usa a biblioteca Lombok, que cria _getters_ e _setters_ automaticamente, e toda a lógica referente a essa estrutura é feita fora dela. Assim, para se alterar o comportamento, que deveria estar apenas dentro de uma classe, é preciso mapear onde se usa a informação e alterar diversas classes.
+
+Uma abordagem que eu adoto constantemente é nunca criar _getters_ e _setters_! O estado interno de uma classe só deve ser alterado pela chamada de métodos de alto nível.
+
+=== Carga Cognitiva
+
+Sabe quando você para para entender um trecho de código e é difícil? Ou quando você precisa constantemente tentar relembrar o que está acontecendo? Isso acontece porque o seu cérebro não consegue lidar com muita complexidade. Complexidade cansa e nosso cérebro sempre procura não se cansar.
+
+A carga cognitiva é normalmente calculada por métricas como https://www.geeksforgeeks.org/dsa/cyclomatic-complexity/[*Complexidade Ciclomática*]. Agora, o que podemos fazer para reduzir a carga cognitiva? Extrair métodos, extrair responsabilidades, etc. A primeira coisa que você deve fazer é listar todas as responsabilidades da classe ou método e perguntar à classe: existe algo que posso extrair aqui? Sempre pense no caso de uso, não no código em si. Se você pensar no código, é bem provável que não chegue a boas abstrações.
+
+=== Desconhecidos Desconhecidos
+
+O terceiro sintoma é o que chamamos de *Desconhecidos Desconhecidos*. Sabe aquela informação que você tem que saber quando alterar um trecho de código? Sabe as coisas que acontecem como mágica? Sabe os frameworks secretos que fazem tarefas aleatórias que mudam o estado da aplicação?
+
+Tudo isso tem que ser descrito em código! Todas as informações que um desenvolvedor precisa para iniciar o desenvolvimento têm que estar no README.md do projeto. Eu lembro quando comecei a trabalhar com Injeção de Dependências e, em muitos casos, não conseguia encontrar onde uma classe era criada. Para mim, era uma dor encontrar e iniciar essas classes; por isso, passei a nomear essas classes com o sufixo `Factory`. Dessa forma, a classe `Session` iria ser criada pelo `SessionFactory` e, na documentação da classe, haveria um comentário dizendo qual é o ciclo de vida da mesma.
+
+== Conclusão
+
+Complexidade é um negócio complexo. 😏 Mas eu espero que tenha te ajudado a entender mais como ela acontece. Esse não é um assunto que se esgotou aqui. Nós vamos falar muito mais de complexidade.
