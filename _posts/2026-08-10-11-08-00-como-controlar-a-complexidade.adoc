@@ -1,0 +1,104 @@
+---
+title: Evitando a complexidade através do Design de Software
+published: true
+description: |
+    Sair do 'Big Design Up Front' para o 'No Design' foi um erro que muitos times cometeram. Neste artigo, resgato o valor do 'Enough Design' e mostro como o Domain-Driven Design, a Linguagem Ubíqua e o Design Orientado a Responsabilidades podem domar a complexidade. Aprenda a transformar requisitos complexos em partes simples e interativas, usando técnicas como BPMN e refatoração, para manter a velocidade do seu time e a saúde do projeto no longo prazo.
+tags: [Complexidade de Software, DDD, Design de Software, Arquitetura de Software, Refatoração, Qualidade de Código]
+image: /assets/images/capas/kids-programming-100-42.jpg
+permalink: /posts/evitando-a-complexidade-atraves-do-design
+publish_date: 2026-08-10 11:08:00 +0300
+series: Manual de Bom Senso para Desenvolvedores
+---
+
+Agora que já entendemos o que é complexidade, como entender e identificar ela, vamos para o próximo passo: como evitar ela desde o princípio! Muitas pessoas apenas escrevem código. Pegam a funcionalidade e saem escrevendo o que deve estar certo ou errado. Essa não é uma boa abordagem. Existem técnicas que nos permitem elaborar modelos de software que vão nos permitir explorar a complexidade e evitar ela desde o princípio.
+
+Como falamos anteriormente, funcionalidades complexas implementadas em software vão ser complexas, mas nós podemos transformar essa complexidade em um amontoado de porções simples que interagem entre si. Tornando a complexidade em algo compreensível. Nesse post quero falar de Design, Modelos de Software e Refatoração.
+
+Para começar, vamos começar a falar de design? O que é isso?
+
+== De onde veio o Design de Projeto? E como perdemos esso hábito de faze-lo?
+
+Design é uma palavra que importamos do inglês e muitos associam a elaboração estética de algum produto. Ela por sua vez vem do italiano _disegno_ footnote:[Fonte: https://www.ifd.com.br/design/a-origem-do-termo-design/[A origem do termo design]], desenho em português, que tem sua tradição nas artes associado a projeto e não ao mero desenho. 
+
+Design era um processo muito importante no projeto de software, sendo uma das etapas mais relevantes de processos de software na época em que os processos Waterfall eram comuns. Na época, escrever software era um processo engessado que consistia em 5 estágios sequênciais que não podiam ser sobrepostos. Primeiro você extraia os requisitos do software na fase de *Requisitos* e depois elaborava o documento de arquitetura na fase do *Design*. Essas duas fases geravam documentos comerciais que iam servir de base para as fases de *Desenvolvimento* e *Verificação*. O software deveria ser entregue exatamente como estava planejado e especificado nos documentos comerciais de arquitetura e requisitos. Por fim existia a fase de *Manutenção*, que vinha depois da entrega.
+
+.As 5 estágios do método waterfall segundo o site management.org.
+image:software-design/5-Stages-of-the-Waterfall-Model.jpg[]
+
+Você já pode ter percebido que esse processo não era muito eficiente. E pode ficar muito pior se você pensar que as 4 primeiras fases faziam parte de um ciclo de desenvolvimento que durava em média 3 meses. Agora, vamos traduzir para o mundo pós-agile: imagina um Scrum com Sprint de 3 meses onde a entrega deveria ser exatamente conforme 2 documentos que você não podia alterar depois de assinado? Desastre total.
+
+Eu não preciso dizer que tudo isso mudou no final dos anos 1990 e inicio dos anos 2000. Kent Beck, ao liderar um projeto na Chrysler, começou a experimentar novas formas de programar, o que chamou de eXtreme Programming, ou XP. O XP não era um método formal, ao estilo dos processos Waterfall, era mais um conjunto de valores e práticas de desenvolvimento footnote:[Fonte: https://engsoftmoderna.info/cap2.html#extreme-programming[Engenharia de Software Moderna]]. Cabia aos desenvolvedores conhecer os valores e as práticas e decidir o que adotar ou não.
+
+Essas novas experiências levaram a um encontro de alguns consultores dos Estados Unidos que lançaram um manifesto conhecido como *Manifesto Ágil*. 
+
+[quote,Manifesto para o Desenvolvimento Ágil de Software]
+____
+Estamos descobrindo maneiras melhores de desenvolver +
+software, fazendo-o e ajudando outros a fazê-lo. +
+Por meio desse trabalho, passamos a valorizar:
+
+*Indivíduos e interações* mais do que processos e ferramentas +
+*Software funcionando* mais do que documentação abrangente +
+*Colaboração com o cliente* mais do que negociação de contratos +
+*Capacidade de resposta a mudanças* mais do que seguir um plano
+
+Ou seja, embora haja valor nos itens à +
+direita, valorizamos mais os itens à esquerda.
+____
+
+O Manifesto Ágil foi uma quebra de paradigma dentro da industria de desenvolvimento de software, porque ele endereçava um problema real que muitos projeto sofriam: a falta de adaptabilidade do processo. O manifesto ágil deveria forçar os gestores de projeto a fazer uma gestão de trade-offs e decidir onde investir o tempo de desenvolvimento. O ponto central sai do processo e dos acordo pré-estabelecidos, para a entrega de valor e colaboração com o cliente. Quem ganha é o cliente.
+
+Como já falamos anteriormente, software é algo extremamente maleável e suscetível a mudanças. As vezes usuários pedem novas funcionalidades, ou funcionalidades antes vistas como importantes são pouco utilizadas e até descartadas, ou, em pior caso, a arquitetura do sistema é incompatível com a realidade. Essas condições, já apontadas por Fred Brooks em 1986 no artigo *Não Existe Bala de Prata — Essência e Acidente em Engenharia de Software*, eram dores reais de quase todo gestor de projetos.
+
+Depois do Manifesto Ágil sugiram várias Metodologias Ágeis que foram largamente aceitas na industria, principalmente no Brasil. Podemos citar o Kanban, o Lean e o Scrum. E essas metodologias de desenvolvimento não tinham uma fase explicita de design. Algumas pessoas continuaram a fazer design das funcionalidades ao ser implementadas, mas outras simplesmente abandonaram ao implementar diretamente a funcionalidade tentando entregar mais funcionalidades possíveis e ignorando atividades como refatoração e design.
+
+Aí é que está o problema. Saímos de uma época que faziamos *Big Design Up Front* indo diretamente para *No Design Up Front*, enquanto se deveria ir para *Enough Design Up Front*. E é sobre isso que vamos falar a seguir.
+
+=== Big Design Up Front
+
+Quando um time faz Big Design Up Front, todas os requisitos funcionais e não funcionais que serão implementados já estão completamente especificado e há um longo cronograma de desenvolvimento acordado. A pessoa que fará o design deve escolher os componentes do software que serão implementados e decidir como eles devem interagir.
+
+Esse estágio do desenvolvimento gerava um documento de de arquitetura contendo diagramas UMLs, descrição de documentos e protocolos. Isso não era muito eficiente, uma vez que durante o desenvolvimento muitas limitações da arquitetura proposta seriam descobertas e após a entrega muitas funcionalidades que antes eram vistas como importantes são descartadas.
+
+Nesse tipo de desing, as decisões impactam como será feito o desenvolvimento, uma vez que componentes em comum devem ter seu desenvolvimento coordenado e deve existir uma analise de dependência entre as atividades.
+
+=== No Design Up Front
+
+Quando um time faz *No Design Up Front*, nenhuma atividade de design é feita. Tudo é focado na entrega das funcionalidades. O design só é realizado quando se torna uma necessidade para o continuidade do projeto. Quando bugs aparecem ou quando o desenvolvimento é impactado. 
+
+Em muitos casos há duplicação de funcionalidades e pouca documentação arquitetural. Não há coordenação entre as etapas de desenvolvimento e as vezes não há coordenação ou divisão de responsabilidade entre os diversos componentes do software. As atividades são priorizadas de acordo com a necessidade de negócio delas, o que é parcialmente bom, pois dá um bom resultado a curto prazo. Porém, a médio e longo prazo, a entropia do sistema pode aumentar e impactar a velocidade de desenvolvimento.
+
+=== Enough Design Up Front
+
+Já no *Enough Design Up Front* o time deverá decidir quando é necessário fazer design e ele pode ser realizado durante a etapa de planejamento do Sprint, se o Scrum é utilizado, ou em reuniões durante o desenvolvimento. 
+
+O design também fará parte do desenvolvimento e proverá a documentação necessária para registrar decisões importantes. Fazer *Enough Design Up Front* também impacta o desenvolvimento, pois novas atividades podem surgir e a priorização entre elas pode mudar.
+
+== O que fazer durante o Design?!
+
+Talvez até agora tudo tenha ficado meio nebuloso porque pouco se fala sobre atividade de design em software, não é? Mas quando vamos fazer o design precisamos estressar os requisitos para extrair o que chamamos de "Modelo". Aqui vou usar o *Domain-Driven Design* como base.
+
+=== O que é Domain-Driven Design?!?
+
+Domain-Driven Design (DDD) é uma abordagem para modelagem de software que tem como origem o Domínio. O domínio é a área do conhecimento para o qual o software está sendo desenvolvido. O DDD foi originalmente proposto por Eric Evans no livro https://link.amazon/B09Cr4oeI["Domain-Driven Design: atacando as complexidades no coração do software"] de 2003. No livro o autor sugere que os desenvolvedores devem modelar o software através do cultivo de uma *Linguagem Onipresente*. A linguagem onipresente são um conjunto de termos e expressões que devem ser exercitadas e definidas pelos desenvolvedores e pelos especialistas de domínio. 
+
+O modelo de software será gerado a partir da linguagem onipresente e deverá ser refletido em software. Os termos usados em software devem ser um misto da linguagem onipresente com padrões de projetos. A ideia é que desenvolvedores possam conversar sobre o software usando termos e expressões que sejam compreensíveis tanto para pessoas do domínio quanto para desenvolvedores. E essas conversas sejam refletidas em software.
+
+Com o DDD, o design se torna uma conversa. E isso estende a forma como entendíamos design antes do DDD. Mas agora ao invés de só fazermos diagramas de sequências do UML ou o *Components & Connectors* footnote:[Diagrama proposto no livro https://link.amazon/B0i8i5IsI[_Software Architecture in Practice_]], o design é feito também ao se definir termos e expressões.
+
+
+== Existem outras boas referências de design?
+
+Sim. Podemos pensar o design do software através das responsabilidades de cada componentes. A *Rebecca J. Wirfs-Brock* publicou o _Responsibility-Driven Design_ footnote:[Fonte: https://www.wirfs-brock.com/PDFs/Responsibility-Driven.pdf[Responsibility-Driven Design]] que pensa um software orientado a objetos como uma dança coreografada de objetos em que cada um possui responsabilidades e interagem com outros objetos, conhecendo os mesmos.
+
+O texto da Rebecca, ela define que no design devemos procurar quais são as responsabilidades de uma classe e quais são as classes que essa classe vai conhecer e interagir. Há aí uma reflexão sobre o compartilhamento de informação dentro do software. Quais interfaces uma classe deve conhecer? Quais classes devem conhecer a classe que eu estou trabalhando?
+
+É importante sempre ter ideia que na classe ou compomente que estamos desenvolvendo, há uma interface e nem todo o projeto deve conhecer ou interagir com essa interface.
+
+== Então, como fazer design hoje?
+
+Agora é a hora de juntarmos tudo e propormos a melhor forma de fazer o design de software para controlar a complexidade. Sabe qual é a melhor forma? Não existe uma melhor! Você vai treinar juntamente com o seu time e aprenderá como que se modela bem um software. 
+
+Nós podemos usar Domain-Driven Design para elaborar uma boa linguagem onipresente. Podemos pensar nas responsabilidades de uma classe. Podemos escrever diagramas de sequência e outras tantas notações que existem por aí. A cada dia que passa novas formas de se pensar o design de software são colocadas a mesa e nós precisamos decidir o que usar de acordo com o contexto.
+
+Eu gosto, por exemplo, de usar BPMN footnote:[Fonte: https://bpmn.io/[Web-based tooling for BPMN, DMN and Forms.]] para modelar sistemas baseados em eventos a nível de negócio. O BPMN é uma notação para modelagem de negócios, e não software, mas que se adequa perfeitamente ao software, inclusive podendendo gerar bons diagramas.
