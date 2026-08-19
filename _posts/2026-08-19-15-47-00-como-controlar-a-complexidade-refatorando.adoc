@@ -18,15 +18,15 @@ Refactor é o que pode ser chamado de uma manutenção adaptativa de um código.
 
 Mas porque devemos alterar o software se não estamos nem adicionando, nem alterando e muito menos removendo funcionalidades dele? 
 
-Como já falamos anteriormente, em https://blog.vepo.dev/posts/por-que-escrever-com-codigo[*Por que escrever um bom código?*], sistemas podem morrer quando eles não são mais compreensíveis ou quando não conseguimos evoluir eles. E esses sistemas podem morrer pela condução errônea do desenvolvimento, ao se adicionar funcionalidades sem nenhuma preocupação com manutenibilidade, ou pelo seu envelhecimento natural deste. Irei até enfatizar algo que muito poucos falam: *sistemas naturalmente envelhecem*. Isso acontece mesmo que não façamos nada com eles. 
+Como já falamos anteriormente, em https://blog.vepo.dev/posts/por-que-escrever-com-codigo[*Por que escrever um bom código?*], sistemas podem morrer quando eles não são mais compreensíveis ou quando não conseguimos evoluir eles. E esses sistemas podem morrer pela condução errônea do desenvolvimento, ao se adicionar funcionalidades sem nenhuma preocupação com manutenibilidade, ou pelo seu envelhecimento natural. Irei até enfatizar algo que muito poucos falam: *sistemas naturalmente envelhecem*. Isso acontece mesmo que não façamos nada com eles. 
 
 === Como um sistema envelhece?
 
 Vamos imaginar um caso hipotético de um sistema que está há bastante tempo em produção, e usa um conjunto de bibliotecas. Se essas bibliotecas não forem atualizadas, vulnerabilidades vão sendo encontradas nelas e isso pode ser um problema que force uma atualização. Não pense que isso é uma realidade distante, aconteceu recentemente com o Log4J, biblioteca amplamente usada e nem sempre atualizada footnote:[Fonte: https://www.ncsc.gov.uk/information/log4j-vulnerability-what-everyone-needs-to-know[Log4j vulnerability - what everyone needs to know]]. 
 
-Atualizar bibliotecas, as vezes, é uma atividade trivial. Basta selecionar https://semver.org/lang/pt-BR/[o último patch da versão usada] e fazer o build da aplicação novamente. Mas quando o software vai se tornando antigo, versões antigas das bibliotecas deixam de receber atualizações e essas dependências se tornam um problema. Somos obrigados a migrar para versões mais recentes ou mesmo substituir essas bibliotecas. Isso pode gerar muito retrabalho, mesmo em um software que não está recebendo novas funcionalidades.
+Atualizar bibliotecas, às vezes, é uma atividade trivial. Basta selecionar https://semver.org/lang/pt-BR/[o último patch da versão usada] e fazer o build da aplicação novamente. Mas quando o software vai se tornando antigo, versões antigas das bibliotecas deixam de receber atualizações e essas dependências se tornam um problema. Somos obrigados a migrar para versões mais recentes ou mesmo substituir essas bibliotecas. Isso pode gerar muito retrabalho, mesmo em um software que não está recebendo novas funcionalidades.
 
-Podemos dizer que: *todo software que está em uso, está em evolução*. Ele pode não receber atualizações, mas com certeza há uma necessidade para isso. O engenheiro Manny Lehman propos uma série de leis que monstram como isso acontece footnote:[Fonte: https://ieeexplore.ieee.org/document/1456074[_Programs, life cycles, and laws of software evolution_]]. Um software, se está em uso, está em mudança continua, em crescimento continue e sofrendo com o aumento de complexidade e um declinio na qualidade.
+Podemos dizer que: *todo software que está em uso, está em evolução*. Ele pode não receber atualizações, mas com certeza há uma necessidade para isso. O engenheiro Manny Lehman propôs uma série de leis que mostram como isso acontece footnote:[Fonte: https://ieeexplore.ieee.org/document/1456074[_Programs, life cycles, and laws of software evolution_]]. Um software, se está em uso, está em mudança contínua, em crescimento contínuo e sofrendo com o aumento de complexidade e um declínio na qualidade.
 
 .*Leis da Evolução de Software* ou *Leis de Lehman* 
 [%header,cols="1,5"]
@@ -39,13 +39,13 @@ Podemos dizer que: *todo software que está em uso, está em evolução*. Ele po
 | Conservação da estabilidade organizacional | A taxa média de trabalho dos profissionais ao utilizar um sistema em evolução deve permanecer constante para garantir a estabilidade organizacional.
 |===
 
-Então, refatorar é uma atividade preventiva que tende a reduzir o impacto do aumento da complexidade e do declinio da qualidado no software. Nós fazemos refactoring para evitar que o software morra, deixando constantemente apto para receber novas funcionalidades.
+Então, refatorar é uma atividade preventiva que tende a reduzir o impacto do aumento da complexidade e do declinio da qualidade no software. Nós fazemos refactoring para evitar que o software morra, deixando constantemente apto para receber novas funcionalidades.
 
-Então vamos falar dos beneficios do refactor?
+Então vamos falar dos benefícios do refactor?
 
 == Os beneficios do refactoring
 
-Agora que eu te convenci que software evelhece e mesmo que não estejamos adicionando funcionalidades o código vai cada vez ficar mais complexo, quero mudar um pouco o tema. Agora é a hora de responder a pergunta: *o que eu ganho refatorando código?* e para isso vou contar uma história que ilustre os beneficios da refatoração apontados por Martin Fowler. No seu livro https://link.amazon/B00K5vxFo[Refatoração], Martin Fowler aponta quatro grandes beneficios:
+Agora que eu te convenci que software envelhece e mesmo que não estejamos adicionando funcionalidades o código vai cada vez ficar mais complexo, quero mudar um pouco o tema. Agora é a hora de responder a pergunta: *o que eu ganho refatorando código?* e para isso vou contar uma história que ilustre os benefícios da refatoração apontados por Martin Fowler. No seu livro https://link.amazon/B00K5vxFo[Refatoração], Martin Fowler aponta quatro grandes benefícios:
 
 * Melhora o design do software
 * Deixa o software mais fácil de entender
@@ -54,19 +54,19 @@ Agora que eu te convenci que software evelhece e mesmo que não estejamos adicio
 
 === Eu e o protocolo OBEX
 
-No longínquo ano de 2006, eu recebi o código da implementação de um protocolo para instalação de aplicativos nos celulares da Motorola. Se você é novo tudo vai parecer muito distante uma vez que não estávamos falando de Androids e iOS, mas do Symbia. A Motorola, na época, era a maior vendedora de celulares do mundo. Podemos dizer que seria o que a Apple é hoje. O https://pt.wikipedia.org/wiki/Symbian[Symbian], por sua vez, era o sistema operacional para celulares mais usado e é tudo tão distante que nem de smartphones estamos falando. Ele era usado para _feature phones_ (só fala ligação, tem agenda e o jogo da cobrinha), _media phone_ (já dá pra ouvir uns MP3, mas vídeo... tá longe!!!) e alguns poucos _smart phones_. Os smart phones estavam surgindo e eu trabalhava no projeto que iria disponibilizar a IDE para as pesssoas fazerem aplicativos para eles. 
+No longínquo ano de 2006, eu recebi o código da implementação de um protocolo para instalação de aplicativos nos celulares da Motorola. Se você é novo tudo vai parecer muito distante uma vez que não estávamos falando de Androids e iOS, mas do Symbian. A Motorola, na época, era a maior vendedora de celulares do mundo. Podemos dizer que seria o que a Apple é hoje. O https://pt.wikipedia.org/wiki/Symbian[Symbian], por sua vez, era o sistema operacional para celulares mais usado e é tudo tão distante que nem de smartphones estamos falando. Ele era usado para _feature phones_ (só fala ligação, tem agenda e o jogo da cobrinha), _media phone_ (já dá pra ouvir uns MP3, mas vídeo... tá longe!!!) e alguns poucos _smart phones_. Os smart phones estavam surgindo e eu trabalhava no projeto que iria disponibilizar a IDE para as pessoas fazerem aplicativos para eles. 
 
 Nós já tinhamos alguns projetos com Symbian, um deles nós criamos uma "IDE" para fazer temas para o V3, que era o celular mais vendido e o mais chique que existia. Tudo que ia em um Symbian era instalado via um protocolo chamado https://en.wikipedia.org/wiki/OBject_EXchange[*OBEX*].
 
 O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisavamos integrar ele em uma ferramenta para o desenvolvimento de themas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de _spaghetti code_. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.
 
-O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem dificil de entender o que estava acontecendo. E o _deploy_ da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas haviam bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.
+O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem difícil de entender o que estava acontecendo. E o _deploy_ da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas haviam bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.
 
 Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto que eu trabalhava iam para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas tinha um grande problema: *o código era gigantesco e ilegível*.
 
 === Antes de agir, é preciso estratégia!
 
-E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primeiro passo foi estudar a especificação tanto do celular quanto do OBEX. Descobrimos que o processo de instalação deveria funcionar como uma série de comandos onde o resultado de um geraria atualização ou instalação da aplicação no dispositivo. Abaixo eu desenho um diagrama de como poderia ser o processo. É obvio que o diagrama não reflete a realidade! Faz quase 20 anos que executei essa atividade, não vou me lembrar desses pormenores.
+E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primeiro passo foi estudar a especificação tanto do celular quanto do OBEX. Descobrimos que o processo de instalação deveria funcionar como uma série de comandos onde o resultado de um geraria atualização ou instalação da aplicação no dispositivo. Abaixo eu desenho um diagrama de como poderia ser o processo. É óbvio que o diagrama não reflete a realidade! Faz quase 20 anos que executei essa atividade, não vou me lembrar desses pormenores.
 
 // https://excalidraw.com/#json=dlIhp_Y2o9iH3NWjVhECx,fypqJHr9PNVn6_ZnfJeoNw
 .Descrição das operações necessárias para se atualizar uma aplicação.
@@ -76,7 +76,7 @@ Já que identificamos esse comportamento de comandos sendo enviados, resolvemos 
 
 Por isso adaptamos o padrão Comando para funcionar como o https://refactoring.guru/pt-br/design-patterns/state[_State_]. Cada comando geraria os próximos comandos a serem executados em sequência baseado no estado da resposta. Faríamos uma Máquina de Estados Finitos, que curiosamente não está descrito no GoF.
 
-Com essa modelagem básica, chegou a hora de refatorar. Pegamos cada trecho de código e movemos para as novas classes. O código em si não iria mudar, só onde ele estava colocado. Cada comando deveria receber alguns parâmetros, gerar o binário, processar uma resposta com a sua saída. A class `ObexCommand` deveria ser bem simples, composta de um método para gerar o comando em binário e um método para processar a resposta, uma vez que os comandos são síncronos.
+Com essa modelagem básica, chegou a hora de refatorar. Pegamos cada trecho de código e movemos para as novas classes. O código em si não iria mudar, só onde ele estava colocado. Cada comando deveria receber alguns parâmetros, gerar o binário, processar uma resposta com a sua saída. A classe `ObexCommand` deveria ser bem simples, composta de um método para gerar o comando em binário e um método para processar a resposta, uma vez que os comandos são síncronos.
 
 [source,java]
 ----
@@ -111,15 +111,15 @@ public class OperationExecutor {
 
 De resto, precisava somente implementar a classe de cada comando que poderiam ser chamadas de `ConnectCommand`, `CheckPreviousAplicationInstallCommand`, `UninstallApplicationCommand`, `SendFileCommand`, `InstallApplicationCommand` e `CloseConnectionCommand`. Cada classe é simples e possui uma responsabilidade bem definida.
 
-Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente *sem nenhum bug*!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma analise _Post Mortem_ e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres `0` que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez o esperado marcador não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.
+Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente *sem nenhum bug*!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma análise _Post Mortem_ e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres `0` que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez o esperado marcador não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.
 
-Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoraçõa me fez encontrar um bug e especifico e ela me ajuda a explicar o próximo beneficio.
+Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoraçõa me fez encontrar um bug e especifico e ela me ajuda a explicar o próximo benefício.
 
-Eu contei essa história porque ela descreve como uma atividade de refatoração bem elaborada pode desencadearam uma serie de ganhos para o projeto.
+Eu contei essa história porque ela descreve como uma atividade de refatoração bem elaborada pode desencadear uma série de ganhos para o projeto.
 
 === Ajuda a encontrar bugs
 
-Uma boa refatoração ajuda a encontrar bugs. No caso que narrei, o bug foi resolvido quase que automaticamente. Só no trabalho de mover o código para dentro das classes da nova modelagem, de se ter um real modelo, ele foi corrigido. O grande problema do código era que tudo era um emaranhado de funções, uma chamado a outra com o controle de estado feito por uma classe com muitas responsabilidades, ou pior, uma responsabilidade genérica.
+Uma boa refatoração ajuda a encontrar bugs. No caso que narrei, o bug foi resolvido quase que automaticamente. Só no trabalho de mover o código para dentro das classes da nova modelagem, de se ter um real modelo, ele foi corrigido. O grande problema do código era que tudo era um emaranhado de funções, uma chamando a outra com o controle de estado feito por uma classe com muitas responsabilidades, ou pior, uma responsabilidade genérica.
 
 
 === Melhora o Design do Software
@@ -138,7 +138,7 @@ Outro ganho foi que o código ficou muito fácil de entender. A grande responsab
 
 E por fim podemos falar do ganho final. Essa refatoração nos ajuda a programar mais rapidamente. Se surgisse uma nova atividade para adicionar a opção de DEBUG da aplicação não era necessário alterar o complexo código com mais um monte de IF/ELSE. Bastava criar uma nova operação com novos comandos. Isso seria muito menos custoso que alterar um código totalmente espaguete.
 
-O Martin Fowler chega a criar um gráfico mostrando que um software com um bom design pode ter mais funcionalidades que um com um design ruim. Isso acontece porque em determinado momento do projeto ficará tão caro dar manutenção no software que não sobrará dinheiro e esforço para evoluir o mesmo. O software será um peso, dificil de manter e impossível de se adicionar novas funcionalidades. Eu já trabalhei em diversos projetos que o escopo era reescrever um software já existente para que ele pudesse receber novas funcionalidades, e creio que isso não é muito incomum.
+O Martin Fowler chega a criar um gráfico mostrando que um software com um bom design pode ter mais funcionalidades que um com um design ruim. Isso acontece porque em determinado momento do projeto ficará tão caro dar manutenção no software que não sobrará dinheiro e esforço para evoluir o mesmo. O software será um peso, difícil de manter e impossível de se adicionar novas funcionalidades. Eu já trabalhei em diversos projetos que o escopo era reescrever um software já existente para que ele pudesse receber novas funcionalidades, e creio que isso não é muito incomum.
 
 // https://excalidraw.com/#json=FF1fGiTILHZpXay0IQG7C,SvLFKaJugYznP9tNUm6bNg
 image::artigos/codigo-bom/crescimento-funcionalidades.png[]
@@ -146,7 +146,7 @@ image::artigos/codigo-bom/crescimento-funcionalidades.png[]
 == Quando refatorar?
 
 
-Agora vamos para a próxima pergunta que devemos fazer: *quando devemos refatorar?* Para mim, a resposta é simples: sempre! Mas isso as vezes não é óbvio. Diversas vezes eu pego _pull requests_ para revisar em que o desenvolvedor adiciona 50 linhas em um método sem nenhuma vergonha. E quando eu pergunto porque ele não refatorou, eles me respondem sem cerimônia: *porque a atividade não envolvia refatoração*.
+Agora vamos para a próxima pergunta que devemos fazer: *quando devemos refatorar?* Para mim, a resposta é simples: sempre! Mas isso às vezes não é óbvio. Diversas vezes eu pego _pull requests_ para revisar em que o desenvolvedor adiciona 50 linhas em um método sem nenhuma vergonha. E quando eu pergunto por que ele não refatorou, eles me respondem sem cerimônia: *porque a atividade não envolvia refatoração*.
 
 Isso pra mim é um mal entendimento das responsabilidades do desenvolvedor. Vamos imaginar que estamos falando de um cozinheiro. E ao cozinheiro é dada a tarefa de cozinhar, mas não se dá a tarefa de limpar. Não estamos falando de uma limpeza pesada, faxina, mas da limpeza de bancada e ferramentas. Não sei se você já viu um cozinheiro profissional, ele sempre está com sua bancada limpíssima, com as ferramentas alinhadas e com seu paninho em mão, sempre limpando a bancada. Esse é um hábito dentro da gastronomia.
 
@@ -163,7 +163,7 @@ Mas, essa é uma resposta muito genérica. Quero detalhar diversos momentos em q
 
 Sabe quando você recebe uma nova funcionalidade para implementar e percebe que ela aumentará a complexidade do módulo. É um excelente momento para testar novos design que facilitem o desenvolvimento da atividade. 
 
-Você terá que pensar no novo design que reduza o tempo de implementação da funcionalidade. Essa abordagem é boa porque a refatoração é inserida dentro da atividade, diluida como um hábito e não como uma atividade extra. Pense como se estivesse limpando a bancada antes de cozinhar. 
+Você terá que pensar no novo design que reduza o tempo de implementação da funcionalidade. Essa abordagem é boa porque a refatoração é inserida dentro da atividade, diluída como um hábito e não como uma atividade extra. Pense como se estivesse limpando a bancada antes de cozinhar. 
 
 O resultado também é bom porque dependendo do resultado você entregará um código com um melhor design e com menos complexidade.
 
