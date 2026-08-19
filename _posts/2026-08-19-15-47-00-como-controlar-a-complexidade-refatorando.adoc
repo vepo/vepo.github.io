@@ -58,11 +58,11 @@ No longínquo ano de 2006, eu recebi o código da implementação de um protocol
 
 Nós já tinhamos alguns projetos com Symbian, um deles nós criamos uma "IDE" para fazer temas para o V3, que era o celular mais vendido e o mais chique que existia. Tudo que ia em um Symbian era instalado via um protocolo chamado https://en.wikipedia.org/wiki/OBject_EXchange[*OBEX*].
 
-O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisavamos integrar ele em uma ferramenta para o desenvolvimento de themas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de _spaghetti code_. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.
+O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisavamos integrá-lo em uma ferramenta para o desenvolvimento de themas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de _spaghetti code_. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.
 
-O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem difícil de entender o que estava acontecendo. E o _deploy_ da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas haviam bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.
+O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem difícil de entender o que estava acontecendo. E o _deploy_ da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas havia bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.
 
-Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto que eu trabalhava iam para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas tinha um grande problema: *o código era gigantesco e ilegível*.
+Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto que eu trabalhava ia para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas tinha um grande problema: *o código era gigantesco e ilegível*.
 
 === Antes de agir, é preciso estratégia!
 
@@ -87,7 +87,7 @@ public abstract class ObexCommand {
 }
 ----
 
-O executor dos comandos também seriam simples. Se fosse hoje eu chamaria de `OperationExecutor` porque receberia uma classe abstrata chamada `Operation`. Depois, o protocolo foi usado para outras coisas dentro da ferramenta, mas seu primeiro uso foi para fazer a instalação/atualização. Observe o código do `OperationExecutor`. Ele é facilmente compreensível. Sabemos exatamente como funcionaria a execução de uma operação completa.
+O executor dos comandos também seria simples. Se fosse hoje eu chamaria de `OperationExecutor` porque receberia uma classe abstrata chamada `Operation`. Depois, o protocolo foi usado para outras coisas dentro da ferramenta, mas seu primeiro uso foi para fazer a instalação/atualização. Observe o código do `OperationExecutor`. Ele é facilmente compreensível. Sabemos exatamente como funcionaria a execução de uma operação completa.
 
 [source,java]
 ----
@@ -111,7 +111,7 @@ public class OperationExecutor {
 
 De resto, precisava somente implementar a classe de cada comando que poderiam ser chamadas de `ConnectCommand`, `CheckPreviousAplicationInstallCommand`, `UninstallApplicationCommand`, `SendFileCommand`, `InstallApplicationCommand` e `CloseConnectionCommand`. Cada classe é simples e possui uma responsabilidade bem definida.
 
-Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente *sem nenhum bug*!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma análise _Post Mortem_ e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres `0` que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez o esperado marcador não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.
+Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente *sem nenhum bug*!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma análise _Post Mortem_ e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres `0` que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez que o marcador esperado não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.
 
 Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoraçõa me fez encontrar um bug e especifico e ela me ajuda a explicar o próximo benefício.
 
@@ -155,7 +155,7 @@ Porque não é um hábito dentro do mercado de desenvolvimento de software norma
 .Meme sobre qualidade do back-end vs front-end. Não sei como um desenvolvedor back-end é capaz de compartilhar isso.
 image::backend/backend-meme-errado.jpg[]
 
-Outra suposição é que nossos cursos são muito preocupados em nos capacitar a aprender a usar uma linguagem, mas nunca em sermos realmente bons desenvolvedores. Isso já é um problema apontado desde 1971 quando Niklaus Wirth falou em seu artigo https://dl.acm.org/doi/10.1145/362575.362577["Program development by stepwise refinement"] que somos ensinados a escrever código, mas não a escrever programas. Ou seja, aprendermos como usar uma linguagem de programação, mas não somos ensinados como entender um problema e criar um programa que o resolva.
+Outra suposição é que nossos cursos são muito preocupados em nos capacitar a aprender a usar uma linguagem, mas nunca em sermos realmente bons desenvolvedores. Isso já é um problema apontado desde 1971 quando Niklaus Wirth falou em seu artigo https://dl.acm.org/doi/10.1145/362575.362577["Program development by stepwise refinement"] que somos ensinados a escrever código, mas não a escrever programas. Ou seja, aprendemos como usar uma linguagem de programação, mas não somos ensinados como entender um problema e criar um programa que o resolva.
 
 Mas, essa é uma resposta muito genérica. Quero detalhar diversos momentos em que podemos refator, mas com objetivos diferentes.
 
@@ -181,17 +181,17 @@ Aliás, se você pratica Test-Driven Development, você deve ter percebido que e
 
 === Refatoração planejada
 
-Sabe quando o time de desenvolvimento entende que há a necessidade de uma refatoração, mas ela não é pontual e não pode ser inserida dentro de uma atividade? Porque não planejar ela como uma atividade diluida que possa ser encarada por diversas pessoas da equipe?
+Sabe quando o time de desenvolvimento entende que há a necessidade de uma refatoração, mas ela não é pontual e não pode ser inserida dentro de uma atividade? Por que não planejar ela como uma atividade diluida que possa ser encarada por diversas pessoas da equipe?
 
 === Refatoração em _Code Review_
 
 Recebeu uma _Pull Request_ para revisar e não entendeu nada? Já coloca como uma atividade refatorar. Os momentos de _Code Review_ são excelentes para se refatorar código. É o momento em que outros olhos vão entender o que foi feito.
 
-Porque não sugerir novos designs? Porque não apontar dificuldades de compreensão? Porque não apontar que a complexidade está crescente. 
+Por que não sugerir novos designs? Por que não apontar dificuldades de compreensão? Por que não apontar que a complexidade está crescendo?
 
 Um módulo não fica complexo do dia pra noite magicamente. Ele passa por diversas _code reviews_ em que pequenas alterações são feitas em trechos cada vez mais complexos.
 
-== Como convencer meu gerente que devo refatorar?
+== Como convencer meu gerente de que devo refatorar?
 
 Na verdade nem sempre precisamos convencer nossos gerentes. Infelizmente *refatorar* é uma atividade que gera repulsa dos gerentes porque eles imaginam que mais trabalho será feito, enquanto na verdade o trabalho pode ser o mesmo ou até menor.
 
