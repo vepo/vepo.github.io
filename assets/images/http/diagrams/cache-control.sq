@@ -1,0 +1,10 @@
+title Controle de Cache
+
+fontawesome5solid f108 Cliente #5dacd1
+fontawesome5solid f233 Servidor #5dacd1
+
+
+Cliente->>Servidor: **URI**: /resource
+Cliente<<--Servidor: **Status**: 200\n**ETag**: W/"e08b6b2a039181c9784a5b03bd93c236"\n**Cache-Control**: public, max-age=0, s-maxage=300\n**Age**: 15\n\n//**DADOS**//
+Cliente->>Servidor: **URI**: /resource\n**If-None-Match**: W/"e08b6b2a039181c9784a5b03bd93c236"
+Cliente<<--Servidor: **Status**: 304\n**ETag**: W/"e08b6b2a039181c9784a5b03bd93c236"\n**Cache-Control**: public, max-age=0, s-maxage=300\n**Age**: 15

@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/TDD.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-08-19T22:44:50+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/TDD.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Evitando a complexidade através da Refatoração</title><link href="https://blog.vepo.dev/posts/evitando-a-complexidade-atraves-da-refatoracao" rel="alternate" type="text/html" title="Evitando a complexidade através da Refatoração" /><published>2026-08-19T00:00:00+00:00</published><updated>2026-08-19T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/15-47-00-como-controlar-a-complexidade-refatorando</id><content type="html" xml:base="https://blog.vepo.dev/posts/evitando-a-complexidade-atraves-da-refatoracao"><![CDATA[<div class="paragraph">
+<p>No post anterior, falamos sobre como diminuir a complexidade do código através do Design, mas existe uma outra técnica que também deve ser aplicada constantemente e junto com o design que efetivamente reduzirá a complexidade: a refatoração (do inglês <em>refactoring</em>).</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-é-refatoração">O que é Refatoração?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Refatoração é o que pode ser chamado de uma manutenção adaptativa de um código. É uma atividade que não adiciona e nem altera as funcionalidades existentes, mas muda a estrutura de um módulo para deixar ele mais fácil de se manter.</p>
+</div>
+<div class="paragraph">
+<p>Mas por que devemos alterar o software se não estamos nem adicionando, nem alterando e muito menos removendo funcionalidades dele?</p>
+</div>
+<div class="paragraph">
+<p>Como já falamos anteriormente, em <a href="https://blog.vepo.dev/posts/por-que-escrever-com-codigo"><strong>Por que escrever um bom código?</strong></a>, sistemas podem morrer quando eles não são mais compreensíveis ou quando não conseguimos evoluí-los. E esses sistemas podem morrer pela condução errônea do desenvolvimento, ao se adicionar funcionalidades sem nenhuma preocupação com manutenibilidade, ou pelo seu envelhecimento natural. Irei até enfatizar algo que muito poucos falam: <strong>sistemas naturalmente envelhecem</strong>. Isso acontece mesmo que não façamos nada com eles.</p>
+</div>
+<div class="sect2">
+<h3 id="_como-um-sistema-envelhece">Como um sistema envelhece?</h3>
+<div class="paragraph">
+<p>Vamos imaginar um caso hipotético de um sistema que está há bastante tempo em produção, e usa um conjunto de bibliotecas. Se essas bibliotecas não forem atualizadas, vulnerabilidades vão sendo encontradas nelas e isso pode ser um problema que force uma atualização. Não pense que isso é uma realidade distante, aconteceu recentemente com o Log4J, biblioteca amplamente usada e nem sempre atualizada <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.</p>
+</div>
+<div class="paragraph">
+<p>Atualizar bibliotecas às vezes é uma atividade trivial. Basta selecionar <a href="https://semver.org/lang/pt-BR/">o último patch da versão usada</a> e fazer o build da aplicação novamente. Mas quando o software vai se tornando antigo, versões antigas das bibliotecas deixam de receber atualizações e essas dependências se tornam um problema. Somos obrigados a migrar para versões mais recentes ou mesmo substituir essas bibliotecas. Isso pode gerar muito retrabalho, mesmo em um software que não está recebendo novas funcionalidades.</p>
+</div>
+<div class="paragraph">
+<p>Podemos dizer que: <strong>todo software que está em uso, está em evolução</strong>. Ele pode não receber atualizações, mas com certeza há uma necessidade para isso. O engenheiro Manny Lehman propôs uma série de leis que mostram como isso acontece <sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup>. Um software, se está em uso, está em mudança contínua, em crescimento contínuo e sofrendo com o aumento de complexidade e um declínio na qualidade.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. <strong>Leis da Evolução de Software</strong> ou <strong>Leis de Lehman</strong></caption>
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 83.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lei da mudança contínua</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O sistema deve se adaptar constantemente ou perderá efetividade ao longo do tempo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lei do crescimento contínuo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O sistema precisa continuar se desenvolvendo para manter a satisfação dos seus usuários.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aumento da complexidade</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A menos que os desenvolvedores intervenham, o sistema se tornará cada vez mais complexo.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Declínio da qualidade</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A qualidade do sistema diminuirá a menos que os desenvolvedores o adaptem rigorosamente às mudanças no ambiente operacional.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Conservação da familiaridade</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">À medida que o sistema evolui e cresce, os profissionais envolvidos, incluindo desenvolvedores e usuários, devem manter sua expertise para garantir o sucesso da evolução.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Conservação da estabilidade organizacional</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A taxa média de trabalho dos profissionais ao utilizar um sistema em evolução deve permanecer constante para garantir a estabilidade organizacional.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Então, refatorar é uma atividade preventiva que tende a reduzir o impacto do aumento da complexidade e do declínio da qualidade no software. Nós fazemos refatoração para evitar que o software morra, deixando constantemente apto para receber novas funcionalidades.</p>
+</div>
+<div class="paragraph">
+<p>Então vamos falar dos benefícios do refatoração?</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_os-benefícios-do-refatoração">Os benefícios do refatoração</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora que eu te convenci que software envelhece e mesmo que não estejamos adicionando funcionalidades o código vai cada vez ficar mais complexo, quero mudar um pouco o tema. Agora é a hora de responder a pergunta: <strong>o que eu ganho refatorando código?</strong> e para isso vou contar uma história que ilustre os benefícios da refatoração apontados por Martin Fowler. No seu livro <a href="https://link.amazon/B00K5vxFo">Refatoração</a>, Martin Fowler aponta quatro grandes benefícios:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Melhora o design do software</p>
+</li>
+<li>
+<p>Deixa o software mais fácil de entender</p>
+</li>
+<li>
+<p>Ajuda a encontrar bugs</p>
+</li>
+<li>
+<p>Ajuda a programar mais rapidamente</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_eu-e-o-protocolo-obex">Eu e o protocolo OBEX</h3>
+<div class="paragraph">
+<p>No longínquo ano de 2006, eu recebi o código da implementação de um protocolo para instalação de aplicativos nos celulares da Motorola. Se você é novo, tudo vai parecer muito distante uma vez que não estávamos falando de Androids e iOS, mas do Symbian. A Motorola, na época, era a maior vendedora de celulares do mundo. Podemos dizer que seria o que a Apple é hoje. O <a href="https://pt.wikipedia.org/wiki/Symbian">Symbian</a>, por sua vez, era o sistema operacional para celulares mais usado e é tudo tão distante que nem de smartphones estamos falando. Ele era usado para <em>feature phones</em> (só fala ligação, tem agenda e o jogo da cobrinha), <em>media phone</em> (já dá pra ouvir uns MP3, mas vídeo&#8230;&#8203; tá longe!!!) e alguns poucos <em>smart phones</em>. Os smart phones estavam surgindo e eu trabalhava no projeto que iria disponibilizar a IDE para as pessoas fazerem aplicativos para eles.</p>
+</div>
+<div class="paragraph">
+<p>Nós já tínhamos alguns projetos com Symbian, um deles nós criamos uma "IDE" para fazer temas para o V3, que era o celular mais vendido e o mais chique que existia. Tudo que ia em um Symbian era instalado via um protocolo chamado <a href="https://en.wikipedia.org/wiki/OBject_EXchange"><strong>OBEX</strong></a>.</p>
+</div>
+<div class="paragraph">
+<p>O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisávamos integrá-lo em uma ferramenta para o desenvolvimento de temas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de <em>spaghetti code</em>. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.</p>
+</div>
+<div class="paragraph">
+<p>O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem difícil de entender o que estava acontecendo. E o <em>deploy</em> da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas havia bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.</p>
+</div>
+<div class="paragraph">
+<p>Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto em que eu trabalhava ia para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas havia um grande problema: <strong>o código era gigantesco e ilegível</strong>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_antes-de-agir-é-preciso-estratégia">Antes de agir, é preciso estratégia!</h3>
+<div class="paragraph">
+<p>E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primeiro passo foi estudar a especificação tanto do celular quanto do OBEX. Descobrimos que o processo de instalação deveria funcionar como uma série de comandos onde o resultado de um geraria atualização ou instalação da aplicação no dispositivo. Abaixo eu desenho um diagrama de como poderia ser o processo. É óbvio que o diagrama não reflete a realidade! Faz quase 20 anos que executei essa atividade, não vou me lembrar desses pormenores.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/artigos/codigo-bom/obex.png" alt="obex">
+</div>
+<div class="title">Figura 1. Descrição das operações necessárias para se atualizar uma aplicação.</div>
+</div>
+<div class="paragraph">
+<p>Já que identificamos esse comportamento de comandos sendo enviados, resolvemos aplicar o padrão <a href="https://refactoring.guru/pt-br/design-patterns/command"><em>Command</em></a> e fazer com que a operação que desejaríamos fosse uma simples sequência de comandos sendo enviados. Isso, por si só, reduziria a complexidade ao separar a lógica do envio dos comandos da construção dos comandos. Então criamos uma classe abstrata chamada <code>ObexCommand</code> e colocamos todo o código de gerar o comando a partir dos parâmetros deles. Também removemos os controles de leitura e escrita da conexão em classes separadas. Haveria uma classe para se comunicar com o dispositivo, abriria a conexão, inicializaria os buffers de entrada e saída, enviaria o comando e leria a resposta, passando a mesma ao comando. Mas se você observou bem a imagem, o comando não resolveria o problema porque a sequência de comandos pode mudar de acordo com a respostas dos mesmo.</p>
+</div>
+<div class="paragraph">
+<p>Por isso adaptamos o padrão Comando para funcionar como o <a href="https://refactoring.guru/pt-br/design-patterns/state"><em>State</em></a>. Cada comando geraria os próximos comandos a serem executados em sequência baseado no estado da resposta. Faríamos uma Máquina de Estados Finitos, que curiosamente não está descrito no GoF.</p>
+</div>
+<div class="paragraph">
+<p>Com essa modelagem básica, chegou a hora de refatorar. Pegamos cada trecho de código e movemos para as novas classes. O código em si não iria mudar, só onde ele estava colocado. Cada comando deveria receber alguns parâmetros, gerar o binário, processar uma resposta com a sua saída. A classe <code>ObexCommand</code> deveria ser bem simples, composta de um método para gerar o comando em binário e um método para processar a resposta, uma vez que os comandos são síncronos.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">ObexCommand</span> <span class="o">{</span>
+
+    <span class="kd">abstract</span> <span class="kt">byte</span><span class="o">[]</span> <span class="nf">serialize</span><span class="o">();</span>
+    <span class="kd">abstract</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">ObexCommand</span><span class="o">&gt;</span> <span class="nf">process</span><span class="o">(</span><span class="nc">ObexResponse</span> <span class="n">response</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O executor dos comandos também seria simples. Se fosse hoje eu chamaria de <code>OperationExecutor</code> porque receberia uma classe abstrata chamada <code>Operation</code>. Depois, o protocolo foi usado para outras coisas dentro da ferramenta, mas seu primeiro uso foi para fazer a instalação/atualização. Observe o código do <code>OperationExecutor</code>. Ele é facilmente compreensível. Sabemos exatamente como funcionaria a execução de uma operação completa.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">OperationExecutor</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="nc">ObexResponse</span> <span class="nf">process</span><span class="o">(</span><span class="nc">Operation</span> <span class="n">operation</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// Inicializa a lista de comandos em ordem e a resposta</span>
+        <span class="nc">Queue</span><span class="o">&lt;</span><span class="nc">ObexCommand</span><span class="o">&gt;</span> <span class="n">commands</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;&gt;(</span><span class="n">operation</span><span class="o">.</span><span class="na">startCommands</span><span class="o">());</span>
+        <span class="nc">ObexResponse</span> <span class="n">operationResponse</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="c1">// Enquanto houver comandos para executar da operação,</span>
+        <span class="c1">// Envia, processa resposta e adiciona novos comandos na lista</span>
+        <span class="k">while</span> <span class="o">(!</span><span class="n">commands</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="nc">ObexCommand</span> <span class="n">currentCommand</span> <span class="o">=</span> <span class="n">commands</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
+            <span class="n">operationResponse</span> <span class="o">=</span> <span class="n">execute</span><span class="o">(</span><span class="n">currentCommand</span><span class="o">);</span>
+            <span class="n">commands</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">currentCommand</span><span class="o">.</span><span class="na">process</span><span class="o">(</span><span class="n">resp</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="c1">// a lista está vazia. Operação concluída!</span>
+        <span class="k">return</span> <span class="n">operationResponse</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>De resto, precisava somente implementar a classe de cada comando que poderiam ser chamadas de <code>ConnectCommand</code>, <code>CheckPreviousAplicationInstallCommand</code>, <code>UninstallApplicationCommand</code>, <code>SendFileCommand</code>, <code>InstallApplicationCommand</code> e <code>CloseConnectionCommand</code>. Cada classe é simples e possui uma responsabilidade bem definida.</p>
+</div>
+<div class="paragraph">
+<p>Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente <strong>sem nenhum bug</strong>!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma análise <em>Post Mortem</em> e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres <code>0</code> que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez que o marcador esperado não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.</p>
+</div>
+<div class="paragraph">
+<p>Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoração me fez encontrar um bug específico e essa história vai me ajudar a explicar todos os benefícios da refatoração.</p>
+</div>
+<div class="paragraph">
+<p>Eu contei essa história porque ela descreve como uma atividade de refatoração bem elaborada pode desencadear uma série de ganhos para o projeto.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ajuda-a-encontrar-bugs">Ajuda a encontrar bugs</h3>
+<div class="paragraph">
+<p>Uma boa refatoração ajuda a encontrar bugs. No caso que narrei, o bug foi resolvido quase que automaticamente. Só no trabalho de mover o código para dentro das classes da nova modelagem, de se ter um real modelo, ele foi corrigido. O grande problema do código era que tudo era um emaranhado de funções, uma chamando a outra com o controle de estado feito por uma classe com muitas responsabilidades, ou pior, uma responsabilidade genérica.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_melhora-o-design-do-software">Melhora o Design do Software</h3>
+<div class="paragraph">
+<p>O outro ganho foi que o design realmente começou a ser palpável. Aquele componente começou a se parecer mais com algo estruturado e não com um processo sem design.</p>
+</div>
+<div class="paragraph">
+<p>Surgiu a ideia de comando, que já estava na documentação, mas não era refletida no código. Com ela se separou cada comando enviado e o código comum entre eles ficou em uma classe comum.</p>
+</div>
+<div class="paragraph">
+<p>Surgiu a ideia de estado. E o estado da execução do comando foi separado do estado da conexão. De certa forma, também adicionamos a ideia de camadas. A comunicação USB era um <em>stream</em> de entrada e saída, mas esse stream passou a ser entendido como comandos síncronos sendo enviados. O controle do estado do stream foi separado do estado dos comandos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deixa-o-software-mais-fácil-de-entender">Deixa o software mais fácil de entender</h3>
+<div class="paragraph">
+<p>Outro ganho foi que o código ficou muito fácil de entender. A grande responsabilidade de "fazer o deploy da aplicação" foi quebrada em diversas pequenas responsabilidades de fácil entendimento. Qualquer classe que fosse aberta, era possível se compreender como ela se encaixava no processo e o processo era descrito por uma classe bem simples representada pelo código de <code>OperationExecutor</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ajuda-a-programar-mais-rapidamente">Ajuda a programar mais rapidamente</h3>
+<div class="paragraph">
+<p>E por fim podemos falar do ganho final. Essa refatoração nos ajuda a programar mais rapidamente. Se surgisse uma nova atividade para adicionar a opção de DEBUG da aplicação não era necessário alterar o complexo código com mais um monte de IF/ELSE. Bastava criar uma nova operação com novos comandos. Isso seria muito menos custoso que alterar um código totalmente espaguete.</p>
+</div>
+<div class="paragraph">
+<p>O Martin Fowler chega a criar um gráfico mostrando que um software com um bom design pode ter mais funcionalidades que um com um design ruim. Isso acontece porque em determinado momento do projeto ficará tão caro dar manutenção no software que não sobrará dinheiro e esforço para evoluir o mesmo. O software será um peso, difícil de manter e impossível de se adicionar novas funcionalidades. Eu já trabalhei em diversos projetos que o escopo era reescrever um software já existente para que ele pudesse receber novas funcionalidades, e creio que isso não é muito incomum.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/artigos/codigo-bom/crescimento-funcionalidades.png" alt="crescimento funcionalidades">
+</div>
+<div class="title">Figura 2. Evolução do número de funcionalidades implementadas por tempo de projeto. Projetos com um bom design tendem a ter uma maior sobrevida.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quando-refatorar">Quando refatorar?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Agora vamos para a próxima pergunta que devemos fazer: <strong>quando devemos refatorar?</strong> Para mim, a resposta é simples: sempre! Mas isso às vezes não é óbvio. Diversas vezes eu pego <em>pull requests</em> para revisar em que o desenvolvedor adiciona 50 linhas em um método sem nenhuma cerimônia. E quando eu pergunto por que ele não refatorou, eles me respondem sem cerimônia: <strong>porque a atividade não envolvia refatoração</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Isso pra mim é um mal entendimento das responsabilidades do desenvolvedor. Vamos imaginar que estamos falando de um cozinheiro. E ao cozinheiro é dada a tarefa de cozinhar, mas não se dá a tarefa de limpar. Não estamos falando de uma limpeza pesada, faxina, mas da limpeza de bancada e ferramentas. Não sei se você já viu um cozinheiro profissional, ele sempre está com sua bancada limpíssima, com as ferramentas alinhadas e com seu paninho em mão, sempre limpando a bancada. Esse é um hábito dentro da gastronomia.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/artisticas/pexels-rdne-5779776.jpg" alt="pexels rdne 5779776">
+</div>
+<div class="title">Figura 3. A imagem mais comum de um chefe de cozinha é ele limpando a sua bancada. O mundo da culinária já entendeu o recado que deve manter tudo organizado. <a href="https://www.pexels.com/photo/a-man-standing-at-the-kitchen-counter-5779776/">(Foto: Projeto RDNE Stock via Pexels)</a>.</div>
+</div>
+<div class="paragraph">
+<p>Por que não é um hábito dentro do mercado de desenvolvimento de software normalizar qualidade como um requisito. Talvez porque nunca vemos o que acontece por detrás dos panos. O código é um produto que muitas vezes se usa, mas não se lê. Até memes são comuns sobre isso.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/backend/backend-meme-errado.jpg" alt="backend meme errado">
+</div>
+<div class="title">Figura 4. Meme sobre qualidade do back-end vs front-end. Não sei como um desenvolvedor back-end é capaz de compartilhar isso.</div>
+</div>
+<div class="paragraph">
+<p>Outra suposição é que nossos cursos são muito preocupados em nos capacitar a aprender a usar uma linguagem, mas nunca em sermos realmente bons desenvolvedores. Isso já é um problema apontado desde 1971 quando Niklaus Wirth falou em seu artigo <a href="https://dl.acm.org/doi/10.1145/362575.362577">"Program development by stepwise refinement"</a> que somos ensinados a escrever código, mas não a escrever programas. Ou seja, aprendemos como usar uma linguagem de programação, mas não somos ensinados como entender um problema e criar um programa que o resolva.</p>
+</div>
+<div class="paragraph">
+<p>Mas, essa é uma resposta muito genérica. Quero detalhar diversos momentos em que podemos refator, mas com objetivos diferentes.</p>
+</div>
+<div class="sect2">
+<h3 id="_refatoração-preparatória">Refatoração preparatória</h3>
+<div class="paragraph">
+<p>Sabe quando você recebe uma nova funcionalidade para implementar e percebe que ela aumentará a complexidade do módulo. É um excelente momento para testar novos designs que facilitem o desenvolvimento da atividade.</p>
+</div>
+<div class="paragraph">
+<p>Você terá que pensar no novo design que reduza o tempo de implementação da funcionalidade. Essa abordagem é boa porque a refatoração é inserida dentro da atividade, diluída como um hábito e não como uma atividade extra. Pense como se estivesse limpando a bancada antes de cozinhar.</p>
+</div>
+<div class="paragraph">
+<p>O resultado também é bom porque dependendo do resultado você entregará um código com um melhor design e com menos complexidade.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refatoração-para-compreensão">Refatoração para compreensão</h3>
+<div class="paragraph">
+<p>Sabe aquele momento que você pega um módulo com zero compreensão dos detalhes de implementação e algumas funcionalidades a serem implementadas? No esforço de tentar entender os trechos mais complexos, vale uma refatoração. Na melhor das hipóteses você vai entregar um código mais compreensível e na pior das hipóteses você compreenderá o código não descartará o trabalho de refatoração.</p>
+</div>
+<div class="paragraph">
+<p>A ideia é tentar entender o código brincando com ele, alterando o design. No exemplo que falei acima, eu usei esse tipo de refatoração e o resultado foi incrivelmente positivo. Foi tão bom que consigo me lembrar depois de 20 anos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refatoração-para-coleta-de-lixo">Refatoração para coleta de lixo</h3>
+<div class="paragraph">
+<p>Em alguns momentos do desenvolvimento vemos que algo ficou desorganizado. Não seria esse o melhor momento para organizar a bagunça? Eu gosto muito da regra do escoteiro, que eu li no fabuloso Manual dos Escoteiros Mirins: sempre deixe o acampamento mais limpo do que recebeu.</p>
+</div>
+<div class="paragraph">
+<p>Aliás, se você pratica Test-Driven Development, você deve ter percebido que essa regra está codificada dentro do processo. No processo, o desenvolvimento é feito em três etapas: (i) na primeira fazemos um teste falhar alterando a validação de acordo com a nova regra de negócio, (ii) depois alteramos o código para que todos os testes passem e (iii) por fim refatoramos o código. Refatorar é uma constante dentro do TDD.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refatoração-planejada">Refatoração planejada</h3>
+<div class="paragraph">
+<p>Sabe quando o time de desenvolvimento entende que há a necessidade de uma refatoração, mas ela não é pontual e não pode ser inserida dentro de uma atividade? Por que não planejá-la como uma atividade diluida que possa ser encarada por diversas pessoas da equipe?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_refatoração-em-code-review">Refatoração em <em>Code Review</em></h3>
+<div class="paragraph">
+<p>Recebeu uma <em>Pull Request</em> para revisar e não entendeu nada? Já coloca como uma atividade refatorar. Os momentos de <em>Code Review</em> são excelentes para se refatorar código. É o momento em que outros olhos vão entender o que foi feito.</p>
+</div>
+<div class="paragraph">
+<p>Por que não sugerir novos designs? Por que não apontar dificuldades de compreensão? Por que não apontar que a complexidade está crescendo?</p>
+</div>
+<div class="paragraph">
+<p>Um módulo não fica complexo do dia pra noite magicamente. Ele passa por diversas <em>code reviews</em> em que pequenas alterações são feitas em trechos cada vez mais complexos.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_como-convencer-meu-gerente-de-que-devo-refatorar">Como convencer meu gerente de que devo refatorar?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Na verdade nem sempre precisamos convencer nossos gerentes. Infelizmente <strong>refatorar</strong> é uma atividade que gera repulsa dos gerentes porque eles imaginam que mais trabalho será feito, enquanto na verdade o trabalho pode ser o mesmo ou até menor.</p>
+</div>
+<div class="paragraph">
+<p>Agir com estratégia evita retrabalho no futuro e esse é um método inteligente de se trabalhar. Mas não precisamos informar que vamos fazer. Você pode apenas dizer que vai melhorar o código para continuar com a implementação.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Refatorar é uma atividade primordial para que um software evolua com qualidade. Refatore sempre, questione o design sempre, pense em modos melhores de se escrever o código sempre!</p>
+</div>
+<div class="paragraph">
+<p>Isso não é um peso ou mais trabalho. Um código bem escrito fará com que menos trabalho seja necessário.</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. Fonte: <a href="https://www.ncsc.gov.uk/information/log4j-vulnerability-what-everyone-needs-to-know">Log4j vulnerability - what everyone needs to know</a>
+</div>
+<div class="footnote" id="_footnotedef_2">
+<a href="#_footnoteref_2">2</a>. Fonte: <a href="https://ieeexplore.ieee.org/document/1456074"><em>Programs, life cycles, and laws of software evolution</em></a>
+</div>
+</div>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Refatoração" /><category term="Qualidade de Código" /><category term="Manutenibilidade" /><category term="Design de Software" /><category term="Arquitetura de Software" /><category term="TDD" /><category term="Code Review" /><category term="Boas Práticas" /><category term="Engenharia de Software" /><summary type="html"><![CDATA[Refatoração não é luxo, é sobrevivência. Entenda como o software envelhece naturalmente e por que a refatoração contínua é a única defesa contra o caos. Neste artigo, compartilho uma história real com o protocolo OBEX, explico os benefícios de Martin Fowler (design, bugs, velocidade) e detalho quando aplicar: preparatória, compreensão, coleta de lixo e code review. Transforme refatoração em hábito, não em evento.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/kids-programming-100-42.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/kids-programming-100-42.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Testes 101 - Testando aplicações Java</title><link href="https://blog.vepo.dev/posts/testes-101-testando-aplicacoes-java" rel="alternate" type="text/html" title="Testes 101 - Testando aplicações Java" /><published>2020-09-01T00:00:00+00:00</published><updated>2020-09-01T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/21-16-00-testes-101-testando-aplicacoes-java</id><content type="html" xml:base="https://blog.vepo.dev/posts/testes-101-testando-aplicacoes-java"><![CDATA[<p>Testes são fundamentais. Se você deseja ser desenvolvedor Java lhe recomendo pelo menos conhecer o que são TDD, Maven e JUnit. E vou te apresentar o porque.</p>
+
+<h1 id="tdd">TDD</h1>
+
+<p>TDD significa Test-Driven-Development. Se você imagina que é criar o testes e depois o código, você está um pouco enganado. TDD é uma disciplina um pouco diferente.</p>
+
+<p>TDD é uma disciplina, não é algo que pode ser explicado. É uma cultura que você tem que aprender, e treinar. Depois de anos você vai ver já melhorou bastante, mas tem muito mais a aprender.</p>
+
+<h2 id="ciclos-do-tdd">Ciclos do TDD</h2>
+
+<p>Pra explicar o TDD facilmente, temos que falar dos ciclos. Nem todos os testes criados serão usados e eles não devem refletir o requisito final. Você tem que usar <strong>Baby Steps</strong>, passos de bebê, em cara ciclo. Imagine um ciclo como um rodada de desenvolvimento de 10 a 30 minutos:</p>
+
+<ul>
+  <li><strong>[R]</strong> Você cria um Test, ele deve falhar.</li>
+  <li><strong>[G]</strong> Você implementa o código para o teste funcionar</li>
+  <li><strong>[R]</strong> Você Refatora o código</li>
+</ul>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/pfjgroqac0hnojyt7vmj.png" alt="Ciclo RGR" /></p>
+
+<p>Ao final de um tempo de desenvolvimento você terá vários testes. Alguns podem ser descartados, outros vão ficar. Eu recomento ficar apenas os que representem a funcionalidades do código. E recomendo também que cubram o máximo possível o seu código.</p>
+
+<h1 id="maven">Maven</h1>
+
+<p>Se estamos falando de testes, estamos falando de Processo de Build. Se você cria os seus testes e não os colocar para serem executados automaticamente, você não fez praticamente nada.</p>
+
+<p>O Maven abstrai cada build criando um ciclo com fases. Então os testes sempre serão executados se você deseja executar ou empacotar o seu projeto.</p>
+
+<p>Para criar um projeto usando Maven, instale o Maven e execute:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn archetype:generate <span class="nt">-DgroupId</span><span class="o">=</span>io.vepo.tests <span class="nt">-DartifactId</span><span class="o">=</span>testsExample <span class="nt">-DarchetypeArtifactId</span><span class="o">=</span>maven-archetype-quickstart <span class="nt">-DinteractiveMode</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>Você vai observar duas coisas:</p>
+<ul>
+  <li>o Maven criou um arquivo pom.xml colocando como dependência o JUnit, e que versão antiga! 🙄</li>
+  <li>o Maven criou duas pastas de código: <code class="language-plaintext highlighter-rouge">src/main/java</code> e <code class="language-plaintext highlighter-rouge">src/test/java</code>.</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.vepo.tests<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>testsExample<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>testsExample<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/g21r9j3qm38eh6eh95cd.png" alt="Estrutura de diretório" /></p>
+
+<p>Mas onde o Maven configura que os testes devem ser executados durante a build ou como ele descobre os testes? O Maven se baseia na ideia convention-over-configuration, ou seja, Convenção acima de Configuração. Para realizar certas configurações basta apenas usar a convenção apropriada.</p>
+
+<p>O projeto criado já vem com alguns testes JUnit configurado, porém é usado a versão <code class="language-plaintext highlighter-rouge">3.8.1</code>… Alguém por favor atualiza o <a href="https://github.com/apache/maven-archetypes">github.com/apache/maven-archetypes</a>, por favor!</p>
+
+<h1 id="junit-5">JUnit 5</h1>
+
+<p>O JUnit é o framework que irá gerenciar o ciclo de vida de seus testes. Cara classe dentro de <code class="language-plaintext highlighter-rouge">src/test/java</code> contendo um método com a annotation <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/Test.html"><code class="language-plaintext highlighter-rouge">org.junit.jupiter.api.Test</code></a> será executado como testes. Assim para migrarmos o arquivo gerado automaticamente, basta mudar o seguinte conteúdo:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.vepo.tests<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>testsExample<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>testsExample<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>org.junit.jupiter<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit-jupiter-engine<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>5.5.2<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+  <span class="nt">&lt;build&gt;</span>
+    <span class="nt">&lt;plugins&gt;</span>
+        <span class="c">&lt;!-- Need at least 2.22.0 to support JUnit 5 --&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>maven-surefire-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>3.0.0-M3<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;configuration&gt;</span>
+                <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+                <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+            <span class="nt">&lt;/configuration&gt;</span>
+        <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;/plugins&gt;</span>
+<span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">io.vepo.tests</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.DisplayName</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppTest</span> 
+<span class="o">{</span>   
+    <span class="nd">@Test</span>
+    <span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Test if it works"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">simpleTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"OK"</span><span class="o">,</span> <span class="s">"OK"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Observe que com o JUnit 5 eu consigo dar nomes aos testes, isso facilita em muito a identificação de um erro. Eu costumo usar frases que definem as features testadas. Isso facilita quando preciso fazer manutenção em código escrito meses, ou anos, antes.</p>
+
+<h2 id="ciclo-de-vida">Ciclo de Vida</h2>
+
+<p>O ciclo de vida de um teste passa pela execução métodos antes/depois da classe ser criada e métodos antes/depois da execução de cada teste. Dê uma olhada na <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-classes-and-methods">documentação</a>. Há vários exemplos de como usar <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html">@BeforeAll</a>, <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeEach.html">@BeforeEach</a>, <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/AfterEach.html">@AfterEach</a> e <a href="https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html">@AfterAll</a>.</p>
+
+<p>Se eu for detalhar cada feature do JUnit 5, esse post não terá fim. São muitas, conheça elas, assim você pode construir bons testes.</p>
+
+<h2 id="asserções">Asserções</h2>
+
+<p>O mais importante do JUnit não é apenas a execução dos testes, mas a validação dos resultados.</p>
+
+<p>O JUnit provê uma classe com métodos estáticos para realizar isso. Na <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-assertions">documentação oficial</a> há vários exemplos.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="kt">void</span> <span class="nf">standardAssertions</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">calculator</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="n">assertEquals</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="n">calculator</span><span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">2</span><span class="o">),</span>
+            <span class="s">"The optional failure message is now the last parameter"</span><span class="o">);</span>
+    <span class="n">assertTrue</span><span class="o">(</span><span class="sc">'a'</span> <span class="o">&lt;</span> <span class="sc">'b'</span><span class="o">,</span> <span class="o">()</span> <span class="o">-&gt;</span> <span class="s">"Assertion messages can be lazily evaluated -- "</span>
+            <span class="o">+</span> <span class="s">"to avoid constructing complex messages unnecessarily."</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="tests-dsl">Tests DSL</h1>
+
+<p>DSL significa <em>Domain-Specific Language</em>. Você cria uma DSL seu código pode ser lido como uma linguagem. Em testes é comum se construir uma DSL usando os termos <a href="https://www.agilealliance.org/glossary/gwt">Given-When-Then</a>. Você pode fazer isso em português Dado-Quando-Então:</p>
+
+<ul>
+  <li>(<strong>Dado</strong>) Qual o contexto que o teste é executado?</li>
+  <li>(<strong>Quando</strong>) Qual ação vai ser testada?</li>
+  <li>(<strong>Então</strong>) O que deve ser validado?</li>
+</ul>
+
+<p>Um bom exemplo pode ser:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dadoNovoUsuário</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">executaChecking</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">validaReserva</span><span class="o">();</span>
+</code></pre></div></div>
+
+<p>Aí fica de você implementar cada método e reutilizar ele quando possível.</p>
+
+<h2 id="assertj">AssertJ</h2>
+
+<p>Há algumas bibliotecas que auxiliam na construção dessa DSL. Eu gosto muito da <a href="https://assertj.github.io/doc/">AssertJ</a>. Com ela é possível usar uma DSL para validação de resultados complexos.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// extracting multiple values at once grouped in tuples</span>
+<span class="n">assertThat</span><span class="o">(</span><span class="n">fellowshipOfTheRing</span><span class="o">).</span><span class="na">extracting</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="s">"age"</span><span class="o">,</span> <span class="s">"race.name"</span><span class="o">)</span>
+                               <span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">tuple</span><span class="o">(</span><span class="s">"Boromir"</span><span class="o">,</span> <span class="mi">37</span><span class="o">,</span> <span class="s">"Man"</span><span class="o">),</span>
+                                         <span class="n">tuple</span><span class="o">(</span><span class="s">"Sam"</span><span class="o">,</span> <span class="mi">38</span><span class="o">,</span> <span class="s">"Hobbit"</span><span class="o">),</span>
+                                         <span class="n">tuple</span><span class="o">(</span><span class="s">"Legolas"</span><span class="o">,</span> <span class="mi">1000</span><span class="o">,</span> <span class="s">"Elf"</span><span class="o">));</span>
+</code></pre></div></div>
+
+<h1 id="mocks">Mocks</h1>
+
+<p>Mock significa Imitação. Imagina no caso de estarmos acessando uma base de dados. Você tem duas opções, ou liga a base de dados e testa diretamente nela, ou você mocka o acesso a base. O problema da primeira abordagem é que ela torna o teste mais abrangente. Não estaremos fazendo um Teste Unitário, mas um Teste de Integração.</p>
+
+<p>Não há problema em fazer Testes de Integração, mas eles serão muito mais lentos. Outro problema é que muitas vezes você não precisa testar uma base de dados. Mas as vezes é bom testar a integração, sempre evita um NullPointerException! ☠️</p>
+
+<p>Há algumas boas bibliotecas para Mock, vou falar um pouco do <a href="https://site.mockito.org/">Mockito</a> e <a href="https://github.com/powermock/powermock">PowerMock</a></p>
+
+<h1 id="mockito">Mockito</h1>
+
+<p>Mockito serve para criar classes onde o código original pode ou não ser executado.</p>
+
+<p>Quando você quer executar o código orignal, estamos falando de um spy. O código é executado e você pode validar o que foi feito.</p>
+
+<p>Um Spy pode ser criado usando <a href="https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#spy"><code class="language-plaintext highlighter-rouge">Mockito.spy</code></a> ou usando o Jupiter Extension para o JUnit 5.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Testa o exemplo de Mock para UserRepository"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUserInMemoryTest</span><span class="o">()</span> <span class="o">{</span>
+
+    <span class="nc">User</span> <span class="n">userWithoutId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+
+    <span class="n">assertThat</span><span class="o">(</span><span class="n">userRepositoryInMemory</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">hasFieldOrPropertyWithValue</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span>
+
+    <span class="n">verify</span><span class="o">(</span><span class="n">userRepositoryInMemory</span><span class="o">).</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Observe que um Spy serve para verificar se o método foi chamado com um valor especifico. Ou seja, precisamos ter uma implementação concreta da classe.</p>
+
+<p>Agora quando falamos de Mocks não precisamos de implementações concretas. Podemos usar em interfaces. Quando é criado um mock, o código real não é chamado, são sempre retornados valores vazios ou nulls. Então é preciso definir o que será retornado e quando.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Test</span>
+<span class="nd">@DisplayName</span><span class="o">(</span><span class="s">"Testa o exemplo de Mock para UserRepository"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addUserTest</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nc">User</span> <span class="n">userWithoutId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithoutId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+
+    <span class="nc">User</span> <span class="n">userWithId</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">();</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setId</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setEmail</span><span class="o">(</span><span class="s">"vepo@vepo.com"</span><span class="o">);</span>
+    <span class="n">userWithId</span><span class="o">.</span><span class="na">setUsername</span><span class="o">(</span><span class="s">"vepo"</span><span class="o">);</span>
+    
+    <span class="n">when</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">userWithId</span><span class="o">);</span>
+    
+    <span class="n">assertThat</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">userWithoutId</span><span class="o">)).</span><span class="na">hasFieldOrPropertyWithValue</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">1L</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="cobertura-de-testes">Cobertura de Testes</h1>
+
+<p>As coisas não andam se não tivermos estatisticas! Então para testes, precisamos saber com exatidão qual é a cobertura de testes do nosso projeto. Se não colocarmos isso em prática, muito rapidamente a cobertura irá cair e nem perceberemos.</p>
+
+<p>Uma ferramenta para gerar um relatório de cobertura é o <a href="https://www.jacoco.org/jacoco/">JaCoCo</a></p>
+
+<p>Para configurar o JaCoCo no Maven, basta adicionar ele como um plugin e configurar quando será executado.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.jacoco<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jacoco-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.8.1<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>prepare-agent<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>prepare-agent<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;id&gt;</span>report<span class="nt">&lt;/id&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>test<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>report<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>Depois para executar:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean <span class="nb">test </span>jacoco:report
+</code></pre></div></div>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/tlsl5nnyppc2ikfbzr6v.png" alt="Relatório de Tests" /></p>
+
+<p>No caso será gerado um relatório. Esse relatório pode ser armazenado no Jenkins ou mesmo usado pela próxima ferramenta que vamos ver.</p>
+
+<h1 id="code-smells">Code Smells</h1>
+
+<p>Antes de partir para última ferramenta, vamos definir uma coisa.</p>
+
+<p><strong>Code Smells</strong> são construções que podem trazer má qualidade ao código. Eliminando eles, você pode melhorar a qualidade do seu código.</p>
+
+<h1 id="análise-estática-de-código">Análise Estática de Código</h1>
+
+<p>Como última ferramenta, vamos falar de Análise Estática de Código. Imagina se você pudesse analisar o seu código e encontrar bugs ou Code Smells. Seria bom, não?</p>
+
+<p>Mas temos isso e de graça. Você pode usar o <a href="https://www.sonarqube.org/">SonarQube</a>. Com esse plugin para o Maven você pode criar um servidor para armazenar a qualidade atual do seu código e construir uma timeline dele. Assim você pode desafiar o time a reduzir o número de Code Smells em 50%. Ou em aumentar a covertura de testes até um determinado patamar.</p>
+
+<p>Para integrar no Maven, basta colocar:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;plugin&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.sonarsource.scanner.maven<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>sonar-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>3.7.0.1746<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;executions&gt;</span>
+        <span class="nt">&lt;execution&gt;</span>
+            <span class="nt">&lt;phase&gt;</span>verify<span class="nt">&lt;/phase&gt;</span>
+            <span class="nt">&lt;goals&gt;</span>
+                <span class="nt">&lt;goal&gt;</span>sonar<span class="nt">&lt;/goal&gt;</span>
+            <span class="nt">&lt;/goals&gt;</span>
+        <span class="nt">&lt;/execution&gt;</span>
+    <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</code></pre></div></div>
+
+<p>Ao adicionar o plugin, crie o projeto no Github e já inicialize ele no <a href="https://sonarcloud.io">SonarCloud</a>. Ao iniciar um projeto, você pode pegar um Token que deve ser usado na build.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nt">-Dsonar</span>.login<span class="o">=</span>&lt;SONAR_TOKEN&gt; verify sonar:sonar
+</code></pre></div></div>
+
+<p>Caso queira rodar o <a href="https://www.sonarqube.org/downloads/">Sonar</a> em projetos internos da sua empresa, você só precisa de um servidor e uma instalação do Sonar. É simples de configurar.</p>
+
+<h1 id="tudo-junto">Tudo Junto</h1>
+
+<p>Agora vamos responder a última pergunta. Quem vai rodar tudo isso? Você pode configurar algumas ferramentas. Entre elas podemos citar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Ferramenta</th>
+      <th>Contexto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Jenkins</td>
+      <td>Para rodar projetos internos. Não é um serviço cloud.</td>
+    </tr>
+    <tr>
+      <td>Github Actions</td>
+      <td>Excelentes para projetos Github.</td>
+    </tr>
+    <tr>
+      <td>TravisCI</td>
+      <td>Could e facilmente integrado com o Github.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Testes são fundamentais e você não precisa saber fazer antes de começar a desenvolver. MAS… Se você souber criar testes, seu código terá muita estabilidade.</p>
+
+<p>Treine fazer testes. Treine TDD. Conheça as ferramentas e boa sorte!</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/36whvqvlgpj79iy7lzmc.jpg" alt="Alt Text" /></p>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Testes" /><category term="TDD" /><category term="JaCoCo" /><summary type="html"><![CDATA[Um guia rápido para tudo o que você precisa saber para fazer testes em aplicações Java]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/teste-carros.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/teste-carros.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Construindo softwares resilientes</title><link href="https://blog.vepo.dev/posts/construindo-software-resilientes" rel="alternate" type="text/html" title="Construindo softwares resilientes" /><published>2020-05-08T00:00:00+00:00</published><updated>2020-05-08T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/20-05-31-construindo-softwares-resilientes</id><content type="html" xml:base="https://blog.vepo.dev/posts/construindo-software-resilientes"><![CDATA[<p><em>—  Já ouviu falar de <strong>eXtreme Go Horse (XGH)</strong>?</em> <br />
+<em>—  Não?!</em> 🙄 <br />
+<em>—  Mas você pratica <strong>XGH</strong>?</em> 🤨<br />
+<em>—  Não?</em> <br />
+<em>—  Ainda bem!</em> 😀</p>
+
+<p><strong>XGH</strong> é uma piada que gosto muito. Espero que você não o pratique. Mas coloquei ele na roda por seu exato oposto. Um Sênior deve construir softwares estáveis. E para se construir software estáveis você tem que ir pro extremo oposto do <strong>XGH</strong>. Devemos construir software resilientes.</p>
+
+<p>Sim, eu usei a palavra resiliente. Vamos ao significado?</p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/ou8mdzzu5v5ii8n4fbay.png" alt="Alt Text" /></p>
+
+<p>Resiliência é a propriedade de um sistema suportar adversidade.</p>
+
+<h1 id="construindo-resiliência">Construindo Resiliência</h1>
+
+<p>Nós como desenvolvedores resolvemos problemas automatizando coisas. Quando vemos um problema já pensamos no modo como ele deve ser resolvido.</p>
+
+<p>Mas e se houver outra forma? 
+E se seu usuário não entender a forma como deve ser feito o processo? 
+E se houver um erro durante processo? 
+E se necessitar uma configuração na máquina?</p>
+
+<p>É nessas horas que seu software tem que ser Resiliente.</p>
+
+<p>Verdadeiros Sêniors constroem sistemas resilientes. Mas não seja gnóstico, não é um post que vai te fazer construir sistemas resilientes, é resolvendo bugs! Tudo que posso fazer por você é te ensinar o caminho, você terá que trilhar ele sozinho.</p>
+
+<p>Então vamos com algumas dicas:</p>
+
+<h2 id="1-um-sênior-pensa-em-todos-os-problemas-que-podem-acontecer-em-um-fluxo">1. Um Sênior pensa em todos os problemas que podem acontecer em um fluxo</h2>
+
+<p>Quando você vai escrever um código, você sempre tem premissas:</p>
+
+<ol>
+  <li>Existe um arquivo de configuração.</li>
+  <li>Há uma classe que implementa essa interface.</li>
+  <li>O servidor está de pé.</li>
+  <li>Etc…</li>
+</ol>
+
+<p>E se uma premissas dessas não for verdadeira? Seu código irá funcionar? Ou pelo menos irá mostrar o erro correto?</p>
+
+<p>Vamos para exemplos reais?</p>
+
+<p>Eu tenho um projeto que estou desenvolvendo para ser um tipo de tester. Dá uma olhada lá:</p>
+
+<div class="github-repo">
+    <h2>
+        <img class="logo" src="/assets/images/plugins/github-logo.png" alt="GitHub logo" loading="lazy" />
+        <img class="user" src="https://avatars.githubusercontent.com/u/353569?v=4" loading="lazy" />
+        <span class="url">
+            <a href="https://github.com/vepo">
+                vepo
+            </a>
+            /
+            <a href="https://github.com/vepo/plain-test">
+                plain-test
+            </a>
+        </span>
+    </h2>
+</div>
+
+<p>Nele eu executo o testes em passos (<em>Step</em>), cada passo tem um plugin que implementa. Então para execução de um passo eu preciso:</p>
+
+<ol>
+  <li>Achar o Plugin de Execução</li>
+  <li>Executar o Passo</li>
+  <li>Verificar os Assertions do Passo</li>
+</ol>
+
+<p>Simples? Poderia ser implementado em 1 linha?</p>
+
+<div data-gist="https://gist.github.com/vepo/871ebd3e0fa62aebfbc135e61ad74235"></div>
+
+<p>Mas temos dois problemas aqui que devem ser validados.</p>
+
+<ol>
+  <li>Há um Plugin para implementar o Passo?</li>
+  <li>Na definição do Passo, todos os parâmetros estão definidos?</li>
+</ol>
+
+<p>Vê que temos mais dois problemas a verificar? E detalhe, esses problemas são um erro de definição do teste e não de execução do teste. Logo o motivo da falha deve ser diferente.</p>
+
+<div data-gist="https://gist.github.com/vepo/416b699bb7c9fca3b49e202b19d99d7d"></div>
+
+<p>Ao se identificar um erro, exiba a mensagem de erro correta, que ajuda quem irá resolver esse erro.</p>
+
+<h2 id="2-um-sênior-desenvolve-software-que-é-resistente-a-desenvolvedores">2. Um Sênior desenvolve software que é resistente a desenvolvedores</h2>
+
+<p>Ok! Você desenvolveu o negócio lindamente. Está tudo funcionando perfeitamente, fez o <em>deploy</em> em produção. Resultado: usuários felizes! 😀</p>
+
+<p>Fim? Pode ser que não, em algum momento esse software poderá ser atualizado. Pode ser necessários corrigir os bugs que ainda não foram encontrados, ou poderá ser adicionada alguma feature. Qualquer alteração, em qualquer lugar, tem o potencial de alterar a lógica do seu software. Como podemos validar que tudo está funcionando corretamente?</p>
+
+<p><em>Não vou vender TDD como uma bala de prata, esse não é o problema que TDD resolve. Depois falo de TDD. Eu gosto de TDD por isso repito TDD… Continuamente… TDD</em></p>
+
+<p>Um Sênior de verdade constrói software resiliente a desenvolvedores. Mas como fazer isso?</p>
+
+<p>Você deveria se preocupar com algumas coisas:</p>
+
+<ol>
+  <li>Qual a cobertura de testes do sistema?</li>
+  <li>Os testes foram feitos só pra passar pela cobertura de testes e agradar o arquiteto? Ou os testes estão realmente validando o output?</li>
+  <li>Os testes são executados no processo de build?</li>
+</ol>
+
+<p>Caso você tenha respondido não para qualquer uma das perguntas abaixo, seu software não é resiliente a desenvolvedores. E você não pode confiar em si mesmo a ponto de pensar que você conseguirá resolver todos os problemas no futuro.</p>
+
+<p>Quando resolvemos um bug, ou adicionamos uma feature nova, temos um pensamento viciado. Apenas pensamos em um fluxo, e nos esquecemos de outros. É normal e esperado isso. Você é um engenheiro e não Deus.</p>
+
+<p>Como eu resolvo isso? Eu crio testes unitários com todos os pressupostos.</p>
+
+<div data-gist="https://gist.github.com/vepo/88d10d4c6e4ae0523ffe19268f5871f0"></div>
+
+<p>É um habito meu começar meu desenvolvimento com alguns pressupostos desses, mas eles não fazem parte do <em><strong>TDD</strong></em>, pois não são <em>Baby Step</em>. Mas eles dão uma clara visão do que vai falhar. Pode ser que em uma próxima feature um passo desses falhe, e o desenvolvedor irá decidir:</p>
+
+<ol>
+  <li>Se corrige o problema</li>
+  <li>Se corrige o teste</li>
+  <li>Se remove o teste, caso ele não faça mais sentido.</li>
+</ol>
+
+<h2 id="3-um-sênior-investiga-possíveis-erros">3. Um Sênior investiga possíveis erros</h2>
+
+<p><em>—  Então, esse teste falha em 50% dos casos. Mas caso falhe, roda de novo que dá certo.</em></p>
+
+<p><img src="https://dev-to-uploads.s3.amazonaws.com/i/lefte06h7r9ngi7d4l8b.jpg" alt="Alt Text" /></p>
+
+<p>Se você ouvir essa frase. Recrimine! Isso não pode acontecer.</p>
+
+<p>Um possível erro intermitente em um teste pode ser um erro intermitente em produção. Pode ser custoso investigar antes do <em>deploy</em>? Pode! Mas será mais barato do que investigar depois do <em>deploy</em>, não?</p>
+
+<p>Um Sênior de verdade sabe que pequenos problemas não podem passar sem investigação. Não pode buscar a solução fácil de ignorar ou remover o teste. Isso é fácil, mas para um sênior é porco <em>(com todo respeito aos porcos)</em>.</p>
+
+<h1 id="conclusão">Conclusão</h1>
+
+<p>Quase todo software necessita de resiliência. E um Sênior de Verdade sabe ver isso.</p>
+
+<p>Ele consegue se precaver de várias situações:</p>
+
+<ol>
+  <li>Erros esperados</li>
+  <li>Erros inesperados</li>
+  <li>Pessoas esperadas</li>
+  <li>Pessoas inesperadas</li>
+  <li>Aleatoriedades….</li>
+</ol>
+
+<p>Não que ele deva ser um Deus em se tratando de desenvolvimento, mas tem que praticar a disciplina de promover a resiliência.</p>
+
+<p>Esse é um caminho a ser trilhado….</p>
+
+<h1 id="livros-recomendados">Livros Recomendados</h1>
+
+<ol>
+  <li><a href="https://www.amazon.com.br/projeto-f%C3%AAnix-Gene-Kim/dp/8550801895?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=2AYVJTDQGN55J&amp;keywords=projeto+phoenix&amp;qid=1588968692&amp;sprefix=projeto+ph%2Caps%2C272&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=45c6f18224bfe9cf0d82b737331a5761&amp;language=pt_BR&amp;ref_=as_li_ss_tl">O Projeto Fênix: um Romance Sobre TI, DevOps e Sobre Ajudar o seu Negócio a Vence</a></li>
+  <li><a href="https://www.amazon.com.br/Test-Driven-Development-Kent-Beck/dp/0321146530?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;crid=BXKYM1LP3IQH&amp;keywords=test+driven+development&amp;qid=1588968574&amp;sprefix=test+dr%2Caps%2C275&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=b9ad00a6e5089e02d277bed813cb0283&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Test Driven Development: By Example</a></li>
+  <li><a href="https://www.amazon.com.br/C%C3%B3digo-limpo-Robert-C-Martin/dp/8576082675?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&amp;keywords=clean+code&amp;qid=1588968796&amp;sr=8-1&amp;linkCode=ll1&amp;tag=vepo0f-20&amp;linkId=7ff5c1abee4d3b6a1860924b6f392698&amp;language=pt_BR&amp;ref_=as_li_ss_tl">Código Limpo: Habilidades Práticas do Agile Software</a></li>
+</ol>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Desenvolvimento de Software" /><category term="Programação" /><category term="TDD" /><category term="Carreira" /><summary type="html"><![CDATA[Um Sênior de Verdade sabe construir software resilientes! Mas o que significa um Software Resiliente?]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/flor.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/flor.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
