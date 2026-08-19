@@ -10,21 +10,21 @@ publish_date: 2026-08-19 15:47:00 +0300
 series: Manual de Bom Senso para Desenvolvedores
 ---
 
-No post anterior, falamos sobre como diminuir a complexidade do código através do Design, mas existe uma outra técnica que também deve ser aplicada constantemente e junto com o design que efetivamente reduzirá a complexidade: o REFACTORING.
+No post anterior, falamos sobre como diminuir a complexidade do código através do Design, mas existe uma outra técnica que também deve ser aplicada constantemente e junto com o design que efetivamente reduzirá a complexidade: a refatoração (do inglês _refactoring_).
 
-== O que é Refactor?
+== O que é Refatoração?
 
-Refactor é o que pode ser chamado de uma manutenção adaptativa de um código. É uma atividade que não adiciona e nem altera as funcionalidades existentes, mas muda a estrutura de um módulo para deixar ele mais fácil de se manter. 
+Refatoração é o que pode ser chamado de uma manutenção adaptativa de um código. É uma atividade que não adiciona e nem altera as funcionalidades existentes, mas muda a estrutura de um módulo para deixar ele mais fácil de se manter. 
 
-Mas porque devemos alterar o software se não estamos nem adicionando, nem alterando e muito menos removendo funcionalidades dele? 
+Mas por que devemos alterar o software se não estamos nem adicionando, nem alterando e muito menos removendo funcionalidades dele? 
 
-Como já falamos anteriormente, em https://blog.vepo.dev/posts/por-que-escrever-com-codigo[*Por que escrever um bom código?*], sistemas podem morrer quando eles não são mais compreensíveis ou quando não conseguimos evoluir eles. E esses sistemas podem morrer pela condução errônea do desenvolvimento, ao se adicionar funcionalidades sem nenhuma preocupação com manutenibilidade, ou pelo seu envelhecimento natural. Irei até enfatizar algo que muito poucos falam: *sistemas naturalmente envelhecem*. Isso acontece mesmo que não façamos nada com eles. 
+Como já falamos anteriormente, em https://blog.vepo.dev/posts/por-que-escrever-com-codigo[*Por que escrever um bom código?*], sistemas podem morrer quando eles não são mais compreensíveis ou quando não conseguimos evoluí-los. E esses sistemas podem morrer pela condução errônea do desenvolvimento, ao se adicionar funcionalidades sem nenhuma preocupação com manutenibilidade, ou pelo seu envelhecimento natural. Irei até enfatizar algo que muito poucos falam: *sistemas naturalmente envelhecem*. Isso acontece mesmo que não façamos nada com eles. 
 
 === Como um sistema envelhece?
 
 Vamos imaginar um caso hipotético de um sistema que está há bastante tempo em produção, e usa um conjunto de bibliotecas. Se essas bibliotecas não forem atualizadas, vulnerabilidades vão sendo encontradas nelas e isso pode ser um problema que force uma atualização. Não pense que isso é uma realidade distante, aconteceu recentemente com o Log4J, biblioteca amplamente usada e nem sempre atualizada footnote:[Fonte: https://www.ncsc.gov.uk/information/log4j-vulnerability-what-everyone-needs-to-know[Log4j vulnerability - what everyone needs to know]]. 
 
-Atualizar bibliotecas, às vezes, é uma atividade trivial. Basta selecionar https://semver.org/lang/pt-BR/[o último patch da versão usada] e fazer o build da aplicação novamente. Mas quando o software vai se tornando antigo, versões antigas das bibliotecas deixam de receber atualizações e essas dependências se tornam um problema. Somos obrigados a migrar para versões mais recentes ou mesmo substituir essas bibliotecas. Isso pode gerar muito retrabalho, mesmo em um software que não está recebendo novas funcionalidades.
+Atualizar bibliotecas às vezes é uma atividade trivial. Basta selecionar https://semver.org/lang/pt-BR/[o último patch da versão usada] e fazer o build da aplicação novamente. Mas quando o software vai se tornando antigo, versões antigas das bibliotecas deixam de receber atualizações e essas dependências se tornam um problema. Somos obrigados a migrar para versões mais recentes ou mesmo substituir essas bibliotecas. Isso pode gerar muito retrabalho, mesmo em um software que não está recebendo novas funcionalidades.
 
 Podemos dizer que: *todo software que está em uso, está em evolução*. Ele pode não receber atualizações, mas com certeza há uma necessidade para isso. O engenheiro Manny Lehman propôs uma série de leis que mostram como isso acontece footnote:[Fonte: https://ieeexplore.ieee.org/document/1456074[_Programs, life cycles, and laws of software evolution_]]. Um software, se está em uso, está em mudança contínua, em crescimento contínuo e sofrendo com o aumento de complexidade e um declínio na qualidade.
 
@@ -32,18 +32,18 @@ Podemos dizer que: *todo software que está em uso, está em evolução*. Ele po
 [%header,cols="1,5"]
 |===
 | Lei da mudança contínua | O sistema deve se adaptar constantemente ou perderá efetividade ao longo do tempo.
-| Lei do crescimento contínuo | O sistema precisa continuar se desenvolvendo para manter a satisfação dos usuários.
+| Lei do crescimento contínuo | O sistema precisa continuar se desenvolvendo para manter a satisfação dos seus usuários.
 | Aumento da complexidade | A menos que os desenvolvedores intervenham, o sistema se tornará cada vez mais complexo.
 | Declínio da qualidade | A qualidade do sistema diminuirá a menos que os desenvolvedores o adaptem rigorosamente às mudanças no ambiente operacional.
 | Conservação da familiaridade | À medida que o sistema evolui e cresce, os profissionais envolvidos, incluindo desenvolvedores e usuários, devem manter sua expertise para garantir o sucesso da evolução.
 | Conservação da estabilidade organizacional | A taxa média de trabalho dos profissionais ao utilizar um sistema em evolução deve permanecer constante para garantir a estabilidade organizacional.
 |===
 
-Então, refatorar é uma atividade preventiva que tende a reduzir o impacto do aumento da complexidade e do declinio da qualidade no software. Nós fazemos refactoring para evitar que o software morra, deixando constantemente apto para receber novas funcionalidades.
+Então, refatorar é uma atividade preventiva que tende a reduzir o impacto do aumento da complexidade e do declínio da qualidade no software. Nós fazemos refatoração para evitar que o software morra, deixando constantemente apto para receber novas funcionalidades.
 
-Então vamos falar dos benefícios do refactor?
+Então vamos falar dos benefícios do refatoração?
 
-== Os beneficios do refactoring
+== Os benefícios do refatoração
 
 Agora que eu te convenci que software envelhece e mesmo que não estejamos adicionando funcionalidades o código vai cada vez ficar mais complexo, quero mudar um pouco o tema. Agora é a hora de responder a pergunta: *o que eu ganho refatorando código?* e para isso vou contar uma história que ilustre os benefícios da refatoração apontados por Martin Fowler. No seu livro https://link.amazon/B00K5vxFo[Refatoração], Martin Fowler aponta quatro grandes benefícios:
 
@@ -54,15 +54,15 @@ Agora que eu te convenci que software envelhece e mesmo que não estejamos adici
 
 === Eu e o protocolo OBEX
 
-No longínquo ano de 2006, eu recebi o código da implementação de um protocolo para instalação de aplicativos nos celulares da Motorola. Se você é novo tudo vai parecer muito distante uma vez que não estávamos falando de Androids e iOS, mas do Symbian. A Motorola, na época, era a maior vendedora de celulares do mundo. Podemos dizer que seria o que a Apple é hoje. O https://pt.wikipedia.org/wiki/Symbian[Symbian], por sua vez, era o sistema operacional para celulares mais usado e é tudo tão distante que nem de smartphones estamos falando. Ele era usado para _feature phones_ (só fala ligação, tem agenda e o jogo da cobrinha), _media phone_ (já dá pra ouvir uns MP3, mas vídeo... tá longe!!!) e alguns poucos _smart phones_. Os smart phones estavam surgindo e eu trabalhava no projeto que iria disponibilizar a IDE para as pessoas fazerem aplicativos para eles. 
+No longínquo ano de 2006, eu recebi o código da implementação de um protocolo para instalação de aplicativos nos celulares da Motorola. Se você é novo, tudo vai parecer muito distante uma vez que não estávamos falando de Androids e iOS, mas do Symbian. A Motorola, na época, era a maior vendedora de celulares do mundo. Podemos dizer que seria o que a Apple é hoje. O https://pt.wikipedia.org/wiki/Symbian[Symbian], por sua vez, era o sistema operacional para celulares mais usado e é tudo tão distante que nem de smartphones estamos falando. Ele era usado para _feature phones_ (só fala ligação, tem agenda e o jogo da cobrinha), _media phone_ (já dá pra ouvir uns MP3, mas vídeo... tá longe!!!) e alguns poucos _smart phones_. Os smart phones estavam surgindo e eu trabalhava no projeto que iria disponibilizar a IDE para as pessoas fazerem aplicativos para eles. 
 
-Nós já tinhamos alguns projetos com Symbian, um deles nós criamos uma "IDE" para fazer temas para o V3, que era o celular mais vendido e o mais chique que existia. Tudo que ia em um Symbian era instalado via um protocolo chamado https://en.wikipedia.org/wiki/OBject_EXchange[*OBEX*].
+Nós já tínhamos alguns projetos com Symbian, um deles nós criamos uma "IDE" para fazer temas para o V3, que era o celular mais vendido e o mais chique que existia. Tudo que ia em um Symbian era instalado via um protocolo chamado https://en.wikipedia.org/wiki/OBject_EXchange[*OBEX*].
 
-O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisavamos integrá-lo em uma ferramenta para o desenvolvimento de themas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de _spaghetti code_. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.
+O protocolo havia sido implementado para uma ferramenta interna da Motorola que era muito usada nos testes, mas nós precisávamos integrá-lo em uma ferramenta para o desenvolvimento de temas, skins e aplicações. Ao pegar o código, ele poderia ser muito bem descrito pela alcunha de _spaghetti code_. Era um real espaguete de funções chamando funções sem o controle bem definido do estado interno, tudo em uma classe só.
 
 O OBEX era um protocolo binário para interação com o dispositivo, ou seja, era bem difícil de entender o que estava acontecendo. E o _deploy_ da aplicação seguia um roteiro de comandos usando o OBEX. Vários comandos deveriam ser enviados para o celular para saber se havia uma aplicação, se deveria desinstalá-la, enviar a nova versão, atualizar e finalizar a conexão. Quando recebi o zip com as classes Java, tudo parecia funcionar bem, mas havia bugs e bugs sérios. A implementação não funcionava corretamente e a cada deploy, o celular precisava ter sua conexão USB (nem sei se era USB) reiniciada. Ou seja, faz um deploy, depois remove o cabo e coloca de novo. Comportamento aceitável para uma ferramenta interna, mas já dá pra supor que alguém tentou consertar, não conseguiu e entregou daquele jeito.
 
-Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto que eu trabalhava ia para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas tinha um grande problema: *o código era gigantesco e ilegível*.
+Funciona, legal! Não! Apesar desse bug ser tolerável dentro de uma empresa, o produto em que eu trabalhava ia para desenvolvedores. Os usuários seriam pessoas que não são obrigadas a usar aquela ferramenta e ficar reiniciando uma conexão USB é um porre! Precisávamos consertar o erro, mas havia um grande problema: *o código era gigantesco e ilegível*.
 
 === Antes de agir, é preciso estratégia!
 
@@ -72,7 +72,7 @@ E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primei
 .Descrição das operações necessárias para se atualizar uma aplicação.
 image::artigos/codigo-bom/obex.png[]
 
-Já que identificamos esse comportamento de comandos sendo enviados, resolvemos aplicar o padrão https://refactoring.guru/pt-br/design-patterns/command[_Command_] e fazer com que a operação que desejariamos fosse uma simples sequência de comandos sendo enviados. Isso, por si só, reduziria a complexidade ao separar a lógica do envio dos comandos da construção dos comandos. Então criamos uma classe abstrata chamada `ObexCommand` e colocamos todo o código de gerar o comando a partir dos parâmetros deles. Também removemos os controles de leitura e escrita da conexão em classes separadas. Haveria uma classe para se comunicar com o dispositivo, abriria a conexão, inicializaria os buffers de entrada e saída, enviaria o comando e leria a resposta, passando a mesma ao comando. Mas se você observou bem a imagem, o comando não resolveria o problema porque a sequência de comandos pode mudar de acordo com a respostas dos mesmo. 
+Já que identificamos esse comportamento de comandos sendo enviados, resolvemos aplicar o padrão https://refactoring.guru/pt-br/design-patterns/command[_Command_] e fazer com que a operação que desejaríamos fosse uma simples sequência de comandos sendo enviados. Isso, por si só, reduziria a complexidade ao separar a lógica do envio dos comandos da construção dos comandos. Então criamos uma classe abstrata chamada `ObexCommand` e colocamos todo o código de gerar o comando a partir dos parâmetros deles. Também removemos os controles de leitura e escrita da conexão em classes separadas. Haveria uma classe para se comunicar com o dispositivo, abriria a conexão, inicializaria os buffers de entrada e saída, enviaria o comando e leria a resposta, passando a mesma ao comando. Mas se você observou bem a imagem, o comando não resolveria o problema porque a sequência de comandos pode mudar de acordo com a respostas dos mesmo. 
 
 Por isso adaptamos o padrão Comando para funcionar como o https://refactoring.guru/pt-br/design-patterns/state[_State_]. Cada comando geraria os próximos comandos a serem executados em sequência baseado no estado da resposta. Faríamos uma Máquina de Estados Finitos, que curiosamente não está descrito no GoF.
 
@@ -103,7 +103,7 @@ public class OperationExecutor {
             operationResponse = execute(currentCommand);
             commands.addAll(currentCommand.process(resp));
         }
-        // a lista está vazia. Operação concluida!
+        // a lista está vazia. Operação concluída!
         return operationResponse;
     }
 }
@@ -113,7 +113,7 @@ De resto, precisava somente implementar a classe de cada comando que poderiam se
 
 Para nossa surpresa, ao apenas copiar os trechos de códigos e adaptar as novas interfaces, a operação começou a funcionar plenamente *sem nenhum bug*!!!!! Ainda foi preciso debugar o código antigo para entender o bug porque naquela época o processo de resolução de bugs exigia uma análise _Post Mortem_ e descobrimos que ao processar uma das respostas, um comando esquecia de escrever alguns caracteres `0` que seriam o marcador binário em específico. Isso fazia com que o dispositivo não escrevesse a resposta do comando uma vez que o marcador esperado não era encontrado. Eu, obviamente, não lembro que comando era e isso nem é importante, Mas ao separar comando a comando conseguimos verificar qual comando estava sendo escrito, o que existia na lista e qual era a resposta esperada. MAS isso foi só para a análise, porque isso foi automaticamente corrigido com a refatoração.
 
-Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoraçõa me fez encontrar um bug e especifico e ela me ajuda a explicar o próximo benefício.
+Queria contar essa experiência porque ela foi muito elucidativa na minha história sobre como uma refatoração me fez encontrar um bug específico e essa história vai me ajudar a explicar todos os benefícios da refatoração.
 
 Eu contei essa história porque ela descreve como uma atividade de refatoração bem elaborada pode desencadear uma série de ganhos para o projeto.
 
@@ -146,14 +146,14 @@ image::artigos/codigo-bom/crescimento-funcionalidades.png[]
 == Quando refatorar?
 
 
-Agora vamos para a próxima pergunta que devemos fazer: *quando devemos refatorar?* Para mim, a resposta é simples: sempre! Mas isso às vezes não é óbvio. Diversas vezes eu pego _pull requests_ para revisar em que o desenvolvedor adiciona 50 linhas em um método sem nenhuma vergonha. E quando eu pergunto por que ele não refatorou, eles me respondem sem cerimônia: *porque a atividade não envolvia refatoração*.
+Agora vamos para a próxima pergunta que devemos fazer: *quando devemos refatorar?* Para mim, a resposta é simples: sempre! Mas isso às vezes não é óbvio. Diversas vezes eu pego _pull requests_ para revisar em que o desenvolvedor adiciona 50 linhas em um método sem nenhuma cerimônia. E quando eu pergunto por que ele não refatorou, eles me respondem sem cerimônia: *porque a atividade não envolvia refatoração*.
 
 Isso pra mim é um mal entendimento das responsabilidades do desenvolvedor. Vamos imaginar que estamos falando de um cozinheiro. E ao cozinheiro é dada a tarefa de cozinhar, mas não se dá a tarefa de limpar. Não estamos falando de uma limpeza pesada, faxina, mas da limpeza de bancada e ferramentas. Não sei se você já viu um cozinheiro profissional, ele sempre está com sua bancada limpíssima, com as ferramentas alinhadas e com seu paninho em mão, sempre limpando a bancada. Esse é um hábito dentro da gastronomia.
 
-.A imagem mais comum de um chefe de cozinha é ele limpando a sua bancada. O mundo da culinária já entendeu o recado que deve manter tudo organizado. https://www.pexels.com/photo/a-man-standing-at-the-kitchen-counter-5779776/[Photo do projeto RDNE Stock].
+.A imagem mais comum de um chefe de cozinha é ele limpando a sua bancada. O mundo da culinária já entendeu o recado que deve manter tudo organizado. https://www.pexels.com/photo/a-man-standing-at-the-kitchen-counter-5779776/[(Foto: Projeto RDNE Stock via Pexels)].
 image:artisticas/pexels-rdne-5779776.jpg[]
 
-Porque não é um hábito dentro do mercado de desenvolvimento de software normalizar qualidade como um requisito. Talvez porque nunca vemos o que acontece por detrás dos panos. O código é um produto que muitas vezes se usa, mas não se lê. Até memes são comuns sobre isso.
+Por que não é um hábito dentro do mercado de desenvolvimento de software normalizar qualidade como um requisito. Talvez porque nunca vemos o que acontece por detrás dos panos. O código é um produto que muitas vezes se usa, mas não se lê. Até memes são comuns sobre isso.
 
 .Meme sobre qualidade do back-end vs front-end. Não sei como um desenvolvedor back-end é capaz de compartilhar isso.
 image::backend/backend-meme-errado.jpg[]
@@ -164,7 +164,7 @@ Mas, essa é uma resposta muito genérica. Quero detalhar diversos momentos em q
 
 === Refatoração preparatória
 
-Sabe quando você recebe uma nova funcionalidade para implementar e percebe que ela aumentará a complexidade do módulo. É um excelente momento para testar novos design que facilitem o desenvolvimento da atividade. 
+Sabe quando você recebe uma nova funcionalidade para implementar e percebe que ela aumentará a complexidade do módulo. É um excelente momento para testar novos designs que facilitem o desenvolvimento da atividade. 
 
 Você terá que pensar no novo design que reduza o tempo de implementação da funcionalidade. Essa abordagem é boa porque a refatoração é inserida dentro da atividade, diluída como um hábito e não como uma atividade extra. Pense como se estivesse limpando a bancada antes de cozinhar. 
 
@@ -184,7 +184,7 @@ Aliás, se você pratica Test-Driven Development, você deve ter percebido que e
 
 === Refatoração planejada
 
-Sabe quando o time de desenvolvimento entende que há a necessidade de uma refatoração, mas ela não é pontual e não pode ser inserida dentro de uma atividade? Por que não planejar ela como uma atividade diluida que possa ser encarada por diversas pessoas da equipe?
+Sabe quando o time de desenvolvimento entende que há a necessidade de uma refatoração, mas ela não é pontual e não pode ser inserida dentro de uma atividade? Por que não planejá-la como uma atividade diluida que possa ser encarada por diversas pessoas da equipe?
 
 === Refatoração em _Code Review_
 
