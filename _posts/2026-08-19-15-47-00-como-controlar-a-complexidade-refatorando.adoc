@@ -29,7 +29,7 @@ Atualizar bibliotecas às vezes é uma atividade trivial. Basta selecionar https
 Podemos dizer que: *todo software que está em uso, está em evolução*. Ele pode não receber atualizações, mas com certeza há uma necessidade para isso. O engenheiro Manny Lehman propôs uma série de leis que mostram como isso acontece footnote:[Fonte: https://ieeexplore.ieee.org/document/1456074[_Programs, life cycles, and laws of software evolution_]]. Um software, se está em uso, está em mudança contínua, em crescimento contínuo e sofrendo com o aumento de complexidade e um declínio na qualidade.
 
 .*Leis da Evolução de Software* ou *Leis de Lehman* 
-[%header,cols="1,5"]
+[cols="1,5"]
 |===
 | Lei da mudança contínua | O sistema deve se adaptar constantemente ou perderá efetividade ao longo do tempo.
 | Lei do crescimento contínuo | O sistema precisa continuar se desenvolvendo para manter a satisfação dos seus usuários.
@@ -70,7 +70,7 @@ E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primei
 
 // https://excalidraw.com/#json=dlIhp_Y2o9iH3NWjVhECx,fypqJHr9PNVn6_ZnfJeoNw
 .Descrição das operações necessárias para se atualizar uma aplicação.
-image::artigos/codigo-bom/obex.png[]
+ç:artigos/codigo-bom/obex.png[]
 
 Já que identificamos esse comportamento de comandos sendo enviados, resolvemos aplicar o padrão https://refactoring.guru/pt-br/design-patterns/command[_Command_] e fazer com que a operação que desejaríamos fosse uma simples sequência de comandos sendo enviados. Isso, por si só, reduziria a complexidade ao separar a lógica do envio dos comandos da construção dos comandos. Então criamos uma classe abstrata chamada `ObexCommand` e colocamos todo o código de gerar o comando a partir dos parâmetros deles. Também removemos os controles de leitura e escrita da conexão em classes separadas. Haveria uma classe para se comunicar com o dispositivo, abriria a conexão, inicializaria os buffers de entrada e saída, enviaria o comando e leria a resposta, passando a mesma ao comando. Mas se você observou bem a imagem, o comando não resolveria o problema porque a sequência de comandos pode mudar de acordo com a respostas dos mesmo. 
 
@@ -141,6 +141,7 @@ E por fim podemos falar do ganho final. Essa refatoração nos ajuda a programar
 O Martin Fowler chega a criar um gráfico mostrando que um software com um bom design pode ter mais funcionalidades que um com um design ruim. Isso acontece porque em determinado momento do projeto ficará tão caro dar manutenção no software que não sobrará dinheiro e esforço para evoluir o mesmo. O software será um peso, difícil de manter e impossível de se adicionar novas funcionalidades. Eu já trabalhei em diversos projetos que o escopo era reescrever um software já existente para que ele pudesse receber novas funcionalidades, e creio que isso não é muito incomum.
 
 // https://excalidraw.com/#json=FF1fGiTILHZpXay0IQG7C,SvLFKaJugYznP9tNUm6bNg
+.Evolução do número de funcionalidades implementadas por tempo de projeto. Projetos com um bom design tendem a ter uma maior sobrevida.
 image::artigos/codigo-bom/crescimento-funcionalidades.png[]
 
 == Quando refatorar?
@@ -151,7 +152,7 @@ Agora vamos para a próxima pergunta que devemos fazer: *quando devemos refatora
 Isso pra mim é um mal entendimento das responsabilidades do desenvolvedor. Vamos imaginar que estamos falando de um cozinheiro. E ao cozinheiro é dada a tarefa de cozinhar, mas não se dá a tarefa de limpar. Não estamos falando de uma limpeza pesada, faxina, mas da limpeza de bancada e ferramentas. Não sei se você já viu um cozinheiro profissional, ele sempre está com sua bancada limpíssima, com as ferramentas alinhadas e com seu paninho em mão, sempre limpando a bancada. Esse é um hábito dentro da gastronomia.
 
 .A imagem mais comum de um chefe de cozinha é ele limpando a sua bancada. O mundo da culinária já entendeu o recado que deve manter tudo organizado. https://www.pexels.com/photo/a-man-standing-at-the-kitchen-counter-5779776/[(Foto: Projeto RDNE Stock via Pexels)].
-image:artisticas/pexels-rdne-5779776.jpg[]
+image::artisticas/pexels-rdne-5779776.jpg[]
 
 Por que não é um hábito dentro do mercado de desenvolvimento de software normalizar qualidade como um requisito. Talvez porque nunca vemos o que acontece por detrás dos panos. O código é um produto que muitas vezes se usa, mas não se lê. Até memes são comuns sobre isso.
 
