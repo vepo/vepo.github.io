@@ -70,7 +70,7 @@ E foi com esse enorme desafio que comecei a pensar em uma estratégia e o primei
 
 // https://excalidraw.com/#json=dlIhp_Y2o9iH3NWjVhECx,fypqJHr9PNVn6_ZnfJeoNw
 .Descrição das operações necessárias para se atualizar uma aplicação.
-ç:artigos/codigo-bom/obex.png[]
+image::artigos/codigo-bom/obex.png[]
 
 Já que identificamos esse comportamento de comandos sendo enviados, resolvemos aplicar o padrão https://refactoring.guru/pt-br/design-patterns/command[_Command_] e fazer com que a operação que desejaríamos fosse uma simples sequência de comandos sendo enviados. Isso, por si só, reduziria a complexidade ao separar a lógica do envio dos comandos da construção dos comandos. Então criamos uma classe abstrata chamada `ObexCommand` e colocamos todo o código de gerar o comando a partir dos parâmetros deles. Também removemos os controles de leitura e escrita da conexão em classes separadas. Haveria uma classe para se comunicar com o dispositivo, abriria a conexão, inicializaria os buffers de entrada e saída, enviaria o comando e leria a resposta, passando a mesma ao comando. Mas se você observou bem a imagem, o comando não resolveria o problema porque a sequência de comandos pode mudar de acordo com a respostas dos mesmo. 
 
