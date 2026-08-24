@@ -740,6 +740,7 @@ public class MessageProcessingBean {
 
 Mas vamos supor que dependemos de um serviço externo que receberá chamadas via um protocolo complexo que não podemos emular em testes. Podemos criar uma interface chamada `ProtocoloExterno`.
 
+.Interface para protocolo externo (porta)
 [source,java]
 ----
 public interface ProtocoloExterno {
@@ -749,6 +750,7 @@ public interface ProtocoloExterno {
 
 No Spring, podemos usar normalmente a implementação de `ProtocoloExterno`, mas, nos testes, podemos usar um mock, como no exemplo abaixo:
 
+.Implementação alternativa do protocolo externo para testes (Spring Profile)
 [source,java]
 ----
 // Implementação falsa (para testes)
@@ -765,6 +767,7 @@ public class FakeProtocoloExterno implements ProtocoloExterno {
 
 No Quarkus, podemos usar a anotação `@Alternative`, que força o framework a selecionar a opção disponível nos testes.
 
+.Implementação alternativa do protocolo externo para testes (Quarkus @Alternative)
 [source,java]
 ----
 @Alternative
@@ -1167,6 +1170,7 @@ Pessoalmente, gosto de criar DSLs fluidas, que podemos ler como um texto. Se voc
 
 Então, vou internalizar todo acesso à aplicação dentro da classe `App`. Podemos até remover a necessidade do campo `url` usando `TestHTTPResourceManager.getUri()`.
 
+.Classe `App` com DSL para acesso à aplicação em testes Selenium
 [source,java]
 ----
 public class App {
@@ -1210,6 +1214,7 @@ public class App {
 
 Além de controlar o acesso à aplicação, podemos também criar uma DSL para configurar o ambiente. Gosto de fazer isso usando os termos da https://cucumber.io/docs/gherkin/reference[DSL Gherkin do Cucumber]: Given, When, Then. Sempre crio uma classe nos meus projetos chamada `Given` que me fornecerá uma forma fácil de criar dados. Se quiser ver um exemplo de um projeto real, o https://github.com/vepo/contraponto/blob/main/src/test/java/dev/vepo/contraponto/shared/Given.java[`Given` da minha plataforma de blogs está disponível].
 
+.Classe `Given` para criação de dados de teste (DSL)
 [source,java]
 ----
 public class Given {
@@ -1231,6 +1236,7 @@ public class Given {
 
 Com as classes `App` e `Given`, consigo gerar dados e acessar a aplicação com uma linguagem de alto nível. Veja que, no teste abaixo, podemos quase ler o que o teste está fazendo sem depender de frameworks e detalhes de implementação.
 
+.Teste final com Selenium usando DSL e injeção de `App`
 [source,java]
 ----
 @WebTest
