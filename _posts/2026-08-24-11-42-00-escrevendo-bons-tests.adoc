@@ -1,0 +1,1257 @@
+---
+title: Escrevendo bons testes
+published: true
+description: |
+    Aprenda a escrever testes eficazes superando as limitações do ambiente de testes. Entenda a diferença entre emular e simular, resolva dependências de frameworks, sistemas externos, SO, tempo e schema de banco. Descubra como usar Spring Boot, Quarkus, Testcontainers e criar DSLs para testes mais legíveis e confiáveis.
+tags: [Testes, Qualidade de Software, TDD, Java, Spring Boot, Quarkus, JUnit, Mockito, Testcontainers, Arquitetura Hexagonal, DSL, Engenharia de Software]
+image: /assets/images/capas/kids-programming-100-42.jpg
+permalink: /posts/escrevendo-bons-testes
+publish_date: 2026-08-24 11:42:00 +0300
+series: Manual de Bom Senso para Desenvolvedores
+---
+
+Você tem dificuldades para escrever testes? Ou seus testes são pouco efetivos, permitindo que bugs não sejam rapidamente identificados? Hoje quero te ensinar a escrever testes de forma eficaz, com dicas práticas. Nós já falamos sobre como controlar a complexidade do código. Mas agora é hora de mudar o escopo: vamos falar de testes.
+
+As primeiras perguntas que podem nos vir à mente quando falamos de testes são: quais frameworks usar ou como escrever testes. Muitas vezes, escolhemos os frameworks e já saímos escrevendo os testes com pouca reflexão sobre como os escrever. Por isso, quero começar com o desafio de investigar *as limitações do ambiente onde os testes rodam*. Ao entender essas limitações, poderemos ter uma ideia clara sobre como escrever testes e compreender as escolhas que fazemos ao escrevê-los.
+
+Testes naturalmente não são executados no mesmo ambiente que a aplicação de produção roda. Não usamos o mesmo banco de dados, nem o mesmo conjunto de dados. Não temos tempo suficiente para simular certos erros, nem interagimos com os mesmos serviços reais de produção. Muitas vezes, também não contamos com os mesmos recursos de CPU e memória.
+
+Em outras palavras, nós não conseguimos *emular* a produção, apenas *simulá-la* e isso traz limitações à forma como testamos. E é interessante entendermos a diferença desses dois termos para compreendermos por que alguns tipos de testes não conseguem identificar problemas reais.
+
+[sidebar]
+.Diferença entre _emular_ e _simular_
+****
+Quantas vezes você já jogou um emulador de videogame? Por que esse emulador não se chama simulador? Se você procurar no Google "emulador mario bros" e "simulador mario bros", a resposta será diferente. O primeiro apontará para um emulador de videogame e um conjunto de ROMs, enquanto o segundo apontará para um site com o jogo. *Emular* e *simular* são operações diferentes na computação.
+
+*Emular* significa construir um sistema que permite atuar exatamente igual ao outro. Quando emulamos um videogame, criamos uma máquina virtual que emula o funcionamento da plataforma, aceitando os mesmos jogos do videogame real. Então, quando você jogava Pokémon no emulador de Game Boy, você usava o mesmo código que o Game Boy usava, e o programa emulava o funcionamento do console em si.
+
+*Simular* significa construir um sistema que cria um modelo aproximado do sistema original, sem ter as mesmas características ou as mesmas funcionalidades. Uma simulação é sempre inferior ao original. Quando jogamos um simulador de um jogo, como o Pokémon, não estamos jogando o mesmo jogo e nem temos uma emulação do ambiente, mas sim um jogo reescrito que imita o original.
+
+Na emulação, você tem algo real do outro lado que funciona através de alguma máquina virtual. Já na simulação, você tem outra coisa que apenas se comporta de maneira parecida.
+****
+
+É justamente porque simulamos o ambiente de execução real que os testes possuem limitações. Mas podemos transpor essas limitações ao escrever testes. O código de teste tem como finalidade testar o código que irá para a produção, mas o código de produção deverá ser executado sem necessariamente saber da existência do código de testes.
+
+== Onde os testes residem? Onde eles são executados?
+
+A primeira grande característica dos testes de software é que em cada projeto existem dois tipos de código importantes. O código de produção e o código de testes possuem finalidades diferentes: o primeiro implementa as funcionalidades da aplicação; o segundo garante que essas funcionalidades se mantenham durante a evolução do software.
+
+Talvez você já tenha se perguntado se testar não é responsabilidade de uma equipe especializada. Sim! Em algumas empresas existem equipes especializadas, mas quando escrevemos testes queremos garantir que nossas alterações não quebrem outras regras de negócio que nem sequer conhecemos.
+
+Vamos imaginar que você implemente a funcionalidade A e escreva os testes que garantam que A funcione corretamente. Anos depois, você pode voltar ao mesmo projeto para implementar uma funcionalidade B, sem nem se lembrar quais eram as regras da funcionalidade A. Os testes da funcionalidade A estarão lá para garantir que ela continue funcionando, mesmo que você altere a base de código. E, caso exista uma equipe de testes e você tenha um bom conjunto de testes para A, eles poderão se focar nos testes da funcionalidade B.
+
+Ambos os códigos são importantes, mas, como têm objetivos distintos, podem, e devem, ser mantidos separados dentro do mesmo repositório. O código de testes deve conhecer o código de produção e executá-lo. Já o código de produção não deve conhecer nem ter as mesmas dependências do código de testes, mas isso não implica que seu design não esteja ciente da existência de testes. Vale lembrar que o código de produção será enviado para a produção sem o código de testes, por isso essa separação pode ser física.
+
+[sidebar]
+.Como funciona a separação física em projetos Java com Maven?
+****
+O Maven é a ferramenta de build mais comum no mundo Java. Ela funciona usando o princípio da https://pt.wikipedia.org/wiki/Conven%C3%A7%C3%A3o_sobre_configura%C3%A7%C3%A3o[Convenção sobre configuração (Convention over Configuration — CoC)]. Ou seja, um desenvolvedor não precisa configurar tudo do projeto, podendo apenas usar a convenção já existente. E a separação entre código de testes e código de produção é parte dessa convenção.
+
+Todo o código de uma aplicação construída com Maven reside no diretório `src`, mas esse diretório é dividido de acordo com o objetivo do código: `src/main` é a pasta onde os códigos de produção devem residir, e `src/test` é a pasta onde o código de teste será escrito.
+
+Caso deseje, abra um projeto Java com Maven e verifique que existem duas pastas com código: `src/main` e `src/test`. Na primeira fica todo o código que será usado no produto, na produção. Na segunda, a implementação dos testes que testarão o código de produção. Ambos possuem também um conjunto diferente de dependências.
+
+.Exemplo de estrutura de diretório criada automaticamente pelo Maven.
+[source,txt]
+----
+meu-projeto
+├── pom.xml                           ## Definição do projeto
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── exemplo
+    │               └─── App.java     ## Código de produção
+    └── test
+        └── java
+            └── com
+                └── exemplo
+                    └─── AppTest.java ## Código de testes
+----
+
+Você também notará que existem outras subpastas antes do código em si. Você pode ter, por exemplo, `src/main/java` para códigos Java, `src/main/resources` para arquivos que não serão compilados, ou, caso tenha outras linguagens no mesmo projeto, poderá ter os arquivos em pastas diferentes, como `src/main/scala` em https://docs.scala-lang.org/tutorials/scala-with-maven.html[projetos Scala] ou `src/main/kotlin` https://kotlinlang.org/docs/maven-configure-project.html#set-jdk-version[para Kotlin], etc.
+****
+
+Como já falamos, essa separação física não torna o código de testes um cidadão de segunda classe; pelo contrário, ele pode e deve influenciar o design do código de produção. Apesar de o código de produção não depender dos testes, ele deverá ser escrito com a consciência de que será testado *em um ambiente limitado*.
+
+Agora que já entendemos a diferença entre código de testes e código de produção, podemos fazer outras perguntas que nos guiarão. A principal delas é: quais são as reais limitações desse ambiente de testes? Como elas podem nos direcionar a escrever bons testes? Como elas podem impactar o design do código de produção?
+
+Para responder a essas perguntas, precisamos identificar e discutir as limitações desse ambiente. Fiz uma pequena lista e quero discutir cada limitação. Os testes são limitados devido a suas dependências, e elas nem sempre são de código. Podemos classificar as dependências como:
+
+1. Dependências dos Frameworks
+2. Dependências de Sistemas Externos
+3. Dependências do Sistema Operacional
+4. Dependências Temporais
+5. Dependências com o Schema do banco de produção
+
+Cada uma dessas dependências impõe um desafio para a escrita de testes, que pode ser contornado com soluções engenhosas. A solução mais óbvia pode parecer o uso de mocks e stubs, mas aí simulamos e não emulamos o ambiente real de produção. Quero discutir cada limitação através do design de código e do sábio uso de frameworks, para que possamos escrever testes eficazes.
+
+=== Como resolver as dependências de Frameworks?
+
+Frameworks são bibliotecas especiais que usam o nosso código, em vez de nós usarmos eles. Quando desenvolvemos usando bibliotecas, conseguimos controlar o código da biblioteca. Mas, quando desenvolvemos usando frameworks, temos acesso apenas a interfaces e anotações de código que dizem ao framework como usar nosso código. Na maioria das vezes que usamos frameworks, não temos acesso ao código que vai para a produção, mas apenas a um conjunto limitado de bibliotecas.
+
+Por exemplo, se vamos desenvolver uma API REST usando Spring, criamos uma classe e um método e os anotamos para que o framework entenda o nosso código e consiga usá-lo em tempo de execução. O mesmo acontece quando usamos frameworks que seguem as especificações Jakarta EE. Aliás, se você reparar nos exemplos abaixo, verá que o código é bem parecido até!
+
+Abaixo escrevo dois exemplos fáceis de se encontrar em projetos e que são grandes desafios para testes. O primeiro desafio é que não temos como saber como a classe `UserRepository` é implementada, ou como o acesso à base de dados é feito. O segundo desafio é que testamos até a interface entre o nosso código e o framework, não sabendo como o framework usará o resultado retornado por `UserResponse` ou como ele lidará com exceções.
+
+.Exemplo de endpoint REST com Spring Boot. A injeção do UserRepository e o mapeamento das respostas são controlados pelo framework, fora do nosso alcance nos testes.
+[source,java]
+----
+@RestController
+public class CreateUserEndpoint {
+    @Autowired
+    private UserRepository userRepository;
+
+    @RequestMapping(value = "/cliente", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody UserResponse create(@Valid @RequestBody CreateUserRequest request) {
+        // [implementação omitida]
+    }
+}
+----
+
+.Exemplo de endpoint REST com Jakarta EE. A estrutura é quase idêntica à do Spring, e o desafio para testar é o mesmo: não temos controle sobre como o framework instancia e gerencia esses objetos.
+[source,java]
+----
+@Path("/user")
+@ApplicationScoped
+public class CreateUserEndpoint {
+    @Inject
+    private UserRepository userRepository;
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ResponseStatus(Response.Status.CREATED)
+    public UserResponse create(@Valid CreateUserRequest request) {
+        // [implementação omitida]
+    }
+}
+----
+
+Os dois trechos de código acima nos trazem duas limitações. Não podemos, durante os testes, instanciar a classe `CreateUserEndpoint` porque ela depende da implementação de `UserRepository` e não sabemos como o framework vai usar essa mesma classe. Uma solução imatura seria usar a classe diretamente em testes através de mocks.
+
+O teste abaixo é um dos exemplos mais comuns para esse tipo de classe. Além de ser verboso, ele exige a configuração de mocks e a alteração, por reflexão, do valor do campo `userRepository`. Há um acoplamento entre a implementação da classe `CreateUserEndpoint` e o seu teste `CreateUserEndpointTest`. Apesar de esse tipo de teste ser comum, ele reflete uma das limitações antigas do Java que dificultava a identificação dos parâmetros no construtor.
+
+.Teste problemático: uso de reflexão para injetar o mock e verificação excessiva com `ArgumentCaptor`
+[source,java]
+----
+@ExtendWith(MockitoExtension.class)
+class CreateUserEndpointTest {
+
+    @Mock
+    private UserRepository userRepository;
+    private CreateUserEndpoint endpoint;
+
+    @BeforeEach
+    void setUp() {
+        endpoint = new CreateUserEndpoint();
+        try {
+            var field = CreateUserEndpoint.class.getDeclaredField("userRepository");
+            field.setAccessible(true);
+            field.set(endpoint, userRepository);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Test
+    void shouldCreateUserAndReturnResponse() {
+        // Dado um request válido
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        // Simula o comportamento do repositório (ex.: salvando e retornando o usuário com ID)
+        User savedUser = new User(1L, request.getName(), request.getEmail());
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // Quando o endpoint é chamado
+        UserResponse response = endpoint.create(request);
+
+        // Então a resposta deve conter os dados esperados
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.name()).isEqualTo("João Silva");
+        assertThat(response.email()).isEqualTo("joao@email.com");
+
+        // Verifica se o repositório foi chamado com o objeto correto
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(1)).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+        assertThat(capturedUser.getName()).isEqualTo("João Silva");
+        assertThat(capturedUser.getEmail()).isEqualTo("joao@email.com");
+    }
+}
+----
+
+Outra limitação desse teste é que apenas a camada de negócios é testada; a camada de persistência é ignorada por ter sido substituída por um mock, e a camada de apresentação é ignorada porque é plenamente implementada pelo framework. Mas todos esses problemas podem ser contornados.
+
+==== Resolvendo o acoplamento entre Classe de Teste e Classe Testada
+
+Nos frameworks de injeção de dependência mais recentes, podemos implementar a classe sem que o framework precise acessar os campos internos para inicializá-la. Ao usar o construtor público, podemos usá-la nos testes sem depender de reflexão, o que já elimina o acoplamento com o nome da variável.
+
+.Exemplo de endpoint REST com Jakarta EE alterado para que o framework não precise acessar o campo `userRepository`. O mesmo pode ser feito com o exemplo do Spring Boot.
+[source,java]
+----
+@Path("/user")
+@ApplicationScoped
+public class CreateUserEndpoint {
+
+    private final UserRepository userRepository;
+
+    @Inject
+    public CreateUserEndpoint(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public UserResponse create(@Valid CreateUserRequest request) {
+        // [implementação omitida]
+    }
+}
+----
+
+Usando o construtor público, podemos reescrever a nossa classe de testes removendo completamente a reflexão, como vemos abaixo. Agora precisamos ir para o próximo passo e remover a necessidade do uso de mocks.
+
+.Teste refatorado: construtor público elimina a reflexão e reduz o acoplamento entre teste e implementação
+[source,java]
+----
+@ExtendWith(MockitoExtension.class)
+class CreateUserEndpointTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Test
+    void shouldCreateUserAndReturnResponse() {
+        // Dado um request válido
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        // Simula o comportamento do repositório (ex.: salvando e retornando o usuário com ID)
+        User savedUser = new User(1L, request.getName(), request.getEmail());
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        // Quando o endpoint é chamado
+        CreateUserEndpoint endpoint = new CreateUserEndpoint(userRepository);
+        UserResponse response = endpoint.create(request);
+
+        // Então a resposta deve conter os dados esperados
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.name()).isEqualTo("João Silva");
+        assertThat(response.email()).isEqualTo("joao@email.com");
+
+        // Verifica se o repositório foi chamado com o objeto correto
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(1)).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+        assertThat(capturedUser.getName()).isEqualTo("João Silva");
+        assertThat(capturedUser.getEmail()).isEqualTo("joao@email.com");
+    }
+}
+----
+
+==== Delegando os mocks para os frameworks
+
+O próximo passo no retrabalho desse teste é delegar o mock da camada de persistência para o framework. Até o momento, criávamos mocks usando a biblioteca Mockito, mas essa abordagem não é boa por diversos motivos.
+
+O primeiro problema com essa abordagem é que o comportamento do mock é definido na classe de testes e não tem nenhuma aderência à implementação da classe. Mocks podem ser bastante úteis, mas eles trazem a lógica da classe para dentro da classe de testes, replicando, de certa forma, código.
+
+O segundo problema é que nem sempre conseguimos capturar o comportamento real do banco. Por exemplo, em consultas do Hibernate, quando não há resultados, o framework lança uma exceção. Eu sempre tento não usar esse comportamento, preferindo retornar uma lista vazia ou com apenas um item em vez de lançar uma exceção. Prefiro essa abordagem porque sei que lançar exceções é extremamente caro em termos de tempo de execução; logo, ao pedir uma lista com apenas um resultado, economizo tempo.
+
+Agora imagine que eu tenha o método `findUserByUsername` dentro da classe `UserRepository` e descubra, depois de algum tempo do código em produção, que podemos reduzir a latência média ao mudar a forma como fazemos a query. Se eu mudar a implementação, quantos testes preciso refatorar? Se a lógica do método `findUserByUsername` está implementada por mocks, preciso revisar todos os mocks. Mas existe um jeito de delegar para o framework?
+
+SIM! Basta conhecermos a forma como devemos escrever testes para os frameworks. No Spring, podemos usar a anotação `@SpringBootTest`, que nos permite ver a classe de testes como uma classe gerenciada pelo framework. No Quarkus, que é compatível com Jakarta EE, podemos usar a anotação `@QuarkusTest`. Caso eu tenha um outro framework que implemente as especificações Jakarta EE, posso usar o próprio framework ou prover uma solução usando Weld ou uma extensão do JUnit. Ainda falaremos sobre extensões do JUnit.
+
+.Teste de integração com Spring Boot: repositório real e rollback transacional
+[source,java]
+----
+@SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@Transactional  // garante rollback ao final de cada teste
+class CreateUserEndpointTest {
+
+    @Autowired
+    private CreateUserEndpoint endpoint;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    void shouldCreateUserAndReturnResponse() {
+        // Dado um request válido
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        // Quando o endpoint é chamado
+        UserResponse response = endpoint.create(request);
+
+        // Então a resposta deve conter os dados esperados
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isNotNull();  // o ID é gerado pelo banco
+        assertThat(response.name()).isEqualTo("João Silva");
+        assertThat(response.email()).isEqualTo("joao@email.com");
+
+        // Verifica se o usuário foi realmente persistido no banco
+        User savedUser = userRepository.findById(response.id()).orElseThrow();
+        assertThat(savedUser.getName()).isEqualTo("João Silva");
+        assertThat(savedUser.getEmail()).isEqualTo("joao@email.com");
+    }
+}
+----
+
+.Teste de integração com Quarkus: repositório real e rollback
+[source,java]
+----
+@QuarkusTest
+class CreateUserEndpointTest {
+
+    @Inject
+    CreateUserEndpoint endpoint;
+
+    @Inject
+    UserRepository userRepository;
+
+    @Test
+    @Transactional  // garante rollback (ou use @TestTransaction do Quarkus)
+    void shouldCreateUserAndReturnResponse() {
+        // Dado um request válido
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        // Quando o endpoint é chamado
+        UserResponse response = endpoint.create(request);
+
+        // Então a resposta deve conter os dados esperados
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isNotNull();
+        assertThat(response.name()).isEqualTo("João Silva");
+        assertThat(response.email()).isEqualTo("joao@email.com");
+
+        // Verifica se o usuário foi persistido
+        User savedUser = userRepository.findById(response.id());
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getName()).isEqualTo("João Silva");
+        assertThat(savedUser.getEmail()).isEqualTo("joao@email.com");
+    }
+}
+----
+
+Nesses dois exemplos, não dependemos de mocks; usamos diretamente as implementações fornecidas pelo framework para a camada de persistência. Mas o teste ainda não está bom, pois não conseguimos validar a camada de apresentação.
+
+==== Garantindo todas as funcionalidades ao usar o framework
+
+Há muitas funcionalidades que ainda não são validadas pelos testes, e agora precisamos cobrir todas elas. A primeira delas são as validações da requisição, delegadas ao Jakarta Bean Validation. A anotação `@Valid` indica ao framework que a classe `CreateUserRequest` deve ter uma lógica de validação. Podemos supor que a implementação da classe é definida abaixo.
+
+.View Object (VO) de requisição com validações Jakarta Bean Validation
+[source,java]
+----
+public record CreateUserRequest(@NotBlank(message = "Nome é obrigatório")
+                                String name,
+                                @NotBlank(message = "Email é obrigatório")
+                                @Email(message = "Email deve ser válido")
+                                String email) {
+}
+----
+
+Caso uma dessas anotações seja alterada, a lógica de criação de usuários pode mudar. Podemos, por exemplo, deixar de responder 400 quando o campo email é vazio e responder 500 porque uma exceção do banco de dados não foi tratada. Essa mudança de comportamento pode trazer resultados inesperados para o usuário final.
+
+Mas como podemos validar isso? SIM, É POSSÍVEL! Basta conhecermos os frameworks.
+
+O que queremos testar são os aspectos do código. Aspectos são comportamentos ortogonais à lógica de negócios. Normalmente, são funcionalidades tão comuns que não precisam ser reimplementadas constantemente. Nos frameworks web modernos, podemos dizer que o protocolo HTTP, a validação das requisições e até as consultas ao banco de dados são aspectos.
+
+Se fôssemos implementar as validações da requisição `CreateUserRequest`, teríamos várias linhas de código replicadas em diversos métodos, que se resumem a 3 anotações. Se delegamos a implementação dessas anotações para o framework, podemos também delegar o teste das mesmas! Mas, para isso, precisamos mudar a interface de testes. Em vez de usarmos a interface da classe `CreateUserEndpoint`, devemos usar o nosso código como uma caixa-preta e testar a interface web. Podemos fazer isso usando `TestRestTemplate` ou `WebTestClient` no Spring; no Quarkus, a integração com REST Assured é nativa.
+
+Veja como podemos reescrever os testes abaixo. Se uma das anotações for removida, um dos testes vai quebrar, indicando que a lógica de validação mudou. Com isso, garantimos até mesmo comportamentos que não são implementados pelo nosso código.
+
+.Teste de contrato HTTP com Spring Boot e TestRestTemplate
+[source,java]
+----
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@ActiveProfiles("test")
+@Transactional
+class CreateUserEndpointTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private final String BASE_URL = "/api/users"; // ajuste para sua rota
+
+    @Test
+    void shouldCreateUserAndReturnResponse() {
+        // Dado
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        // Quando chamamos o endpoint REST de fato
+        ResponseEntity<UserResponse> response = restTemplate.postForEntity(BASE_URL, request, UserResponse.class);
+
+        // Então: valida HTTP, resposta JSON e persistência
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        UserResponse body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.id()).isNotNull();
+        assertThat(body.name()).isEqualTo("João Silva");
+        assertThat(body.email()).isEqualTo("joao@email.com");
+
+        // Valida no banco real
+        User persisted = userRepository.findByEmail("joao@email.com")
+                .orElseThrow();
+        assertThat(persisted.getName()).isEqualTo("João Silva");
+        assertThat(persisted.getEmail()).isEqualTo("joao@email.com");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenNameIsBlank() {
+        // Request inválido (nome null/vazio)
+        CreateUserRequest invalidRequest = new CreateUserRequest("", "joao@email.com");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(BASE_URL, invalidRequest, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        // Opcional: validar corpo do erro (ex: "nome não pode estar em branco")
+        Map<String, Object> errorBody = response.getBody();
+        assertThat(errorBody).isNotNull();
+        // Exemplo para Spring Validation Errors
+        assertThat(errorBody.toString()).contains("name");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenEmailIsInvalid() {
+        CreateUserRequest invalidRequest = new CreateUserRequest("João", "email_invalido");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(BASE_URL, invalidRequest, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+}
+----
+
+.Teste de contrato HTTP com Quarkus e REST Assured
+[source,java]
+----
+@QuarkusTest
+@TestTransaction
+class CreateUserEndpointTest {
+
+    @Inject
+    UserRepository userRepository; // Panache ou JPA real
+
+    private final String BASE_PATH = "/api/users"; // ajuste
+
+    @Test
+    void shouldCreateUserAndReturnResponse() {
+        CreateUserRequest request = new CreateUserRequest("João Silva", "joao@email.com");
+
+        given().contentType(ContentType.JSON)
+               .body(request)
+        .when().post(BASE_PATH)
+        .then().statusCode(201)
+               .body("id", notNullValue())
+               .body("name", equalTo("João Silva"))
+               .body("email", equalTo("joao@email.com"));
+
+        // Valida no banco real
+        User persisted = userRepository.find("email", "joao@email.com").firstResult();
+        assertThat(persisted).isNotNull();
+        assertThat(persisted.getName()).isEqualTo("João Silva");
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenNameIsBlank() {
+        CreateUserRequest invalidRequest = new CreateUserRequest("", "joao@email.com");
+
+        given().contentType(ContentType.JSON)
+               .body(invalidRequest)
+        .when().post(BASE_PATH)
+        .then().statusCode(400)
+               .body(containsString("name")); // valida que a mensagem de erro menciona o campo
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenEmailIsInvalid() {
+        CreateUserRequest invalidRequest = new CreateUserRequest("João", "email_invalido");
+
+        given().contentType(ContentType.JSON)
+               .body(invalidRequest)
+        .when().post(BASE_PATH)
+        .then().statusCode(400);
+    }
+}
+----
+
+Usando o framework para testar, conseguimos eliminar a dependência do próprio framework. Não que não dependamos dele nos testes, mas, ao depender dele, testamos o comportamento por ele implementado. Observe que, nos dois casos, a interface que testamos é a aplicação e não a classe `CreateUserEndpoint`.
+
+=== Como resolver as dependências de Sistemas Externos?
+
+Sistemas externos são uma grande complicação. Quero deixar claro que esse é um dos maiores problemas para testes de aplicações. Mas existem três cenários possíveis: (i) o sistema pode estar disponível por uma imagem Docker, (ii) o sistema pode estar disponível por uma instância de testes, ou (iii) o sistema pode não estar disponível.
+
+==== Como fazer quando dependo de uma imagem Docker?
+
+A solução mais fácil quando se depende de uma imagem Docker é usar um framework para construir essa infraestrutura. O https://testcontainers.com/[Testcontainers] é o framework perfeito para essa solução, mas ela também pode ser feita pelo próprio JUnit, como veremos no final.
+
+Com o Testcontainers, podemos usar a implementação real de sistemas dos quais temos apenas a imagem Docker. O framework permite configurar variáveis de ambiente e até volumes, de forma que podemos simular ambientes de execução bem próximos do real. Os exemplos abaixo foram extraídos da própria documentação do Testcontainers.
+
+No primeiro exemplo, criamos um teste para Spring Boot que usa Kafka. Já no segundo, configuramos uma instância do https://www.cockroachlabs.com/[CockroachDB] diretamente no ciclo de vida de uma aplicação Quarkus. Em ambos os casos, usamos imagens que a biblioteca padrão do Testcontainers implementa, mas a biblioteca também dá suporte a qualquer imagem Docker.
+
+.Teste de integração com Spring Boot e Kafka usando Testcontainers
+[source,java]
+----
+@SpringBootTest
+@TestPropertySource(properties = { "spring.kafka.consumer.auto-offset-reset=earliest",
+                                   "spring.datasource.url=jdbc:tc:mysql:8.0.32:///db"})
+@Testcontainers
+class ProductPriceChangedEventHandlerTest {
+
+  @Container
+  static final KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.1"));
+
+  @DynamicPropertySource
+  static void overrideProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+  }
+
+  @Autowired
+  private KafkaTemplate<String, Object> kafkaTemplate;
+
+  @Autowired
+  private ProductRepository productRepository;
+
+  @BeforeEach
+  void setUp() {
+    Product product = new Product(null, "P100", "Product One", BigDecimal.TEN);
+    productRepository.save(product);
+  }
+
+  @Test
+  void shouldHandleProductPriceChangedEvent() {
+    ProductPriceChangedEvent event = new ProductPriceChangedEvent(
+      "P100",
+      new BigDecimal("14.50")
+    );
+
+    kafkaTemplate.send("product-price-changes", event.productCode(), event);
+
+    await().pollInterval(Duration.ofSeconds(3))
+           .atMost(10, SECONDS)
+           .untilAsserted(() -> {
+                                  Optional<Product> optionalProduct = productRepository.findByCode(
+                                    "P100"
+                                  );
+                                  assertThat(optionalProduct).isPresent();
+                                  assertThat(optionalProduct.get().getCode()).isEqualTo("P100");
+                                  assertThat(optionalProduct.get().getPrice())
+                                    .isEqualTo(new BigDecimal("14.50"));
+                                });
+  }
+}
+----
+
+.Recurso de teste para Quarkus com CockroachDB e Testcontainers
+[source,java]
+----
+public class CockroachDBTestResource implements QuarkusTestResourceLifecycleManager {
+
+    CockroachContainer cockroachdb;
+
+    @Override
+    public Map<String, String> start() {
+        cockroachdb = new CockroachContainer("cockroachdb/cockroach:v22.2.0");
+        cockroachdb.start();
+        Map<String, String> conf = new HashMap<>();
+        conf.put("quarkus.datasource.jdbc.url", cockroachdb.getJdbcUrl());
+        conf.put("quarkus.datasource.username", cockroachdb.getUsername());
+        conf.put("quarkus.datasource.password", cockroachdb.getPassword());
+        return conf;
+    }
+
+    @Override
+    public void stop() {
+        cockroachdb.stop();
+    }
+}
+----
+
+Podemos usar o Testcontainers para subir qualquer imagem que precisamos como container. Mas também podemos usar o nosso framework de testes. Sempre recomendo ser um grande usuário da documentação dos frameworks que você usa. Ainda falaremos do JUnit, mas, se você usa outro framework, pesquise como estender o ciclo de vida de um teste e implemente manualmente, se necessário.
+
+==== Como fazer quando dependo de uma instância de testes?
+
+Toda vez que alguém me diz que preciso depender de um serviço externo que não posso instanciar localmente, pergunto se o serviço me fornece um sandbox. Quando o serviço é uma especificação genérica, como um SMTP, podemos usar um sandbox genérico. Para um serviço de email, sugiro o https://mailtrap.io/[mailtrap]. Mas e quando tenho apenas um endpoint que varia entre a produção e o ambiente de testes?
+
+Nesses casos, não precisamos alterar nada nos nossos testes. Podemos simplesmente alterar as configurações dos testes, e isso pode ser feito de forma bem simples, apenas sobrescrevendo o arquivo de configuração dos testes.
+
+Vamos ver como configurar isso na prática, usando os mesmos frameworks que vimos até agora.
+
+===== Configurando a instância de testes no Spring Boot
+
+No Spring Boot, a maneira mais idiomática é usar perfis (profiles). Crie um arquivo `application-test.yml` (ou `.properties`) dentro do diretório `src/test/resources`. Ele será carregado automaticamente quando o perfil `test` estiver ativo.
+
+Suponha que, no seu `application.yml` de produção, você tenha:
+
+.Configuração da API externa no ambiente de produção
+[source,yaml]
+----
+external:
+    payment:
+        url: https://api.pagamento.com/v1
+        api-key: ${PAYMENT_API_KEY}
+----
+
+No seu arquivo de teste, você sobrescreve apenas o que precisa:
+
+.Configuração da API externa para o perfil de teste
+[source,yaml]
+----
+external:
+    payment:
+        url: https://sandbox.pagamento.com/v1
+        api-key: sandbox-key-fixa-para-testes
+----
+
+E na sua classe de teste, basta ativar o perfil com `@ActiveProfiles("test")`:
+
+.Teste com sandbox real usando perfil de teste no Spring Boot
+[source,java]
+----
+@SpringBootTest
+@ActiveProfiles("test")
+class PaymentServiceTest {
+
+    @Value("${external.payment.url}")
+    private String paymentUrl; // Agora aponta para a sandbox
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Test
+    void shouldProcessPaymentInSandbox() {
+        // Gera um ID único para evitar colisões na sandbox
+        String transactionId = UUID.randomUUID().toString();
+        PaymentRequest request = new PaymentRequest(transactionId, 150.0);
+
+        PaymentResponse response = paymentService.process(request);
+
+        assertThat(response.getStatus()).isEqualTo(TransactionStatus.APPROVED);
+    }
+}
+----
+
+Perceba que você não precisa de mocks aqui. A requisição HTTP real vai para o ambiente de homologação do provedor, testando a serialização, os headers de autenticação e o mapeamento da resposta! Tudo de verdade.
+
+===== Configurando a instância de testes no Quarkus
+
+O Quarkus também possui suporte nativo a perfis de configuração, provido pela especificação https://microprofile.io/specifications/config/3-1/[MicroProfile Config]. A lógica é muito parecida com a do Spring: crie um arquivo `application-test.properties` (ou `application-test.yml`) dentro de `src/test/resources`.
+
+No seu código de produção, você usa `@ConfigProperty` normalmente para injetar a configuração:
+
+.Código de produção que injeta a URL da API externa via `@ConfigProperty`
+[source,java]
+----
+@ApplicationScoped
+public class PaymentService {
+
+    @ConfigProperty(name = "external.payment.url")
+    String paymentUrl;
+    // ...
+}
+----
+
+No arquivo de teste, você pode usar o prefixo `%test` para sobrescrever propriedades especificamente para esse perfil:
+
+.Configuração da API externa para o perfil de teste
+[source,properties]
+----
+%test.external.payment.url=https://sandbox.pagamento.com/v1
+%test.external.payment.api-key=sandbox-key-fixa-para-testes
+----
+
+E na classe de teste, utilize `@QuarkusTest` (que já ativa o perfil `test` por padrão) e injete o serviço normalmente:
+
+.Serviço que consome configuração via MicroProfile Config
+[source,java]
+----
+@QuarkusTest
+class PaymentServiceTest {
+
+    @Inject
+    PaymentService paymentService;
+
+    @Test
+    void shouldProcessPaymentInSandbox() {
+        String transactionId = UUID.randomUUID().toString();
+        PaymentRequest request = new PaymentRequest(transactionId, 150.0);
+
+        PaymentResponse response = paymentService.process(request);
+
+        assertThat(response.getStatus()).isEqualTo(TransactionStatus.APPROVED);
+    }
+}
+----
+
+Uma vantagem extra do Quarkus é que, durante os testes, você pode combinar essa abordagem com a anotação `@TestProfile` para criar perfis programáticos, caso precise de lógica condicional mais complexa mas, na maioria dos casos, o arquivo de propriedades já resolve.
+
+==== Como fazer quando o sistema não está disponível?
+
+Agora vemos o caso perfeito para usar a Arquitetura Hexagonal! Hoje ela é muito conhecida, mas é usada mesmo quando desnecessária. Algumas pessoas tendem a usá-la para evitar qualquer dependência de sistemas externos, mesmo quando sabemos que é bem improvável que nosso framework mude e, mesmo quando mudar, isso pouco importa no nosso código. Se formos fazer um https://alistair.cockburn.us/hexagonal-architecture[trabalho arqueológico], a arquitetura hexagonal foi proposta para que possamos não depender de componentes externos que não possam ser emulados localmente. Mas hoje ela é usada genericamente para substituir qualquer dependência, mesmo que isso seja extremamente raro! Eu vejo isso como um plano da Nasa para colonizar planetas inabitáveis: uma solução extremamente custosa e arriscada para um evento improvável.
+
+Como vimos acima, o código do Spring Boot pode ser bem parecido com o do Quarkus. Mas, se precisarmos migrar de um framework para outro, podemos usar ferramentas como o https://docs.openrewrite.org/[OpenRewrite] em vez de confiar na simples funcionalidade find/replace da nossa IDE (mesmo que ela seja suficiente).
+
+Mas e se o nosso sistema não for provido pelo framework? É hora de pensarmos em portas e adaptadores.
+
+A arquitetura hexagonal foi desenvolvida quando os frameworks eram muito imaturos e mecanismos de injeção de dependência e containers não existiam. Tudo deveria ser feito via código de produção, e a solução encontrada foi separar a implementação (_adapters_) da interface (_ports_).
+
+Se você observar direito, todo framework moderno já internaliza a ideia da arquitetura hexagonal. Vamos pegar, por exemplo, como o Quarkus implementa canais de comunicação via mensageria. O framework oferece interfaces próprias para que não dependamos das interfaces externas. Observe no código abaixo que a interface `Emitter` é um `port` que, em ambiente de produção, usará os clientes Kafka, mas, em testes, essas bibliotecas podem ser simuladas e, no caso do consumidor, ele pode ser chamado diretamente.
+
+.Emissão de mensagens com Quarkus SmallRye Reactive Messaging (https://pt.quarkus.io/guides/messaging[Documentação oficial])
+[source,java]
+----
+@ApplicationScoped
+@Path("/")
+public class MyImperativeBean {
+
+   @Channel("prices")
+   Emitter<Double> emitter;
+
+   @GET
+   @Path("/send")
+   public CompletionStage<Void> send(double d) {
+       return emitter.send(d);
+   }
+}
+----
+
+.Processamento de mensagens com Quarkus SmallRye Reactive Messaging (https://pt.quarkus.io/guides/messaging#receiving-messages[Documentação oficial – Recebimento])
+[source,java]
+----
+@ApplicationScoped
+public class MessageProcessingBean {
+
+   @Incoming("source")
+   public void process(String consumedPayload) {
+       // process the payload
+       consumedPayload.toUpperCase();
+   }
+
+}
+----
+
+Mas vamos supor que dependemos de um serviço externo que receberá chamadas via um protocolo complexo que não podemos emular em testes. Podemos criar uma interface chamada `ProtocoloExterno`.
+
+[source,java]
+----
+public interface ProtocoloExterno {
+    ProtocoloResponse process(ProtocoloRequest request);
+}
+----
+
+No Spring, podemos usar normalmente a implementação de `ProtocoloExterno`, mas, nos testes, podemos usar um mock, como no exemplo abaixo:
+
+[source,java]
+----
+// Implementação falsa (para testes)
+@Component
+@Profile("test")  // ativada apenas no perfil "test"
+public class FakeProtocoloExterno implements ProtocoloExterno {
+
+    @Override
+    public ProtocoloResponse process(ProtocoloRequest request) {
+        // ...
+    }
+}
+----
+
+No Quarkus, podemos usar a anotação `@Alternative`, que força o framework a selecionar a opção disponível nos testes.
+
+[source,java]
+----
+@Alternative
+@Priority(1)
+@ApplicationScoped
+public class MockProtocoloExterno implements ProtocoloExterno {
+
+    public ProtocoloResponse process(ProtocoloRequest request) {
+        // ...
+    }
+}
+----
+
+Em ambos os casos, são mocks, mas é a opção que temos. Podemos até implementar a lógica, mas isso também é um mock, sem usar Mockito! Use a sua criatividade para resolver os desafios dos testes.
+
+=== Como resolver as dependências do Sistema Operacional?
+
+Em muitos casos, aplicações são desenvolvidas em um sistema operacional para serem executadas em outros. Já trabalhei com sistemas que dependem exclusivamente de Linux enquanto sou obrigado a trabalhar no Windows. Como fazemos para escrever um código que sobreviva a esse intercâmbio de sistemas?
+
+A primeira resposta vem da própria escrita do código de produção! Devemos confiar mais nas interfaces da nossa linguagem do que no ambiente em que rodamos. Isso implica que operações como `File file = new File(".my-folder/my-file.txt")` não devem ser usadas, uma vez que, no Linux, `/` é entendido como separador de diretório e, no Windows, o mesmo é `\`. O Java, mesmo nas versões mais antigas, já sugeria usar https://docs.oracle.com/javase/8/docs/api/java/io/File.html#pathSeparator[`File.pathSeparator`], ou seja, `File file = new File(".my-folder" + File.separator + "my-file.txt")`. Nas versões mais recentes, podemos usar a classe https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html[`Paths`] e substituir o código por `Paths.get(".my-folder", "my-file.txt")`.
+
+Outra grande dependência de sistema operacional é a quebra de linha. No Linux, a quebra de linha é o caractere `\n`; no Windows, a sequência `\r\n`. Essa é uma característica histórica dos sistemas. Em um, já há a codificação que a quebra de linha pressupõe o retorno ao início da mesma; no outro, não há essa pressuposição.
+
+Por isso, podemos usar a String https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#lineSeparator--[`System.lineSeparator()`] ou o https://docs.oracle.com/javase/tutorial/java/data/numberformat.html[separador `%n` quando se trata de caractere].
+
+=== Como resolver a dependência do tempo?
+
+A dependência temporal também pode ser facilmente resolvida por design, e muitas vezes somos tentados a usar o framework ou o sistema operacional. Não tente apelar para o https://site.mockito.org/[Mockito] ou o https://github.com/powermock/powermock/wiki/mockito[PowerMockito]! Há maneiras mais fáceis de resolver esse problema.
+
+Para isso, vamos mudar o exemplo. Quero agora reutilizar o `Buffer` de https://blog.vepo.dev/posts/entendendo-a-complexidade[Como identificar e controlar a complexidade através de abstrações eficientes?], como podemos ver no trecho de código abaixo.
+
+.Classe `Buffer` original (com dependência direta de `System.nanoTime()`)
+[source,java]
+----
+public class Buffer<K,V> {
+    private List<Record<K,V>> accumulatedMessages;
+    private long lastMessageReceived;
+    private final long processingTimeout;
+    private final int maxBufferSize;
+
+    public Buffer(int maxBufferSize, long processingTimeout) {
+        // inicializar
+    }
+
+    public boolean isReady() {
+        return !accumulatedMessages.isEmpty() && (System.nanoTime() - lastMessageReceived > processingTimeout ||  accumulatedMessages.size() >= maxBufferSize);
+    }
+
+    public boolean isEmpty() {
+        return accumulatedMessages.isEmpty();
+    }
+
+    public List<Record<K,V>> consume() {
+         var consumedMessages = accumulatedMessages;
+         accumulatedMessages = new ArrayList<>();
+         return consumedMessages;
+    }
+}
+----
+
+Qual é o grande problema da classe `Buffer`? Nós dependemos do valor de `processingTimeout`, uma vez que as chamadas ao sistema `System.nanoTime()` não podem ser sobrescritas. Mas será que podemos contornar essa situação?
+
+SIM! Podemos usar a arquitetura hexagonal até para o clock da máquina. O grande problema da nossa classe Buffer é que ela depende do clock da máquina, que não pode ser contornado. Mas essa classe não precisa depender do clock da máquina; podemos fazê-la depender de uma interface proposta por ela mesma.
+
+Observe o código abaixo. Há uma pequena alteração que fará com que o código em produção dependa da chamada ao sistema `System.nanoTime()`, mas, nos testes, podemos ter outra implementação.
+
+.Classe `Buffer` refatorada com `ClockSupplier` (inversão de dependência)
+[source,java]
+----
+public class Buffer<K,V> {
+    public interface ClockSupplier {
+        long currentTime();
+    }
+
+    private List<Record<K,V>> accumulatedMessages;
+    private long lastMessageReceived;
+    private final long processingTimeout;
+    private final int maxBufferSize;
+    private final ClockSupplier clock;
+
+    public Buffer(int maxBufferSize, long processingTimeout) {
+        this(maxBufferSize, processingTimeout, () -> System.nanoTime());
+    }
+
+    public Buffer(int maxBufferSize, long processingTimeout, ClockSupplier clockSupplier) {
+        // inicializar        
+    }
+
+    public boolean isReady() {
+        return !accumulatedMessages.isEmpty() && (clock.currentTime() - lastMessageReceived > processingTimeout ||  accumulatedMessages.size() >= maxBufferSize);
+    }
+
+    public boolean isEmpty() {
+        return accumulatedMessages.isEmpty();
+    }
+
+    public void feed(Record<K,V> record) {
+        this.accumulatedMessages.add(record);
+        this.lastMessageReceived = clock.currentTime(); // reseta o timer a cada nova mensagem
+}
+
+    public List<Record<K,V>> consume() {
+         var consumedMessages = accumulatedMessages;
+         accumulatedMessages = new ArrayList<>();
+         return consumedMessages;
+    }
+}
+----
+
+Com a classe acima, podemos testá-la usando um adapter que avance no tempo conforme a necessidade dos testes. Veja como ficaria a implementação abaixo.
+
+.Teste da classe `Buffer` usando `ClockSupplierMock`
+[source,java]
+----
+class BufferTest {
+    private class ClockSupplierMock implements ClockSupplier {
+        private long currentTime;
+        public ClockSupplierMock() {
+            this.currentTime = 0;
+        }
+
+        @Override
+        public long currentTime() {
+            return this.currentTime;
+        }
+
+        public advance(long time) {
+            this.currentTime += time;
+        }
+    }
+    ClockSupplierMock timeMock = new ClockSupplierMock();
+    Buffer<String, String> buffer = new Buffer<>(15, 1_000, timeMock);
+    buffer.feed(new Record<>("key", "value"));
+    assertFalse(buffer.isReady());
+    timeMock.advance(1_000 + 1);
+    assertTrue(buffer.isReady());
+}
+----
+
+Ao usar uma interface própria, temos o total controle sobre o valor de `System.nano` e toda dependência temporal pode ser resolvida por uma interface acessível.
+
+=== Como resolver a dependência ao Schema do banco de produção?
+
+Por fim, temos a dependência mais complicada! Em muitos sistemas, o Schema do banco de dados é mantido de forma independente do código. Eu mesmo já encontrei situações em que tive que resolver bugs e, ao investigá-los, a única explicação possível era que o banco de dados estivesse sujeito a uma procedure que não estava prevista na base de código.
+
+Esse tipo de bug é muito complexo, porque devemos supor que o código do repositório é um espelho do código de produção, e nada além do código do repositório deve impactar os sistemas de produção. MAS... os sistemas de produção precisam evoluir e, muitas vezes, não conhecemos frameworks que permitam manter a evolução de bases de dados.
+
+Para resolver esse problema, podemos usar frameworks como o https://www.liquibase.com/[`Liquibase`] ou o https://www.baeldung.com/database-migrations-with-flyway[`Flyway`].
+
+Com frameworks de migração de Schema, toda a definição da base de dados fica em um mesmo repositório. Isso evita que alterações sejam feitas sem a ciência do time de desenvolvimento.
+
+== Entendendo o Framework de Testes
+
+Até aqui, supusemos que estamos usando o JUnit, e vamos supor que esse é o nosso framework de escolha. Caso você esteja usando outro, procure as soluções similares.
+
+Quando vamos executar qualquer teste, sempre pensamos no ciclo de vida do teste. Todo teste pertence a uma Suite, ou seja, a um conjunto de testes. A suite de testes pressupõe uma infraestrutura. Ou seja, todos os testes pertencentes a uma mesma suite possuem a mesma infraestrutura. Isso é muito importante, e quero entrar nos meandros da biblioteca JUnit para explicar isso.
+
+Quando vamos executar os testes, primeiro iniciamos a suite de testes, depois executamos teste por teste. Logo, podemos imaginar que existem configurações que devem ser feitas antes da suite, antes de cada teste, depois de cada teste e depois da suite. Essas configurações normalmente são feitas em código.
+
+Para exemplificar, vamos pensar em um software que gere páginas HTML, e alguns testes validam a página web gerada. Para testá-lo, vamos precisar usar uma biblioteca chamada https://www.selenium.dev/[Selenium]. O Selenium instancia e controla um navegador localmente. A operação de abrir o navegador é lenta, mas o navegador pode ser reutilizado dentro de uma mesma suite.
+
+Observe a suite abaixo. Nela, testamos uma aplicação de blogging. Vamos supor que a base de dados já esteja populada. Estamos fazendo três testes usando o Selenium, e a execução deles será bem lenta, uma vez que, para cada teste, uma instância do Chrome é criada.
+
+.Teste com Selenium (versão lenta, criando driver por teste)
+[source,java]
+----
+@QuarkusTest
+class BlogAccessTest {
+    @TestHTTPResource("/")
+    URL url;
+
+    @Test
+    void postDetailTest() {
+        WebDriver driver = new ChromeDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.get(url.toString() + "posts/1"); // assuming a post detail endpoint
+        WebElement txtTitle = driver.findElement(By.cssSelector("h1.title"));
+        assertEquals("Post title", txtTitle.getText());
+
+        WebElement txtAuthor = driver.findElement(By.cssSelector(".author"));
+        assertEquals("Post Author", txtAuthor.getText());
+
+        WebElement txtContent = driver.findElement(By.cssSelector(".content"));
+        assertEquals("Post Content", txtContent.getText());
+        driver.quit();
+    }
+
+    @Test
+    void homePageTest() {
+        WebDriver driver = new ChromeDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.get(url.toString());
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("Blog Posts", heading.getText());
+
+        // Check that at least one post is listed
+        List<WebElement> posts = driver.findElements(By.cssSelector(".post-item"));
+        assertTrue(posts.size() > 0);
+        driver.quit();
+    }
+
+    @Test
+    void aboutPageTest() {
+        WebDriver driver = new ChromeDriver();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        driver.get(url.toString() + "about");
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("About", heading.getText());
+
+        WebElement description = driver.findElement(By.cssSelector(".about-text"));
+        assertEquals("This is a sample blog application.", description.getText());
+        driver.quit();
+    }
+}
+----
+
+Como podemos melhorar a execução desses testes? Como falei, precisamos conhecer o ciclo de vida dos testes dentro do framework usado. No JUnit 5, existem algumas anotações que podem nos ajudar a configurar corretamente os testes: `@BeforeAll`, `@BeforeEach`, `@AfterEach` e `@AfterAll` podem ser usadas para informar ao JUnit que um método deve ser usado dentro do ciclo de vida dos testes. Então, podemos reescrever a suite acima usando o mesmo `ChromeDriver` configurado via `@BeforeAll` e `@AfterAll`.
+
+.Teste com Selenium refatorado usando `@BeforeAll` / `@AfterAll`
+[source,java]
+----
+@QuarkusTest
+class BlogAccessTest {
+    @TestHTTPResource("/")
+    URL url;
+
+    private WebDriver driver;
+    private WebDriverWait wait;
+
+    @BeforeAll
+    void start() {
+        driver = new ChromeDriver();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
+
+    @AfterAll
+    void shutdown() {
+        driver.quit();        
+    }
+
+    @Test
+    void postDetailTest() {        
+        driver.get(url.toString() + "posts/1"); // assuming a post detail endpoint
+        WebElement txtTitle = driver.findElement(By.cssSelector("h1.title"));
+        assertEquals("Post title", txtTitle.getText());
+
+        WebElement txtAuthor = driver.findElement(By.cssSelector(".author"));
+        assertEquals("Post Author", txtAuthor.getText());
+
+        WebElement txtContent = driver.findElement(By.cssSelector(".content"));
+        assertEquals("Post Content", txtContent.getText());
+    }
+
+    @Test
+    void homePageTest() {
+        driver.get(url.toString());
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("Blog Posts", heading.getText());
+
+        // Check that at least one post is listed
+        List<WebElement> posts = driver.findElements(By.cssSelector(".post-item"));
+        assertTrue(posts.size() > 0);
+    }
+
+    @Test
+    void aboutPageTest() {
+        driver.get(url.toString() + "about");
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("About", heading.getText());
+
+        WebElement description = driver.findElement(By.cssSelector(".about-text"));
+        assertEquals("This is a sample blog application.", description.getText());
+    }
+}
+----
+
+O teste parece bem melhor, mas existem formas de melhorar ainda mais? SIM! E a resposta está na primeira linha. Podemos criar extensões, da mesma forma que o Quarkus faz em `@QuarkusTest`. Para fazer isso, precisamos primeiro pensar que tipo de testes são esses. Não devemos criar extensões que apenas olhem para o código, mas que olhem para o caso de uso.
+
+Se estamos escrevendo testes para validar via Selenium, provavelmente é um teste via `Web`. Por isso, vou criar a extensão `WebTest` e, para isso, precisamos definir a anotação `@WebTest` e a extensão `WebTestExtension`. A extensão irá configurar a classe de acordo com a execução dos testes. O método anotado com `@BeforeAll` pode migrar para a implementação da interface `BeforeAllCallback`, e o método anotado com `@AfterAll` para a interface `AfterAllCallback`. Como não queremos lidar com reflexão, vou também usar a interface `ParameterResolver`, que me permitirá injetar parâmetros nos testes.
+
+.Definição da anotação `@WebTest` para metaprogramação
+[source,java]
+----
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith({ QuarkusTest.class, WebTestExtension.class })
+public @interface WebTest {}
+----
+
+.Implementação da extensão `WebTestExtension` (JUnit 5)
+[source,java]
+----
+public class WebTestExtension implements BeforeAllCallback, 
+                                         AfterAllCallback, 
+                                         ParameterResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebTestExtension.class);
+    private WebDriver driver;
+    private WebDriverWait wait;
+    private App app;
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        if (driver != null) {
+            logger.info("Closing Chrome driver...");
+            try {
+                driver.quit();
+            } catch (Exception e) {
+                logger.warn("Chrome driver shutdown failed", e);
+            }
+            driver = null;
+            logger.info("Chrome driver closed!");
+        }
+    }
+
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        driver = ChromeTestDriverFactory.createDriver();
+    }
+
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
+        if (parameterContext.getParameter().getType().isAssignableFrom(WebDriver.class)) {
+            return this.driver;
+        } else if (parameterContext.getParameter().getType().isAssignableFrom(WebDriverWait.class)) {
+            if (Objects.isNull(this.wait)) {
+                this.wait = ChromeTestDriverFactory.createWait(driver);
+            }
+            return this.wait;
+        } else {
+            throw new ParameterResolutionException("Parameter not implemented!!! class=%s".formatted(parameterContext.getParameter().getType()));
+        }
+    }
+
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+            throws ParameterResolutionException {
+        return parameterContext.getParameter().getType().isAssignableFrom(WebDriver.class) ||
+                parameterContext.getParameter().getType().isAssignableFrom(WebDriverWait.class);
+    }
+}
+----
+
+Dessa forma, conseguimos reimplementar a classe de testes sem a necessidade de usar `@BeforeAll` e `@AfterAll`, e toda classe que use o mesmo tipo de teste pode reutilizar nossa extensão apenas adicionando a anotação `@WebTest`.
+
+.Teste final com Selenium usando `@WebTest` e injeção de parâmetros
+[source,java]
+----
+@WebTest
+class BlogAccessTest {
+    @TestHTTPResource("/")
+    URL url;
+
+    @Test
+    void postDetailTest(WebDriver driver, WebDriverWait wait) {        
+        driver.get(url.toString() + "posts/1"); // assuming a post detail endpoint
+        WebElement txtTitle = driver.findElement(By.cssSelector("h1.title"));
+        assertEquals("Post title", txtTitle.getText());
+
+        WebElement txtAuthor = driver.findElement(By.cssSelector(".author"));
+        assertEquals("Post Author", txtAuthor.getText());
+
+        WebElement txtContent = driver.findElement(By.cssSelector(".content"));
+        assertEquals("Post Content", txtContent.getText());
+    }
+
+    @Test
+    void homePageTest(WebDriver driver, WebDriverWait wait) {
+        driver.get(url.toString());
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("Blog Posts", heading.getText());
+
+        // Check that at least one post is listed
+        List<WebElement> posts = driver.findElements(By.cssSelector(".post-item"));
+        assertTrue(posts.size() > 0);
+    }
+
+    @Test
+    void aboutPageTest(WebDriver driver, WebDriverWait wait) {
+        driver.get(url.toString() + "about");
+        WebElement heading = driver.findElement(By.cssSelector("h1"));
+        assertEquals("About", heading.getText());
+
+        WebElement description = driver.findElement(By.cssSelector(".about-text"));
+        assertEquals("This is a sample blog application.", description.getText());
+    }
+}
+----
+
+Conhecendo o framework, conseguimos criar suites de testes mais inteligentes e evitar a duplicação de código. Agora, nossos testes até parecem elegantes, mas eles ainda podem melhorar se construirmos uma linguagem específica para os testes, ou uma DSL.
+
+== Criando uma linguagem específica para os testes (DSL)
+
+Não sei se você já ouviu o termo DSL. DSL significa _Domain Specific Language_ e isso não significa que usaremos uma outra linguagem de programação. Pode até acontecer que frameworks de testes, como o https://cucumber.io/[Cucumber], sugiram usar uma DSL fora da sua linguagem de programação. Mas, em muitos casos, a DSL é nada mais do que um conjunto de funções que elevam o nível do código para evitar tarefas repetidas.
+
+Vamos usar o nosso exemplo dos testes com Selenium: há vários trechos repetidos e altamente acoplados com a implementação. Em toda parte da aplicação, se desejamos verificar o título do post, devemos executar `driver.findElement(By.cssSelector("h1.title"))`, ou seja, se mudarmos a classe da tag do título, precisamos refatorar todo o código de testes. Será que não conseguimos internalizar isso dentro de uma DSL?
+
+Pessoalmente, gosto de criar DSLs fluidas, que podemos ler como um texto. Se você não conhece o padrão de Interfaces Fluentes, leia o post em que Martin Fowler o descreve: https://martinfowler.com/bliki/FluentInterface.html[Fluent Interface].
+
+Então, vou internalizar todo acesso à aplicação dentro da classe `App`. Podemos até remover a necessidade do campo `url` usando `TestHTTPResourceManager.getUri()`.
+
+[source,java]
+----
+public class App {
+    private final WebDriver driver;
+    private final WebDriverWait wait;
+
+    public App(WebDriver driver, WebDriverWait wait) {
+        this.driver = driver;
+        this.wait = wait;
+    }
+
+    public App access() {
+        driver.get(TestHTTPResourceManager.getUri().toString());
+        return this;
+    }
+
+    public App access(String path) {
+        driver.get(TestHTTPResourceManager.getUri().toString() + path);
+        return this;
+    }
+
+    public App thenValidateTitle(Consumer<String> titleValidator) {
+        WebElement txtTitle = driver.findElement(By.cssSelector("h1.title"));
+        titleValidator.accept(txtTitle.getText());
+        return this;
+    }
+
+    public App thenValidateAuthor(Consumer<String> authorValidator) {
+        WebElement txtAuthor = driver.findElement(By.cssSelector(".author"));
+        authorValidator.accept(txtAuthor.getText());
+        return this;
+    }
+
+    public App thenValidateContent(Consumer<String> contentValidator) {
+        WebElement txtContent = driver.findElement(By.cssSelector(".content"));
+        contentValidator.accept(txtContent.getText());
+        return this;
+    }
+}
+----
+
+Além de controlar o acesso à aplicação, podemos também criar uma DSL para configurar o ambiente. Gosto de fazer isso usando os termos da https://cucumber.io/docs/gherkin/reference[DSL Gherkin do Cucumber]: Given, When, Then. Sempre crio uma classe nos meus projetos chamada `Given` que me fornecerá uma forma fácil de criar dados. Se quiser ver um exemplo de um projeto real, o https://github.com/vepo/contraponto/blob/main/src/test/java/dev/vepo/contraponto/shared/Given.java[`Given` da minha plataforma de blogs está disponível].
+
+[source,java]
+----
+public class Given {
+    public class GivenPost {
+        private GivenPost(String title, String author, String content) {
+            // inicializa
+        }
+
+        public Post persiste() {
+            // salva na base e retorna
+        }
+    }
+
+    public GivenPost post(String title, String author, String content) {
+        return new GivenPost(title, author, content);
+    }
+}
+----
+
+Com as classes `App` e `Given`, consigo gerar dados e acessar a aplicação com uma linguagem de alto nível. Veja que, no teste abaixo, podemos quase ler o que o teste está fazendo sem depender de frameworks e detalhes de implementação.
+
+[source,java]
+----
+@WebTest
+class BlogAccessTest {
+
+    @Test
+    void postDetailTest(App app) {     
+        var post = Given.post("Post title", "Post Author", "Post Content")
+                        .persiste();
+        app.access("posts/" + post.getId())
+            .thenValidateTitle(title -> assertEquals("Post title", title))
+            .thenValidateAuthor(author -> assertEquals("Post Author", author))
+            .thenValidateContent(content -> assertEquals("Post Content", content));
+    }
+}
+----
+
+Essa abordagem torna os testes legíveis e nos permite saber exatamente o que está sendo feito, sem nos perdermos em detalhes de implementação.
+
+== Conclusão
+
+Podemos escrever testes de qualidade que garantam o funcionamento da nossa aplicação entre diversos ciclos de desenvolvimento. Aqui, mostramos quais são as limitações de ambientes de testes e diversas formas de contorná-las.
+
+Espero que você possa agora construir testes mais ricos e fluidos.
