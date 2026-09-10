@@ -1,0 +1,1690 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/Quarkus.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-09-10T19:05:38+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/Quarkus.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Escrevendo bons testes</title><link href="https://blog.vepo.dev/posts/escrevendo-bons-testes" rel="alternate" type="text/html" title="Escrevendo bons testes" /><published>2026-08-24T00:00:00+00:00</published><updated>2026-08-24T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-42-00-escrevendo-bons-tests</id><content type="html" xml:base="https://blog.vepo.dev/posts/escrevendo-bons-testes"><![CDATA[<div class="paragraph">
+<p>Você tem dificuldades para escrever testes? Ou seus testes são pouco efetivos, permitindo que bugs não sejam rapidamente identificados? Hoje quero te ensinar a escrever testes de forma eficaz, com dicas práticas. Nós já falamos sobre como controlar a complexidade do código. Mas agora é hora de mudar o escopo: vamos falar de testes.</p>
+</div>
+<div class="paragraph">
+<p>As primeiras perguntas que podem nos vir à mente quando falamos de testes são: quais frameworks usar ou como escrever testes. Muitas vezes, escolhemos os frameworks e já saímos escrevendo os testes com pouca reflexão sobre como os escrever. Por isso, quero começar com o desafio de investigar <strong>as limitações do ambiente onde os testes rodam</strong>. Ao entender essas limitações, poderemos ter uma ideia clara sobre como escrever testes e compreender as escolhas que fazemos ao escrevê-los.</p>
+</div>
+<div class="paragraph">
+<p>Testes naturalmente não são executados no mesmo ambiente que a aplicação de produção roda. Não usamos o mesmo banco de dados, nem o mesmo conjunto de dados. Não temos tempo suficiente para simular certos erros, nem interagimos com os mesmos serviços reais de produção. Muitas vezes, também não contamos com os mesmos recursos de CPU e memória.</p>
+</div>
+<div class="paragraph">
+<p>Em outras palavras, nós não conseguimos <strong>emular</strong> a produção, apenas <strong>simulá-la</strong> e isso traz limitações à forma como testamos. E é interessante entendermos a diferença desses dois termos para compreendermos por que alguns tipos de testes não conseguem identificar problemas reais.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Diferença entre <em>emular</em> e <em>simular</em></div>
+<div class="paragraph">
+<p>Quantas vezes você já jogou um emulador de videogame? Por que esse emulador não se chama simulador? Se você procurar no Google "emulador mario bros" e "simulador mario bros", a resposta será diferente. O primeiro apontará para um emulador de videogame e um conjunto de ROMs, enquanto o segundo apontará para um site com o jogo. <strong>Emular</strong> e <strong>simular</strong> são operações diferentes na computação.</p>
+</div>
+<div class="paragraph">
+<p><strong>Emular</strong> significa construir um sistema que permite atuar exatamente igual ao outro. Quando emulamos um videogame, criamos uma máquina virtual que emula o funcionamento da plataforma, aceitando os mesmos jogos do videogame real. Então, quando você jogava Pokémon no emulador de Game Boy, você usava o mesmo código que o Game Boy usava, e o programa emulava o funcionamento do console em si.</p>
+</div>
+<div class="paragraph">
+<p><strong>Simular</strong> significa construir um sistema que cria um modelo aproximado do sistema original, sem ter as mesmas características ou as mesmas funcionalidades. Uma simulação é sempre inferior ao original. Quando jogamos um simulador de um jogo, como o Pokémon, não estamos jogando o mesmo jogo e nem temos uma emulação do ambiente, mas sim um jogo reescrito que imita o original.</p>
+</div>
+<div class="paragraph">
+<p>Na emulação, você tem algo real do outro lado que funciona através de alguma máquina virtual. Já na simulação, você tem outra coisa que apenas se comporta de maneira parecida.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>É justamente porque simulamos o ambiente de execução real que os testes possuem limitações. Mas podemos transpor essas limitações ao escrever testes. O código de teste tem como finalidade testar o código que irá para a produção, mas o código de produção deverá ser executado sem necessariamente saber da existência do código de testes.</p>
+</div>
+<div class="sect1">
+<h2 id="_onde-os-testes-residem-onde-eles-são-executados">Onde os testes residem? Onde eles são executados?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A primeira grande característica dos testes de software é que em cada projeto existem dois tipos de código importantes. O código de produção e o código de testes possuem finalidades diferentes: o primeiro implementa as funcionalidades da aplicação; o segundo garante que essas funcionalidades se mantenham durante a evolução do software.</p>
+</div>
+<div class="paragraph">
+<p>Talvez você já tenha se perguntado se testar não é responsabilidade de uma equipe especializada. Sim! Em algumas empresas existem equipes especializadas, mas quando escrevemos testes queremos garantir que nossas alterações não quebrem outras regras de negócio que nem sequer conhecemos.</p>
+</div>
+<div class="paragraph">
+<p>Vamos imaginar que você implemente a funcionalidade A e escreva os testes que garantam que A funcione corretamente. Anos depois, você pode voltar ao mesmo projeto para implementar uma funcionalidade B, sem nem se lembrar quais eram as regras da funcionalidade A. Os testes da funcionalidade A estarão lá para garantir que ela continue funcionando, mesmo que você altere a base de código. E, caso exista uma equipe de testes e você tenha um bom conjunto de testes para A, eles poderão se focar nos testes da funcionalidade B.</p>
+</div>
+<div class="paragraph">
+<p>Ambos os códigos são importantes, mas, como têm objetivos distintos, podem, e devem, ser mantidos separados dentro do mesmo repositório. O código de testes deve conhecer o código de produção e executá-lo. Já o código de produção não deve conhecer nem ter as mesmas dependências do código de testes, mas isso não implica que seu design não esteja ciente da existência de testes. Vale lembrar que o código de produção será enviado para a produção sem o código de testes, por isso essa separação pode ser física.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Como funciona a separação física em projetos Java com Maven?</div>
+<div class="paragraph">
+<p>O Maven é a ferramenta de build mais comum no mundo Java. Ela funciona usando o princípio da <a href="https://pt.wikipedia.org/wiki/Conven%C3%A7%C3%A3o_sobre_configura%C3%A7%C3%A3o">Convenção sobre configuração (Convention over Configuration — CoC)</a>. Ou seja, um desenvolvedor não precisa configurar tudo do projeto, podendo apenas usar a convenção já existente. E a separação entre código de testes e código de produção é parte dessa convenção.</p>
+</div>
+<div class="paragraph">
+<p>Todo o código de uma aplicação construída com Maven reside no diretório <code>src</code>, mas esse diretório é dividido de acordo com o objetivo do código: <code>src/main</code> é a pasta onde os códigos de produção devem residir, e <code>src/test</code> é a pasta onde o código de teste será escrito.</p>
+</div>
+<div class="paragraph">
+<p>Caso deseje, abra um projeto Java com Maven e verifique que existem duas pastas com código: <code>src/main</code> e <code>src/test</code>. Na primeira fica todo o código que será usado no produto, na produção. Na segunda, a implementação dos testes que testarão o código de produção. Ambos possuem também um conjunto diferente de dependências.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de estrutura de diretório criada automaticamente pelo Maven.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="txt">meu-projeto
+├── pom.xml                           ## Definição do projeto
+└── src
+    ├── main
+    │   └── java
+    │       └── com
+    │           └── exemplo
+    │               └─── App.java     ## Código de produção
+    └── test
+        └── java
+            └── com
+                └── exemplo
+                    └─── AppTest.java ## Código de testes</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Você também notará que existem outras subpastas antes do código em si. Você pode ter, por exemplo, <code>src/main/java</code> para códigos Java, <code>src/main/resources</code> para arquivos que não serão compilados, ou, caso tenha outras linguagens no mesmo projeto, poderá ter os arquivos em pastas diferentes, como <code>src/main/scala</code> em <a href="https://docs.scala-lang.org/tutorials/scala-with-maven.html">projetos Scala</a> ou <code>src/main/kotlin</code> <a href="https://kotlinlang.org/docs/maven-configure-project.html#set-jdk-version">para Kotlin</a>, etc.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Como já falamos, essa separação física não torna o código de testes um cidadão de segunda classe; pelo contrário, ele pode e deve influenciar o design do código de produção. Apesar de o código de produção não depender dos testes, ele deverá ser escrito com a consciência de que será testado <strong>em um ambiente limitado</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Agora que já entendemos a diferença entre código de testes e código de produção, podemos fazer outras perguntas que nos guiarão. A principal delas é: quais são as reais limitações desse ambiente de testes? Como elas podem nos direcionar a escrever bons testes? Como elas podem impactar o design do código de produção?</p>
+</div>
+<div class="paragraph">
+<p>Para responder a essas perguntas, precisamos identificar e discutir as limitações desse ambiente. Fiz uma pequena lista e quero discutir cada limitação. Os testes são limitados devido a suas dependências, e elas nem sempre são de código. Podemos classificar as dependências como:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Dependências dos Frameworks</p>
+</li>
+<li>
+<p>Dependências de Sistemas Externos</p>
+</li>
+<li>
+<p>Dependências do Sistema Operacional</p>
+</li>
+<li>
+<p>Dependências Temporais</p>
+</li>
+<li>
+<p>Dependências com o Schema do banco de produção</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Cada uma dessas dependências impõe um desafio para a escrita de testes, que pode ser contornado com soluções engenhosas. A solução mais óbvia pode parecer o uso de mocks e stubs, mas aí simulamos e não emulamos o ambiente real de produção. Quero discutir cada limitação através do design de código e do sábio uso de frameworks, para que possamos escrever testes eficazes.</p>
+</div>
+<div class="sect2">
+<h3 id="_como-resolver-as-dependências-de-frameworks">Como resolver as dependências de Frameworks?</h3>
+<div class="paragraph">
+<p>Frameworks são bibliotecas especiais que usam o nosso código, em vez de nós usarmos eles. Quando desenvolvemos usando bibliotecas, conseguimos controlar o código da biblioteca. Mas, quando desenvolvemos usando frameworks, temos acesso apenas a interfaces e anotações de código que dizem ao framework como usar nosso código. Na maioria das vezes que usamos frameworks, não temos acesso ao código que vai para a produção, mas apenas a um conjunto limitado de bibliotecas.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, se vamos desenvolver uma API REST usando Spring, criamos uma classe e um método e os anotamos para que o framework entenda o nosso código e consiga usá-lo em tempo de execução. O mesmo acontece quando usamos frameworks que seguem as especificações Jakarta EE. Aliás, se você reparar nos exemplos abaixo, verá que o código é bem parecido até!</p>
+</div>
+<div class="paragraph">
+<p>Abaixo escrevo dois exemplos fáceis de se encontrar em projetos e que são grandes desafios para testes. O primeiro desafio é que não temos como saber como a classe <code>UserRepository</code> é implementada, ou como o acesso à base de dados é feito. O segundo desafio é que testamos até a interface entre o nosso código e o framework, não sabendo como o framework usará o resultado retornado por <code>UserResponse</code> ou como ele lidará com exceções.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de endpoint REST com Spring Boot. A injeção do UserRepository e o mapeamento das respostas são controlados pelo framework, fora do nosso alcance nos testes.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@RestController</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CreateUserEndpoint</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"/cliente"</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="nc">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
+    <span class="nd">@ResponseStatus</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nd">@ResponseBody</span> <span class="nc">UserResponse</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nd">@RequestBody</span> <span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// [implementação omitida]</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de endpoint REST com Jakarta EE. A estrutura é quase idêntica à do Spring, e o desafio para testar é o mesmo: não temos controle sobre como o framework instancia e gerencia esses objetos.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Path</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CreateUserEndpoint</span> <span class="o">{</span>
+    <span class="nd">@Inject</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@POST</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="nd">@Consumes</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="nd">@ResponseStatus</span><span class="o">(</span><span class="nc">Response</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// [implementação omitida]</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Os dois trechos de código acima nos trazem duas limitações. Não podemos, durante os testes, instanciar a classe <code>CreateUserEndpoint</code> porque ela depende da implementação de <code>UserRepository</code> e não sabemos como o framework vai usar essa mesma classe. Uma solução imatura seria usar a classe diretamente em testes através de mocks.</p>
+</div>
+<div class="paragraph">
+<p>O teste abaixo é um dos exemplos mais comuns para esse tipo de classe. Além de ser verboso, ele exige a configuração de mocks e a alteração, por reflexão, do valor do campo <code>userRepository</code>. Há um acoplamento entre a implementação da classe <code>CreateUserEndpoint</code> e o seu teste <code>CreateUserEndpointTest</code>. Apesar de esse tipo de teste ser comum, ele reflete uma das limitações antigas do Java que dificultava a identificação dos parâmetros no construtor.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste problemático: uso de reflexão para injetar o mock e verificação excessiva com <code>ArgumentCaptor</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ExtendWith</span><span class="o">(</span><span class="nc">MockitoExtension</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Mock</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">CreateUserEndpoint</span> <span class="n">endpoint</span><span class="o">;</span>
+
+    <span class="nd">@BeforeEach</span>
+    <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserEndpoint</span><span class="o">();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="kt">var</span> <span class="n">field</span> <span class="o">=</span> <span class="nc">CreateUserEndpoint</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getDeclaredField</span><span class="o">(</span><span class="s">"userRepository"</span><span class="o">);</span>
+            <span class="n">field</span><span class="o">.</span><span class="na">setAccessible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+            <span class="n">field</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">endpoint</span><span class="o">,</span> <span class="n">userRepository</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Dado um request válido</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Simula o comportamento do repositório (ex.: salvando e retornando o usuário com ID)</span>
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="mi">1L</span><span class="o">,</span> <span class="n">request</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">request</span><span class="o">.</span><span class="na">getEmail</span><span class="o">());</span>
+        <span class="n">when</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">any</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">))).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">savedUser</span><span class="o">);</span>
+
+        <span class="c1">// Quando o endpoint é chamado</span>
+        <span class="nc">UserResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="c1">// Então a resposta deve conter os dados esperados</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Verifica se o repositório foi chamado com o objeto correto</span>
+        <span class="nc">ArgumentCaptor</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">userCaptor</span> <span class="o">=</span> <span class="nc">ArgumentCaptor</span><span class="o">.</span><span class="na">forClass</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">verify</span><span class="o">(</span><span class="n">userRepository</span><span class="o">,</span> <span class="n">times</span><span class="o">(</span><span class="mi">1</span><span class="o">)).</span><span class="na">save</span><span class="o">(</span><span class="n">userCaptor</span><span class="o">.</span><span class="na">capture</span><span class="o">());</span>
+        <span class="nc">User</span> <span class="n">capturedUser</span> <span class="o">=</span> <span class="n">userCaptor</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">capturedUser</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">capturedUser</span><span class="o">.</span><span class="na">getEmail</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Outra limitação desse teste é que apenas a camada de negócios é testada; a camada de persistência é ignorada por ter sido substituída por um mock, e a camada de apresentação é ignorada porque é plenamente implementada pelo framework. Mas todos esses problemas podem ser contornados.</p>
+</div>
+<div class="sect3">
+<h4 id="_resolvendo-o-acoplamento-entre-classe-de-teste-e-classe-testada">Resolvendo o acoplamento entre Classe de Teste e Classe Testada</h4>
+<div class="paragraph">
+<p>Nos frameworks de injeção de dependência mais recentes, podemos implementar a classe sem que o framework precise acessar os campos internos para inicializá-la. Ao usar o construtor público, podemos usá-la nos testes sem depender de reflexão, o que já elimina o acoplamento com o nome da variável.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de endpoint REST com Jakarta EE alterado para que o framework não precise acessar o campo <code>userRepository</code>. O mesmo pode ser feito com o exemplo do Spring Boot.</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Path</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CreateUserEndpoint</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="kd">public</span> <span class="nf">CreateUserEndpoint</span><span class="o">(</span><span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">userRepository</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@POST</span>
+    <span class="nd">@Produces</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="nd">@Consumes</span><span class="o">(</span><span class="nc">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="nc">UserResponse</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nc">CreateUserRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// [implementação omitida]</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usando o construtor público, podemos reescrever a nossa classe de testes removendo completamente a reflexão, como vemos abaixo. Agora precisamos ir para o próximo passo e remover a necessidade do uso de mocks.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste refatorado: construtor público elimina a reflexão e reduz o acoplamento entre teste e implementação</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ExtendWith</span><span class="o">(</span><span class="nc">MockitoExtension</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Mock</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Dado um request válido</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Simula o comportamento do repositório (ex.: salvando e retornando o usuário com ID)</span>
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="o">(</span><span class="mi">1L</span><span class="o">,</span> <span class="n">request</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">request</span><span class="o">.</span><span class="na">getEmail</span><span class="o">());</span>
+        <span class="n">when</span><span class="o">(</span><span class="n">userRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">any</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">))).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">savedUser</span><span class="o">);</span>
+
+        <span class="c1">// Quando o endpoint é chamado</span>
+        <span class="nc">CreateUserEndpoint</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserEndpoint</span><span class="o">(</span><span class="n">userRepository</span><span class="o">);</span>
+        <span class="nc">UserResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="c1">// Então a resposta deve conter os dados esperados</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">1L</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Verifica se o repositório foi chamado com o objeto correto</span>
+        <span class="nc">ArgumentCaptor</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="n">userCaptor</span> <span class="o">=</span> <span class="nc">ArgumentCaptor</span><span class="o">.</span><span class="na">forClass</span><span class="o">(</span><span class="nc">User</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">verify</span><span class="o">(</span><span class="n">userRepository</span><span class="o">,</span> <span class="n">times</span><span class="o">(</span><span class="mi">1</span><span class="o">)).</span><span class="na">save</span><span class="o">(</span><span class="n">userCaptor</span><span class="o">.</span><span class="na">capture</span><span class="o">());</span>
+        <span class="nc">User</span> <span class="n">capturedUser</span> <span class="o">=</span> <span class="n">userCaptor</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">capturedUser</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">capturedUser</span><span class="o">.</span><span class="na">getEmail</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_delegando-os-mocks-para-os-frameworks">Delegando os mocks para os frameworks</h4>
+<div class="paragraph">
+<p>O próximo passo no retrabalho desse teste é delegar o mock da camada de persistência para o framework. Até o momento, criávamos mocks usando a biblioteca Mockito, mas essa abordagem não é boa por diversos motivos.</p>
+</div>
+<div class="paragraph">
+<p>O primeiro problema com essa abordagem é que o comportamento do mock é definido na classe de testes e não tem nenhuma aderência à implementação da classe. Mocks podem ser bastante úteis, mas eles trazem a lógica da classe para dentro da classe de testes, replicando, de certa forma, código.</p>
+</div>
+<div class="paragraph">
+<p>O segundo problema é que nem sempre conseguimos capturar o comportamento real do banco. Por exemplo, em consultas do Hibernate, quando não há resultados, o framework lança uma exceção. Eu sempre tento não usar esse comportamento, preferindo retornar uma lista vazia ou com apenas um item em vez de lançar uma exceção. Prefiro essa abordagem porque sei que lançar exceções é extremamente caro em termos de tempo de execução; logo, ao pedir uma lista com apenas um resultado, economizo tempo.</p>
+</div>
+<div class="paragraph">
+<p>Agora imagine que eu tenha o método <code>findUserByUsername</code> dentro da classe <code>UserRepository</code> e descubra, depois de algum tempo do código em produção, que podemos reduzir a latência média ao mudar a forma como fazemos a query. Se eu mudar a implementação, quantos testes preciso refatorar? Se a lógica do método <code>findUserByUsername</code> está implementada por mocks, preciso revisar todos os mocks. Mas existe um jeito de delegar para o framework?</p>
+</div>
+<div class="paragraph">
+<p>SIM! Basta conhecermos a forma como devemos escrever testes para os frameworks. No Spring, podemos usar a anotação <code>@SpringBootTest</code>, que nos permite ver a classe de testes como uma classe gerenciada pelo framework. No Quarkus, que é compatível com Jakarta EE, podemos usar a anotação <code>@QuarkusTest</code>. Caso eu tenha um outro framework que implemente as especificações Jakarta EE, posso usar o próprio framework ou prover uma solução usando Weld ou uma extensão do JUnit. Ainda falaremos sobre extensões do JUnit.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste de integração com Spring Boot: repositório real e rollback transacional</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SpringBootTest</span>
+<span class="nd">@AutoConfigureTestDatabase</span><span class="o">(</span><span class="n">replace</span> <span class="o">=</span> <span class="nc">AutoConfigureTestDatabase</span><span class="o">.</span><span class="na">Replace</span><span class="o">.</span><span class="na">ANY</span><span class="o">)</span>
+<span class="nd">@Transactional</span>  <span class="c1">// garante rollback ao final de cada teste</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">CreateUserEndpoint</span> <span class="n">endpoint</span><span class="o">;</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Dado um request válido</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Quando o endpoint é chamado</span>
+        <span class="nc">UserResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="c1">// Então a resposta deve conter os dados esperados</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isNotNull</span><span class="o">();</span>  <span class="c1">// o ID é gerado pelo banco</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Verifica se o usuário foi realmente persistido no banco</span>
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">.</span><span class="na">findById</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">orElseThrow</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">getEmail</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Teste de integração com Quarkus: repositório real e rollback</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@QuarkusTest</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">CreateUserEndpoint</span> <span class="n">endpoint</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="nd">@Transactional</span>  <span class="c1">// garante rollback (ou use @TestTransaction do Quarkus)</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Dado um request válido</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Quando o endpoint é chamado</span>
+        <span class="nc">UserResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="c1">// Então a resposta deve conter os dados esperados</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Verifica se o usuário foi persistido</span>
+        <span class="nc">User</span> <span class="n">savedUser</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">.</span><span class="na">findById</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">id</span><span class="o">());</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">savedUser</span><span class="o">.</span><span class="na">getEmail</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Nesses dois exemplos, não dependemos de mocks; usamos diretamente as implementações fornecidas pelo framework para a camada de persistência. Mas o teste ainda não está bom, pois não conseguimos validar a camada de apresentação.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_garantindo-todas-as-funcionalidades-ao-usar-o-framework">Garantindo todas as funcionalidades ao usar o framework</h4>
+<div class="paragraph">
+<p>Há muitas funcionalidades que ainda não são validadas pelos testes, e agora precisamos cobrir todas elas. A primeira delas são as validações da requisição, delegadas ao Jakarta Bean Validation. A anotação <code>@Valid</code> indica ao framework que a classe <code>CreateUserRequest</code> deve ter uma lógica de validação. Podemos supor que a implementação da classe é definida abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="title">View Object (VO) de requisição com validações Jakarta Bean Validation</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="n">record</span> <span class="nf">CreateUserRequest</span><span class="o">(</span><span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"Nome é obrigatório"</span><span class="o">)</span>
+                                <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+                                <span class="nd">@NotBlank</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"Email é obrigatório"</span><span class="o">)</span>
+                                <span class="nd">@Email</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"Email deve ser válido"</span><span class="o">)</span>
+                                <span class="nc">String</span> <span class="n">email</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Caso uma dessas anotações seja alterada, a lógica de criação de usuários pode mudar. Podemos, por exemplo, deixar de responder 400 quando o campo email é vazio e responder 500 porque uma exceção do banco de dados não foi tratada. Essa mudança de comportamento pode trazer resultados inesperados para o usuário final.</p>
+</div>
+<div class="paragraph">
+<p>Mas como podemos validar isso? SIM, É POSSÍVEL! Basta conhecermos os frameworks.</p>
+</div>
+<div class="paragraph">
+<p>O que queremos testar são os aspectos do código. Aspectos são comportamentos ortogonais à lógica de negócios. Normalmente, são funcionalidades tão comuns que não precisam ser reimplementadas constantemente. Nos frameworks web modernos, podemos dizer que o protocolo HTTP, a validação das requisições e até as consultas ao banco de dados são aspectos.</p>
+</div>
+<div class="paragraph">
+<p>Se fôssemos implementar as validações da requisição <code>CreateUserRequest</code>, teríamos várias linhas de código replicadas em diversos métodos, que se resumem a 3 anotações. Se delegamos a implementação dessas anotações para o framework, podemos também delegar o teste das mesmas! Mas, para isso, precisamos mudar a interface de testes. Em vez de usarmos a interface da classe <code>CreateUserEndpoint</code>, devemos usar o nosso código como uma caixa-preta e testar a interface web. Podemos fazer isso usando <code>TestRestTemplate</code> ou <code>WebTestClient</code> no Spring; no Quarkus, a integração com REST Assured é nativa.</p>
+</div>
+<div class="paragraph">
+<p>Veja como podemos reescrever os testes abaixo. Se uma das anotações for removida, um dos testes vai quebrar, indicando que a lógica de validação mudou. Com isso, garantimos até mesmo comportamentos que não são implementados pelo nosso código.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste de contrato HTTP com Spring Boot e TestRestTemplate</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">webEnvironment</span> <span class="o">=</span> <span class="nc">SpringBootTest</span><span class="o">.</span><span class="na">WebEnvironment</span><span class="o">.</span><span class="na">RANDOM_PORT</span><span class="o">)</span>
+<span class="nd">@AutoConfigureTestDatabase</span><span class="o">(</span><span class="n">replace</span> <span class="o">=</span> <span class="nc">AutoConfigureTestDatabase</span><span class="o">.</span><span class="na">Replace</span><span class="o">.</span><span class="na">ANY</span><span class="o">)</span>
+<span class="nd">@ActiveProfiles</span><span class="o">(</span><span class="s">"test"</span><span class="o">)</span>
+<span class="nd">@Transactional</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">TestRestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">BASE_URL</span> <span class="o">=</span> <span class="s">"/api/users"</span><span class="o">;</span> <span class="c1">// ajuste para sua rota</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Dado</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Quando chamamos o endpoint REST de fato</span>
+        <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">UserResponse</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForEntity</span><span class="o">(</span><span class="no">BASE_URL</span><span class="o">,</span> <span class="n">request</span><span class="o">,</span> <span class="nc">UserResponse</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+        <span class="c1">// Então: valida HTTP, resposta JSON e persistência</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">);</span>
+        <span class="nc">UserResponse</span> <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">body</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">body</span><span class="o">.</span><span class="na">id</span><span class="o">()).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">body</span><span class="o">.</span><span class="na">name</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">body</span><span class="o">.</span><span class="na">email</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="c1">// Valida no banco real</span>
+        <span class="nc">User</span> <span class="n">persisted</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">.</span><span class="na">findByEmail</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">orElseThrow</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">persisted</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">persisted</span><span class="o">.</span><span class="na">getEmail</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldReturnBadRequestWhenNameIsBlank</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Request inválido (nome null/vazio)</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">invalidRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">""</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForEntity</span><span class="o">(</span><span class="no">BASE_URL</span><span class="o">,</span> <span class="n">invalidRequest</span><span class="o">,</span> <span class="nc">Map</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span><span class="o">);</span>
+        <span class="c1">// Opcional: validar corpo do erro (ex: "nome não pode estar em branco")</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">errorBody</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">errorBody</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="c1">// Exemplo para Spring Validation Errors</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">errorBody</span><span class="o">.</span><span class="na">toString</span><span class="o">()).</span><span class="na">contains</span><span class="o">(</span><span class="s">"name"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldReturnBadRequestWhenEmailIsInvalid</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">invalidRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João"</span><span class="o">,</span> <span class="s">"email_invalido"</span><span class="o">);</span>
+
+        <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">Map</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForEntity</span><span class="o">(</span><span class="no">BASE_URL</span><span class="o">,</span> <span class="n">invalidRequest</span><span class="o">,</span> <span class="nc">Map</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">BAD_REQUEST</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Teste de contrato HTTP com Quarkus e REST Assured</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@QuarkusTest</span>
+<span class="nd">@TestTransaction</span>
+<span class="kd">class</span> <span class="nc">CreateUserEndpointTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">UserRepository</span> <span class="n">userRepository</span><span class="o">;</span> <span class="c1">// Panache ou JPA real</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">BASE_PATH</span> <span class="o">=</span> <span class="s">"/api/users"</span><span class="o">;</span> <span class="c1">// ajuste</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldCreateUserAndReturnResponse</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="n">given</span><span class="o">().</span><span class="na">contentType</span><span class="o">(</span><span class="nc">ContentType</span><span class="o">.</span><span class="na">JSON</span><span class="o">)</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="n">request</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">when</span><span class="o">().</span><span class="na">post</span><span class="o">(</span><span class="no">BASE_PATH</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">then</span><span class="o">().</span><span class="na">statusCode</span><span class="o">(</span><span class="mi">201</span><span class="o">)</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="n">notNullValue</span><span class="o">())</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">equalTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">))</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="s">"email"</span><span class="o">,</span> <span class="n">equalTo</span><span class="o">(</span><span class="s">"joao@email.com"</span><span class="o">));</span>
+
+        <span class="c1">// Valida no banco real</span>
+        <span class="nc">User</span> <span class="n">persisted</span> <span class="o">=</span> <span class="n">userRepository</span><span class="o">.</span><span class="na">find</span><span class="o">(</span><span class="s">"email"</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">).</span><span class="na">firstResult</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">persisted</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">persisted</span><span class="o">.</span><span class="na">getName</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"João Silva"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldReturnBadRequestWhenNameIsBlank</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">invalidRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">""</span><span class="o">,</span> <span class="s">"joao@email.com"</span><span class="o">);</span>
+
+        <span class="n">given</span><span class="o">().</span><span class="na">contentType</span><span class="o">(</span><span class="nc">ContentType</span><span class="o">.</span><span class="na">JSON</span><span class="o">)</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="n">invalidRequest</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">when</span><span class="o">().</span><span class="na">post</span><span class="o">(</span><span class="no">BASE_PATH</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">then</span><span class="o">().</span><span class="na">statusCode</span><span class="o">(</span><span class="mi">400</span><span class="o">)</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="n">containsString</span><span class="o">(</span><span class="s">"name"</span><span class="o">));</span> <span class="c1">// valida que a mensagem de erro menciona o campo</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldReturnBadRequestWhenEmailIsInvalid</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">CreateUserRequest</span> <span class="n">invalidRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CreateUserRequest</span><span class="o">(</span><span class="s">"João"</span><span class="o">,</span> <span class="s">"email_invalido"</span><span class="o">);</span>
+
+        <span class="n">given</span><span class="o">().</span><span class="na">contentType</span><span class="o">(</span><span class="nc">ContentType</span><span class="o">.</span><span class="na">JSON</span><span class="o">)</span>
+               <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="n">invalidRequest</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">when</span><span class="o">().</span><span class="na">post</span><span class="o">(</span><span class="no">BASE_PATH</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">then</span><span class="o">().</span><span class="na">statusCode</span><span class="o">(</span><span class="mi">400</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Usando o framework para testar, conseguimos eliminar a dependência do próprio framework. Não que não dependamos dele nos testes, mas, ao depender dele, testamos o comportamento por ele implementado. Observe que, nos dois casos, a interface que testamos é a aplicação e não a classe <code>CreateUserEndpoint</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-resolver-as-dependências-de-sistemas-externos">Como resolver as dependências de Sistemas Externos?</h3>
+<div class="paragraph">
+<p>Sistemas externos são uma grande complicação. Quero deixar claro que esse é um dos maiores problemas para testes de aplicações. Mas existem três cenários possíveis: (i) o sistema pode estar disponível por uma imagem Docker, (ii) o sistema pode estar disponível por uma instância de testes, ou (iii) o sistema pode não estar disponível.</p>
+</div>
+<div class="sect3">
+<h4 id="_como-fazer-quando-dependo-de-uma-imagem-docker">Como fazer quando dependo de uma imagem Docker?</h4>
+<div class="paragraph">
+<p>A solução mais fácil quando se depende de uma imagem Docker é usar um framework para construir essa infraestrutura. O <a href="https://testcontainers.com/">Testcontainers</a> é o framework perfeito para essa solução, mas ela também pode ser feita pelo próprio JUnit, como veremos no final.</p>
+</div>
+<div class="paragraph">
+<p>Com o Testcontainers, podemos usar a implementação real de sistemas dos quais temos apenas a imagem Docker. O framework permite configurar variáveis de ambiente e até volumes, de forma que podemos simular ambientes de execução bem próximos do real. Os exemplos abaixo foram extraídos da própria documentação do Testcontainers.</p>
+</div>
+<div class="paragraph">
+<p>No primeiro exemplo, criamos um teste para Spring Boot que usa Kafka. Já no segundo, configuramos uma instância do <a href="https://www.cockroachlabs.com/">CockroachDB</a> diretamente no ciclo de vida de uma aplicação Quarkus. Em ambos os casos, usamos imagens que a biblioteca padrão do Testcontainers implementa, mas a biblioteca também dá suporte a qualquer imagem Docker.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste de integração com Spring Boot e Kafka usando Testcontainers</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SpringBootTest</span>
+<span class="nd">@TestPropertySource</span><span class="o">(</span><span class="n">properties</span> <span class="o">=</span> <span class="o">{</span> <span class="s">"spring.kafka.consumer.auto-offset-reset=earliest"</span><span class="o">,</span>
+                                   <span class="s">"spring.datasource.url=jdbc:tc:mysql:8.0.32:///db"</span><span class="o">})</span>
+<span class="nd">@Testcontainers</span>
+<span class="kd">class</span> <span class="nc">ProductPriceChangedEventHandlerTest</span> <span class="o">{</span>
+
+  <span class="nd">@Container</span>
+  <span class="kd">static</span> <span class="kd">final</span> <span class="nc">KafkaContainer</span> <span class="n">kafka</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">KafkaContainer</span><span class="o">(</span><span class="nc">DockerImageName</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"confluentinc/cp-kafka:7.6.1"</span><span class="o">));</span>
+
+  <span class="nd">@DynamicPropertySource</span>
+  <span class="kd">static</span> <span class="kt">void</span> <span class="nf">overrideProperties</span><span class="o">(</span><span class="nc">DynamicPropertyRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">registry</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"spring.kafka.bootstrap-servers"</span><span class="o">,</span> <span class="nl">kafka:</span><span class="o">:</span><span class="n">getBootstrapServers</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Autowired</span>
+  <span class="kd">private</span> <span class="nc">KafkaTemplate</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">kafkaTemplate</span><span class="o">;</span>
+
+  <span class="nd">@Autowired</span>
+  <span class="kd">private</span> <span class="nc">ProductRepository</span> <span class="n">productRepository</span><span class="o">;</span>
+
+  <span class="nd">@BeforeEach</span>
+  <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nc">Product</span> <span class="n">product</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Product</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"P100"</span><span class="o">,</span> <span class="s">"Product One"</span><span class="o">,</span> <span class="nc">BigDecimal</span><span class="o">.</span><span class="na">TEN</span><span class="o">);</span>
+    <span class="n">productRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">product</span><span class="o">);</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Test</span>
+  <span class="kt">void</span> <span class="nf">shouldHandleProductPriceChangedEvent</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nc">ProductPriceChangedEvent</span> <span class="n">event</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ProductPriceChangedEvent</span><span class="o">(</span>
+      <span class="s">"P100"</span><span class="o">,</span>
+      <span class="k">new</span> <span class="nf">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">)</span>
+    <span class="o">);</span>
+
+    <span class="n">kafkaTemplate</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="s">"product-price-changes"</span><span class="o">,</span> <span class="n">event</span><span class="o">.</span><span class="na">productCode</span><span class="o">(),</span> <span class="n">event</span><span class="o">);</span>
+
+    <span class="n">await</span><span class="o">().</span><span class="na">pollInterval</span><span class="o">(</span><span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+           <span class="o">.</span><span class="na">atMost</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="no">SECONDS</span><span class="o">)</span>
+           <span class="o">.</span><span class="na">untilAsserted</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                                  <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Product</span><span class="o">&gt;</span> <span class="n">optionalProduct</span> <span class="o">=</span> <span class="n">productRepository</span><span class="o">.</span><span class="na">findByCode</span><span class="o">(</span>
+                                    <span class="s">"P100"</span>
+                                  <span class="o">);</span>
+                                  <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">).</span><span class="na">isPresent</span><span class="o">();</span>
+                                  <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"P100"</span><span class="o">);</span>
+                                  <span class="n">assertThat</span><span class="o">(</span><span class="n">optionalProduct</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">getPrice</span><span class="o">())</span>
+                                    <span class="o">.</span><span class="na">isEqualTo</span><span class="o">(</span><span class="k">new</span> <span class="nc">BigDecimal</span><span class="o">(</span><span class="s">"14.50"</span><span class="o">));</span>
+                                <span class="o">});</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Recurso de teste para Quarkus com CockroachDB e Testcontainers</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CockroachDBTestResource</span> <span class="kd">implements</span> <span class="nc">QuarkusTestResourceLifecycleManager</span> <span class="o">{</span>
+
+    <span class="nc">CockroachContainer</span> <span class="n">cockroachdb</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">start</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">cockroachdb</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CockroachContainer</span><span class="o">(</span><span class="s">"cockroachdb/cockroach:v22.2.0"</span><span class="o">);</span>
+        <span class="n">cockroachdb</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">conf</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">conf</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"quarkus.datasource.jdbc.url"</span><span class="o">,</span> <span class="n">cockroachdb</span><span class="o">.</span><span class="na">getJdbcUrl</span><span class="o">());</span>
+        <span class="n">conf</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"quarkus.datasource.username"</span><span class="o">,</span> <span class="n">cockroachdb</span><span class="o">.</span><span class="na">getUsername</span><span class="o">());</span>
+        <span class="n">conf</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"quarkus.datasource.password"</span><span class="o">,</span> <span class="n">cockroachdb</span><span class="o">.</span><span class="na">getPassword</span><span class="o">());</span>
+        <span class="k">return</span> <span class="n">conf</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">stop</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">cockroachdb</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Podemos usar o Testcontainers para subir qualquer imagem que precisamos como container. Mas também podemos usar o nosso framework de testes. Sempre recomendo ser um grande usuário da documentação dos frameworks que você usa. Ainda falaremos do JUnit, mas, se você usa outro framework, pesquise como estender o ciclo de vida de um teste e implemente manualmente, se necessário.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_como-fazer-quando-dependo-de-uma-instância-de-testes">Como fazer quando dependo de uma instância de testes?</h4>
+<div class="paragraph">
+<p>Toda vez que alguém me diz que preciso depender de um serviço externo que não posso instanciar localmente, pergunto se o serviço me fornece um sandbox. Quando o serviço é uma especificação genérica, como um SMTP, podemos usar um sandbox genérico. Para um serviço de email, sugiro o <a href="https://mailtrap.io/">mailtrap</a>. Mas e quando tenho apenas um endpoint que varia entre a produção e o ambiente de testes?</p>
+</div>
+<div class="paragraph">
+<p>Nesses casos, não precisamos alterar nada nos nossos testes. Podemos simplesmente alterar as configurações dos testes, e isso pode ser feito de forma bem simples, apenas sobrescrevendo o arquivo de configuração dos testes.</p>
+</div>
+<div class="paragraph">
+<p>Vamos ver como configurar isso na prática, usando os mesmos frameworks que vimos até agora.</p>
+</div>
+<div class="sect4">
+<h5 id="_configurando-a-instância-de-testes-no-spring-boot">Configurando a instância de testes no Spring Boot</h5>
+<div class="paragraph">
+<p>No Spring Boot, a maneira mais idiomática é usar perfis (profiles). Crie um arquivo <code>application-test.yml</code> (ou <code>.properties</code>) dentro do diretório <code>src/test/resources</code>. Ele será carregado automaticamente quando o perfil <code>test</code> estiver ativo.</p>
+</div>
+<div class="paragraph">
+<p>Suponha que, no seu <code>application.yml</code> de produção, você tenha:</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuração da API externa no ambiente de produção</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">external</span><span class="pi">:</span>
+    <span class="na">payment</span><span class="pi">:</span>
+        <span class="na">url</span><span class="pi">:</span> <span class="s">https://api.pagamento.com/v1</span>
+        <span class="na">api-key</span><span class="pi">:</span> <span class="s">${PAYMENT_API_KEY}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No seu arquivo de teste, você sobrescreve apenas o que precisa:</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuração da API externa para o perfil de teste</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">external</span><span class="pi">:</span>
+    <span class="na">payment</span><span class="pi">:</span>
+        <span class="na">url</span><span class="pi">:</span> <span class="s">https://sandbox.pagamento.com/v1</span>
+        <span class="na">api-key</span><span class="pi">:</span> <span class="s">sandbox-key-fixa-para-testes</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E na sua classe de teste, basta ativar o perfil com <code>@ActiveProfiles("test")</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste com sandbox real usando perfil de teste no Spring Boot</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@SpringBootTest</span>
+<span class="nd">@ActiveProfiles</span><span class="o">(</span><span class="s">"test"</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">PaymentServiceTest</span> <span class="o">{</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">"${external.payment.url}"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">paymentUrl</span><span class="o">;</span> <span class="c1">// Agora aponta para a sandbox</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="nc">PaymentService</span> <span class="n">paymentService</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldProcessPaymentInSandbox</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// Gera um ID único para evitar colisões na sandbox</span>
+        <span class="nc">String</span> <span class="n">transactionId</span> <span class="o">=</span> <span class="no">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+        <span class="nc">PaymentRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PaymentRequest</span><span class="o">(</span><span class="n">transactionId</span><span class="o">,</span> <span class="mf">150.0</span><span class="o">);</span>
+
+        <span class="nc">PaymentResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">paymentService</span><span class="o">.</span><span class="na">process</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getStatus</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">TransactionStatus</span><span class="o">.</span><span class="na">APPROVED</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Perceba que você não precisa de mocks aqui. A requisição HTTP real vai para o ambiente de homologação do provedor, testando a serialização, os headers de autenticação e o mapeamento da resposta! Tudo de verdade.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_configurando-a-instância-de-testes-no-quarkus">Configurando a instância de testes no Quarkus</h5>
+<div class="paragraph">
+<p>O Quarkus também possui suporte nativo a perfis de configuração, provido pela especificação <a href="https://microprofile.io/specifications/config/3-1/">MicroProfile Config</a>. A lógica é muito parecida com a do Spring: crie um arquivo <code>application-test.properties</code> (ou <code>application-test.yml</code>) dentro de <code>src/test/resources</code>.</p>
+</div>
+<div class="paragraph">
+<p>No seu código de produção, você usa <code>@ConfigProperty</code> normalmente para injetar a configuração:</p>
+</div>
+<div class="listingblock">
+<div class="title">Código de produção que injeta a URL da API externa via <code>@ConfigProperty</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PaymentService</span> <span class="o">{</span>
+
+    <span class="nd">@ConfigProperty</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"external.payment.url"</span><span class="o">)</span>
+    <span class="nc">String</span> <span class="n">paymentUrl</span><span class="o">;</span>
+    <span class="c1">// ...</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No arquivo de teste, você pode usar o prefixo <code>%test</code> para sobrescrever propriedades especificamente para esse perfil:</p>
+</div>
+<div class="listingblock">
+<div class="title">Configuração da API externa para o perfil de teste</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="err">%</span><span class="py">test.external.payment.url</span><span class="p">=</span><span class="s">https://sandbox.pagamento.com/v1</span>
+<span class="err">%</span><span class="py">test.external.payment.api-key</span><span class="p">=</span><span class="s">sandbox-key-fixa-para-testes</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>E na classe de teste, utilize <code>@QuarkusTest</code> (que já ativa o perfil <code>test</code> por padrão) e injete o serviço normalmente:</p>
+</div>
+<div class="listingblock">
+<div class="title">Serviço que consome configuração via MicroProfile Config</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@QuarkusTest</span>
+<span class="kd">class</span> <span class="nc">PaymentServiceTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">PaymentService</span> <span class="n">paymentService</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldProcessPaymentInSandbox</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">transactionId</span> <span class="o">=</span> <span class="no">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+        <span class="nc">PaymentRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PaymentRequest</span><span class="o">(</span><span class="n">transactionId</span><span class="o">,</span> <span class="mf">150.0</span><span class="o">);</span>
+
+        <span class="nc">PaymentResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">paymentService</span><span class="o">.</span><span class="na">process</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getStatus</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">TransactionStatus</span><span class="o">.</span><span class="na">APPROVED</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Uma vantagem extra do Quarkus é que, durante os testes, você pode combinar essa abordagem com a anotação <code>@TestProfile</code> para criar perfis programáticos, caso precise de lógica condicional mais complexa mas, na maioria dos casos, o arquivo de propriedades já resolve.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_como-fazer-quando-o-sistema-não-está-disponível">Como fazer quando o sistema não está disponível?</h4>
+<div class="paragraph">
+<p>Agora vemos o caso perfeito para usar a Arquitetura Hexagonal! Hoje ela é muito conhecida, mas é usada mesmo quando desnecessária. Algumas pessoas tendem a usá-la para evitar qualquer dependência de sistemas externos, mesmo quando sabemos que é bem improvável que nosso framework mude e, mesmo quando mudar, isso pouco importa no nosso código. Se formos fazer um <a href="https://alistair.cockburn.us/hexagonal-architecture">trabalho arqueológico</a>, a arquitetura hexagonal foi proposta para que possamos não depender de componentes externos que não possam ser emulados localmente. Mas hoje ela é usada genericamente para substituir qualquer dependência, mesmo que isso seja extremamente raro! Eu vejo isso como um plano da Nasa para colonizar planetas inabitáveis: uma solução extremamente custosa e arriscada para um evento improvável.</p>
+</div>
+<div class="paragraph">
+<p>Como vimos acima, o código do Spring Boot pode ser bem parecido com o do Quarkus. Mas, se precisarmos migrar de um framework para outro, podemos usar ferramentas como o <a href="https://docs.openrewrite.org/">OpenRewrite</a> em vez de confiar na simples funcionalidade find/replace da nossa IDE (mesmo que ela seja suficiente).</p>
+</div>
+<div class="paragraph">
+<p>Mas e se o nosso sistema não for provido pelo framework? É hora de pensarmos em portas e adaptadores.</p>
+</div>
+<div class="paragraph">
+<p>A arquitetura hexagonal foi desenvolvida quando os frameworks eram muito imaturos e mecanismos de injeção de dependência e containers não existiam. Tudo deveria ser feito via código de produção, e a solução encontrada foi separar a implementação (<em>adapters</em>) da interface (<em>ports</em>).</p>
+</div>
+<div class="paragraph">
+<p>Se você observar direito, todo framework moderno já internaliza a ideia da arquitetura hexagonal. Vamos pegar, por exemplo, como o Quarkus implementa canais de comunicação via mensageria. O framework oferece interfaces próprias para que não dependamos das interfaces externas. Observe no código abaixo que a interface <code>Emitter</code> é um <code>port</code> que, em ambiente de produção, usará os clientes Kafka, mas, em testes, essas bibliotecas podem ser simuladas e, no caso do consumidor, ele pode ser chamado diretamente.</p>
+</div>
+<div class="listingblock">
+<div class="title">Emissão de mensagens com Quarkus SmallRye Reactive Messaging (<a href="https://pt.quarkus.io/guides/messaging">Documentação oficial</a>)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyImperativeBean</span> <span class="o">{</span>
+
+   <span class="nd">@Channel</span><span class="o">(</span><span class="s">"prices"</span><span class="o">)</span>
+   <span class="nc">Emitter</span><span class="o">&lt;</span><span class="nc">Double</span><span class="o">&gt;</span> <span class="n">emitter</span><span class="o">;</span>
+
+   <span class="nd">@GET</span>
+   <span class="nd">@Path</span><span class="o">(</span><span class="s">"/send"</span><span class="o">)</span>
+   <span class="kd">public</span> <span class="nc">CompletionStage</span><span class="o">&lt;</span><span class="nc">Void</span><span class="o">&gt;</span> <span class="nf">send</span><span class="o">(</span><span class="kt">double</span> <span class="n">d</span><span class="o">)</span> <span class="o">{</span>
+       <span class="k">return</span> <span class="n">emitter</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">d</span><span class="o">);</span>
+   <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Processamento de mensagens com Quarkus SmallRye Reactive Messaging (<a href="https://pt.quarkus.io/guides/messaging#receiving-messages">Documentação oficial – Recebimento</a>)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MessageProcessingBean</span> <span class="o">{</span>
+
+   <span class="nd">@Incoming</span><span class="o">(</span><span class="s">"source"</span><span class="o">)</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">process</span><span class="o">(</span><span class="nc">String</span> <span class="n">consumedPayload</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">// process the payload</span>
+       <span class="n">consumedPayload</span><span class="o">.</span><span class="na">toUpperCase</span><span class="o">();</span>
+   <span class="o">}</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Mas vamos supor que dependemos de um serviço externo que receberá chamadas via um protocolo complexo que não podemos emular em testes. Podemos criar uma interface chamada <code>ProtocoloExterno</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Interface para protocolo externo (porta)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ProtocoloExterno</span> <span class="o">{</span>
+    <span class="nc">ProtocoloResponse</span> <span class="nf">process</span><span class="o">(</span><span class="nc">ProtocoloRequest</span> <span class="n">request</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No Spring, podemos usar normalmente a implementação de <code>ProtocoloExterno</code>, mas, nos testes, podemos usar um mock, como no exemplo abaixo:</p>
+</div>
+<div class="listingblock">
+<div class="title">Implementação alternativa do protocolo externo para testes (Spring Profile)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="c1">// Implementação falsa (para testes)</span>
+<span class="nd">@Component</span>
+<span class="nd">@Profile</span><span class="o">(</span><span class="s">"test"</span><span class="o">)</span>  <span class="c1">// ativada apenas no perfil "test"</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FakeProtocoloExterno</span> <span class="kd">implements</span> <span class="nc">ProtocoloExterno</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">ProtocoloResponse</span> <span class="nf">process</span><span class="o">(</span><span class="nc">ProtocoloRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// ...</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>No Quarkus, podemos usar a anotação <code>@Alternative</code>, que força o framework a selecionar a opção disponível nos testes.</p>
+</div>
+<div class="listingblock">
+<div class="title">Implementação alternativa do protocolo externo para testes (Quarkus @Alternative)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Alternative</span>
+<span class="nd">@Priority</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MockProtocoloExterno</span> <span class="kd">implements</span> <span class="nc">ProtocoloExterno</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="nc">ProtocoloResponse</span> <span class="nf">process</span><span class="o">(</span><span class="nc">ProtocoloRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// ...</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Em ambos os casos, são mocks, mas é a opção que temos. Podemos até implementar a lógica, mas isso também é um mock, sem usar Mockito! Use a sua criatividade para resolver os desafios dos testes.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-resolver-as-dependências-do-sistema-operacional">Como resolver as dependências do Sistema Operacional?</h3>
+<div class="paragraph">
+<p>Em muitos casos, aplicações são desenvolvidas em um sistema operacional para serem executadas em outros. Já trabalhei com sistemas que dependem exclusivamente de Linux enquanto sou obrigado a trabalhar no Windows. Como fazemos para escrever um código que sobreviva a esse intercâmbio de sistemas?</p>
+</div>
+<div class="paragraph">
+<p>A primeira resposta vem da própria escrita do código de produção! Devemos confiar mais nas interfaces da nossa linguagem do que no ambiente em que rodamos. Isso implica que operações como <code>File file = new File(".my-folder/my-file.txt")</code> não devem ser usadas, uma vez que, no Linux, <code>/</code> é entendido como separador de diretório e, no Windows, o mesmo é <code>\</code>. O Java, mesmo nas versões mais antigas, já sugeria usar <a href="https://docs.oracle.com/javase/8/docs/api/java/io/File.html#pathSeparator"><code>File.pathSeparator</code></a>, ou seja, <code>File file = new File(".my-folder" + File.separator + "my-file.txt")</code>. Nas versões mais recentes, podemos usar a classe <a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Paths.html"><code>Paths</code></a> e substituir o código por <code>Paths.get(".my-folder", "my-file.txt")</code>.</p>
+</div>
+<div class="paragraph">
+<p>Outra grande dependência de sistema operacional é a quebra de linha. No Linux, a quebra de linha é o caractere <code>\n</code>; no Windows, a sequência <code>\r\n</code>. Essa é uma característica histórica dos sistemas. Em um, já há a codificação que a quebra de linha pressupõe o retorno ao início da mesma; no outro, não há essa pressuposição.</p>
+</div>
+<div class="paragraph">
+<p>Por isso, podemos usar a String <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#lineSeparator--"><code>System.lineSeparator()</code></a> ou o <a href="https://docs.oracle.com/javase/tutorial/java/data/numberformat.html">separador <code>%n</code> quando se trata de caractere</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-resolver-a-dependência-do-tempo">Como resolver a dependência do tempo?</h3>
+<div class="paragraph">
+<p>A dependência temporal também pode ser facilmente resolvida por design, e muitas vezes somos tentados a usar o framework ou o sistema operacional. Não tente apelar para o <a href="https://site.mockito.org/">Mockito</a> ou o <a href="https://github.com/powermock/powermock/wiki/mockito">PowerMockito</a>! Há maneiras mais fáceis de resolver esse problema.</p>
+</div>
+<div class="paragraph">
+<p>Para isso, vamos mudar o exemplo. Quero agora reutilizar o <code>Buffer</code> de <a href="https://blog.vepo.dev/posts/entendendo-a-complexidade">Como identificar e controlar a complexidade através de abstrações eficientes?</a>, como podemos ver no trecho de código abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="title">Classe <code>Buffer</code> original (com dependência direta de <code>System.nanoTime()</code>)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Buffer</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;&gt;</span> <span class="n">accumulatedMessages</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">long</span> <span class="n">lastMessageReceived</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">processingTimeout</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">maxBufferSize</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Buffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">maxBufferSize</span><span class="o">,</span> <span class="kt">long</span> <span class="n">processingTimeout</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// inicializar</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isReady</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">()</span> <span class="o">-</span> <span class="n">lastMessageReceived</span> <span class="o">&gt;</span> <span class="n">processingTimeout</span> <span class="o">||</span>  <span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="n">maxBufferSize</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmpty</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;&gt;</span> <span class="nf">consume</span><span class="o">()</span> <span class="o">{</span>
+         <span class="kt">var</span> <span class="n">consumedMessages</span> <span class="o">=</span> <span class="n">accumulatedMessages</span><span class="o">;</span>
+         <span class="n">accumulatedMessages</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+         <span class="k">return</span> <span class="n">consumedMessages</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Qual é o grande problema da classe <code>Buffer</code>? Nós dependemos do valor de <code>processingTimeout</code>, uma vez que as chamadas ao sistema <code>System.nanoTime()</code> não podem ser sobrescritas. Mas será que podemos contornar essa situação?</p>
+</div>
+<div class="paragraph">
+<p>SIM! Podemos usar a arquitetura hexagonal até para o clock da máquina. O grande problema da nossa classe Buffer é que ela depende do clock da máquina, que não pode ser contornado. Mas essa classe não precisa depender do clock da máquina; podemos fazê-la depender de uma interface proposta por ela mesma.</p>
+</div>
+<div class="paragraph">
+<p>Observe o código abaixo. Há uma pequena alteração que fará com que o código em produção dependa da chamada ao sistema <code>System.nanoTime()</code>, mas, nos testes, podemos ter outra implementação.</p>
+</div>
+<div class="listingblock">
+<div class="title">Classe <code>Buffer</code> refatorada com <code>ClockSupplier</code> (inversão de dependência)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Buffer</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ClockSupplier</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="nf">currentTime</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;&gt;</span> <span class="n">accumulatedMessages</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">long</span> <span class="n">lastMessageReceived</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">processingTimeout</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">maxBufferSize</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">ClockSupplier</span> <span class="n">clock</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Buffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">maxBufferSize</span><span class="o">,</span> <span class="kt">long</span> <span class="n">processingTimeout</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="n">maxBufferSize</span><span class="o">,</span> <span class="n">processingTimeout</span><span class="o">,</span> <span class="o">()</span> <span class="o">-&gt;</span> <span class="nc">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">Buffer</span><span class="o">(</span><span class="kt">int</span> <span class="n">maxBufferSize</span><span class="o">,</span> <span class="kt">long</span> <span class="n">processingTimeout</span><span class="o">,</span> <span class="nc">ClockSupplier</span> <span class="n">clockSupplier</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// inicializar</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isReady</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">clock</span><span class="o">.</span><span class="na">currentTime</span><span class="o">()</span> <span class="o">-</span> <span class="n">lastMessageReceived</span> <span class="o">&gt;</span> <span class="n">processingTimeout</span> <span class="o">||</span>  <span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="n">maxBufferSize</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isEmpty</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">accumulatedMessages</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">feed</span><span class="o">(</span><span class="nc">Record</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">record</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">accumulatedMessages</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">record</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">lastMessageReceived</span> <span class="o">=</span> <span class="n">clock</span><span class="o">.</span><span class="na">currentTime</span><span class="o">();</span> <span class="c1">// reseta o timer a cada nova mensagem</span>
+<span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Record</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;&gt;</span> <span class="nf">consume</span><span class="o">()</span> <span class="o">{</span>
+         <span class="kt">var</span> <span class="n">consumedMessages</span> <span class="o">=</span> <span class="n">accumulatedMessages</span><span class="o">;</span>
+         <span class="n">accumulatedMessages</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+         <span class="k">return</span> <span class="n">consumedMessages</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Com a classe acima, podemos testá-la usando um adapter que avance no tempo conforme a necessidade dos testes. Veja como ficaria a implementação abaixo.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste da classe <code>Buffer</code> usando <code>ClockSupplierMock</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">class</span> <span class="nc">BufferTest</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">ClockSupplierMock</span> <span class="kd">implements</span> <span class="nc">ClockSupplier</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="kt">long</span> <span class="n">currentTime</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="nf">ClockSupplierMock</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">currentTime</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="kt">long</span> <span class="nf">currentTime</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">currentTime</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nf">advance</span><span class="o">(</span><span class="kt">long</span> <span class="n">time</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">currentTime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="nc">ClockSupplierMock</span> <span class="n">timeMock</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClockSupplierMock</span><span class="o">();</span>
+    <span class="nc">Buffer</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Buffer</span><span class="o">&lt;&gt;(</span><span class="mi">15</span><span class="o">,</span> <span class="mi">1_000</span><span class="o">,</span> <span class="n">timeMock</span><span class="o">);</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="na">feed</span><span class="o">(</span><span class="k">new</span> <span class="nc">Record</span><span class="o">&lt;&gt;(</span><span class="s">"key"</span><span class="o">,</span> <span class="s">"value"</span><span class="o">));</span>
+    <span class="n">assertFalse</span><span class="o">(</span><span class="n">buffer</span><span class="o">.</span><span class="na">isReady</span><span class="o">());</span>
+    <span class="n">timeMock</span><span class="o">.</span><span class="na">advance</span><span class="o">(</span><span class="mi">1_000</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="n">assertTrue</span><span class="o">(</span><span class="n">buffer</span><span class="o">.</span><span class="na">isReady</span><span class="o">());</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ao usar uma interface própria, temos o total controle sobre o valor de <code>System.nano</code> e toda dependência temporal pode ser resolvida por uma interface acessível.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_como-resolver-a-dependência-ao-schema-do-banco-de-produção">Como resolver a dependência ao Schema do banco de produção?</h3>
+<div class="paragraph">
+<p>Por fim, temos a dependência mais complicada! Em muitos sistemas, o Schema do banco de dados é mantido de forma independente do código. Eu mesmo já encontrei situações em que tive que resolver bugs e, ao investigá-los, a única explicação possível era que o banco de dados estivesse sujeito a uma procedure que não estava prevista na base de código.</p>
+</div>
+<div class="paragraph">
+<p>Esse tipo de bug é muito complexo, porque devemos supor que o código do repositório é um espelho do código de produção, e nada além do código do repositório deve impactar os sistemas de produção. MAS&#8230;&#8203; os sistemas de produção precisam evoluir e, muitas vezes, não conhecemos frameworks que permitam manter a evolução de bases de dados.</p>
+</div>
+<div class="paragraph">
+<p>Para resolver esse problema, podemos usar frameworks como o <a href="https://www.liquibase.com/"><code>Liquibase</code></a> ou o <a href="https://www.baeldung.com/database-migrations-with-flyway"><code>Flyway</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Com frameworks de migração de Schema, toda a definição da base de dados fica em um mesmo repositório. Isso evita que alterações sejam feitas sem a ciência do time de desenvolvimento.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_entendendo-o-framework-de-testes">Entendendo o Framework de Testes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Até aqui, supusemos que estamos usando o JUnit, e vamos supor que esse é o nosso framework de escolha. Caso você esteja usando outro, procure as soluções similares.</p>
+</div>
+<div class="paragraph">
+<p>Quando vamos executar qualquer teste, sempre pensamos no ciclo de vida do teste. Todo teste pertence a uma Suite, ou seja, a um conjunto de testes. A suite de testes pressupõe uma infraestrutura. Ou seja, todos os testes pertencentes a uma mesma suite possuem a mesma infraestrutura. Isso é muito importante, e quero entrar nos meandros da biblioteca JUnit para explicar isso.</p>
+</div>
+<div class="paragraph">
+<p>Quando vamos executar os testes, primeiro iniciamos a suite de testes, depois executamos teste por teste. Logo, podemos imaginar que existem configurações que devem ser feitas antes da suite, antes de cada teste, depois de cada teste e depois da suite. Essas configurações normalmente são feitas em código.</p>
+</div>
+<div class="paragraph">
+<p>Para exemplificar, vamos pensar em um software que gere páginas HTML, e alguns testes validam a página web gerada. Para testá-lo, vamos precisar usar uma biblioteca chamada <a href="https://www.selenium.dev/">Selenium</a>. O Selenium instancia e controla um navegador localmente. A operação de abrir o navegador é lenta, mas o navegador pode ser reutilizado dentro de uma mesma suite.</p>
+</div>
+<div class="paragraph">
+<p>Observe a suite abaixo. Nela, testamos uma aplicação de blogging. Vamos supor que a base de dados já esteja populada. Estamos fazendo três testes usando o Selenium, e a execução deles será bem lenta, uma vez que, para cada teste, uma instância do Chrome é criada.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste com Selenium (versão lenta, criando driver por teste)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@QuarkusTest</span>
+<span class="kd">class</span> <span class="nc">BlogAccessTest</span> <span class="o">{</span>
+    <span class="nd">@TestHTTPResource</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="no">URL</span> <span class="n">url</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">postDetailTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChromeDriver</span><span class="o">();</span>
+        <span class="nc">WebDriverWait</span> <span class="n">wait</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WebDriverWait</span><span class="o">(</span><span class="n">driver</span><span class="o">,</span> <span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"posts/1"</span><span class="o">);</span> <span class="c1">// assuming a post detail endpoint</span>
+        <span class="nc">WebElement</span> <span class="n">txtTitle</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1.title"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post title"</span><span class="o">,</span> <span class="n">txtTitle</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtAuthor</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".author"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Author"</span><span class="o">,</span> <span class="n">txtAuthor</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtContent</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".content"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Content"</span><span class="o">,</span> <span class="n">txtContent</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">quit</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">homePageTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChromeDriver</span><span class="o">();</span>
+        <span class="nc">WebDriverWait</span> <span class="n">wait</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WebDriverWait</span><span class="o">(</span><span class="n">driver</span><span class="o">,</span> <span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Blog Posts"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="c1">// Check that at least one post is listed</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">WebElement</span><span class="o">&gt;</span> <span class="n">posts</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElements</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".post-item"</span><span class="o">));</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">posts</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">quit</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">aboutPageTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChromeDriver</span><span class="o">();</span>
+        <span class="nc">WebDriverWait</span> <span class="n">wait</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WebDriverWait</span><span class="o">(</span><span class="n">driver</span><span class="o">,</span> <span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"about"</span><span class="o">);</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"About"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">description</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".about-text"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"This is a sample blog application."</span><span class="o">,</span> <span class="n">description</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">quit</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Como podemos melhorar a execução desses testes? Como falei, precisamos conhecer o ciclo de vida dos testes dentro do framework usado. No JUnit 5, existem algumas anotações que podem nos ajudar a configurar corretamente os testes: <code>@BeforeAll</code>, <code>@BeforeEach</code>, <code>@AfterEach</code> e <code>@AfterAll</code> podem ser usadas para informar ao JUnit que um método deve ser usado dentro do ciclo de vida dos testes. Então, podemos reescrever a suite acima usando o mesmo <code>ChromeDriver</code> configurado via <code>@BeforeAll</code> e <code>@AfterAll</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste com Selenium refatorado usando <code>@BeforeAll</code> / <code>@AfterAll</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@QuarkusTest</span>
+<span class="kd">class</span> <span class="nc">BlogAccessTest</span> <span class="o">{</span>
+    <span class="nd">@TestHTTPResource</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="no">URL</span> <span class="n">url</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">;</span>
+
+    <span class="nd">@BeforeAll</span>
+    <span class="kt">void</span> <span class="nf">start</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChromeDriver</span><span class="o">();</span>
+        <span class="n">wait</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WebDriverWait</span><span class="o">(</span><span class="n">driver</span><span class="o">,</span> <span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">10</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@AfterAll</span>
+    <span class="kt">void</span> <span class="nf">shutdown</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">quit</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">postDetailTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"posts/1"</span><span class="o">);</span> <span class="c1">// assuming a post detail endpoint</span>
+        <span class="nc">WebElement</span> <span class="n">txtTitle</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1.title"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post title"</span><span class="o">,</span> <span class="n">txtTitle</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtAuthor</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".author"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Author"</span><span class="o">,</span> <span class="n">txtAuthor</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtContent</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".content"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Content"</span><span class="o">,</span> <span class="n">txtContent</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">homePageTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Blog Posts"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="c1">// Check that at least one post is listed</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">WebElement</span><span class="o">&gt;</span> <span class="n">posts</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElements</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".post-item"</span><span class="o">));</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">posts</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">aboutPageTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"about"</span><span class="o">);</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"About"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">description</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".about-text"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"This is a sample blog application."</span><span class="o">,</span> <span class="n">description</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O teste parece bem melhor, mas existem formas de melhorar ainda mais? SIM! E a resposta está na primeira linha. Podemos criar extensões, da mesma forma que o Quarkus faz em <code>@QuarkusTest</code>. Para fazer isso, precisamos primeiro pensar que tipo de testes são esses. Não devemos criar extensões que apenas olhem para o código, mas que olhem para o caso de uso.</p>
+</div>
+<div class="paragraph">
+<p>Se estamos escrevendo testes para validar via Selenium, provavelmente é um teste via <code>Web</code>. Por isso, vou criar a extensão <code>WebTest</code> e, para isso, precisamos definir a anotação <code>@WebTest</code> e a extensão <code>WebTestExtension</code>. A extensão irá configurar a classe de acordo com a execução dos testes. O método anotado com <code>@BeforeAll</code> pode migrar para a implementação da interface <code>BeforeAllCallback</code>, e o método anotado com <code>@AfterAll</code> para a interface <code>AfterAllCallback</code>. Como não queremos lidar com reflexão, vou também usar a interface <code>ParameterResolver</code>, que me permitirá injetar parâmetros nos testes.</p>
+</div>
+<div class="listingblock">
+<div class="title">Definição da anotação <code>@WebTest</code> para metaprogramação</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Target</span><span class="o">({</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span> <span class="o">})</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@ExtendWith</span><span class="o">({</span> <span class="nc">QuarkusTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="nc">WebTestExtension</span><span class="o">.</span><span class="na">class</span> <span class="o">})</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="nc">WebTest</span> <span class="o">{}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Implementação da extensão <code>WebTestExtension</code> (JUnit 5)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebTestExtension</span> <span class="kd">implements</span> <span class="nc">BeforeAllCallback</span><span class="o">,</span>
+                                         <span class="nc">AfterAllCallback</span><span class="o">,</span>
+                                         <span class="nc">ParameterResolver</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">WebTestExtension</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">App</span> <span class="n">app</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterAll</span><span class="o">(</span><span class="nc">ExtensionContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">driver</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Closing Chrome driver..."</span><span class="o">);</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">driver</span><span class="o">.</span><span class="na">quit</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Chrome driver shutdown failed"</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Chrome driver closed!"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">beforeAll</span><span class="o">(</span><span class="nc">ExtensionContext</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="nc">ChromeTestDriverFactory</span><span class="o">.</span><span class="na">createDriver</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">Object</span> <span class="nf">resolveParameter</span><span class="o">(</span><span class="nc">ParameterContext</span> <span class="n">parameterContext</span><span class="o">,</span> <span class="nc">ExtensionContext</span> <span class="n">extensionContext</span><span class="o">)</span>
+            <span class="kd">throws</span> <span class="nc">ParameterResolutionException</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">parameterContext</span><span class="o">.</span><span class="na">getParameter</span><span class="o">().</span><span class="na">getType</span><span class="o">().</span><span class="na">isAssignableFrom</span><span class="o">(</span><span class="nc">WebDriver</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">driver</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">parameterContext</span><span class="o">.</span><span class="na">getParameter</span><span class="o">().</span><span class="na">getType</span><span class="o">().</span><span class="na">isAssignableFrom</span><span class="o">(</span><span class="nc">WebDriverWait</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="nc">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">wait</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">this</span><span class="o">.</span><span class="na">wait</span> <span class="o">=</span> <span class="nc">ChromeTestDriverFactory</span><span class="o">.</span><span class="na">createWait</span><span class="o">(</span><span class="n">driver</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">wait</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ParameterResolutionException</span><span class="o">(</span><span class="s">"Parameter not implemented!!! class=%s"</span><span class="o">.</span><span class="na">formatted</span><span class="o">(</span><span class="n">parameterContext</span><span class="o">.</span><span class="na">getParameter</span><span class="o">().</span><span class="na">getType</span><span class="o">()));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">supportsParameter</span><span class="o">(</span><span class="nc">ParameterContext</span> <span class="n">parameterContext</span><span class="o">,</span> <span class="nc">ExtensionContext</span> <span class="n">extensionContext</span><span class="o">)</span>
+            <span class="kd">throws</span> <span class="nc">ParameterResolutionException</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">parameterContext</span><span class="o">.</span><span class="na">getParameter</span><span class="o">().</span><span class="na">getType</span><span class="o">().</span><span class="na">isAssignableFrom</span><span class="o">(</span><span class="nc">WebDriver</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">||</span>
+                <span class="n">parameterContext</span><span class="o">.</span><span class="na">getParameter</span><span class="o">().</span><span class="na">getType</span><span class="o">().</span><span class="na">isAssignableFrom</span><span class="o">(</span><span class="nc">WebDriverWait</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Dessa forma, conseguimos reimplementar a classe de testes sem a necessidade de usar <code>@BeforeAll</code> e <code>@AfterAll</code>, e toda classe que use o mesmo tipo de teste pode reutilizar nossa extensão apenas adicionando a anotação <code>@WebTest</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste final com Selenium usando <code>@WebTest</code> e injeção de parâmetros</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@WebTest</span>
+<span class="kd">class</span> <span class="nc">BlogAccessTest</span> <span class="o">{</span>
+    <span class="nd">@TestHTTPResource</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="no">URL</span> <span class="n">url</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">postDetailTest</span><span class="o">(</span><span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">,</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"posts/1"</span><span class="o">);</span> <span class="c1">// assuming a post detail endpoint</span>
+        <span class="nc">WebElement</span> <span class="n">txtTitle</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1.title"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post title"</span><span class="o">,</span> <span class="n">txtTitle</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtAuthor</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".author"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Author"</span><span class="o">,</span> <span class="n">txtAuthor</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">txtContent</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".content"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Content"</span><span class="o">,</span> <span class="n">txtContent</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">homePageTest</span><span class="o">(</span><span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">,</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Blog Posts"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="c1">// Check that at least one post is listed</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">WebElement</span><span class="o">&gt;</span> <span class="n">posts</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElements</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".post-item"</span><span class="o">));</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">posts</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">aboutPageTest</span><span class="o">(</span><span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">,</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">url</span><span class="o">.</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="s">"about"</span><span class="o">);</span>
+        <span class="nc">WebElement</span> <span class="n">heading</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"About"</span><span class="o">,</span> <span class="n">heading</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+
+        <span class="nc">WebElement</span> <span class="n">description</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".about-text"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"This is a sample blog application."</span><span class="o">,</span> <span class="n">description</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Conhecendo o framework, conseguimos criar suites de testes mais inteligentes e evitar a duplicação de código. Agora, nossos testes até parecem elegantes, mas eles ainda podem melhorar se construirmos uma linguagem específica para os testes, ou uma DSL.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_criando-uma-linguagem-específica-para-os-testes-dsl">Criando uma linguagem específica para os testes (DSL)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Não sei se você já ouviu o termo DSL. DSL significa <em>Domain Specific Language</em> e isso não significa que usaremos uma outra linguagem de programação. Pode até acontecer que frameworks de testes, como o <a href="https://cucumber.io/">Cucumber</a>, sugiram usar uma DSL fora da sua linguagem de programação. Mas, em muitos casos, a DSL é nada mais do que um conjunto de funções que elevam o nível do código para evitar tarefas repetidas.</p>
+</div>
+<div class="paragraph">
+<p>Vamos usar o nosso exemplo dos testes com Selenium: há vários trechos repetidos e altamente acoplados com a implementação. Em toda parte da aplicação, se desejamos verificar o título do post, devemos executar <code>driver.findElement(By.cssSelector("h1.title"))</code>, ou seja, se mudarmos a classe da tag do título, precisamos refatorar todo o código de testes. Será que não conseguimos internalizar isso dentro de uma DSL?</p>
+</div>
+<div class="paragraph">
+<p>Pessoalmente, gosto de criar DSLs fluidas, que podemos ler como um texto. Se você não conhece o padrão de Interfaces Fluentes, leia o post em que Martin Fowler o descreve: <a href="https://martinfowler.com/bliki/FluentInterface.html">Fluent Interface</a>.</p>
+</div>
+<div class="paragraph">
+<p>Então, vou internalizar todo acesso à aplicação dentro da classe <code>App</code>. Podemos até remover a necessidade do campo <code>url</code> usando <code>TestHTTPResourceManager.getUri()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Classe <code>App</code> com DSL para acesso à aplicação em testes Selenium</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">App</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">App</span><span class="o">(</span><span class="nc">WebDriver</span> <span class="n">driver</span><span class="o">,</span> <span class="nc">WebDriverWait</span> <span class="n">wait</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">driver</span> <span class="o">=</span> <span class="n">driver</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">wait</span> <span class="o">=</span> <span class="n">wait</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">App</span> <span class="nf">access</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="nc">TestHTTPResourceManager</span><span class="o">.</span><span class="na">getUri</span><span class="o">().</span><span class="na">toString</span><span class="o">());</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">App</span> <span class="nf">access</span><span class="o">(</span><span class="nc">String</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="nc">TestHTTPResourceManager</span><span class="o">.</span><span class="na">getUri</span><span class="o">().</span><span class="na">toString</span><span class="o">()</span> <span class="o">+</span> <span class="n">path</span><span class="o">);</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">App</span> <span class="nf">thenValidateTitle</span><span class="o">(</span><span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">titleValidator</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">WebElement</span> <span class="n">txtTitle</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">"h1.title"</span><span class="o">));</span>
+        <span class="n">titleValidator</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">txtTitle</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">App</span> <span class="nf">thenValidateAuthor</span><span class="o">(</span><span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">authorValidator</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">WebElement</span> <span class="n">txtAuthor</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".author"</span><span class="o">));</span>
+        <span class="n">authorValidator</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">txtAuthor</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">App</span> <span class="nf">thenValidateContent</span><span class="o">(</span><span class="nc">Consumer</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">contentValidator</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">WebElement</span> <span class="n">txtContent</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">cssSelector</span><span class="o">(</span><span class="s">".content"</span><span class="o">));</span>
+        <span class="n">contentValidator</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">txtContent</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Além de controlar o acesso à aplicação, podemos também criar uma DSL para configurar o ambiente. Gosto de fazer isso usando os termos da <a href="https://cucumber.io/docs/gherkin/reference">DSL Gherkin do Cucumber</a>: Given, When, Then. Há também outras semânticas que podem ser usadas como a <a href="http://xunitpatterns.com/Four%20Phase%20Test.html">Four Phase</a> (<em>Setup</em>, <em>Exercise</em>, <em>Verify</em> e <em>Teardown</em>) ou o <a href="https://dl.acm.org/doi/10.1145/3551349.3559510">Padrão AAA</a> (<em>Arrange</em>, <em>Act</em> e <em>Assert</em>), mas eu prefiro usar uma que denota ordem temporal entre os eventos. Dessa forma, sempre crio uma classe nos meus projetos chamada <code>Given</code> que me fornecerá uma forma fácil de criar dados. Se quiser ver um exemplo de um projeto real, o <a href="https://github.com/vepo/contraponto/blob/main/src/test/java/dev/vepo/contraponto/shared/Given.java"><code>Given</code> da minha plataforma de blogs está disponível</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Classe <code>Given</code> para criação de dados de teste (DSL)</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Given</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">GivenPost</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="nf">GivenPost</span><span class="o">(</span><span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">String</span> <span class="n">author</span><span class="o">,</span> <span class="nc">String</span> <span class="n">content</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// inicializa</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="nc">Post</span> <span class="nf">persiste</span><span class="o">()</span> <span class="o">{</span>
+            <span class="c1">// salva na base e retorna</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">GivenPost</span> <span class="nf">post</span><span class="o">(</span><span class="nc">String</span> <span class="n">title</span><span class="o">,</span> <span class="nc">String</span> <span class="n">author</span><span class="o">,</span> <span class="nc">String</span> <span class="n">content</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">GivenPost</span><span class="o">(</span><span class="n">title</span><span class="o">,</span> <span class="n">author</span><span class="o">,</span> <span class="n">content</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Com as classes <code>App</code> e <code>Given</code>, consigo gerar dados e acessar a aplicação com uma linguagem de alto nível. Veja que, no teste abaixo, podemos quase ler o que o teste está fazendo sem depender de frameworks e detalhes de implementação.</p>
+</div>
+<div class="listingblock">
+<div class="title">Teste final com Selenium usando DSL e injeção de <code>App</code></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@WebTest</span>
+<span class="kd">class</span> <span class="nc">BlogAccessTest</span> <span class="o">{</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">postDetailTest</span><span class="o">(</span><span class="nc">App</span> <span class="n">app</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">var</span> <span class="n">post</span> <span class="o">=</span> <span class="nc">Given</span><span class="o">.</span><span class="na">post</span><span class="o">(</span><span class="s">"Post title"</span><span class="o">,</span> <span class="s">"Post Author"</span><span class="o">,</span> <span class="s">"Post Content"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">persiste</span><span class="o">();</span>
+        <span class="n">app</span><span class="o">.</span><span class="na">access</span><span class="o">(</span><span class="s">"posts/"</span> <span class="o">+</span> <span class="n">post</span><span class="o">.</span><span class="na">getId</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">thenValidateTitle</span><span class="o">(</span><span class="n">title</span> <span class="o">-&gt;</span> <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post title"</span><span class="o">,</span> <span class="n">title</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">thenValidateAuthor</span><span class="o">(</span><span class="n">author</span> <span class="o">-&gt;</span> <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Author"</span><span class="o">,</span> <span class="n">author</span><span class="o">))</span>
+            <span class="o">.</span><span class="na">thenValidateContent</span><span class="o">(</span><span class="n">content</span> <span class="o">-&gt;</span> <span class="n">assertEquals</span><span class="o">(</span><span class="s">"Post Content"</span><span class="o">,</span> <span class="n">content</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Essa abordagem torna os testes legíveis e nos permite saber exatamente o que está sendo feito, sem nos perdermos em detalhes de implementação.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Podemos escrever testes de qualidade que garantam o funcionamento da nossa aplicação entre diversos ciclos de desenvolvimento. Aqui, mostramos quais são as limitações de ambientes de testes e diversas formas de contorná-las.</p>
+</div>
+<div class="paragraph">
+<p>Espero que você possa agora construir testes mais ricos e fluidos.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Testes" /><category term="Qualidade de Software" /><category term="TDD" /><category term="Java" /><category term="Spring Boot" /><category term="Quarkus" /><category term="JUnit" /><category term="Mockito" /><category term="Testcontainers" /><category term="Arquitetura Hexagonal" /><category term="DSL" /><category term="Engenharia de Software" /><summary type="html"><![CDATA[Aprenda a escrever testes eficazes superando as limitações do ambiente de testes. Entenda a diferença entre emular e simular, resolva dependências de frameworks, sistemas externos, SO, tempo e schema de banco. Descubra como usar Spring Boot, Quarkus, Testcontainers e criar DSLs para testes mais legíveis e confiáveis.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/kids-programming-100-42.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/kids-programming-100-42.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Injeção de Dependência e sua importância no gerenciamento da conexão com o banco de dados</title><link href="https://blog.vepo.dev/posts/injecao-de-dependencia" rel="alternate" type="text/html" title="Injeção de Dependência e sua importância no gerenciamento da conexão com o banco de dados" /><published>2026-02-27T00:00:00+00:00</published><updated>2026-02-27T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/10-25-00-injecao-de-dependencia</id><content type="html" xml:base="https://blog.vepo.dev/posts/injecao-de-dependencia"><![CDATA[<div class="paragraph">
+<p>Esse post é parte da série "Introdução a Bases de Dados". Se você ainda não leu os posts anteriores, recomendo começar por eles para obter uma compreensão completa dos conceitos abordados.</p>
+</div>
+<div class="paragraph">
+<p>Talvez você esteja se perguntando porque falar de "Injeção de Dependência" em uma série sobre bancos de dados. A resposta é simples: a injeção de dependência é uma prática fundamental para o gerenciamento eficiente da conexão com o banco de dados em aplicações Java. Em aplicações modernas do Java, o desenvolvedor não instancia diretamente as classes de conexão com o banco de dados. Em vez disso, ele utiliza um framework de injeção de dependência, como o Spring ou o CDI, para gerenciar essa conexão e todas as classes relacionadas. Isso traz diversos benefícios, como a redução do acoplamento entre as classes, a facilitação dos testes unitários e a melhoria da manutenção do código.</p>
+</div>
+<div class="sect1">
+<h2 id="_o-que-é-injeção-de-dependência">O que é Injeção de Dependência?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A injeção de dependência é um padrão de design que permite que as dependências de uma classe sejam fornecidas por um framework, em vez de serem criadas diretamente pela classe. Isso promove a inversão de controle, onde o controle da criação e gerenciamento das dependências é transferido para um componente externo.</p>
+</div>
+<div class="paragraph">
+<p>Em muitas referências sobre Injeção de Dependência a palavra "container" é utilizada, mas é preciso cuidado ao se entender esse termo, porque tomou outro significado depois do surgimento do Docker. O termo "container" em Injeção de Dependência se refere a um componente que gerencia o ciclo de vida dos componentes e suas dependências, enquanto o "container" no contexto de Docker se refere a um ambiente isolado para executar aplicações.</p>
+</div>
+<div class="paragraph">
+<p>Containers são partes dos Servidores de Aplicação, como o Tomcat, que gerenciam a execução de aplicações Java. Uma aplicação Java moderna não é controlada pelo código que implementamos, mas nós implementamos classes que se integram ao ciclo de vida do servidor de aplicação e precisamos informar o servidor de aplicação sobre como usar elas.</p>
+</div>
+<div class="paragraph">
+<p>A grande vantagem de se usar frameworks de injeção de dependência é que não precisamos nos preocupar com a criação e gerenciamento de classes de serviços, como a conexão com o banco de dados. O framework cuida disso para nós, permitindo que nos concentremos na lógica de negócios da aplicação. Além disso, a injeção de dependência facilita a substituição de implementações, o que é especialmente útil para testes unitários, onde podemos usar mocks ou stubs para simular o comportamento das dependências.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/databases/injecao-dependencia.png" alt="injecao dependencia">
+</div>
+<div class="title">Figura 1. Servidor de Aplicação e Injeção de Dependência</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_injeção-de-dependência-no-spring-framework">Injeção de Dependência no Spring Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O Spring Framework é um dos frameworks mais populares para desenvolvimento de aplicações Java, e ele oferece suporte robusto para injeção de dependência. No Spring, podemos usar anotações como @Autowired para indicar que uma dependência deve ser injetada automaticamente pelo framework. Por exemplo, se tivermos uma classe de serviço que precisa de uma conexão com o banco de dados, podemos simplesmente anotar a dependência com @Autowired, e o Spring cuidará de fornecer a implementação correta.</p>
+</div>
+<div class="paragraph">
+<p>No exemplo abaixo, temos uma classe BasketballService que depende de um RuleRepository. Ao usar a anotação @Autowired, o Spring irá injetar automaticamente a implementação de RuleRepository quando criar uma instância de BasketballService. Isso torna o código mais simples e fácil de manter, além de facilitar a realização de testes unitários, onde podemos substituir a implementação real por um mock ou stub.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de Injeção de Dependência no Spring via Construtor</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Component</span>   <span class="c1">// [1] Declara que esta classe é um componente gerenciado pelo Spring</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BasketballService</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span> <span class="c1">// [2] Indica que o Spring deve injetar a dependência de RuleRepository</span>
+    <span class="kd">public</span> <span class="nf">BasketballService</span><span class="o">(</span><span class="nc">RuleRepository</span> <span class="n">ruleRepository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// O Spring irá injetar a implementação de RuleRepository aqui</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A injeção de dependência também pode ser feita usando métodos setter e campos, mas a injeção via construtor é geralmente recomendada, pois torna as dependências explícitas e facilita a criação de objetos imutáveis.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de Injeção de Dependência via Setter</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Component</span>  <span class="c1">// [1] Declara que esta classe é um componente gerenciado pelo Spring</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BasketballService</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="nc">LogRepository</span> <span class="n">logRepository</span><span class="o">;</span>
+
+    <span class="nd">@Autowired</span> <span class="c1">// [2] Indica que o Spring deve injetar a dependência de LogRepository</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">setLogRepository</span><span class="o">(</span><span class="nc">LogRepository</span> <span class="n">logRepository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">logRepository</span> <span class="o">=</span> <span class="n">logRepository</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_injeção-de-dependência-no-cdi-contexts-and-dependency-injection">Injeção de Dependência no CDI (Contexts and Dependency Injection)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>O CDI é uma especificação de injeção de dependência para Jakarta EE (antigo Java EE). Ele oferece uma abordagem semelhante à do Spring para injeção de dependência, usando anotações como @Inject para indicar que uma dependência deve ser injetada. O CDI também suporta a criação de beans e a definição de escopos, o que facilita o gerenciamento do ciclo de vida dos objetos.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">Escopo</th>
+<th class="tableblock halign-center valign-top">Anotação</th>
+<th class="tableblock halign-left valign-top">Ciclo de vida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Requisição</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">@RequestScoped</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A interação de um usuário com um aplicativo web em uma única requisição HTTP.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Sessão</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">@SessionScoped</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A interação de um usuário com um aplicativo web por meio de múltiplas requisições HTTP.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Aplicação</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">@ApplicationScoped</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Estado compartilhado entre todas as interações dos usuários com um aplicativo web.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Dependente</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">@Dependent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O escopo padrão, caso nenhum seja especificado; significa que um objeto existe para atender exatamente um cliente (bean) e possui o mesmo ciclo de vida que esse cliente (bean).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">Conversação</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">@ConversationScoped</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A interação de um usuário com um aplicativo ocorre dentro de limites explícitos controlados pelo desenvolvedor, que estendem o escopo por múltiplas invocações do ciclo de vida. Todas as conversas de longa duração são limitadas a uma sessão específica do servlet HTTP e não podem ultrapassar os limites da sessão.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Para usar o CDI, em alguns casos, é necessário configurar um arquivo beans.xml no diretório META-INF do projeto. Esse arquivo é usado para ativar o CDI e pode conter configurações adicionais, como a definição de interceptadores e decoradores. Mas em outros frameworks, como o Quarkus, o CDI é ativado por padrão, e não é necessário criar um arquivo beans.xml.</p>
+</div>
+<div class="paragraph">
+<p>Toda classe é possívelmente um bean gerenciado pelo CDI, mas para que o CDI possa injetar uma dependência, a classe precisa ser anotada com uma anotação de escopo, como @RequestScoped, @SessionScoped, @ApplicationScoped ou @Dependent. Essas anotações indicam ao CDI como gerenciar o ciclo de vida dos objetos e suas dependências.</p>
+</div>
+<div class="paragraph">
+<p>Dessa forma, o servidor de aplicação identifica as classes anotadas com escopos e as gerencia como beans, permitindo que o CDI injete as dependências necessárias quando essas classes forem instanciadas. No exemplo abaixo, a classe BasketballService é anotada com @ApplicationScoped, indicando que ela é um bean de escopo de aplicação, e o CDI irá injetar a dependência de RuleRepository quando criar uma instância de BasketballService.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de Injeção de Dependência no CDI via Construtor</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>  <span class="c1">// [1] Declara que esta classe é um bean de escopo de aplicação gerenciado pelo CDI</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BasketballService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span> <span class="c1">// [2] Indica que o CDI deve injetar a dependência de RuleRepository</span>
+    <span class="kd">public</span> <span class="nf">BasketballService</span><span class="o">(</span><span class="nc">RuleRepository</span> <span class="n">ruleRepository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// O CDI irá injetar a implementação de RuleRepository aqui</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O CDI também suporta a injeção via reflexão, onde as dependências são injetadas diretamente nos campos da classe, sem a necessidade de um construtor ou método setter. No entanto, a injeção via construtor é geralmente recomendada, pois torna as dependências explícitas e facilita a criação de objetos imutáveis.</p>
+</div>
+<div class="listingblock">
+<div class="title">Exemplo de Injeção de Dependência no CDI via Campo</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ApplicationScoped</span>  <span class="c1">// [1] Declara que esta classe é um bean de escopo de aplicação gerenciado pelo CDI</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BasketballService</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span> <span class="c1">// [2] Indica que o CDI deve injetar a dependência de LogRepository diretamente no campo</span>
+    <span class="kd">private</span> <span class="nc">LogRepository</span> <span class="n">logRepository</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">BasketballService</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// O CDI irá injetar a implementação de LogRepository diretamente no campo logRepository</span>
+        <span class="c1">// Mas o logRepository não é visível no construtor, o que pode dificultar a criação de objetos imutáveis e a realização de testes unitários.</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PostConstruct</span> <span class="c1">// [3] Indica que este método deve ser chamado após a injeção de dependências</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// O método init() é chamado após a injeção de dependências, permitindo que o logRepository seja utilizado aqui.</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a-importância-da-injeção-de-dependência-para-o-gerenciamento-da-conexão-com-o-banco-de-dados">A importância da Injeção de Dependência para o Gerenciamento da Conexão com o Banco de Dados</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A injeção de dependência é especialmente importante para o gerenciamento da conexão com o banco de dados, pois permite que a aplicação seja configurada de forma flexível e modular. Ao usar um framework de injeção de dependência, os desenvolvedores podem facilmente configurar a conexão com o banco de dados, definindo as propriedades necessárias, como URL, nome de usuário e senha, sem precisar modificar o código da aplicação.</p>
+</div>
+<div class="paragraph">
+<p>Fica sob a responsabilidade do framework definir quando a conexão com o banco de dados deve ser criada, mantida e fechada, o que pode ser feito de forma eficiente e segura. Além disso, a injeção de dependência facilita a substituição da implementação da conexão com o banco de dados, permitindo que os desenvolvedores testem a aplicação usando um banco de dados em memória ou um mock, sem precisar alterar o código da aplicação.</p>
+</div>
+<div class="paragraph">
+<p>Outra vantagem é a facilidade de desenvolvimento, pois o código de instanciação e gerenciamento da conexão com o banco de dados é um detalhe de implementação que pode ser abstraído pelo framework, permitindo que os desenvolvedores se concentrem na lógica de negócios da aplicação.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A injeção de dependência é uma prática essencial para o desenvolvimento de aplicações Java modernas, especialmente quando se trata do gerenciamento da conexão com o banco de dados. Ao usar frameworks como Spring ou CDI, os desenvolvedores podem se beneficiar de um código mais limpo, modular e fácil de testar, além de melhorar a manutenção e a escalabilidade da aplicação. Portanto, entender e aplicar a injeção de dependência é fundamental para qualquer desenvolvedor Java que deseja criar aplicações robustas e eficientes.</p>
+</div>
+<div class="paragraph">
+<p>É importante para o desenvolvedor conhecer os conceitos de injeção de dependência e como os frameworks de injeção de dependência funcionam, para que possa aproveitar ao máximo os benefícios que eles oferecem.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Injeção de Dependência" /><category term="Spring" /><category term="Quarkus" /><category term="Java CDI" /><category term="Banco de Dados" /><summary type="html"><![CDATA[A injeção de dependência é uma prática fundamental para o gerenciamento eficiente da conexão com o banco de dados em aplicações Java. Neste post, exploramos o que é injeção de dependência, como ela funciona e por que é tão importante para o desenvolvimento de aplicações Java modernas.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/disquete-100-42.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/disquete-100-42.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">A Evolução do Java no Backend: Jakarta EE, Spring e Quarkus</title><link href="https://blog.vepo.dev/posts/java-no-backend" rel="alternate" type="text/html" title="A Evolução do Java no Backend: Jakarta EE, Spring e Quarkus" /><published>2023-10-16T00:00:00+00:00</published><updated>2023-10-16T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/11-15-52-java-no-backend</id><content type="html" xml:base="https://blog.vepo.dev/posts/java-no-backend"><![CDATA[<p>O ecossistema Java para desenvolvimento backend passou por diversas transformações ao longo dos anos, desde os primórdios da orientação a objetos até as modernas soluções como microsserviços e contêineres. Neste post, exploramos essa jornada, destacando as tecnologias que moldaram o Java no backend e como elas se relacionam hoje.</p>
+
+<hr />
+<div class="img-block">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/uTHZet430rs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+</div>
+
+<hr />
+
+<h2 id="1-as-fases-do-java-no-backend"><strong>1. As Fases do Java no Backend</strong></h2>
+
+<h3 id="orientação-a-objetos-e-servidores-de-aplicação"><strong>Orientação a Objetos e Servidores de Aplicação</strong></h3>
+<ul>
+  <li><strong>Anos 90</strong>: Java surgiu em 1995 incorporando conceitos como CORBA e servlets (1996).</li>
+  <li><strong>J2EE (1999)</strong>: Trouxe soluções como EJB (Enterprise JavaBeans) para objetos distribuídos e JDBC para conexão com bancos de dados.</li>
+  <li><strong>Servidores de Aplicação (2001)</strong>: Como JBoss e WebLogic, permitiam deploy de aplicações em um único processo Java, facilitando a gestão de recursos.</li>
+</ul>
+
+<h3 id="a-revolução-do-docker-2013"><strong>A Revolução do Docker (2013)</strong></h3>
+<ul>
+  <li>A conteinerização mudou a forma como aplicações eram deployadas, eliminando a necessidade de servidores de aplicação monolíticos.</li>
+  <li>Java 8 (2014) e Spring Boot surgiram como respostas ágeis a essa nova era.</li>
+</ul>
+
+<hr />
+
+<h2 id="2-jakarta-ee-o-modelo-baseado-em-especificações"><strong>2. Jakarta EE: O Modelo Baseado em Especificações</strong></h2>
+<p>Jakarta EE (antigo Java EE) é um <strong>modelo de programação baseado em specs</strong>, garantindo compatibilidade e flexibilidade.</p>
+
+<h3 id="principais-especificações"><strong>Principais Especificações</strong></h3>
+<ul>
+  <li><strong>JPA</strong>: Persistência de dados.</li>
+  <li><strong>JAX-RS</strong>: Desenvolvimento de APIs REST.</li>
+  <li><strong>Bean Validation</strong>: Validação de dados com anotações.</li>
+  <li><strong>CDI</strong>: Injeção de dependências.</li>
+</ul>
+
+<h3 id="vantagens"><strong>Vantagens</strong></h3>
+<ul>
+  <li><strong>Estabilidade</strong>: Código escrito há 20 anos ainda roda em servidores modernos.</li>
+  <li><strong>Portabilidade</strong>: Depende de interfaces, não de implementações específicas.</li>
+</ul>
+
+<h3 id="microprofile-jakarta-ee-para-microsserviços"><strong>MicroProfile: Jakarta EE para Microsserviços</strong></h3>
+<ul>
+  <li>Extensão do Jakarta EE com foco em:
+    <ul>
+      <li>Observabilidade (OpenTelemetry).</li>
+      <li>Tolerância a falhas.</li>
+      <li>Autenticação via JWT.</li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="3-spring-acelerando-o-desenvolvimento"><strong>3. Spring: Acelerando o Desenvolvimento</strong></h2>
+<ul>
+  <li><strong>Contexto</strong>: Surgiu para simplificar o desenvolvimento Java EE, que era lento e burocrático.</li>
+  <li><strong>Spring Boot (2014)</strong>: Revolucionou com:
+    <ul>
+      <li>Executáveis independentes (sem servidor de aplicação).</li>
+      <li>Configuração simplificada (menos XML, mais anotações).</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="comparação-com-jakarta-ee"><strong>Comparação com Jakarta EE</strong></h3>
+<p>| <strong>Spring</strong>          | <strong>Jakarta EE</strong>       |
+|———————-|———————-|
+| <code class="language-plaintext highlighter-rouge">@GetMapping</code>       | <code class="language-plaintext highlighter-rouge">@Path</code> (JAX-RS)    |
+| <code class="language-plaintext highlighter-rouge">@RestController</code>   | <code class="language-plaintext highlighter-rouge">@ApplicationScoped</code> (CDI) |
+| Foco em produtividade | Foco em padrões empresariais |</p>
+
+<hr />
+
+<h2 id="4-quarkus-java-para-a-era-kubernetes"><strong>4. Quarkus: Java para a Era Kubernetes</strong></h2>
+<ul>
+  <li><strong>Origem</strong>: Evolução do JBoss/WildFly, focada em:
+    <ul>
+      <li><strong>Tempo de inicialização rápido</strong> (crucial para microsserviços).</li>
+      <li><strong>Experiência do desenvolvedor</strong> (live coding, integração com Kubernetes).</li>
+    </ul>
+  </li>
+  <li><strong>Relacionamento com Jakarta EE</strong>: Implementa specs como JAX-RS e CDI, mas com abordagem moderna.</li>
+</ul>
+
+<hr />
+
+<h2 id="conclusão-qual-escolher"><strong>Conclusão: Qual Escolher?</strong></h2>
+<ul>
+  <li><strong>Jakarta EE</strong>: Ideal para aplicações empresariais robustas e de longa vida.</li>
+  <li><strong>Spring</strong>: Melhor para produtividade e adoção rápida.</li>
+  <li><strong>Quarkus</strong>: Focado em microsserviços e cloud-native.</li>
+</ul>
+
+<h3 id="dicas-para-aprofundar"><strong>Dicas para Aprofundar</strong></h3>
+<ol>
+  <li>Explore specs como <strong>JAX-RS</strong> e <strong>Bean Validation</strong>.</li>
+  <li>Experimente starters em <a href="https://start.jakarta.ee">start.jakarta.ee</a> e <a href="https://code.quarkus.io">code.quarkus.io</a>.</li>
+  <li>Para Spring, use <a href="https://start.spring.io">start.spring.io</a>.</li>
+</ol>
+
+<p>O Java no backend continua evoluindo, e entender essas tecnologias é essencial para escolher a melhor ferramenta para seu projeto.</p>
+
+<p><strong>#Java #JakartaEE #Spring #Quarkus #Backend</strong></p>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Java" /><category term="Backend" /><category term="Quarkus" /><category term="Spring" /><category term="Jakarta EE" /><summary type="html"><![CDATA[O ecossistema Java para desenvolvimento backend passou por diversas transformações ao longo dos anos, desde os primórdios da orientação a objetos até as modernas soluções como microsserviços e contêineres. Neste post, exploramos essa jornada, destacando as tecnologias que moldaram o Java no backend e como elas se relacionam hoje.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/java/duke-chez-100-42.webp" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/java/duke-chez-100-42.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
