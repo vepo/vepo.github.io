@@ -77,7 +77,11 @@ Todas as métricas do Kafka são expostas pela biblioteca Kafka usando JMX. Elas
 
 === Métricas de consumo
 
-https://kafka.apache.org/44/operations/monitoring/#consumer-fetch-metrics[Métricas do Fetch]
+Ao chamar `poll`, o consumidor dispara operações de `Fetch` para os brokers e recebe de volta os registros que serão processados. As métricas desta seção descrevem justamente esse fluxo de dados entre o broker e o consumidor: quanto está chegando, a que velocidade e com qual atraso em relação ao final da partição.
+
+As duas métricas centrais são o _lag_ e a vazão. O _lag_ responde "quanto falta para o consumidor alcançar o final da partição?", enquanto a vazão responde "a que velocidade o consumidor está processando?". Juntas, elas dão a primeira indicação sobre a saúde do consumo. As métricas das seções seguintes ajudam a explicar _por que_ o _lag_ ou a vazão estão no patamar observado.
+
+A documentação oficial lista essas métricas em https://kafka.apache.org/44/operations/monitoring/#consumer-fetch-metrics[Métricas do Fetch].
 
 ==== _Lag_, ou o atraso do consumidor
 
