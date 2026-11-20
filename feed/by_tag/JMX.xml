@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.vepo.dev/feed/by_tag/JMX.xml" rel="self" type="application/atom+xml" /><link href="https://blog.vepo.dev/" rel="alternate" type="text/html" /><updated>2026-11-20T22:09:58+00:00</updated><id>https://blog.vepo.dev/feed/by_tag/JMX.xml</id><title type="html">vepo</title><subtitle>Um repositório para todos os posts, palestras e tutoriais que já fiz. Java, Desenvolvimento de Software e reflexões sobre filosofia</subtitle><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><entry><title type="html">Métricas relevantes para o consumidor Apache Kafka</title><link href="https://blog.vepo.dev/posts/metricas-relevantes-consumidor-apache-kafka/" rel="alternate" type="text/html" title="Métricas relevantes para o consumidor Apache Kafka" /><published>2026-11-14T00:00:00+00:00</published><updated>2026-11-14T00:00:00+00:00</updated><id>https://blog.vepo.dev/posts/16-07-00-metricas-relevantes-consumidor-apache-kafka</id><content type="html" xml:base="https://blog.vepo.dev/posts/metricas-relevantes-consumidor-apache-kafka/"><![CDATA[<div class="paragraph">
+<p>No meu trabalho de mestrado, precisei analisar a fundo diversas métricas dos clientes Apache Kafka para criar um mecanismo auto-adaptativo para ele. Neste post, quero detalhar algumas métricas e como elas se relacionam com alguns parâmetros.</p>
+</div>
+<div class="paragraph">
+<p>O ecossistema Apache Kafka é composto por Broker, Produtor, Consumidor, Kafka Streams e Kafka Connect (com seus connectors). Quero começar pelo Consumidor. Todas as métricas do Kafka estão documentadas na página <a href="https://kafka.apache.org/44/operations/monitoring/">Monitoring</a> (Monitoramento) da documentação do Kafka. Essa página é organizada por componente e eu sempre recomendo a leitura, pois novas métricas são adicionadas a cada nova versão.</p>
+</div>
+<div class="paragraph">
+<p>Para entender as métricas, precisamos primeiro entender como funciona um consumidor Kafka.</p>
+</div>
+<div class="sect1">
+<h2 id="_como-funciona-o-consumidor-kafka">Como funciona o consumidor Kafka?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>Caso queira assistir a uma aula que dei há 2 anos sobre isso, recomendo o vídeo <a href="https://youtu.be/bZ8wf9MKPH4">Apache Kafka do Zero! (iii) Como receber mensagens?</a>.</em></p>
+</div>
+<div class="img-block">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/bZ8wf9MKPH4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+<div class="paragraph">
+<p>O consumidor Kafka funciona de forma assíncrona. O código que instancia e processa as mensagens usa a thread da aplicação, e o consumidor mantém uma thread de rede para se comunicar com o broker. A ideia é que as duas threads funcionem independentemente, sem que sejam bloqueadas, e se comuniquem por meio de buffers.</p>
+</div>
+<div class="paragraph">
+<p>Para descrever como o consumidor funciona, vou usar o exemplo abaixo. Removi toda a lógica de processamento e deixei basicamente a interação com o consumidor.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nc">Properties</span> <span class="n">properties</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Properties</span><span class="o">();</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="nc">ConsumerConfig</span><span class="o">.</span><span class="na">BOOTSTRAP_SERVERS_CONFIG</span><span class="o">,</span> <span class="s">"localhost:9092"</span><span class="o">);</span>  <span class="c1">// Obrigatório</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="nc">ConsumerConfig</span><span class="o">.</span><span class="na">GROUP_ID_CONFIG</span><span class="o">,</span> <span class="s">"meu-primeiro-consumidor"</span><span class="o">);</span>  <span class="c1">// Obrigatório</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="nc">ConsumerConfig</span><span class="o">.</span><span class="na">KEY_DESERIALIZER_CLASS_CONFIG</span><span class="o">,</span> <span class="nc">GeolocationDeserializer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>   <span class="c1">// Obrigatório</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="nc">ConsumerConfig</span><span class="o">.</span><span class="na">VALUE_DESERIALIZER_CLASS_CONFIG</span><span class="o">,</span> <span class="nc">WeatherInfoDeserializer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span> <span class="c1">// Obrigatório</span>
+<span class="n">properties</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="nc">ConsumerConfig</span><span class="o">.</span><span class="na">MAX_POLL_RECORDS_CONFIG</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>  <span class="c1">// Opcional, valor padrão 500</span>
+<span class="nc">KafkaConsumer</span> <span class="n">consumidor</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">KafkaConsumer</span><span class="o">&lt;&gt;(</span><span class="n">properties</span><span class="o">);</span>
+<span class="n">consumidor</span><span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">"weather"</span><span class="o">));</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">running</span><span class="o">.</span><span class="na">get</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">consumidor</span><span class="o">.</span><span class="na">poll</span><span class="o">(</span><span class="nc">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="mi">1</span><span class="o">))</span>
+              <span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">processaMensagem</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>O método <code>poll</code> é central no entendimento do consumidor Kafka. Para esse método ser chamado, é necessário ter um consumidor iniciado e com algumas partições atribuídas. No exemplo, as partições são atribuídas automaticamente, uma vez que usamos o método <code>subscribe</code>, mas elas podem ser atribuídas manualmente se usarmos os métodos <code>assign</code>. Só faça isso manualmente se você souber exatamente o que está fazendo!!! Confie no algoritmo de atribuição automática ou, se quiser, implemente um usando o parâmetro <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_partition.assignment.strategy"><code>partition.assignment.strategy</code></a>.</p>
+</div>
+<div class="paragraph">
+<p>Toda vez que a thread de aplicação chama o método <code>.poll(Duration.ofSeconds(1))</code>, ela fica bloqueada até que uma das condições ocorra: o timeout de <code>Duration.ofSeconds(1)</code> seja atingido ou existam registros disponíveis para retorno, respeitando o limite de <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_max.poll.records"><code>max.poll.records</code></a>. O <code>max.poll.records</code> é um limite superior; o <code>poll</code> não precisa retornar exatamente essa quantidade e pode retornar uma lista vazia. Enquanto não houver registros disponíveis, o cliente mantém a comunicação com o broker e o buffer de busca; quando há registros, o <code>poll</code> os retorna para processamento. O cliente Kafka também mantém um mecanismo de prefetch: ele pode buscar registros antecipadamente para que a próxima chamada de <code>poll</code> já encontre dados no buffer. Isso reduz o impacto das idas ao broker.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/artigos/kafka/consumer-poll.png" alt="consumer poll">
+</div>
+<div class="title">Figura 1. Diagrama de sequência da operação de <code>poll</code> que usei na minha dissertação de mestrado.</div>
+</div>
+<div class="paragraph">
+<p>O cenário ideal é que o <code>poll</code> nunca bloqueie a thread de processamento por muito tempo.</p>
+</div>
+<div class="paragraph">
+<p>Uma operação de <code>Fetch</code> é enviada para um broker específico e pode incluir várias partições hospedadas nesse broker. Quando iniciamos um consumidor Kafka usando a configuração <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_bootstrap.servers"><code>bootstrap.servers</code></a>, deve haver ao menos um broker do cluster listado. Isso não significa que o consumidor se comunicará apenas com esse broker; ele pode se comunicar com qualquer broker, dependendo das partições que estiver consumindo. A lista completa de brokers pode não ser conhecida inicialmente, mas, ao se conectar, o cliente descobre quais brokers existem e quais deve contatar.</p>
+</div>
+<div class="paragraph">
+<p>Uma requisição <code>Fetch</code> pode buscar dados de várias partições do mesmo broker. Quando a aplicação precisa escalar, o paralelismo é limitado pelo número de partições: mais threads ou consumidores do que partições ficarão ociosos.</p>
+</div>
+<div class="paragraph">
+<p>Para resolver esse problema, algumas pessoas tentam compartilhar um consumidor entre diversas threads de processamento. Eu não recomendo essa abordagem!! Por quê? Porque o <code>KafkaConsumer</code> não é thread-safe e o processamento de mensagens é sequencial dentro de uma partição. O commit do offset, manual ou automático, também é sequencial e pertence à partição, não à mensagem. No Kafka, não commitamos uma mensagem; commitamos a posição/offset de uma partição.</p>
+</div>
+<div class="paragraph">
+<p>Por exemplo, observe a distribuição de mensagens no tópico <code>weather</code> abaixo. A partição 0 possui 6 mensagens, a partição 1 possui 4 e a partição 2 possui 5 mensagens. Se eu tenho mais de uma thread de processamento consumindo a partição 0 e o processamento da mensagem 3 falha, mas o processamento da mensagem 4 é feito com sucesso, o commit será feito depois da mensagem 4. Isso significa que, se a thread reiniciar, ela começará a consumir a partir da mensagem 5. Mesmo que a mensagem 3 não seja comitada, o commit não é da mensagem, mas do offset da partição; ao commitar o offset 5, as mensagens anteriores naquela partição são consideradas processadas.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="/assets/images/artigos/kafka/consumer-offsets.png" alt="consumer offsets">
+</div>
+<div class="title">Figura 2. Descrição da distribuição de mensagens em um tópico <code>weather</code> com 3 partições e 15 mensagens.</div>
+</div>
+<div class="paragraph">
+<p>É possível ter várias threads processando registros, mas não compartilhando o mesmo <code>KafkaConsumer</code>. A distribuição de partições entre consumidores do mesmo grupo é feita pelo próprio Kafka; cada consumidor deve ser usado por uma única thread.</p>
+</div>
+<div class="paragraph">
+<p>Outra característica importante do consumidor é o mecanismo de <code>heartbeat</code>, que faz com que o grupo de consumidores perceba se um membro está ativo. O consumidor mantém uma thread de heartbeat em segundo plano. Se o broker não receber heartbeats dentro de <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_session.timeout.ms"><code>session.timeout.ms</code></a>, o membro é removido do grupo e uma operação de rebalance é chamada para distribuir as partições desse membro entre os outros consumidores. Além disso, se a thread de aplicação ficar sem chamar <code>poll</code> por mais que <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_max.poll.interval.ms"><code>max.poll.interval.ms</code></a>, o consumidor também é considerado inativo e sai do grupo.</p>
+</div>
+<div class="paragraph">
+<p>É importante que o tempo entre chamadas de <code>poll</code> — incluindo o processamento do lote retornado — seja bem menor que <code>max.poll.interval.ms</code>, e que a thread de processamento nunca pare de executar o <code>poll</code> por longos períodos. Caso exista alguma indisponibilidade, a aplicação deve se precaver e chamar os métodos <a href="https://kafka.apache.org/42/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html#pause(java.util.Collection)"><code>pause</code></a> e <a href="https://kafka.apache.org/42/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html#resume(java.util.Collection)"><code>resume</code></a>. Em muitos casos de uso, é necessário controlar o consumo de algumas partições, caso elas sejam distribuídas para clusters específicos.</p>
+</div>
+<div class="paragraph">
+<p>Agora que já entendemos o funcionamento do consumidor, vamos ver as métricas relevantes para entendermos a saúde dele?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_métricas-relevantes">Métricas relevantes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Para entender as métricas, vou separá-las por operações: consumo e distribuição de carga.</p>
+</div>
+<div class="paragraph">
+<p>Todas as métricas do Kafka são expostas pela biblioteca Kafka usando JMX. Elas podem ser consultadas via JMX ou usando exportadores como o <a href="https://github.com/prometheus/jmx_exporter">Prometheus JMX Exporter</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_métricas-de-consumo">Métricas de consumo</h3>
+<div class="paragraph">
+<p>Ao chamar <code>poll</code>, o consumidor dispara operações de <code>Fetch</code> para os brokers e recebe de volta os registros que serão processados. As métricas desta seção descrevem justamente esse fluxo de dados entre o broker e o consumidor: quanto está chegando, a que velocidade e com qual atraso em relação ao final da partição.</p>
+</div>
+<div class="paragraph">
+<p>As duas métricas centrais são o <em>lag</em> e a vazão. O <em>lag</em> responde "quanto falta para o consumidor alcançar o final da partição?", enquanto a vazão responde "a que velocidade o consumidor está processando?". Juntas, elas dão a primeira indicação sobre a saúde do consumo. As métricas das seções seguintes ajudam a explicar <em>por que</em> o <em>lag</em> ou a vazão estão no patamar observado.</p>
+</div>
+<div class="paragraph">
+<p>A documentação oficial lista essas métricas em <a href="https://kafka.apache.org/44/operations/monitoring/#consumer-fetch-metrics">Métricas do Fetch</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="_lag-ou-o-atraso-do-consumidor"><em>Lag</em>, ou o atraso do consumidor</h4>
+<div class="paragraph">
+<p>A primeira é o <em>lag</em>. Lag é o atraso do consumidor em relação ao final de uma partição, ou seja, a distância entre a última mensagem consumida e a última mensagem produzida na partição. O consumidor expõe essa métrica de quatro formas e em dois contextos, conforme descrito abaixo.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 1. Métricas de lag do consumidor Kafka. As métricas são agrupadas por contexto (cliente e partição) e expostas via JMX.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-lag-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maior lag entre as partições atribuídas ao cliente. É útil para alertas e para uma visão global do atraso.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-lag</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Partição</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lag atual da partição: diferença entre o último offset produzido e a posição atual do consumidor na partição.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,partition="{partition}",topic="{topic}",client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-lag-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Partição</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Média do lag da partição na janela de amostragem; suaviza variações pontuais.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,partition="{partition}",topic="{topic}",client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-lag-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Partição</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maior lag observado para a partição na janela de amostragem; ajuda a identificar picos.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,partition="{partition}",topic="{topic}",client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>O lag é medido em número de registros (offsets), não em tempo; ele não representa o atraso temporal de uma mensagem.</p>
+</div>
+<div class="paragraph">
+<p>Se o <em>lag</em> é crescente, significa que a vazão (<em>throughput</em>) de processamento do seu consumidor não é suficiente, o que pode indicar a necessidade de mais threads de processamento, mas essas são limitadas pelo número de partições. Se o número de consumidores já é igual ao número de partições, será necessário encontrar um conjunto melhor de configurações que permita aumentar a vazão desses consumidores.</p>
+</div>
+<div class="paragraph">
+<p>É importante ressaltar que o <em>lag</em> não é o atraso de uma mensagem. No Kafka, o timestamp de uma mensagem é definido pela aplicação que a produz; isso significa que não há uma ordenação temporal dentro de uma partição, mas uma ordenação lógica. A partição é ordenada conforme a entrega da mensagem, e o lag não mede o atraso temporal de uma mensagem específica.</p>
+</div>
+<div class="paragraph">
+<p>É aceitável que o <em>lag</em> cresça? Sim. É possível que uma aplicação tenha uma vazão sustentável mesmo que o <em>lag</em> cresça em alguns momentos do dia. Isso depende das características do sistema e da necessidade de consumo da mensagem. Há aplicações cujo uso varia durante o dia, com picos e momentos de baixa. Se o processamento não é urgente, é possível que o <em>lag</em> acumulado nos momentos de pico seja consumido nos momentos de baixa. Acompanhar o <em>lag</em> é importante para se entender o comportamento da aplicação.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_taxa-de-consumo-ou-vazão-throughput">Taxa de consumo, ou vazão (<em>throughput</em>)</h4>
+<div class="paragraph">
+<p>A taxa de consumo em um consumidor Kafka pode ser expressa tanto em bytes quanto em mensagens. Essas duas métricas também podem ser relacionadas para se extrair o tamanho médio das mensagens consumidas. A métrica é exposta tanto por cliente quanto por tópico, quando um mesmo consumidor é usado para consumir diversos tópicos.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 2. Métricas de vazão de consumo do consumidor Kafka. As métricas são agrupadas por contexto (cliente e tópico) e expostas via JMX.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bytes-consumed-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Taxa média de bytes consumidos por segundo pelo cliente.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-consumed-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Taxa média de registros (mensagens) consumidos por segundo pelo cliente.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bytes-consumed-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tópico</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Taxa média de bytes consumidos por segundo para o tópico, no contexto do cliente.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}",topic="{topic}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-consumed-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tópico</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Taxa média de registros (mensagens) consumidos por segundo para o tópico, no contexto do cliente.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}",topic="{topic}"</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>As métricas por tópico permitem comparar a vazão entre tópicos consumidos pelo mesmo cliente. A razão entre <code>bytes-consumed-rate</code> e <code>records-consumed-rate</code> pode ser usada para estimar o tamanho médio dos registros consumidos.</p>
+</div>
+<div class="paragraph">
+<p>A vazão é a velocidade de processamento e pode ser comparada com a velocidade de produção de mensagens. Logicamente, toda mensagem produzida deve ser consumida em algum momento; quando a velocidade de produção é superior à velocidade de consumo, o <em>lag</em> tende a aumentar.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_métricas-de-processamento">Métricas de Processamento</h3>
+<div class="sect3">
+<h4 id="_tempo-médio-de-processamento">Tempo médio de processamento</h4>
+<div class="paragraph">
+<p>O processamento é sempre realizado entre chamadas ao método <code>poll</code>, que deve ser chamado constantemente. O <code>poll</code> retorna uma lista de mensagens — que pode ser vazia — e não uma única mensagem. Por isso, o tempo médio de processamento de uma mensagem deve ser calculado pela aplicação; o consumidor calcula apenas o tempo médio entre chamadas de <code>poll</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 3. Métricas de tempo entre chamadas de <code>poll</code> do consumidor Kafka. As métricas são expostas no contexto do cliente via JMX e ajudam a identificar intervalos longos sem <code>poll</code>.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time-between-poll-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo médio entre as chamadas de <code>poll</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>time-between-poll-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo máximo entre as chamadas de <code>poll</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>last-poll-seconds-ago</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo, em segundos, desde a última chamada de <code>poll</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Essa métrica é importante de ser monitorada, pois, caso algum consumidor tenha um tempo entre chamadas ao <code>poll</code> maior que <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_max.poll.interval.ms"><code>max.poll.interval.ms</code></a>, uma operação de rebalance será iniciada, o que pode reduzir a vazão.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_número-médio-de-mensagens-no-poll">Número médio de mensagens no <code>poll</code></h4>
+<div class="paragraph">
+<p>O Kafka Consumer não possui uma métrica que diga quantas mensagens retornam em cada chamada ao método <code>poll</code>. Essa métrica pode ser criada pela aplicação. Se você olhar a documentação, até encontrará a métrica <code>poll-records-avg</code>, mas ela é calculada pelo Kafka Streams e não está disponível no consumidor.</p>
+</div>
+<div class="paragraph">
+<p>Porém, podemos analisar quantos registros são retornados pelas requisições de <code>Fetch</code>. Lembre-se de que o <code>poll</code> retorna quando há registros disponíveis, até o limite de <a href="https://kafka.apache.org/44/configuration/consumer-configs/#consumerconfigs_max.poll.records"><code>max.poll.records</code></a>, ou quando o timeout fornecido via código expira. A chamada <code>poll</code> pode disparar assincronamente requisições de <code>Fetch</code> para dispor de mensagens na próxima chamada ao <code>poll</code>. Por isso, a métrica <code>records-per-request-avg</code> fornece uma informação importante: ela indica a eficácia média das requisições de <code>Fetch</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 4. Métricas de registros por requisição de <code>Fetch</code> do consumidor Kafka. A métrica é exposta no contexto do cliente via JMX e indica a eficácia média das requisições de <code>Fetch</code>.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-per-request-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Média de registros retornados por requisição de <code>Fetch</code> concluída.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Caso a operação de <code>Fetch</code> não esteja sendo eficaz, os parâmetros de <code>Fetch</code> podem ser alterados para reduzir o tempo de bloqueio do <code>poll</code>, fazendo com que as threads de processamento e de rede atuem coordenadamente. Exemplos de parâmetros que podem ser avaliados incluem <code>fetch.min.bytes</code>, <code>fetch.max.wait.ms</code>, <code>max.poll.records</code> e <code>max.partition.fetch.bytes</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_métricas-de-rede">Métricas de Rede</h3>
+<div class="sect3">
+<h4 id="_eficiência-do-fetch">Eficiência do <code>Fetch</code></h4>
+<div class="paragraph">
+<p>As métricas de eficiência do <code>Fetch</code> medem a latência e o volume de dados por requisição de busca. Latências altas podem indicar broker sobrecarregado ou rede lenta; tamanhos muito pequenos podem sugerir que o consumidor está buscando com frequência sem necessidade.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 5. Métricas de eficiência do <code>Fetch</code> do consumidor Kafka. As métricas de latência e de tamanho no contexto do cliente são expostas via JMX; as métricas de tamanho por tópico permitem comparar o comportamento entre tópicos consumidos pelo mesmo cliente.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-latency-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo médio gasto em uma requisição de <code>Fetch</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-latency-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo máximo gasto em uma requisição de <code>Fetch</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-size-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número médio de bytes retornados por requisição de <code>Fetch</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-size-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número máximo de bytes retornados por requisição de <code>Fetch</code>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-size-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tópico</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número médio de bytes retornados por requisição de <code>Fetch</code> para o tópico.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}",topic="{topic}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>fetch-size-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tópico</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número máximo de bytes retornados por requisição de <code>Fetch</code> para o tópico.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}",topic="{topic}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>records-per-request-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Média de registros retornados por requisição de <code>Fetch</code> concluída.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-fetch-manager-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_eficiência-da-rede">Eficiência da Rede</h4>
+<div class="paragraph">
+<p>As métricas de rede por nó medem a latência das requisições entre o consumidor e cada broker. Elas são úteis para isolar problemas de rede ou de um broker específico.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 6. Métricas de latência de requisição por nó (broker) do consumidor Kafka. As métricas são expostas por conexão com cada broker e ajudam a isolar problemas de rede ou de broker específico.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>request-latency-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nó (broker)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Latência média das requisições para o nó, em milissegundos.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-node-metrics,client-id="{client-id}",node-id="{node-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>request-latency-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nó (broker)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Latência máxima das requisições para o nó, em milissegundos.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-node-metrics,client-id="{client-id}",node-id="{node-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_métricas-de-coordenação">Métricas de Coordenação</h3>
+<div class="paragraph">
+<p>As métricas de coordenação cobrem o gerenciamento do grupo de consumidores: heartbeat, <em>rebalance</em> e commit de offset. Elas ajudam a diagnosticar instabilidade do grupo e a correlacionar pausas no processamento com variações de lag e de vazão.</p>
+</div>
+<div class="sect3">
+<h4 id="_heartbeat-e-rebalance"><em>Heartbeat</em> e <em>Rebalance</em></h4>
+<div class="paragraph">
+<p>O heartbeat mantém o consumidor vivo perante o group coordinator, enquanto as métricas de <em>rebalance</em> mostram o custo das redistribuições de partição.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 7. Métricas de <em>heartbeat</em> e <em>rebalance</em> do consumidor Kafka. Todas são expostas no contexto do cliente via JMX e permitem identificar membros inativos, <em>rebalances</em> frequentes ou <em>rebalances</em> demorados.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>heartbeat-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número médio de heartbeats enviados por segundo.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>heartbeat-response-time-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo máximo, em milissegundos, para receber resposta a uma requisição de heartbeat.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>last-heartbeat-seconds-ago</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número de segundos desde o último heartbeat enviado.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rebalance-latency-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo médio, em milissegundos, gasto em um rebalance do grupo.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rebalance-latency-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo máximo, em milissegundos, gasto em um rebalance do grupo.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rebalance-rate-per-hour</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número de rebalances dos quais o consumidor participou por hora. Valores altos indicam instabilidade.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_commit-de-offset">Commit de offset</h4>
+<div class="paragraph">
+<p>As métricas de commit mostram a frequência e a latência das operações de confirmação de offset. Commits lentos ou frequentes podem impactar o ciclo de <code>poll</code>.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Tabela 8. Métricas de commit de offset do consumidor Kafka. Todas são expostas no contexto do cliente via JMX e ajudam a avaliar o custo da confirmação de offsets.</caption>
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 33.3333%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Métrica</th>
+<th class="tableblock halign-left valign-top">Contexto</th>
+<th class="tableblock halign-left valign-top">Descrição</th>
+<th class="tableblock halign-left valign-top">MBean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>commit-rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Número de chamadas de commit de offset por segundo.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>commit-latency-avg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo médio, em milissegundos, gasto em uma requisição de commit.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>commit-latency-max</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cliente</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tempo máximo, em milissegundos, gasto em uma requisição de commit.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>kafka.consumer:type=consumer-coordinator-metrics,client-id="{client-id}"</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conclusão">Conclusão</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Neste post, vimos que o consumidor Kafka expõe um conjunto rico de métricas, organizadas por contexto (cliente, partição, tópico e nó) e agrupadas em MBeans distintos via JMX. Cada grupo responde a uma pergunta diferente: o <em>lag</em> diz se o consumidor está atrasado; a vazão diz a que velocidade ele processa; o tempo entre chamadas de <code>poll</code> diz se a thread de processamento está progredindo; as métricas de <code>Fetch</code> e de rede dizem se a comunicação com o broker está eficiente; e as métricas de coordenação dizem se o grupo está estável.</p>
+</div>
+<div class="paragraph">
+<p>A ideia central é que nenhuma métrica isolada conta a história completa. Um <em>lag</em> crescente pode ser causado por processamento lento, por <code>Fetch</code> ineficaz, por rebalances frequentes ou por limitação de partições. Por isso, o diagnóstico depende de correlacionar métricas de grupos diferentes, e é justamente essa correlação que serve de base para um mecanismo auto-adaptativo, como o que desenvolvi no mestrado. Ao perceber, por exemplo, que o <code>time-between-poll-avg</code> se aproxima de <code>max.poll.interval.ms</code> enquanto o <code>records-per-request-avg</code> permanece baixo, você pode ajustar <code>max.poll.records</code> ou <code>fetch.min.bytes</code> para reduzir as operaćões de rebalancing.</p>
+</div>
+<div class="paragraph">
+<p>Para quem está começando a monitorar consumidores Kafka, a recomendação é priorizar o <em>lag</em> e a vazão como painéis principais, e usar as métricas de processamento, rede e coordenação como ferramentas de diagnóstico quando algo sair do esperado. E lembre-se: as métricas evoluem a cada versão do Kafka, então vale revisitar periodicamente a página de <a href="https://kafka.apache.org/44/operations/monitoring/">Monitoring</a> da documentação oficial.</p>
+</div>
+<div class="paragraph">
+<p>Nos próximos posts, pretendo abordar as métricas do lado do produtor e do broker, fechando o ciclo de observabilidade de um cluster Kafka.</p>
+</div>
+</div>
+</div>]]></content><author><name>{&quot;youtube&quot;=&gt;&quot;https://www.youtube.com/@victor.osorio&quot;, &quot;linkedin&quot;=&gt;&quot;https://www.linkedin.com/in/victorosorio/&quot;, &quot;picture&quot;=&gt;&quot;/assets/images/me.avif&quot;}</name></author><category term="Apache Kafka" /><category term="Kafka" /><category term="Métricas" /><category term="Monitoramento" /><category term="JMX" /><summary type="html"><![CDATA[Um panorama das principais métricas do consumidor Apache Kafka, incluindo lag, vazão, tempo entre polls, eficiência de Fetch, rede e coordenação, com seus MBeans e dicas de monitoramento.]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.vepo.dev/assets/images/capas/metrics.jpg" /><media:content medium="image" url="https://blog.vepo.dev/assets/images/capas/metrics.jpg" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
